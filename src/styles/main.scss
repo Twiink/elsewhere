@@ -1,11 +1,11 @@
 // =============================================================================
-// MAIN STYLES ENTRY POINT - ITom Portfolio
+// ITom 作品集的样式入口。
 // =============================================================================
 
-// Foundation
+// 基础样式。
 @use 'variables';
 @use 'mixins';
 @use 'base';
 
-// Components
+// 组件。
 @use 'Preloader';

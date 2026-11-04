@@ -4,13 +4,13 @@ import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
 /**
- * Avatar Component - Hand-drawn sketch style character
+ * Avatar：手绘速写风格人物组件。
  * 
- * New sketchy avatar with WOW effects:
- * - Parallax depth effect on scroll
- * - Hand-drawn line style matching entrance
- * - Dodges when camera approaches
- * - Frame-by-frame animation (Boomerang effect: 1-6-1)
+ * 速写人物的视觉效果：
+ * - 随滚动产生景深视差。
+ * - 手绘线条与入口风格一致。
+ * - 相机靠近时躲避。
+ * - 逐帧往返动画：1→6→1。
  */
 const Avatar = ({ position = [10, -20, 30] }) => {
     const meshRef = useRef();
@@ -18,50 +18,50 @@ const Avatar = ({ position = [10, -20, 30] }) => {
     const [dimensions, setDimensions] = useState({ width: 1.2, height: 2.4 });
     const { camera } = useThree();
 
-    // Dodge state
+    // 躲避状态。
     const dodgeX = useRef(0);
     const targetDodgeX = useRef(0);
     const worldPosVec = useRef(new THREE.Vector3());
 
-    // --- FRAME-BY-FRAME ANIMATION (PING-PONG) ---
+    // 逐帧往返动画。
     const TOTAL_FRAMES = 9;
     const framePaths = Array.from({ length: TOTAL_FRAMES }, (_, i) => `/textures/corridor/avatar_anim/${i + 1}.webp`);
 
-    // Load all texture frames
+    // 加载全部纹理帧。
     const textures = useTexture(framePaths);
 
-    // Animation control refs
-    // start at index 0 (which refers to 1.webp)
+    // 动画控制引用。
+    // 从索引 0 开始，对应 1.webp。
     const currentFrame = useRef(0);
     const isReversing = useRef(false);
     const frameTimer = useRef(0);
 
-    // Apply color space and calculate dimensions once
+    // 一次性设置色彩空间并计算尺寸。
     useEffect(() => {
         textures.forEach(tex => tex.colorSpace = THREE.SRGBColorSpace);
 
         if (textures[0] && textures[0].image) {
             const aspectRatio = textures[0].image.width / textures[0].image.height;
-            const baseHeight = 2.3; // Fixed size
+            const baseHeight = 2.3; // 固定尺寸。
             setDimensions({
                 width: baseHeight * aspectRatio,
                 height: baseHeight
             });
         }
 
-        // Set initial texture to avoid white flash, but don't bind it declaratively 
-        // to prevent React from overwriting our useFrame mutations
+        // 设置初始纹理以避免白色闪烁，但不使用声明式绑定，
+        // 防止 React 覆盖 useFrame 中的修改。
         if (meshRef.current && textures[currentFrame.current]) {
             meshRef.current.material.map = textures[currentFrame.current];
             meshRef.current.material.needsUpdate = true;
         }
     }, [textures]);
 
-    // Main animation loop
+    // 主动画循环。
     useFrame((state, delta) => {
         if (!groupRef.current || !meshRef.current) return;
 
-        // === DODGE LOGIC ===
+        // 躲避逻辑。
         groupRef.current.getWorldPosition(worldPosVec.current);
         const distance = camera.position.z - worldPosVec.current.z;
 
@@ -85,36 +85,36 @@ const Avatar = ({ position = [10, -20, 30] }) => {
         groupRef.current.position.x = position[0] + dodgeX.current;
         groupRef.current.position.y = position[1];
 
-        // === FRAME ANIMATION LOGIC (PING-PONG) ===
-        // Using delta for consistent speed regardless of monitor Hz
-        const FPS = 20; // Prędkość machania (klatki na sekundę)
+        // 往返逐帧动画逻辑。
+        // 使用 delta，保证不同刷新率下速度一致。
+        const FPS = 20; // 挥手速度，每秒帧数。
         const frameDuration = 1 / FPS;
 
         frameTimer.current += delta;
 
         if (frameTimer.current >= frameDuration) {
-            frameTimer.current = 0; // Reset timer
+            frameTimer.current = 0; // 重置计时器。
 
-            // Jesteśmy na ostatniej (od prawej)? To machamy do lewej
+            // 到达最右侧帧后，向左播放。
             if (currentFrame.current >= TOTAL_FRAMES - 1) {
                 isReversing.current = true;
             }
-            // Jesteśmy na indeksie 0 (czyli 1.webp)? To machamy z powrotem do prawej
+            // 到达索引 0（1.webp）后，向右播放。
             else if (currentFrame.current <= 0) {
                 isReversing.current = false;
             }
 
-            // Przejście klatki
+            // 切换帧。
             if (isReversing.current) {
                 currentFrame.current -= 1;
             } else {
                 currentFrame.current += 1;
             }
 
-            // Zabezpieczenie przed błędem indeksu (nie schodzimy poniżej 0)
+            // 防止索引越界，最低不小于 0。
             const safeIndex = Math.max(0, Math.min(TOTAL_FRAMES - 1, currentFrame.current));
 
-            // Aplikacja tekstury
+            // 应用纹理。
             meshRef.current.material.map = textures[safeIndex];
             meshRef.current.material.needsUpdate = true;
         }
@@ -134,7 +134,7 @@ const Avatar = ({ position = [10, -20, 30] }) => {
     );
 };
 
-// Easing function
+// 缓动函数。
 const easeOutQuad = (t) => t * (2 - t);
 
 export default Avatar;

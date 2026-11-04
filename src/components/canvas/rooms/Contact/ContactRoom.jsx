@@ -12,8 +12,8 @@ import { useAudio } from '../../../../context/AudioManager';
 
 // ============================================
 // ============================================
-// 🌊 CONTACT ROOM v2 - MESSAGE IN A BOTTLE
-// Immersive experience: write message, roll into bottle, throw
+// 🌊 联系我房间第二版：漂流瓶留言。
+// 沉浸体验：写信、卷入瓶中、投出漂流瓶。
 // ============================================
 import { useTexture } from '@react-three/drei';
 import { usePaintMaterial } from '../Gallery/usePaintMaterial';
@@ -21,74 +21,74 @@ import { usePaintMaterial } from '../Gallery/usePaintMaterial';
 const WAVE_LAYERS = 4;
 
 // ============================================
-// ⚙️ AUDIO SETTINGS - TWEAK HERE
-// Edytuj te wartości, aby zmienić głośność i zasięg słyszalności szumu morza
+// ⚙️ 音频设置：在此调整。
+// 修改这些值可调整海浪声的音量和可听范围。
 // ============================================
 export const AUDIO_SETTINGS = {
     volume: 2,
-    distance: 2,           // Dystans, od którego dźwięk zaczyna cichnąć (refDistance)
-    rolloff: 1.2           // Szybkość cichnięcia (rolloffFactor)
+    distance: 2,           // 声音开始衰减的距离 refDistance。
+    rolloff: 1.2           // 声音衰减速度 rolloffFactor。
 };
 
 // ============================================
-// ⚙️ LATARNIA SETTINGS - TWEAK HERE
-// Edytuj te wartości, aby zmienić pozycję, obrót i wielkość latarni
+// ⚙️ 灯塔设置：在此调整。
+// 修改灯塔的位置、旋转和尺寸。
 // ============================================
 export const LATARNIA_SETTINGS = {
-    // Pozycja: [lewo/prawo (X), góra/dół (Y), tył/przód (Z)]
+    // 位置：[左右 X、上下 Y、前后 Z]。
     position: [-10, 5, -20],
 
-    // Rotacja: [przechył w przód/tył (X), obrót w lewo/prawo (Y), obrót na boki (Z)]
+    // 旋转：[前后倾斜 X、左右转向 Y、侧倾 Z]。
     rotation: [0, 0.1, 0],
 
-    // Wielkość: [szerokość, wysokość]
-    scale: [4.49, 5] // Legacy ratio 1102/1225
+    // 尺寸：[宽度、高度]。
+    scale: [4.49, 5] // 原始比例 1102/1225。
 };
 
 // ============================================
-// ⚙️ STATEK SETTINGS - TWEAK HERE
-// Edytuj te wartości, aby zmienić pozycję, obrót i wielkość statku
+// ⚙️ 船设置：在此调整。
+// 修改船的位置、旋转和尺寸。
 // ============================================
 export const STATEK_SETTINGS = {
-    // Pozycja: [lewo/prawo (X), góra/dół (Y), tył/przód (Z)]
+    // 位置：[左右 X、上下 Y、前后 Z]。
     position: [0, 1.6, -15],
 
-    // Rotacja: [przechył w przód/tył (X), obrót w lewo/prawo (Y), obrót na boki (Z)]
+    // 旋转：[前后倾斜 X、左右转向 Y、侧倾 Z]。
     rotation: [0, -0.2, 0],
 
-    // Wielkość: [szerokość, wysokość]
-    scale: [3.35, 1.3] // Legacy ratio 2525/978
+    // 尺寸：[宽度、高度]。
+    scale: [3.35, 1.3] // 原始比例 2525/978。
 };
 
 // ============================================
-// ⚙️ CAMERA SETTINGS - TWEAK HERE
+// ⚙️ 相机设置：在此调整。
 // ============================================
 const CAMERA_SETTINGS = {
-    // Rotation X: How much to look down (radians)
-    // -1.5 is straight down (-90 deg), -1.2 is ~70 deg
+    // X 旋转：低头角度，单位为弧度。
+    // -1.5 为接近垂直向下的 -90°，-1.2 约为 70°。
     lookDownAngle: -1.2,
 
-    // Rotation Y: Left/Right turn
-    // Set to 0 to force center, or null to keep current direction
-    forceCenterY: -1.05, // FORCE CENTER to align paper straight
+    // Y 旋转：左右转向。
+    // 设为 0 强制居中，设为 null 保留当前方向。
+    forceCenterY: -1.05, // 强制居中，让纸张保持正对。
 
-    // Rotation Z: Tilt/Roll
-    // Set to 0 to straighten the camera
+    // Z 旋转：侧倾。
+    // 设为 0 使相机摆正。
     forceStraightZ: 0,
 
-    // Animation speed
+    // 动画速度。
     lerpSpeed: 2.5
 };
 
-// Experience phases
+// 体验阶段。
 const PHASE = {
-    ENTERING: 'entering',      // Camera entering room, looking at menu
-    LOOKING_DOWN: 'looking_down', // Camera animating to look at dock
-    WRITING: 'writing',        // User writing on paper
-    ROLLING: 'rolling',        // Paper rolling into bottle
-    HOLDING: 'holding',        // Camera holding bottle, looking at sea
-    THROWING: 'throwing',      // Bottle being thrown
-    DONE: 'done'               // Bottle floating away
+    ENTERING: 'entering',      // 相机进入房间，面向菜单。
+    LOOKING_DOWN: 'looking_down', // 相机转向码头的动画。
+    WRITING: 'writing',        // 用户在纸上写信。
+    ROLLING: 'rolling',        // 信纸卷入瓶中。
+    HOLDING: 'holding',        // 相机持瓶面向海面。
+    THROWING: 'throwing',      // 投出瓶子。
+    DONE: 'done'               // 瓶子漂远。
 };
 
 const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
@@ -111,17 +111,17 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         }
     }, [isExiting, isTeleporting, hidePopup]);
 
-    // Load Sea Texture
+    // 加载海面纹理。
     const seaTexture = useTexture("/textures/contact/faletopdown.webp");
-    // Load Molo Texture
+    // 加载码头纹理。
     const moloTexture = useTexture("/textures/contact/molo.webp");
-    // Load Latarnia Texture
+    // 加载灯塔纹理。
     const latarniaTexture = useTexture("/textures/contact/latarnia.webp");
-    // Load Statek Texture
+    // 加载船纹理。
     const statekTexture = useTexture("/textures/contact/statek.webp");
 
 
-    // Configure texture repeating (1:1 scale)
+    // 配置纹理按 1:1 比例重复。
     useEffect(() => {
         if (seaTexture) {
             seaTexture.wrapS = seaTexture.wrapT = THREE.MirroredRepeatWrapping;
@@ -139,23 +139,23 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     }, [seaTexture, moloTexture]);
 
     useEffect(() => {
-        // Change to YXZ smoothly on mount for proper head nodding, 
-        // avoiding mathematical snapping of the Euler angles.
+        // 挂载时平滑切换为 YXZ 顺序，使点头动作正确，
+        // 避免欧拉角计算造成跳变。
         camera.rotation.reorder('YXZ');
 
         return () => {
-            // Restore default XYZ on unmount so other rooms/corridors don't break
+            // 卸载时恢复默认 XYZ，避免影响其他房间或走廊。
             camera.rotation.reorder('XYZ');
         };
     }, [camera]);
 
-    // ===== PAINT TRANSITION =====
-    // Contact is on the RIGHT side of the corridor, so reveal goes from right (+X) into the room
+    // 上色过渡。
+    // 联系我房间位于走廊右侧，显现从右侧 +X 向房间内部推进。
     const groupRef = useRef();
     const { onBeforeCompile, animatePaint, resetPaint, uniformsData, updateRoomOrigin } = usePaintMaterial({
-        dirX: 1.0,    // Opposite to Gallery (right side door)
+        dirX: 1.0,    // 与画廊方向相反，对应右侧门。
         dirY: 0.0,
-        dirZ: -0.1,   // Slight angle matching mirrored direction
+        dirZ: -0.1,   // 略微倾斜以匹配镜像方向。
         startDist: -5.0,
         endDist: 55.0,
         noiseAxes: 'yz'
@@ -186,35 +186,35 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         }
     }, [showRoom, isWarmup, isTeleporting]);
 
-    // Track if we've signaled ready
+    // 跟踪是否已发出就绪信号。
     const hasSignaledReady = useRef(false);
     const frameCount = useRef(0);
     const FRAMES_TO_WAIT = 5;
 
-    // Phase state
+    // 阶段状态。
     const [currentPhase, setCurrentPhase] = useState(PHASE.ENTERING);
     const [showSelection, setShowSelection] = useState(true);
 
     const hasAnimatedDown = useRef(false);
-    // Latch exit state to prevent glitch
+    // 锁定退出状态，防止闪变。
     const hasExitTriggered = useRef(false);
     if (isExiting && !hasExitTriggered.current) {
         hasExitTriggered.current = true;
-        // Do NOT reorder to XYZ here. Let DoorSection's GSAP animate camera back to the door
-        // while remaining in YXZ order. This prevents "neck snapping" because interpolating 
-        // to X=0 in YXZ order naturally lifts the head up without twisting the neck.
+        // 此处不切回 XYZ，让 DoorSection 的 GSAP 在 YXZ 下将相机移回门边。
+        // 这样可防止视角突然扭转，因为在 YXZ 下
+        // 将 X 插值到 0 会自然抬头，而不会扭曲转向。
     }
 
-    // Refs for animations
+    // 动画引用。
     const waveRefs = useRef([]);
-    const statekRef = useRef(); // Ref for ship animation
+    const statekRef = useRef(); // 船动画引用。
 
-    // Target rotation values
+    // 目标旋转值。
     const targetRotX = useRef(0);
     const targetRotY = useRef(0);
     const targetRotZ = useRef(0);
 
-    // Reset camera rotation when teleporting starts
+    // 传送开始时重置相机旋转。
     useEffect(() => {
         if (isTeleporting) {
             hasAnimatedDown.current = false;
@@ -223,18 +223,18 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             targetRotY.current = 0;
             targetRotZ.current = 0;
             setCurrentPhase(PHASE.ENTERING);
-            setShowSelection(true); // Reset selection menu
+            setShowSelection(true); // 重置选择菜单。
         }
     }, [isTeleporting]);
 
-    // This effect now initializes the room but DOES NOT trigger look down
+    // 此效果只初始化房间，不再触发低头。
     useEffect(() => {
         if (hasSignaledReady.current && !hasAnimatedDown.current && showRoom) {
-            // Just ensure we are in entering phase
-            // We wait for user selection to trigger the rest
+            // 只确保处于 entering 阶段。
+            // 等待用户选择后触发后续过程。
         }
 
-        // EXIT ANIMATION CLEANUP
+        // 退出动画清理。
         if (!showRoom) {
             hasExitTriggered.current = false;
             if (hasAnimatedDown.current) {
@@ -248,47 +248,47 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     }, [hasSignaledReady.current, showRoom, camera]);
 
     const handleMailSelect = () => {
-        // Awaryjne przekierowanie mailto:
+        // 备用 mailto 跳转。
         window.location.href = 'mailto:tomszma12@gmail.com';
 
         /* 
         setShowSelection(false);
 
-        // Trigger the look down sequence
+        // 触发低头过程。
         hasAnimatedDown.current = true;
         hasExitTriggered.current = false;
 
-        // Capture landing rotation (usually 0,0,0)
+        // 保存落点旋转，通常为 0,0,0。
         targetRotX.current = camera.rotation.x;
         targetRotY.current = camera.rotation.y;
         targetRotZ.current = camera.rotation.z;
 
-        // Start sequence directly
+        // 直接开始流程。
         setCurrentPhase(PHASE.LOOKING_DOWN);
 
-        // 1. SET X (Looking down)
+        // 1. 设置 X：低头。
         targetRotX.current = CAMERA_SETTINGS.lookDownAngle;
 
-        // 2. SET Y (Turning)
+        // 2. 设置 Y：转向。
         if (CAMERA_SETTINGS.forceCenterY !== null) {
             targetRotY.current = CAMERA_SETTINGS.forceCenterY;
         }
 
-        // 3. SET Z (Tilt)
+        // 3. 设置 Z：侧倾。
         if (CAMERA_SETTINGS.forceStraightZ !== null) {
             targetRotZ.current = CAMERA_SETTINGS.forceStraightZ;
         }
 
-        // Phase transition
+        // 阶段过渡。
         setTimeout(() => {
             setCurrentPhase(PHASE.WRITING);
         }, 1500);
         */
     };
 
-    // Frame Loop
+    // 逐帧循环。
     useFrame((state, delta) => {
-        // Update room origin for paint shader
+        // 为上色着色器更新房间原点。
         updateRoomOrigin(groupRef);
 
         if (!hasSignaledReady.current) {
@@ -300,22 +300,22 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             }
         }
 
-        // 1. Camera Animation (Simple Lerp)
+        // 1. 相机动画，使用简单线性插值。
         if (hasAnimatedDown.current && !isExiting && !hasExitTriggered.current) {
-            // Only animate if we started the 'look down' sequence AND we are NOT exiting.
-            // When exiting, DoorSection.jsx takes full control of the camera with GSAP.
+            // 仅在低头过程已开始且未退出时执行动画。
+            // 退出时由 DoorSection.jsx 通过 GSAP 完全接管相机。
 
-            // Clamp delta to prevent massive jumps when React re-renders lag the frame rate
+            // 限制 delta，避免 React 重渲染导致低帧率时大幅跳动。
             const safeDelta = Math.min(delta, 0.033);
             const lerpSpeed = safeDelta * CAMERA_SETTINGS.lerpSpeed;
 
-            // NORMAL MODE (Look Down)
+            // 正常模式：低头。
             camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, targetRotX.current, lerpSpeed);
             camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, targetRotY.current, lerpSpeed);
             camera.rotation.z = THREE.MathUtils.lerp(camera.rotation.z, targetRotZ.current, lerpSpeed);
         }
 
-        // 2. Wave Animation
+        // 2. 波浪动画。
         const time = state.clock.getElapsedTime();
         waveRefs.current.forEach((ref, i) => {
             if (ref) {
@@ -326,19 +326,19 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             }
         });
 
-        // 2.5 Ship Animation (bobbing with waves and sailing)
+        // 2.5 船随波浮动并航行。
         if (statekRef.current) {
-            // 🌊 Bobbing up and down (Y axis)
+            // 🌊 沿 Y 轴上下浮动。
             const bobSpeed = 0.8;
             const bobAmplitude = 0.3;
             statekRef.current.position.y = STATEK_SETTINGS.position[1] + Math.sin(time * bobSpeed) * bobAmplitude;
 
-            // ⛵ Sailing left and right (X axis)
-            const sailSpeed = 0.04; // znacznie wolniejsze pływanie (było 0.15)
-            const sailAmplitude = 12; // mniejszy obszar pływania, by nie wyjeżdżał za ekran (było 25)
+            // ⛵ 沿 X 轴左右航行。
+            const sailSpeed = 0.04; // 显著减慢航行速度，原值为 0.15。
+            const sailAmplitude = 12; // 缩小航行区域，防止驶出屏幕，原值为 25。
             statekRef.current.position.x = STATEK_SETTINGS.position[0] + Math.sin(time * sailSpeed) * sailAmplitude;
 
-            // 🔄 Add a slight tilt on the Z axis (roll)
+            // 🔄 添加轻微 Z 轴侧倾。
             const rollAmplitude = 0.05;
             statekRef.current.rotation.z = Math.sin(time * bobSpeed * 1.2) * rollAmplitude;
         }
@@ -349,7 +349,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 
     useEffect(() => {
         const checkMobile = () => {
-            setIsMobile(window.innerWidth < 1000); // 1000px breakpoint to catch tablets/phones
+            setIsMobile(window.innerWidth < 1000); // 1000 像素断点，覆盖平板和手机。
         };
         checkMobile();
         window.addEventListener('resize', checkMobile);
@@ -371,10 +371,10 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 />
             )}
 
-            {/* ☁️ CLOUDS */}
+            {/* ☁️ 云层。 */}
             <GalleryClouds count={45} seed={88} rotationOffset={[0, 1, 0]} />
 
-            {/* 🌊 OCEAN WAVE LAYERS */}
+            {/* 🌊 海浪图层。 */}
             <group position={[0, -1, -8]}>
                 {Array.from({ length: WAVE_LAYERS }).map((_, i) => (
                     <mesh
@@ -397,8 +397,8 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 ))}
             </group>
 
-            {/* 🛢️ SOCIAL BARRELS (Floating in water) */}
-            {/* LINKEDIN */}
+            {/* 🛢️ 漂浮在水中的社交木桶。 */}
+            {/* LinkedIn 社交木桶。 */}
             <SocialBarrel
                 position={isMobile ? [-1.2, 0.5, -10] : [-3, 0.5, -10]}
                 rotation={[0, 0.2, 0]}
@@ -408,7 +408,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 paintOnBeforeCompile={onBeforeCompile}
                 paintUniforms={uniformsData}
             />
-            {/* GITHUB */}
+            {/* GitHub 社交木桶。 */}
             <SocialBarrel
                 position={isMobile ? [-1.5, -0.3, -7] : [-5, -0.3, -8]}
                 rotation={[0, 0.3, 0]}
@@ -418,7 +418,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 paintOnBeforeCompile={onBeforeCompile}
                 paintUniforms={uniformsData}
             />
-            {/* FACEBOOK */}
+            {/* Facebook 社交木桶。 */}
             <SocialBarrel
                 position={isMobile ? [1.2, 0.5, -10] : [3, 0.5, -10]}
                 rotation={[0, -0.2, 0]}
@@ -428,7 +428,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 paintOnBeforeCompile={onBeforeCompile}
                 paintUniforms={uniformsData}
             />
-            {/* INSTAGRAM */}
+            {/* Instagram 社交木桶。 */}
             <SocialBarrel
                 position={isMobile ? [1.5, -0.3, -7] : [5, -0.3, -8]}
                 rotation={[0, -0.3, 0]}
@@ -438,19 +438,19 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 paintOnBeforeCompile={onBeforeCompile}
                 paintUniforms={uniformsData}
             />
-            {/* MAIL (Triggers animation) */}
+            {/* 邮件，触发动画。 */}
             <SocialBarrel
                 position={isMobile ? [0, -0.7, -6] : [0, -0.7, -7]}
                 rotation={[0, 0, 0]}
                 texturePath="/textures/contact/beczka.webp"
-                label="MESSAGE"
+                label="写留言"
                 onClick={handleMailSelect}
                 paintOnBeforeCompile={onBeforeCompile}
                 paintUniforms={uniformsData}
             />
 
 
-            {/* 🏖️ DOCK / MOLO */}
+            {/* 🏖️ 码头。 */}
             <mesh
                 position={[0, 0.05, 1.8]}
                 rotation={[-Math.PI / 2, 0, 0]}
@@ -466,7 +466,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 />
             </mesh>
 
-            {/* 🗼 LATARNIA (LIGHTHOUSE) */}
+            {/* 🗼 灯塔。 */}
             <mesh
                 position={LATARNIA_SETTINGS.position}
                 rotation={LATARNIA_SETTINGS.rotation}
@@ -481,7 +481,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 />
             </mesh>
 
-            {/* 🚢 STATEK (SHIP) */}
+            {/* 🚢 船。 */}
             <mesh
                 ref={statekRef}
                 position={STATEK_SETTINGS.position}
@@ -497,15 +497,15 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 />
             </mesh>
 
-            {/* 📜 INTERACTIVE MESSAGE PAPER */}
-            {/* Only show when not selecting or when diving in? 
-                Actually we want it there but enabled only after selection
+            {/* 📜 交互信纸。 */}
+            {/* 选择前是否显示信纸。
+                保留信纸，但仅在完成选择后启用。
             */}
             <group visible={!showSelection}>
                 <MessagePaper
                     position={[0, 0.07, 2]}
                     onSend={(data) => {
-                        // console.log('📬 Contact form submitted:', data);
+                        // console.log('📬 联系表单已提交：', data);
                         unlockAchievement('contact_submit');
                     }}
                 />

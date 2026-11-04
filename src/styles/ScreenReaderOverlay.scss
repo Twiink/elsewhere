@@ -1,20 +1,20 @@
-// ScreenReaderOverlay — A7 Accessibility Styles
-// Visually hidden but fully accessible to screen readers
+// ScreenReaderOverlay 无障碍样式。
+// 视觉隐藏，但屏幕阅读器仍可完整访问。
 
 .sr-overlay {
-    // Overlay sits on top of canvas but is invisible
+    // 位于画布上方的不可见层。
     position: fixed;
     inset: 0;
-    z-index: 1; // Below all UI (z-index: 100) but above nothing visible
+    z-index: 1; // 低于所有界面元素（z-index=100），不覆盖可见内容。
     pointer-events: none;
 
-    // All interactive elements need pointer-events
+    // 所有交互元素需要启用 pointer-events。
     button, a {
         pointer-events: auto;
     }
 }
 
-// Visually hidden — accessible to SR only
+// 视觉隐藏，仅屏幕阅读器可访问。
 .sr-only {
     position: absolute !important;
     width: 1px !important;
@@ -27,7 +27,7 @@
     border: 0 !important;
 }
 
-// Focusable skip link — becomes visible on focus
+// 可聚焦跳转链接，聚焦后显示。
 .sr-focusable:focus {
     position: fixed !important;
     top: 8px;
@@ -43,7 +43,7 @@
     background: #1a1a1a;
     color: #ffffff;
     font-size: 14px;
-    font-family: 'Inter', sans-serif;
+    font-family: '霞鹜文楷', 'Inter', sans-serif;
     font-weight: 600;
     border-radius: 8px;
     text-decoration: none;

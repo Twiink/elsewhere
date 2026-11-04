@@ -13,14 +13,14 @@ const SOTD_FILES = [
 ];
 
 async function fixAwardsToSquarePOT() {
-  console.log('Fixing SOTD Awards to Square POT (512x512) for stretching in code...');
+  console.log('将每日最佳奖项纹理转为 512×512 二次幂正方形，供代码还原比例……');
   for (const file of SOTD_FILES) {
     const backupPath = path.join(BACKUP_DIR, file);
     const targetPath = path.join(TARGET_DIR, file);
 
     if (fs.existsSync(backupPath)) {
-      console.log(`Processing ${file}...`);
-      // Resize to 512x512 with fill (distorting to square so code can stretch it back)
+      console.log(`正在处理 ${file}……`);
+      // 填充缩放至 512×512；先拉伸为正方形，再由代码还原比例。
       await sharp(backupPath)
         .resize(512, 512, {
           fit: 'fill'
@@ -29,12 +29,12 @@ async function fixAwardsToSquarePOT() {
         .toFile(targetPath + '.tmp');
       
       fs.renameSync(targetPath + '.tmp', targetPath);
-      console.log(`Updated ${file} to 512x512 (filled)`);
+      console.log(`已将 ${file} 填充缩放为 512×512`);
     } else {
-      console.error(`Backup not found for ${file}`);
+      console.error(`未找到 ${file} 的备份`);
     }
   }
-  console.log('SOTD Awards Square fix complete!');
+  console.log('每日最佳奖项纹理修复完成！');
 }
 
 fixAwardsToSquarePOT();

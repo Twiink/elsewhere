@@ -8,16 +8,16 @@ import AchievementPopup from './AchievementPopup';
 import AchievementsPanel from './AchievementsPanel';
 import '../../styles/NavigationUI.scss';
 
-// Room data for the map - positions are percentages on the map image
-// These positions correspond to the visual elements on the map
+// 地图房间数据，位置以地图图片的百分比表示。
+// 这些坐标对应地图上的视觉元素。
 const ROOMS = [
-    { id: 'about', label: 'About', x: 43, y: 38 },      // Paper airplane (left side)
-    { id: 'gallery', label: 'Gallery', x: 43, y: 72 },  // City buildings (bottom left)
-    { id: 'contact', label: 'Contact', x: 57, y: 25 },  // Pier/dock (top right)
-    { id: 'studio', label: 'Studio', x: 57, y: 55 },    // Monitors stack (right side)
+    { id: 'about', label: "关于我", x: 43, y: 38 },      // 左侧纸飞机。
+    { id: 'gallery', label: "画廊", x: 43, y: 72 },  // 左下城市建筑。
+    { id: 'contact', label: "联系我", x: 57, y: 25 },  // 右上码头。
+    { id: 'studio', label: "工作室", x: 57, y: 55 },    // 右侧显示器堆。
 ];
 
-// Pin starting position - the dashed circle at the bottom of the tower
+// 图钉起始位置，位于塔底部的虚线圆。
 const PIN_START_POSITION = { x: 50.5, y: 97 };
 
 const NavigationUI = () => {
@@ -26,15 +26,15 @@ const NavigationUI = () => {
     const { showTutorial, unlockAchievement } = useAchievements();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [hoveredRoom, setHoveredRoom] = useState(null);
-    const [isExiting, setIsExiting] = useState(false); // Track when back button is clicked
+    const [isExiting, setIsExiting] = useState(false); // 跟踪返回按钮点击状态。
 
-    // Audio controls state
+    // 音频控制状态。
     const [isAudioMenuOpen, setIsAudioMenuOpen] = useState(false);
     const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
     const [bgmVol, setBgmVol] = useState(0.3);
     const [isUIHidden, setIsUIHidden] = useState(false);
 
-    // Refs for focus management
+    // 焦点管理引用。
     const mapPanelRef = useRef();
     const mapCloseRef = useRef();
 
@@ -59,8 +59,8 @@ const NavigationUI = () => {
     };
 
     useEffect(() => {
-        // About (zone: left 10%, top 20%, width 30%, height 35%)
-        // -> X: 10% to 40%, Y: 20% to 55%
+        // 关于我区域：左 10%、上 20%、宽 30%、高 35%。
+        // X 范围 10% 至 40%，Y 范围 20% 至 55%。
         if (paintedMapsRefs.about.current) {
             gsap.to(paintedMapsRefs.about.current, {
                 clipPath: (hoveredRoom === 'about' || currentRoom === 'about')
@@ -71,8 +71,8 @@ const NavigationUI = () => {
             });
         }
 
-        // Gallery (zone: left 10%, bottom 8%, width 30%, height 35%)
-        // -> X: 10% to 40%, Y: 57% to 92% (since bottom=8% means top is 100-8-35=57%)
+        // 画廊区域：左 10%、下 8%、宽 30%、高 35%。
+        // X 为 10% 至 40%，Y 为 57% 至 92%；顶部为 100-8-35=57%。
         if (paintedMapsRefs.gallery.current) {
             gsap.to(paintedMapsRefs.gallery.current, {
                 clipPath: (hoveredRoom === 'gallery' || currentRoom === 'gallery')
@@ -83,8 +83,8 @@ const NavigationUI = () => {
             });
         }
 
-        // Contact (zone: right 5%, top 10%, width 35%, height 25%)
-        // -> X: 60% to 95% (since right=5% means left is 100-5-35=60%), Y: 10% to 35%
+        // 联系我区域：右 5%、上 10%、宽 35%、高 25%。
+        // X 为 60% 至 95%，Y 为 10% 至 35%；左侧为 100-5-35=60%。
         if (paintedMapsRefs.contact.current) {
             gsap.to(paintedMapsRefs.contact.current, {
                 clipPath: (hoveredRoom === 'contact' || currentRoom === 'contact')
@@ -95,8 +95,8 @@ const NavigationUI = () => {
             });
         }
 
-        // Studio (zone: right 15%, bottom 19%, width 25%, height 40%)
-        // -> X: 60% to 85% (since right=15% means left is 100-15-25=60%), Y: 41% to 81% (since bottom=19% means top is 100-19-40=41%)
+        // 工作室区域：右 15%、下 19%、宽 25%、高 40%。
+        // X 为 60% 至 85%，Y 为 41% 至 81%；左侧为 100-15-25=60%，顶部为 100-19-40=41%。
         if (paintedMapsRefs.studio.current) {
             gsap.to(paintedMapsRefs.studio.current, {
                 clipPath: (hoveredRoom === 'studio' || currentRoom === 'studio')
@@ -124,7 +124,7 @@ const NavigationUI = () => {
         setMusicVolume(val);
     };
 
-    // Show entrance hint before entering, and explore hint when user enters
+    // 进入前显示入口提示，进入后显示探索提示。
     useEffect(() => {
         if (!hasEntered && !isTeleporting) {
             showTutorial('corridor_enter');
@@ -133,7 +133,7 @@ const NavigationUI = () => {
         }
     }, [hasEntered, isTeleporting, isInRoom, showTutorial]);
 
-    // Close menu when entering a room or starting teleport
+    // 进入房间或开始传送时关闭菜单。
     useEffect(() => {
         if (isInRoom || isTeleporting) {
             setIsMenuOpen(false);
@@ -143,22 +143,22 @@ const NavigationUI = () => {
         }
     }, [isInRoom, isTeleporting]);
 
-    // Reset exiting state when not in room anymore
+    // 离开房间后重置退出状态。
     useEffect(() => {
         if (!isInRoom) {
             setIsExiting(false);
         }
     }, [isInRoom]);
 
-    // A4: Focus management for map panel — auto-focus, Escape, and focus trap
+    // 地图焦点管理：自动聚焦、Esc 关闭与焦点限制。
     useEffect(() => {
         if (isMenuOpen) {
-            // Auto-focus on close button when map opens
+            // 地图打开时自动聚焦关闭按钮。
             setTimeout(() => mapCloseRef.current?.focus(), 100);
         }
     }, [isMenuOpen]);
 
-    // Global Escape key handler — closes any open panel
+    // 全局 Esc 处理，关闭已打开的面板。
     useEffect(() => {
         const handleEscape = (e) => {
             if (e.key === 'Escape') {
@@ -171,7 +171,7 @@ const NavigationUI = () => {
         return () => window.removeEventListener('keydown', handleEscape);
     }, [isMenuOpen, isAudioMenuOpen, isAchievementsOpen]);
 
-    // Focus trap handler for map panel
+    // 地图面板焦点循环处理。
     const handleMapKeyDown = (e) => {
         if (e.key !== 'Tab' || !mapPanelRef.current) return;
 
@@ -184,13 +184,13 @@ const NavigationUI = () => {
         const last = focusable[focusable.length - 1];
 
         if (e.shiftKey) {
-            // Shift+Tab on first element → wrap to last
+            // 首项按 Shift+Tab 时跳至末项。
             if (document.activeElement === first) {
                 e.preventDefault();
                 last.focus();
             }
         } else {
-            // Tab on last element → wrap to first
+            // 末项按 Tab 时跳至首项。
             if (document.activeElement === last) {
                 e.preventDefault();
                 first.focus();
@@ -199,10 +199,10 @@ const NavigationUI = () => {
     };
 
     const handleRoomClick = (roomId) => {
-        // Don't teleport to the same room or if already teleporting
+        // 不传送到当前房间，正在传送时也不重复触发。
         if (roomId === currentRoom || isTeleporting) return;
 
-        // Close map first, then start teleport
+        // 先关闭地图，再开始传送。
         setIsMenuOpen(false);
         setIsAudioMenuOpen(false);
         setIsAchievementsOpen(false);
@@ -210,22 +210,22 @@ const NavigationUI = () => {
     };
 
     const handleBackClick = () => {
-        setIsExiting(true); // Immediately start exit animation
-        // Request exit - DoorSection will handle the animation
+        setIsExiting(true); // 立即开始退出动画。
+        // 发出退出请求，由 DoorSection 执行动画。
         requestExit();
     };
 
     return (
         <div className="navigation-ui">
-            {/* Global Achievement Popup */}
+            {/* 全局成就弹窗。 */}
             <AchievementPopup />
 
-            {/* Back Button - Only visible in rooms, hides up when clicked */}
+            {/* 返回按钮仅在房间内显示，点击后向上隐藏。 */}
             {hasEntered && isInRoom && (
                 <button
                     className={`nav-btn back-btn ${isExiting ? 'exiting' : ''}`}
                     onClick={handleBackClick}
-                    aria-label="Back to corridor"
+                    aria-label="返回走廊"
                 >
                     <svg viewBox="0 0 24 24" className="icon-back">
                         <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -233,14 +233,14 @@ const NavigationUI = () => {
                 </button>
             )}
 
-            {/* Right side controls - Only visible after entering */}
+            {/* 右侧控制按钮，进入后才显示。 */}
             {hasEntered && (
                 <div className={`nav-controls ${isMenuOpen || isAudioMenuOpen ? 'menu-open' : ''} ${isUIHidden ? 'ui-hidden' : ''}`}>
-                    {/* Hamburger Menu Button */}
+                    {/* 菜单按钮。 */}
                     <button
                         className={`nav-btn hamburger-btn ${isMenuOpen ? 'open' : ''}`}
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        aria-label="Toggle menu"
+                        aria-label="展开或收起菜单"
                         aria-expanded={isMenuOpen}
                     >
                         <div className="hamburger-icon">
@@ -249,11 +249,11 @@ const NavigationUI = () => {
                             <span></span>
                         </div>
                     </button>
-                    {/* Audio Toggle Button */}
+                    {/* 音频切换按钮。 */}
                     <button
                         className={`nav-btn audio-btn ${isAudioMenuOpen ? 'open' : ''}`}
                         onClick={() => setIsAudioMenuOpen(!isAudioMenuOpen)}
-                        aria-label="Audio Settings"
+                        aria-label="声音设置"
                         aria-expanded={isAudioMenuOpen}
                     >
                         {isMuted ? (
@@ -270,11 +270,11 @@ const NavigationUI = () => {
                             </svg>
                         )}
                     </button>
-                    {/* Achievements Toggle Button */}
+                    {/* 成就切换按钮。 */}
                     <button
                         className={`nav-btn achievements-btn ${isAchievementsOpen ? 'open' : ''}`}
                         onClick={() => setIsAchievementsOpen(!isAchievementsOpen)}
-                        aria-label="Achievements"
+                        aria-label="探索成就"
                         aria-expanded={isAchievementsOpen}
                     >
                         <svg viewBox="0 0 24 24" className="icon-trophy">
@@ -286,10 +286,10 @@ const NavigationUI = () => {
                 </div>
             )}
 
-            {/* Map Panel - Drops from top when open */}
+            {/* 地图面板，打开时从上方落下。 */}
             {hasEntered && (
-                <div className={`map-panel ${isMenuOpen ? 'open' : ''}`} inert={!isMenuOpen ? true : undefined} ref={mapPanelRef} onKeyDown={handleMapKeyDown} role="dialog" aria-label="Map">
-                    {/* SVG Border Overlay */}
+                <div className={`map-panel ${isMenuOpen ? 'open' : ''}`} inert={!isMenuOpen ? true : undefined} ref={mapPanelRef} onKeyDown={handleMapKeyDown} role="dialog" aria-label="地图">
+                    {/* SVG 边框叠加层。 */}
                     <svg
                         className="map-border-overlay"
                         viewBox="0 0 100 100"
@@ -317,12 +317,12 @@ const NavigationUI = () => {
 
                     <div className="map-content-clipped">
                         <div className="map-header">
-                            <h3>MAP</h3>
+                            <h3>地图</h3>
                             <button
                                 ref={mapCloseRef}
                                 className="close-btn"
                                 onClick={() => setIsMenuOpen(false)}
-                                aria-label="Close map"
+                                aria-label="关闭地图"
                             >
                                 <svg viewBox="0 0 24 24">
                                     <path d="M18 6L6 18M6 6l12 12" />
@@ -330,16 +330,16 @@ const NavigationUI = () => {
                             </button>
                         </div>
                         <div className="map-container">
-                            {/* Map background image */}
-                            <img src="/images/map.webp" alt="Portfolio Map" className="map-image" />
+                            {/* 地图背景图片。 */}
+                            <img src="/images/map.webp" alt="作品集地图" className="map-image" />
 
-                            {/* Painted Map Overlays */}
+                            {/* 地图彩色叠加层。 */}
                             <img ref={paintedMapsRefs.about} src="/images/map_about_painted.webp" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(10% 20%, 10% 20%, 10% 55%, 10% 55%)' }} />
                             <img ref={paintedMapsRefs.gallery} src="/images/map_gallery_painted.webp" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(10% 57%, 10% 57%, 10% 92%, 10% 92%)' }} />
                             <img ref={paintedMapsRefs.contact} src="/images/map_contact_painted.webp" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(95% 10%, 95% 10%, 95% 35%, 95% 35%)' }} />
                             <img ref={paintedMapsRefs.studio} src="/images/map_studio_painted.webp" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(85% 41%, 85% 41%, 85% 81%, 85% 81%)' }} />
 
-                            {/* Hover Zones — 4 quadrants covering the map */}
+                            {/* 四个悬停区域覆盖地图。 */}
                             <button
                                 type="button"
                                 className="map-hover-zone zone-about"
@@ -348,7 +348,7 @@ const NavigationUI = () => {
                                 onFocus={() => setHoveredRoom('about')}
                                 onBlur={() => setHoveredRoom(null)}
                                 onClick={() => handleRoomClick('about')}
-                                aria-label="Teleport to About room"
+                                aria-label="前往关于我房间"
                             />
                             <button
                                 type="button"
@@ -358,7 +358,7 @@ const NavigationUI = () => {
                                 onFocus={() => setHoveredRoom('gallery')}
                                 onBlur={() => setHoveredRoom(null)}
                                 onClick={() => handleRoomClick('gallery')}
-                                aria-label="Teleport to Gallery room"
+                                aria-label="前往画廊房间"
                             />
                             <button
                                 type="button"
@@ -368,7 +368,7 @@ const NavigationUI = () => {
                                 onFocus={() => setHoveredRoom('contact')}
                                 onBlur={() => setHoveredRoom(null)}
                                 onClick={() => handleRoomClick('contact')}
-                                aria-label="Teleport to Contact room"
+                                aria-label="前往联系我房间"
                             />
                             <button
                                 type="button"
@@ -378,16 +378,16 @@ const NavigationUI = () => {
                                 onFocus={() => setHoveredRoom('studio')}
                                 onBlur={() => setHoveredRoom(null)}
                                 onClick={() => handleRoomClick('studio')}
-                                aria-label="Teleport to Studio room"
+                                aria-label="前往工作室房间"
                             />
 
-                            {/* Permanent Map Text Labels */}
-                            <div className="map-room-label about">ABOUT</div>
-                            <div className="map-room-label gallery">THE<br />GALLERY</div>
-                            <div className="map-room-label contact">CONTACT</div>
-                            <div className="map-room-label studio">THE<br />STUDIO</div>
+                            {/* 常驻地图文字标签。 */}
+                            <div className="map-room-label about">关于我</div>
+                            <div className="map-room-label gallery">我的<br />画廊</div>
+                            <div className="map-room-label contact">联系我</div>
+                            <div className="map-room-label studio">我的<br />工作室</div>
 
-                            {/* Pin slot markers - 4 locations */}
+                            {/* 四个图钉槽位。 */}
                             {ROOMS.map((room) => (
                                 <button
                                     key={room.id}
@@ -402,7 +402,7 @@ const NavigationUI = () => {
                                 </button>
                             ))}
 
-                            {/* The pin marker - moves to hovered slot, or current room, or start position */}
+                            {/* 图钉移至悬停槽位、当前房间或起始位置。 */}
                             <div
                                 className="pin-marker"
                                 style={{
@@ -420,23 +420,23 @@ const NavigationUI = () => {
                                         }%`
                                 }}
                             >
-                                <img src="/images/pin.webp" alt="You are here" className="pin-image" />
+                                <img src="/images/pin.webp" alt="你在这里" className="pin-image" />
                             </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Audio Panel — drops down from the button */}
+            {/* 音频面板从按钮下方展开。 */}
             {hasEntered && (
                 <div className={`audio-panel ${isAudioMenuOpen ? 'open' : ''}`} inert={!isAudioMenuOpen ? true : undefined}>
                     <div className="audio-card">
                         <div className="audio-header">
-                            <h3>AUDIO SETTINGS</h3>
+                            <h3>声音设置</h3>
                             <button
                                 className="close-btn"
                                 onClick={() => setIsAudioMenuOpen(false)}
-                                aria-label="Close audio settings"
+                                aria-label="关闭声音设置"
                             >
                                 <svg viewBox="0 0 24 24">
                                     <path d="M18 6L6 18M6 6l12 12" />
@@ -446,7 +446,7 @@ const NavigationUI = () => {
                         <div className="audio-sliders-container">
                             <div className="slider-group">
                                 <div className="slider-label">
-                                    <span>Music</span>
+                                    <span>音乐</span>
                                     <span>{Math.round(bgmVol * 100)}%</span>
                                 </div>
                                 <input
@@ -455,13 +455,13 @@ const NavigationUI = () => {
                                     value={bgmVol}
                                     onChange={(e) => handleBgmChange(parseFloat(e.target.value))}
                                     className="paper-slider"
-                                    aria-label="Music volume"
-                                    aria-valuetext={`${Math.round(bgmVol * 100)} percent`}
+                                    aria-label="音乐音量"
+                                    aria-valuetext={`${Math.round(bgmVol * 100)}%`}
                                 />
                             </div>
                             <div className="slider-group">
                                 <div className="slider-label">
-                                    <span>SFX</span>
+                                    <span>音效</span>
                                     <span>{Math.round(globalVolume * 100)}%</span>
                                 </div>
                                 <input
@@ -470,8 +470,8 @@ const NavigationUI = () => {
                                     value={globalVolume}
                                     onChange={(e) => setGlobalVolume(parseFloat(e.target.value))}
                                     className="paper-slider"
-                                    aria-label="SFX volume"
-                                    aria-valuetext={`${Math.round(globalVolume * 100)} percent`}
+                                    aria-label="音效音量"
+                                    aria-valuetext={`${Math.round(globalVolume * 100)}%`}
                                 />
                             </div>
                         </div>
@@ -479,13 +479,13 @@ const NavigationUI = () => {
                 </div>
             )}
 
-            {/* Achievements Panel */}
+            {/* 成就面板。 */}
             <AchievementsPanel
                 isOpen={isAchievementsOpen}
                 onClose={() => setIsAchievementsOpen(false)}
             />
 
-            {/* Overlay to close menus */}
+            {/* 点击遮罩关闭菜单。 */}
             {(isMenuOpen || isAudioMenuOpen || isAchievementsOpen) && (
                 <div
                     className="menu-overlay"

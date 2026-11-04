@@ -11,7 +11,7 @@ const GlobalOverlay = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [animateOpen, setAnimateOpen] = useState(false);
 
-    // Check if mobile based on window width
+    // 按窗口宽度判断是否为移动端。
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
     useEffect(() => {
@@ -23,20 +23,20 @@ const GlobalOverlay = () => {
     useEffect(() => {
         if (overlayContent) {
             setIsVisible(true);
-            // Delay animation to allow DOM mount and initial 'closed' layout paint
+            // 延迟动画，让 DOM 挂载并先绘制关闭状态。
             const delayAnim = setTimeout(() => {
                 setAnimateOpen(true);
-            }, 50); // 50ms is safe for React render + browser paint
+            }, 50); // 50 毫秒可留出 React 渲染与浏览器绘制时间。
             return () => clearTimeout(delayAnim);
         } else {
             setAnimateOpen(false);
-            // Wait for exit animation (should match transition duration ~0.6-1s)
+            // 等待退出动画，时长需匹配约 0.6 至 1 秒的过渡。
             const timer = setTimeout(() => setIsVisible(false), 800);
             return () => clearTimeout(timer);
         }
     }, [overlayContent]);
 
-    // Keep content visible during exit animation using a dedicated cache
+    // 使用独立缓存，在退出动画期间保留内容。
     const [cachedContent, setCachedContent] = useState(null);
     useEffect(() => {
         if (overlayContent) {
@@ -44,14 +44,14 @@ const GlobalOverlay = () => {
         }
     }, [overlayContent]);
 
-    // Wyłączamy "return null", żeby ciężkie filtry rozmycia i SVG były osadzone w DOM 
-    // i nie powodowały zacięć podczas pierwszego wywołania.
+    // 取消 return null，让开销较大的模糊滤镜和 SVG 始终留在 DOM 中，
+    // 避免首次调用时卡顿。
     // if (!isVisible && !overlayContent && !cachedContent) return null;
 
-    // DUMMY RENDER MOCK - Pre-render the heaviest layout (certificate_grid) invisibly 
-    // to calculate CSS layout costs on page load, NOT on first click.
+    // 不可见地预渲染最复杂的证书网格布局，
+    // 在页面加载时完成 CSS 布局计算，避免首次点击才计算。
     const dummyGridContent = {
-        title: 'Loading...',
+        title: "加载中……",
         layout: 'certificate_grid',
         items: [
             { label: '', date: '', image: '' },
@@ -64,16 +64,16 @@ const GlobalOverlay = () => {
 
     const content = overlayContent || cachedContent || dummyGridContent;
 
-    // Propagate animateOpen state to control CSS transitions
+    // 传递 animateOpen 状态，控制 CSS 过渡。
     return <ContentCard content={content} isOpen={animateOpen} onClose={closeOverlay} isMobile={isMobile} />;
 };
 
 const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
     if (!content) return null;
 
-    const label = content.platformConfig?.label || 'Content';
+    const label = content.platformConfig?.label || '内容';
 
-    // GSAP TextPlugin typing effect for description
+    // 使用 GSAP TextPlugin 实现说明文字打字效果。
     const descriptionRef = useRef(null);
     useEffect(() => {
         if (isOpen && content.description && descriptionRef.current && content.layout !== 'certificate_grid') {
@@ -90,7 +90,7 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
         }
     }, [isOpen, content]);
 
-    // Custom scrollbar state
+    // 自定义滚动条状态。
     const scrollContainerRef = useRef(null);
     const trackRef = useRef(null);
     const thumbRef = useRef(null);
@@ -100,7 +100,7 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
     const [scrollThumbTop, setScrollThumbTop] = useState(0);
     const [showScrollbar, setShowScrollbar] = useState(false);
 
-    // Update thumb position based on scroll
+    // 根据滚动位置更新滑块。
     const updateThumbPosition = useCallback(() => {
         const el = scrollContainerRef.current;
         if (!el) return;
@@ -109,23 +109,23 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
         setShowScrollbar(maxScroll > 10);
         if (maxScroll <= 0) return;
         const scrollRatio = scrollTop / maxScroll;
-        // Track area: 5% to 90% of track height (matching CSS)
+        // 轨道区域为高度的 5% 至 90%，与 CSS 一致。
         const trackEl = trackRef.current;
         if (!trackEl) return;
         const trackHeight = trackEl.clientHeight;
-        const thumbHeight = 32; // matches CSS
+        const thumbHeight = 32; // 与 CSS 一致。
         const usableHeight = trackHeight * 0.9 - thumbHeight;
         const topOffset = trackHeight * 0.05;
         setScrollThumbTop(topOffset + scrollRatio * usableHeight);
     }, []);
 
-    // Scroll listener
+    // 滚动监听。
     useEffect(() => {
         const el = scrollContainerRef.current;
         if (!el) return;
         const onScroll = () => updateThumbPosition();
         el.addEventListener('scroll', onScroll, { passive: true });
-        // Initial check
+        // 初始检查。
         const raf = requestAnimationFrame(updateThumbPosition);
         return () => {
             el.removeEventListener('scroll', onScroll);
@@ -133,13 +133,13 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
         };
     }, [updateThumbPosition, content]);
 
-    // Recalculate on content/open change
+    // 内容或打开状态变化时重新计算。
     useEffect(() => {
         const timer = setTimeout(updateThumbPosition, 200);
         return () => clearTimeout(timer);
     }, [isOpen, content, updateThumbPosition]);
 
-    // Drag handlers
+    // 拖动处理。
     const handleThumbMouseDown = useCallback((e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -180,7 +180,7 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
         };
     }, []);
 
-    // Click on track to jump
+    // 点击轨道可跳转。
     const handleTrackClick = useCallback((e) => {
         const el = scrollContainerRef.current;
         const trackEl = trackRef.current;
@@ -194,41 +194,41 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
     }, []);
 
     const handleBackdropClick = (e) => {
-        // Only close if clicking the wrapper itself (which acts as backdrop here)
-        // OR the backdrop-layer (if we could attach handler there directly, but wrapper covers it)
-        // Currently wrapper covers everything.
+        // 仅点击充当背景的包装层自身时关闭，
+        // 或点击背景层；当前包装层覆盖全部区域。
+        // 当前包装层覆盖所有内容。
         if (e.target.classList.contains('global-overlay-wrapper') || e.target.classList.contains('global-overlay-backdrop-layer')) {
             onClose();
         }
     };
 
-    // --- STYLES & ANIMATION CONFIG ---
-    // Spring ease for that "pop" effect
+    // 样式与动画配置。
+    // 弹簧缓动，产生弹出效果。
     const transitionSpring = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease';
     const transitionContent = 'all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
 
-    // --- KONFIGURACJA STYLU KARTKI (POZYCJA) ---
-    // Używamy % lub vw/vh dla fluid-responsywności.
+    // 纸张位置样式配置。
+    // 使用百分比或 vw/vh 实现连续响应式布局。
     const cardStyle = isMobile ? {
-        // MOBILE: Karta na dole
+        // 移动端：卡片位于底部。
         width: '90%',
         maxHeight: '60vh',
-        bottom: '10rem', // <--- FLUID: WPROWADZONE PRZEZ UZYTKOWNIKA
+        bottom: '10rem', // 用户指定的连续响应式参数。
         left: '50%',
         transform: isOpen ? 'translate(-50%, 0) rotate(-1deg)' : 'translate(-50%, 120%) rotate(10deg)',
         opacity: isOpen ? 1 : 0,
         color: '#1a1a1a',
     } : {
-        // DESKTOP: Karta po prawej
-        width: 'clamp(280px, 30vw, 450px)', // <--- FLUID
-        right: 'clamp(2rem, 12vw, 20rem)', // <--- FLUID: scales with viewport
+        // 桌面端：卡片位于右侧。
+        width: 'clamp(280px, 30vw, 450px)', // 连续响应式参数。
+        right: 'clamp(2rem, 12vw, 20rem)', // 随视口缩放。
         top: '50%',
         transform: isOpen ? 'translateY(-50%) rotate(1deg)' : 'translate(150%, -50%) rotate(15deg)',
         opacity: isOpen ? 1 : 0,
         color: '#1a1a1a',
     };
 
-    // Staggered animation helper (delays based on index)
+    // 按索引设置延迟的错开动画辅助函数。
     const getStaggerStyle = (delay) => ({
         opacity: isOpen ? 1 : 0,
         transform: isOpen ? 'translateY(0)' : 'translateY(20px)',
@@ -236,17 +236,17 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
         transitionDelay: isOpen ? `${delay}ms` : '0ms',
     });
 
-    // --- KONFIGURACJA MASKI (SPOTLIGHT - CZARNA DZIURA) ---
+    // 聚光灯孔洞遮罩配置。
     const maskStyle = (content.layout === 'certificate_grid') ? {
         maskImage: 'none',
         WebkitMaskImage: 'none'
     } : isMobile ? {
-        // Mobile: Monitor jest na górze (50% szerokości, 25% wysokości od góry)
+        // 移动端显示器在上方：宽度 50%、距顶部 25%。
         maskImage: 'radial-gradient(circle at 50% 25%, transparent 0%, transparent 15%, black 40%)',
         WebkitMaskImage: 'radial-gradient(circle at 50% 25%, transparent 0%, transparent 15%, black 40%)'
     } : {
-        // Desktop: Monitor jest po lewej (31% szerokości od lewej, 50% wysokości)
-        // WPROWADZONE PRZEZ UZYTKOWNIKA 31%
+        // 桌面端显示器在左侧：距左侧 31%、高度 50%。
+        // 用户指定的 31%。
         maskImage: 'radial-gradient(circle at 31% 50%, transparent 0%, transparent 12%, black 35%)',
         WebkitMaskImage: 'radial-gradient(circle at 31% 50%, transparent 0%, transparent 12%, black 35%)'
     };
@@ -262,12 +262,12 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                 height: '100vh',
                 zIndex: 2000,
                 pointerEvents: isOpen ? 'auto' : 'none',
-                // Important: Wrapper itself has NO background and NO mask. 
-                // It just holds the layers.
+                // 包装层自身没有背景和遮罩，
+                // 只用于承载各图层。
             }}
             onClick={handleBackdropClick}
         >
-            {/* 1. LAYER: BACKDROP (The dark blurry part with the hole) */}
+            {/* 第 1 层：带孔洞的深色模糊背景。 */}
             <div
                 className="global-overlay-backdrop-layer"
                 style={{
@@ -276,26 +276,26 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                     left: 0,
                     width: '100%',
                     height: '100%',
-                    // Optymalizacja WebGL: Filtry są baaaardzo drogie podczas animacji
-                    // Trzymamy je na sztywno, a animujemy tylko przezroczystość (opacity)
+                    // WebGL 优化：动画中的滤镜开销很大，
+                    // 所以保持滤镜固定，只动画更新透明度。
                     backgroundColor: 'rgba(0,0,0,0.5)',
                     backdropFilter: 'blur(8px)',
                     WebkitBackdropFilter: 'blur(8px)',
                     opacity: isOpen ? 1 : 0,
                     transition: 'opacity 0.8s ease',
-                    // Mask applies ONLY here
+                    // 遮罩仅应用于此层。
                     ...maskStyle
                 }}
             />
 
-            {/* 2. LAYER: CONTENT (The card, sits ON TOP of backdrop, unaffected by mask) */}
+            {/* 第 2 层：卡片内容，位于背景上方，不受遮罩影响。 */}
             <div
                 style={{
                     position: 'absolute',
                     width: '100%',
                     height: '100%',
-                    pointerEvents: 'none', // Pass clicks through empty areas to backdrop wrapper
-                    display: 'flex', // Helper to position absolute children if needed, but we use absolute on card
+                    pointerEvents: 'none', // 空白区域的点击穿透到背景包装层。
+                    display: 'flex', // 可辅助定位绝对子元素，当前卡片使用绝对定位。
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}
@@ -304,16 +304,16 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                     style={{
                         position: 'absolute',
                         padding: isMobile ? '1.5rem' : '2.5rem',
-                        transition: transitionSpring, // The bouncy entrance
+                        transition: transitionSpring, // 弹跳入场。
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '1.2rem',
-                        fontFamily: "'Cabin Sketch', cursive", // Hand-drawn vibe
-                        pointerEvents: 'auto', // Re-enable clicks for the card
+                        fontFamily: "'霞鹜文楷', cursive", // 手绘风格。
+                        pointerEvents: 'auto', // 重新启用卡片点击。
                         ...cardStyle,
-                        // Override styles for grid layout to be centered and wider
+                        // 覆盖网格布局样式，使其居中并加宽。
                         ...(content.layout === 'certificate_grid' ? {
-                            // Make it centered and wide on desktop
+                            // 桌面端居中并加宽。
                             width: isMobile ? '95vw' : 'clamp(300px, 90vw, 1200px)',
                             height: 'clamp(500px, 85vh, 900px)',
                             maxHeight: '85vh',
@@ -325,9 +325,9 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                         } : {})
                     }}
                     className="studio-paper-card"
-                    onClick={(e) => e.stopPropagation()} // Prevent closing when clicking card
+                    onClick={(e) => e.stopPropagation()} // 点击卡片时阻止关闭。
                 >
-                    {/* SVG Border Overlay for Torn Paper */}
+                    {/* 撕纸 SVG 边框叠加层。 */}
                     <svg
                         className="studio-border-overlay"
                         viewBox="0 0 100 100"
@@ -353,7 +353,7 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                         />
                     </svg>
 
-                    {/* Paper Tape / Decor (Mobile Handle) */}
+                    {/* 纸胶带装饰，兼作移动端把手。 */}
                     <div style={{
                         position: 'absolute',
                         top: '10px',
@@ -366,7 +366,7 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                         display: isMobile ? 'block' : 'none'
                     }} />
 
-                    {/* Header */}
+                    {/* 标题区域。 */}
                     <div style={{
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -389,7 +389,7 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                                 margin: 0,
                                 lineHeight: 1.1,
                                 fontWeight: 800,
-                                fontFamily: "'Rubik Scribble', cursive", // Clean, bold
+                                fontFamily: "'霞鹜文楷', cursive", // 简洁、粗体。
                             }}>
                                 {content.title}
                             </h2>
@@ -398,7 +398,7 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                         <button
                             onClick={onClose}
                             className="studio-close-btn"
-                            aria-label="Close"
+                            aria-label="关闭"
                         >
                             <svg viewBox="0 0 24 24">
                                 <path d="M18 6L6 18M6 6l12 12" />
@@ -406,7 +406,7 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                         </button>
                     </div>
 
-                    {/* === LAYOUT: CERTIFICATE GRID === */}
+                    {/* 证书网格布局。 */}
                     {content.layout === 'certificate_grid' ? (
                         <div style={{ position: 'relative', flex: 1, minHeight: 0 }}>
                             <div
@@ -443,7 +443,7 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                                         <div style={{
                                             position: 'relative',
                                             width: '100%',
-                                            paddingBottom: '141%', // A4 Portrait ratio
+                                            paddingBottom: '141%', // A4 竖向比例。
                                             backgroundColor: '#eee',
                                             border: '2px solid #1a1a1a',
                                             overflow: 'hidden',
@@ -465,10 +465,10 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                                             />
                                         </div>
                                         <div style={{ textAlign: 'center' }}>
-                                            <h4 style={{ margin: '0 0 0.4rem 0', fontSize: '1.2rem', fontWeight: 700, fontFamily: "'Rubik Scribble', cursive" }}>
+                                            <h4 style={{ margin: '0 0 0.4rem 0', fontSize: '1.2rem', fontWeight: 700, fontFamily: "'霞鹜文楷', cursive" }}>
                                                 {item.label}
                                             </h4>
-                                            <span style={{ fontSize: '1.1rem', color: '#4a4a4a', fontFamily: "'Cabin Sketch', cursive", fontWeight: 700 }}>
+                                            <span style={{ fontSize: '1.1rem', color: '#4a4a4a', fontFamily: "'霞鹜文楷', cursive", fontWeight: 700 }}>
                                                 {item.date}
                                             </span>
                                         </div>
@@ -476,7 +476,7 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                                 ))}
                             </div>
 
-                            {/* Custom torn-paper scrollbar */}
+                            {/* 自定义撕纸滚动条。 */}
                             {showScrollbar && (
                                 <div
                                     ref={trackRef}
@@ -495,9 +495,9 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                             )}
                         </div>
                     ) : (
-                        /* === LAYOUT: DEFAULT (The Studio Style) === */
+                        /* 默认布局，采用工作室风格。 */
                         <>
-                            {/* Meta Info */}
+                            {/* 元信息。 */}
                             <div style={{
                                 display: 'flex',
                                 flexWrap: 'wrap',
@@ -509,10 +509,10 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                                 ...getStaggerStyle(200)
                             }}>
                                 <strong>{content.date}</strong>
-                                {content.views && <span>{content.views} views</span>}
+                                {content.views && <span>{content.views} 次浏览</span>}
                             </div>
 
-                            {/* Description */}
+                            {/* 说明。 */}
                             <p 
                                 ref={descriptionRef}
                                 style={{
@@ -520,13 +520,13 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                                 color: '#333',
                                 fontSize: '0.95rem',
                                 margin: 0,
-                                minHeight: '80px', // Prevent layout jump while typing
+                                minHeight: '80px', // 打字时避免布局跳动。
                                 ...getStaggerStyle(300)
                             }}>
                                 {content.description}
                             </p>
 
-                            {/* Action Button */}
+                            {/* 操作按钮。 */}
                             <div style={{
                                 marginTop: 'auto',
                                 paddingTop: '1rem',
@@ -538,7 +538,7 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                                     rel="noopener noreferrer"
                                     className="studio-action-button"
                                 >
-                                    Open Link ↗
+                                    查看内容 ↗
                                 </a>
                             </div>
                         </>

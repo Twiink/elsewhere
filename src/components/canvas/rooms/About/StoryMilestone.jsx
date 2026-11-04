@@ -3,37 +3,37 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Reusable Vector3 to avoid allocations in useFrame
+// 复用 Vector3，避免 useFrame 中分配对象。
 const _worldPos = new THREE.Vector3();
 
 /**
- * StoryMilestone Component
+ * StoryMilestone 故事里程碑组件。
  * 
- * A story section that appears in the sky during flight.
- * Fades in as you approach, fades out as you pass through.
- * Objects move TO camera (camera stays at z=0).
+ * 飞行时出现在天空中的故事段落。
+ * 靠近时淡入，穿过时淡出。
+ * 物体朝相机移动，相机保持在 z=0。
  */
 
-// Fade distances (world Z position)
-// Objects start far in -Z and move towards 0
-const FADE_IN_START = -50;   // Start fading in
-const FADE_IN_END = -25;     // Fully visible
-const FADE_OUT_START = -8;   // Start fading out when close
-const FADE_OUT_END = -2;     // Fully invisible
+// 淡入淡出距离，使用世界 Z。
+// 物体从远处的负 Z 向 0 移动。
+const FADE_IN_START = -50;   // 开始淡入。
+const FADE_IN_END = -25;     // 完全可见。
+const FADE_OUT_START = -8;   // 靠近时开始淡出。
+const FADE_OUT_END = -2;     // 完全不可见。
 
 const StoryMilestone = ({
     position = [0, 0, -30],
-    title = "TITLE",
+    title = "标题",
     subtitle = "",
-    type = "intro",  // intro, awards, journey, skills
+    type = "intro",  // 介绍、奖项、经历、技能。
     children
 }) => {
     const groupRef = useRef();
 
-    // Track opacity for smooth transitions
+    // 跟踪透明度，产生平滑过渡。
     const currentOpacity = useRef(0);
 
-    // Refs for text materials
+    // 文字材质引用。
     const titleRef = useRef();
     const subtitleRef = useRef();
     const decorRef = useRef();
@@ -42,36 +42,36 @@ const StoryMilestone = ({
     useFrame((state, delta) => {
         if (!groupRef.current) return;
 
-        // Get world position of milestone (reuse vector to avoid GC pressure)
+        // 获取里程碑世界位置，复用向量以减少垃圾回收压力。
         groupRef.current.getWorldPosition(_worldPos);
 
-        // Objects move TOWARDS camera (camera is at z ~ 0)
-        // worldPos.z goes from very negative (far) to positive (passed camera)
+        // 物体朝相机移动，相机 Z 约为 0。
+        // worldPos.z 从远处的较大负值增加到越过相机后的正值。
         const z = _worldPos.z;
 
-        // Calculate target opacity based on Z position
+        // 按 Z 位置计算目标透明度。
         let targetOpacity = 0;
 
         if (z < FADE_IN_START) {
-            // Too far - not visible yet
+            // 过远，尚不可见。
             targetOpacity = 0;
         } else if (z >= FADE_IN_START && z <= FADE_IN_END) {
-            // Fading in (approaching)
+            // 正在靠近并淡入。
             const t = (z - FADE_IN_START) / (FADE_IN_END - FADE_IN_START);
             targetOpacity = t;
         } else if (z > FADE_IN_END && z < FADE_OUT_START) {
-            // Fully visible (in the sweet spot)
+            // 位于最佳区域，完全可见。
             targetOpacity = 1;
         } else if (z >= FADE_OUT_START && z <= FADE_OUT_END) {
-            // Fading out (very close, passing through)
+            // 非常接近并穿过，正在淡出。
             const t = 1 - (z - FADE_OUT_START) / (FADE_OUT_END - FADE_OUT_START);
             targetOpacity = t;
         } else {
-            // Already passed - invisible
+            // 已经经过，不可见。
             targetOpacity = 0;
         }
 
-        // Smooth lerp
+        // 平滑插值。
         currentOpacity.current = THREE.MathUtils.lerp(
             currentOpacity.current,
             targetOpacity,
@@ -80,7 +80,7 @@ const StoryMilestone = ({
 
         const opacity = currentOpacity.current;
 
-        // Apply opacity to text elements
+        // 将透明度应用到文字元素。
         if (titleRef.current) {
             titleRef.current.fillOpacity = opacity;
         }
@@ -94,12 +94,12 @@ const StoryMilestone = ({
             avatarRef.current.opacity = opacity * 0.5;
         }
 
-        // Scale effect - grow slightly as you approach
+        // 靠近时略微放大。
         const scale = 0.8 + opacity * 0.2;
         groupRef.current.scale.setScalar(scale);
     });
 
-    // Type-specific styles
+    // 按类型设置样式。
     const styles = useMemo(() => {
         switch (type) {
             case 'intro':
@@ -147,7 +147,7 @@ const StoryMilestone = ({
 
     return (
         <group ref={groupRef} position={position}>
-            {/* Background decorative element */}
+            {/* 背景装饰元素。 */}
             <mesh position={[0, 0, 0.5]}>
                 <planeGeometry args={[8, 5]} />
                 <meshBasicMaterial
@@ -159,7 +159,7 @@ const StoryMilestone = ({
                 />
             </mesh>
 
-            {/* Main title */}
+            {/* 主标题。 */}
             <Text
                 ref={titleRef}
                 position={[0, 0.5, 0]}
@@ -167,13 +167,13 @@ const StoryMilestone = ({
                 color={styles.titleColor}
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Bold.ttf"
+                font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 fillOpacity={0}
             >
                 {title}
             </Text>
 
-            {/* Subtitle */}
+            {/* 副标题。 */}
             {subtitle && (
                 <Text
                     ref={subtitleRef}
@@ -182,14 +182,14 @@ const StoryMilestone = ({
                     color={styles.subtitleColor}
                     anchorX="center"
                     anchorY="middle"
-                    font="/fonts/CabinSketch-Regular.ttf"
+                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                     fillOpacity={0}
                 >
                     {subtitle}
                 </Text>
             )}
 
-            {/* Avatar placeholder for INTRO */}
+            {/* 介绍区域的人物占位。 */}
             {type === 'intro' && (
                 <mesh position={[0, -1.5, 0]}>
                     <circleGeometry args={[0.8, 32]} />
@@ -203,7 +203,7 @@ const StoryMilestone = ({
                 </mesh>
             )}
 
-            {/* Custom children content */}
+            {/* 自定义子内容。 */}
             {children}
         </group>
     );

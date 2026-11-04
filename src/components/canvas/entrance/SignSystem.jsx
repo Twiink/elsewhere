@@ -8,14 +8,14 @@ const SignSystem = (props) => {
     const signTexture = useTexture('/textures/entrance/sign.webp');
     const mountTexture = useTexture('/textures/entrance/belka.webp');
 
-    // Physics parameters
+    // 物理参数。
     const timeOffset = useMemo(() => Math.random() * 100, []);
 
     useFrame((state) => {
         if (groupRef.current) {
-            // Simple wind sway (idle animation only)
+            // 简单风摆，仅用于待机动画。
             const time = state.clock.elapsedTime + timeOffset;
-            const windSway = Math.sin(time * 2) * 0.05; // Gentle constant sway
+            const windSway = Math.sin(time * 2) * 0.05; // 持续轻柔摆动。
 
             groupRef.current.rotation.x = windSway;
             groupRef.current.rotation.y = 0;
@@ -24,32 +24,32 @@ const SignSystem = (props) => {
 
     return (
         <group {...props}>
-            {/* 1. THE MOUNT (Visual Anchor) */}
-            {/* Texture is horizontal, so we use Width=3.5, Height=0.4 (approx aspect ratio) */}
-            {/* No rotation needed as the texture is already horizontal */}
+            {/* 1. 安装架：视觉锚点。 */}
+            {/* 纹理为横向，宽 3.5、高 0.4，近似保持比例。 */}
+            {/* 纹理本身已为横向，无需旋转。 */}
             <mesh position={[-0.05, 2.05, 0.65]}>
                 <planeGeometry args={[2.7, 0.4]} />
                 <meshBasicMaterial color="#e0e0e0" map={mountTexture} transparent={true} side={THREE.DoubleSide} />
             </mesh>
 
-            {/* 2. THE SIGN (SignGroup) */}
-            {/* Positioned exactly at the center of the mounting bar */}
+            {/* 2. 标牌组 SignGroup。 */}
+            {/* 精确位于安装横杆中心。 */}
             <group
                 ref={groupRef}
                 position={[0, 1.9, 0.60]}
             >
-                {/* 3. THE PIVOT FIX */}
-                {/* Translate geometry DOWN so the top edge (where chains are) is at (0,0,0) of the group */}
+                {/* 3. 修正旋转轴。 */}
+                {/* 几何体向下平移，使链条所在的上边缘位于组的 (0,0,0)。 */}
                 <mesh
-                    position={[0, -0.5, 0]} // Moving down by half height (assuming height ~1)
+                    position={[0, -0.5, 0]} // 下移半个高度，假定总高约 1。
                 >
-                    {/* Width 2.6 (Narrower), Height 1 */}
+                    {/* 宽 2.6，较窄；高 1。 */}
                     <planeGeometry args={[2, 1]} />
                     <meshBasicMaterial color="#e0e0e0"
                         map={signTexture}
                         transparent={true}
                         side={THREE.DoubleSide}
-                        depthWrite={false} // Fix for seeing objects behind transparent parts
+                        depthWrite={false} // 修正透明区域后方物体不可见的问题。
                     />
                 </mesh>
             </group>

@@ -2,34 +2,34 @@ import { useRef, useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useFrame, useThree, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import gsap from 'gsap';
-import { CONTENT_DATA, PLATFORM_CONFIG, getLatestContent } from './contentData';
+import { PLATFORM_CONFIG } from './contentData';
 import { useScene } from '../../../../context/SceneContext';
 import { useAchievements } from '../../../../context/AchievementsContext';
 import { TextureLoader } from 'three';
 import FloatingCodeParticles from './FloatingCodeParticles';
 import { PositionalAudio } from '@react-three/drei';
 import { useAudio } from '../../../../context/AudioManager';
-import { useStudioContent } from '../../../../hooks/useSanityData';
+import { useStudioContent } from '../../../../hooks/useContentData';
 import '../../shaders/RevealMaterial';
 import { isTouchDevice } from '../../../../utils/deviceDetect';
 import { usePaintMaterial } from '../Gallery/usePaintMaterial';
 
 // ============================================
-// ⚙️ PAINT CONFIGURATION - TWEAK HERE (Skąd-Dokąd)
-// Edytuj te wartości, aby zmienić kierunek i zakres animacji wejścia
+// ⚙️ 上色配置：调整起止位置。
+// 修改这些值可调整入场动画的方向与范围。
 // ============================================
 const STUDIO_PAINT_CONFIG = {
     dirX: 0.0,
-    dirY: -1.0,    // Kierunek: od góry (-1) do dołu
+    dirY: -1.0,    // 方向：从上方 -1 向下。
     dirZ: 0.0,
-    startDist: -10.0, // Początek fali
-    endDist: 10.0,   // Koniec fali
-    noiseAxes: 'xz'  // Płaszczyzna szumu
+    startDist: -10.0, // 波前起点。
+    endDist: 10.0,   // 波前终点。
+    noiseAxes: 'xz'  // 噪声平面。
 };
 
 // ============================================
-// ⚙️ AUDIO SETTINGS - TWEAK HERE
-// Edytuj te wartości, aby zmienić głośność i zasięg słyszalności szumu monitorów
+// ⚙️ 音频设置：在此调整。
+// 修改这些值可调整显示器环境声的音量和可听范围。
 // ============================================
 export const AUDIO_SETTINGS = {
     volume: 1,
@@ -38,78 +38,76 @@ export const AUDIO_SETTINGS = {
 };
 
 // ============================================
-// CONFIG - Adjust these values as needed
+// 按需调整的配置。
 // ============================================
-const CAMERA_Y_OFFSET = -6; // Negative = camera lower, Positive = camera higher
-const CAMERA_ZOOM_DISTANCE = 3; // Distance from monitor front when zoomed in
-const CAMERA_PAN_RIGHT = 1; // How far camera moves right after zoom (for content panel space)
-const TOWER_RADIUS = 2.2; // All monitors at same distance from center (smaller = narrower)
-const MONITORS_PER_RING = 4; // How many monitors per vertical level
-const FALL_SPEED = 0.3; // How fast monitors fall down
-const TOWER_HEIGHT = 12; // Total visible height of tower
-const VERTICAL_SPACING = 2.5; // Space between monitor rings
-const TOWER_Y_START = -5; // Starting Y offset for tower (negative = lower) -> CONTROLS HEIGHT (UP/DOWN)
-const TOWER_Z_START = -10; // Starting Z position (negative = further away) -> CONTROLS DISTANCE
+const CAMERA_Y_OFFSET = -6; // 负值使相机降低，正值使相机升高。
+const CAMERA_ZOOM_DISTANCE = 3; // 放大时相机距显示器正面的距离。
+const CAMERA_PAN_RIGHT = 1; // 放大后相机向右移的距离，为内容面板留出空间。
+const TOWER_RADIUS = 2.2; // 所有显示器与中心的距离相同，数值越小塔越窄。
+const MONITORS_PER_RING = 4; // 每层显示器数量。
+const FALL_SPEED = 0.3; // 显示器下落速度。
+const TOWER_HEIGHT = 12; // 塔的总可见高度。
+const VERTICAL_SPACING = 2.5; // 显示器环之间的间距。
+const TOWER_Y_START = -5; // 塔的初始 Y 偏移，负值更低，用于控制上下位置。
+const TOWER_Z_START = -10; // 初始 Z 位置，负值更远，用于控制距离。
 
 const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     const groupRef = useRef();
     const towerRef = useRef();
     const { camera, size } = useThree();
 
-    // Responsive camera parameters based on PIXEL width
+    // 根据像素宽度调整相机响应式参数。
     const responsiveParams = useMemo(() => {
-        const isMobile = size.width < 768; // Standard mobile breakpoint
+        const isMobile = size.width < 768; // 标准移动端断点。
         const isTablet = size.width < 1024 && size.width >= 768;
 
 
         return {
             zoomDistance: isMobile ? 2 : isTablet ? 3 : CAMERA_ZOOM_DISTANCE,
             panRight: isMobile ? 0 : isTablet ? 0.5 : Math.max(0.3, (size.width / 1920) * CAMERA_PAN_RIGHT),
-            panDown: isMobile ? 9.7 : 0, // Positive = camera DOWN = monitor at TOP
+            panDown: isMobile ? 9.7 : 0, // 正值表示相机下移，显示器位于画面顶部。
             yOffset: isMobile ? 2.5 : isTablet ? -3 : CAMERA_Y_OFFSET,
             towerRadius: isMobile ? 1.5 : (isTablet ? 1.8 : TOWER_RADIUS),
-            isMobile, // Pass through boolean
+            isMobile, // 透传布尔值。
         };
     }, [size.width]);
 
-    // Store original camera position for reset
+    // 保存相机原位置，供重置使用。
     const originalCameraY = useRef(null);
     const originalCameraZ = useRef(null);
     const originalCameraX = useRef(null);
 
-    // State
+    // 状态。
     const isDraggingRef = useRef(false);
     const lastXRef = useRef(0);
-    const dragDistance = useRef(0); // Changed to ref to prevent 100x/sec re-renders on drag
+    const dragDistance = useRef(0); // 改用 ref，防止拖动时每秒重渲染上百次。
 
-    // Physics
+    // 物理参数。
     const rotationVelocity = useRef(0);
-    const autoRotationSpeed = useRef(0.12); // Now a ref to support changing direction
-    const DRAG_SENSITIVITY = 0.008; // Increased from 0.005
-    const FRICTION = 0.98; // Increased from 0.95 (longer spin)
+    const autoRotationSpeed = useRef(0.12); // 改用 ref，以支持改变方向。
+    const DRAG_SENSITIVITY = 0.008; // 从 0.005 增大。
+    const FRICTION = 0.98; // 从 0.95 增大，旋转持续更久。
 
-    // Vertical Fall Physics
-    const fallSpeed = useRef(FALL_SPEED); // Start with default
+    // 竖向下落物理。
+    const fallSpeed = useRef(FALL_SPEED); // 从默认值开始。
     const BASE_FALL_SPEED = FALL_SPEED;
-    const SCROLL_SENSITIVITY = 0.006; // Tripled from 0.002
-    const SWIPE_SENSITIVITY = 0.005; // Adjusted
-    const SPEED_DECAY = 0.985; // Slower return to normal (was 0.96)
+    const SCROLL_SENSITIVITY = 0.006; // 从 0.002 增至三倍。
+    const SWIPE_SENSITIVITY = 0.005; // 已调整。
+    const SPEED_DECAY = 0.985; // 更慢地恢复正常速度，原值为 0.96。
 
-    // Content State
+    // 内容状态。
     const [selectedMonitor, setSelectedMonitor] = useState(null);
     const [isAnimating, setIsAnimating] = useState(false);
 
-    // Global Scene Context for Overlay
+    // 遮罩使用的全局场景上下文。
     const { openOverlay, overlayContent, isTeleporting } = useScene();
 
-    // Achievements Context
+    // 成就上下文。
     const { showTutorial, unlockAchievement, hidePopup } = useAchievements();
     const { globalVolume, isMuted } = useAudio();
     const effectiveVolume = isMuted ? 0 : AUDIO_SETTINGS.volume * globalVolume;
 
-    // Pobieranie danych z Sanity.io (fallback do starych danych)
-    const sanityContent = useStudioContent();
-    const activeContent = sanityContent || CONTENT_DATA;
+    const activeContent = useStudioContent();
 
     const audioRef = useRef();
     useEffect(() => {
@@ -124,7 +122,7 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         }
     }, [isExiting, isTeleporting, hidePopup]);
 
-    // ===== PAINT TRANSITION (top-to-bottom) =====
+    // 自上而下的上色过渡。
     const { onBeforeCompile: paintOnBeforeCompile, animatePaint, resetPaint, uniformsData: paintUniforms, updateRoomOrigin } = usePaintMaterial(STUDIO_PAINT_CONFIG);
 
     const [isTransitioning, setIsTransitioning] = useState(false);
@@ -157,30 +155,30 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         return [...activeContent].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
     }, [activeContent]);
 
-    // Monitor Y offsets for falling animation (mutable)
+    // 下落动画的显示器 Y 偏移，可变。
     const monitorOffsets = useRef([]);
-    // Refs to monitor meshes for direct position updates (avoids 28 useFrame hooks)
+    // 通过显示器网格引用直接更新位置，避免 28 个 useFrame。
     const monitorRefs = useRef([]);
 
-    // Track tower state for floating particles parallax (REFS not state!)
+    // 使用 ref 跟踪塔状态，驱动背景粒子视差。
     const particleTowerRotation = useRef(0);
     const particleFallOffset = useRef(0);
 
-    // Track if we've signaled ready
+    // 跟踪是否已发出就绪信号。
     const hasSignaledReady = useRef(false);
     const frameCount = useRef(0);
-    const FRAMES_TO_WAIT = 5; // Wait for 5 actual render frames
+    const FRAMES_TO_WAIT = 5; // 等待五个实际渲染帧。
 
-    // Real render-based ready detection - count actual rendered frames
+    // 按实际渲染帧数判断就绪。
     useFrame(() => {
-        // Update room origin for paint shader
+        // 为上色着色器更新房间原点。
         updateRoomOrigin(groupRef);
 
         if (hasSignaledReady.current) return;
 
         frameCount.current++;
 
-        // After N frames have been rendered, we know GPU has drawn the content
+        // 渲染 N 帧后，可确认 GPU 已绘制内容。
         if (frameCount.current >= FRAMES_TO_WAIT) {
             hasSignaledReady.current = true;
             onReady?.();
@@ -188,22 +186,22 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         }
     });
 
-    // Build cylindrical tower - all monitors at same radius, shuffled content, staggered heights
+    // 构建圆柱塔：统一半径，打乱内容，高度错落。
     const monitorData = useMemo(() => {
         const items = [];
 
-        // Shuffle content for mixed appearance (seeded for consistency)
+        // 使用固定种子打乱内容，保持顺序稳定。
         let shuffledContent = [...activeContent].sort(() => 0.5 - Math.random());
         
-        // Ensure the tower is extremely tall (at least 12 rings = 48 items)
-        // so that the teleportation boundaries are far outside the camera's view.
+        // 塔至少高 12 环，即 48 个项目，
+        // 让循环传送边界远离相机视野。
         if (shuffledContent.length > 0) {
             while (shuffledContent.length < 48) {
                 shuffledContent = [...shuffledContent, ...[...activeContent].sort(() => 0.5 - Math.random())];
             }
         }
 
-        // Calculate how many rings we need
+        // 计算所需环数。
         const totalMonitors = shuffledContent.length;
         const ringsNeeded = Math.ceil(totalMonitors / MONITORS_PER_RING);
 
@@ -212,7 +210,7 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 
         for (let ring = 0; ring < ringsNeeded && contentIndex < shuffledContent.length; ring++) {
             const angleStep = (Math.PI * 2) / MONITORS_PER_RING;
-            const angleOffset = ring % 2 === 0 ? 0 : angleStep / 2; // Offset alternate rings
+            const angleOffset = ring % 2 === 0 ? 0 : angleStep / 2; // 隔环设置偏移。
 
             for (let i = 0; i < MONITORS_PER_RING && contentIndex < shuffledContent.length; i++) {
                 const contentItem = shuffledContent[contentIndex];
@@ -228,22 +226,22 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 const x = Math.cos(angle) * currentRadius;
                 const z = Math.sin(angle) * currentRadius;
 
-                // Staggered Y - base + random jitter for organic look
+                // Y 高度为基础值加随机偏移，营造自然感。
                 const baseY = ring * VERTICAL_SPACING;
-                const yJitter = (Math.sin(contentIndex * 1.7) + Math.cos(contentIndex * 2.3)) * 0.4; // Pseudo-random
+                const yJitter = (Math.sin(contentIndex * 1.7) + Math.cos(contentIndex * 2.3)) * 0.4; // 伪随机。
                 const finalY = baseY + yJitter;
 
                 let width, height, depth;
                 const deviceShape = contentItem.device || platform.shape || 'monitor';
                 switch (deviceShape) {
                     case 'tv':
-                        width = 1.6; height = 1.187; depth = 1.0; // Legacy 1.348 ratio
+                        width = 1.6; height = 1.187; depth = 1.0; // 原始比例 1.348。
                         break;
                     case 'monitor':
-                        width = 1.6; height = 1; depth = 0.15; // Legacy 1.835 ratio
+                        width = 1.6; height = 1; depth = 0.15; // 原始比例 1.835。
                         break;
                     case 'phone':
-                        width = 0.6; height = 1.139; depth = 0.1; // Legacy 0.527 ratio
+                        width = 0.6; height = 1.139; depth = 0.1; // 原始比例 0.527。
                         break;
                     default:
                         width = 1.4; height = 1.0; depth = 0.6;
@@ -253,7 +251,7 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                     ...contentItem,
                     index: contentIndex,
                     x,
-                    baseY: finalY, // Staggered Y position
+                    baseY: finalY, // 错落的 Y 位置。
                     z,
                     width, height, depth,
                     angle: angle,
@@ -266,38 +264,38 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             }
         }
 
-        // Initialize offsets
+        // 初始化偏移。
         monitorOffsets.current = items.map(() => 0);
 
-        // Pre-compute totalHeight for seamless loop (avoid calculating in useFrame)
+        // 预先计算 totalHeight，实现无缝循环，避免在 useFrame 中重复计算。
         const minBaseY = items.length > 0 ? Math.min(...items.map(m => m.baseY)) : 0;
         const maxBaseY = items.length > 0 ? Math.max(...items.map(m => m.baseY)) : 0;
-        // Make sure we have a baseline height so monitors don't instantly teleport if there's only 1 row
+        // 保证最小高度，避免仅一行显示器时立即循环传送。
         const totalHeight = Math.max(VERTICAL_SPACING * 3, maxBaseY - minBaseY + VERTICAL_SPACING);
 
         return { items, totalHeight };
     }, [latestContent?.id, responsiveParams.towerRadius, activeContent]);
 
-    // Destructure for easier access
+    // 解构以便访问。
     const monitors = monitorData.items;
     const totalHeight = monitorData.totalHeight;
 
-    // Need a ref for lastY too
+    // lastY 也需要 ref。
     const lastYRef = useRef(0);
 
-    // --- INTERACTION ---
+    // 交互。
     const handlePointerDown = (e) => {
         if (isAnimating) return;
-        // e.preventDefault(); // Might block scroll, good for custom drag
-        e.stopPropagation(); // Stop bubbling
+        // e.preventDefault(); // 可阻止页面滚动，便于自定义拖动。
+        e.stopPropagation(); // 停止事件冒泡。
 
         isDraggingRef.current = true;
         lastXRef.current = e.clientX;
-        lastYRef.current = e.clientY; // Store init Y
+        lastYRef.current = e.clientY; // 保存初始 Y。
         dragDistance.current = 0;
         rotationVelocity.current = 0;
 
-        // Disable auto-rotate immediately
+        // 立即禁用自动旋转。
         document.body.style.cursor = 'grabbing';
     };
 
@@ -322,25 +320,25 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 
         dragDistance.current += Math.abs(deltaX) + Math.abs(deltaY);
 
-        // HORIZONTAL -> Rotation
+        // 水平移动转换为旋转。
         if (Math.abs(deltaX) > 1) {
             autoRotationSpeed.current = Math.sign(deltaX) * 0.12;
         }
         rotationVelocity.current = deltaX * DRAG_SENSITIVITY;
         towerRef.current.rotation.y += rotationVelocity.current;
 
-        // VERTICAL -> Fall Speed
+        // 竖向移动转换为下落速度。
         fallSpeed.current += deltaY * SWIPE_SENSITIVITY;
 
         unlockAchievement('studio_interact');
     }, [isAnimating, unlockAchievement]);
 
-    // Wheel Listener for Desktop
+    // 桌面端滚轮监听。
     useEffect(() => {
         const handleWheel = (e) => {
-            // e.deltaY > 0 means scroll DOWN.
-            // Scroll DOWN -> Monitors go DOWN (Speed +).
-            // Scroll UP -> Monitors go UP (Speed -).
+            // e.deltaY > 0 表示向下滚动。
+            // 向下滚动使显示器下移，速度为正。
+            // 向上滚动使显示器上移，速度为负。
             fallSpeed.current += e.deltaY * SCROLL_SENSITIVITY;
             unlockAchievement('studio_interact');
         };
@@ -349,13 +347,13 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         return () => window.removeEventListener('wheel', handleWheel);
     }, [unlockAchievement]);
 
-    // Global Event Listeners for seamless drag
+    // 全局事件监听，保证拖动连续。
     useEffect(() => {
         window.addEventListener('pointerup', handlePointerUp);
         window.addEventListener('pointermove', handlePointerMove);
-        // Also touch events for mobile if pointer events fail (though React usually patches)
+        // 额外监听移动端触摸事件，处理指针事件不可用的情况。
         window.addEventListener('touchend', handlePointerUp);
-        window.addEventListener('touchmove', handlePointerMove); // Native touchmove
+        window.addEventListener('touchmove', handlePointerMove); // 原生 touchmove。
 
         return () => {
             window.removeEventListener('pointerup', handlePointerUp);
@@ -365,9 +363,9 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         };
     }, [handlePointerUp, handlePointerMove]);
 
-    // STEP 1 ONLY: Rotate tower to center the clicked monitor
+    // 步骤 1：旋转塔，使点击的显示器居中。
     const handleMonitorClick = useCallback((item) => {
-        // Prevent click if we were dragging
+        // 刚发生拖动时不触发点击。
         if (dragDistance.current > 5 || isAnimating || !towerRef.current) return;
 
         setIsAnimating(true);
@@ -376,75 +374,75 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 
         unlockAchievement('studio_interact');
 
-        // Monitor's facing rotation (item.rot = -angle + PI/2)
-        // Monitor's screen faces local +Z, rotated by item.rot
-        // Tower rotated by towerRotation
-        // World facing = item.rot + towerRotation
-        // We want world facing = 0 (toward camera at +Z)
-        // So: towerRotation = -item.rot
+        // 显示器朝向旋转：item.rot=-angle+PI/2。
+        // 屏幕朝局部 +Z，再旋转 item.rot。
+        // 塔旋转 towerRotation。
+        // 世界朝向 = item.rot + towerRotation。
+        // 目标世界朝向为 0，即朝向 +Z 处的相机。
+        // 因此 towerRotation=-item.rot。
 
         const monitorFacingRotation = item.rot;
         let targetRotation = -monitorFacingRotation;
 
-        // Normalize current rotation
+        // 归一化当前旋转。
         let currentRotation = towerRef.current.rotation.y % (Math.PI * 2);
         if (currentRotation < 0) currentRotation += Math.PI * 2;
 
-        // Normalize target
+        // 归一化目标旋转。
         while (targetRotation < 0) targetRotation += Math.PI * 2;
         targetRotation = targetRotation % (Math.PI * 2);
 
-        // Find shortest path from current to target
+        // 寻找当前到目标的最短路径。
         let delta = targetRotation - currentRotation;
         if (delta > Math.PI) delta -= Math.PI * 2;
         if (delta < -Math.PI) delta += Math.PI * 2;
 
-        // Final target = current + shortest delta
+        // 最终目标 = 当前值 + 最短角度差。
         const finalRotation = towerRef.current.rotation.y + delta;
 
 
-        // STEP 1: Animate tower rotation
+        // 步骤 1：塔旋转动画。
         gsap.to(towerRef.current.rotation, {
             y: finalRotation,
             duration: 0.8,
             ease: 'power2.inOut',
             onComplete: () => {
-                // STEP 2: After rotation, move camera Y to center on monitor
-                // Store original camera Y if not stored
+                // 步骤 2：旋转完成后调整相机 Y，使显示器居中。
+                // 尚未保存时记录原始相机 Y。
                 if (originalCameraY.current === null) {
                     originalCameraY.current = camera.position.y;
                 }
 
-                // Monitor's world Y position
-                // Group is at y=-1.2, tower at y=0 relative to group
-                // Monitor's current Y = baseY + offset
+                // 显示器世界 Y 位置。
+                // 组位于 y=-1.2，塔相对于组为 y=0。
+                // 显示器当前 Y = baseY + offset。
                 const monitorCurrentY = item.baseY + (monitorOffsets.current[item.index] || 0);
                 const monitorWorldY = -1.2 + monitorCurrentY + responsiveParams.yOffset;
 
-                // STEP 3: Move camera FORWARD (in the direction it's looking)
-                // Store original camera position if not stored
+                // 步骤 3：沿相机朝向向前移动。
+                // 尚未保存时记录原始相机位置。
                 if (originalCameraZ.current === null) {
                     originalCameraZ.current = camera.position.z;
                     originalCameraX.current = camera.position.x;
                 }
 
-                // Get camera's forward direction
+                // 获取相机前向向量。
                 const forward = new THREE.Vector3();
                 camera.getWorldDirection(forward);
 
-                // Get camera's right direction (cross product of forward and up)
+                // 前向与上方向叉乘，得到相机右向向量。
                 const up = new THREE.Vector3(0, 1, 0);
                 const right = new THREE.Vector3();
                 right.crossVectors(forward, up).normalize();
 
-                // STEP 3 & 4: Move camera forward + right/down (using responsive values)
+                // 步骤 3、4：使用响应式参数向前、向右及向下移动相机。
                 const zoomDist = responsiveParams.zoomDistance;
                 const panRight = responsiveParams.panRight;
                 const panDown = responsiveParams.panDown;
 
                 const targetX = camera.position.x + forward.x * zoomDist + right.x * panRight;
                 const targetZ = camera.position.z + forward.z * zoomDist + right.z * panRight;
-                const targetY = monitorWorldY - panDown; // Pan down moves camera down = monitor at top
+                const targetY = monitorWorldY - panDown; // 向下平移相机，使显示器位于画面顶部。
 
 
                 gsap.to(camera.position, {
@@ -455,7 +453,7 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                     ease: 'power2.inOut',
                     onComplete: () => {
                         setIsAnimating(false);
-                        openOverlay(item); // Open global overlay in HUD
+                        openOverlay(item); // 在界面层打开全局遮罩。
                     }
                 });
             }
@@ -463,24 +461,24 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 
     }, [isAnimating, camera, responsiveParams, openOverlay]);
 
-    // Trigger camera return ONLY when overlay is explicitly closed
-    // We use a ref to track if overlay was previously open to avoid initial race conditions
+    // 仅在遮罩被明确关闭时触发相机返回。
+    // 用 ref 记录遮罩此前是否打开，避免初始化竞态。
     const prevOverlayContent = useRef(null);
 
     useEffect(() => {
-        // If it WAS open (prev) and is NOW closed (null) AND we are viewing a monitor -> Return camera
+        // 此前打开、现在为 null，且正在查看显示器时，返回相机。
         if (prevOverlayContent.current && !overlayContent && selectedMonitor && !isAnimating) {
             handleReturnCamera();
         }
 
-        // Update ref for next render
+        // 更新 ref，供下次渲染使用。
         prevOverlayContent.current = overlayContent;
     }, [overlayContent, selectedMonitor, isAnimating]);
 
     const handleReturnCamera = useCallback(() => {
         setIsAnimating(true);
 
-        // Slightly faster return
+        // 返回速度略快。
         if (originalCameraX.current !== null && originalCameraY.current !== null && originalCameraZ.current !== null) {
             gsap.to(camera.position, {
                 x: originalCameraX.current,
@@ -490,7 +488,7 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 ease: 'power2.inOut',
                 onComplete: () => {
                     setIsAnimating(false);
-                    setSelectedMonitor(null); // Resume auto-rotation
+                    setSelectedMonitor(null); // 恢复自动旋转。
                 }
             });
         } else {
@@ -499,50 +497,50 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         }
     }, [camera]);
 
-    // Cleaned up old listener effect that is now handled by the global effect above
+    // 清理旧监听效果，现由上方全局效果管理。
 
     useFrame((state, delta) => {
         if (!towerRef.current) return;
 
-        // Auto-rotate and Physics when idle
+        // 闲置时自动旋转并应用物理效果。
         if (!isDraggingRef.current && !isAnimating && !selectedMonitor) {
             towerRef.current.rotation.y += autoRotationSpeed.current * delta + rotationVelocity.current;
             rotationVelocity.current *= FRICTION;
 
-            // Decay fall speed back to base speed (but keep direction!)
-            // If going down (>0), drift to positive base. If going up (<0), drift to negative base.
+            // 下落速度逐渐回到基础速度，保持当前方向。
+            // 向下时回归正基础速度，向上时回归负基础速度。
             const targetDrift = fallSpeed.current > 0 ? BASE_FALL_SPEED : -BASE_FALL_SPEED;
             fallSpeed.current = THREE.MathUtils.lerp(fallSpeed.current, targetDrift, 1.0 - SPEED_DECAY);
 
-            // totalHeight is now pre-computed in useMemo for performance
-            // Update all monitor offsets and positions in a single loop (no child useFrames needed)
+            // totalHeight 已在 useMemo 中预先计算。
+            // 单次循环更新全部显示器偏移与位置，无需子级 useFrame。
             monitors.forEach((monitor, index) => {
-                // Update offset
+                // 更新偏移。
                 monitorOffsets.current[index] -= fallSpeed.current * delta;
 
-                // Calculate current Y
+                // 计算当前 Y。
                 const currentY = monitor.baseY + monitorOffsets.current[index];
 
-                // If below threshold (-10.0), teleport to top (seamless loop)
-                // If moving UP (negative speed), check TOP threshold (totalHeight - 10.0)
+                // 低于 -10.0 阈值时移至顶部，实现无缝循环。
+                // 向上移动、速度为负时，检查 totalHeight - 10.0 的顶部阈值。
                 if (currentY < -10.0 && fallSpeed.current > 0) {
-                    // Falling Down -> Reset to top
+                    // 向下落出时重置到顶部。
                     monitorOffsets.current[index] += totalHeight;
                 } else if (currentY > totalHeight - 10.0 && fallSpeed.current < 0) {
-                    // Moving Up -> Reset to bottom
+                    // 向上移出时重置到底部。
                     monitorOffsets.current[index] -= totalHeight;
                 }
 
-                // Direct DOM update - bypass React reconciliation for performance
+                // 直接更新对象，绕过 React 协调以提升性能。
                 const ref = monitorRefs.current[index];
                 if (ref) {
                     ref.position.y = monitor.baseY + monitorOffsets.current[index];
                 }
             });
 
-            // Update particle refs directly (no setState = no re-render = smooth!)
+            // 直接更新粒子 ref，不调用 setState，避免重渲染。
             particleTowerRotation.current = towerRef.current.rotation.y;
-            particleFallOffset.current = fallSpeed.current; // Pass velocity, not offset!
+            particleFallOffset.current = fallSpeed.current; // 传入速度，而非偏移。
         }
     });
 
@@ -561,13 +559,13 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 />
             )}
 
-            {/* THE INFINITE TOWER */}
+            {/* 无限显示器塔。 */}
             <group
                 ref={towerRef}
                 position={[0, TOWER_Y_START, TOWER_Z_START]}
                 onPointerDown={handlePointerDown}
             >
-                {/* Invisible Hit Cylinder for easier drag interaction */}
+                {/* 不可见交互圆柱，便于拖动。 */}
                 <mesh visible={false}>
                     <cylinderGeometry args={[responsiveParams.towerRadius + 0.5, responsiveParams.towerRadius + 0.5, TOWER_HEIGHT * 1.5, 16]} />
                     <meshBasicMaterial color="#e0e0e0" />
@@ -588,7 +586,7 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 ))}
             </group>
 
-            {/* Floating code symbols parallax background */}
+            {/* 漂浮代码符号的视差背景。 */}
             <FloatingCodeParticles
                 towerRotationRef={particleTowerRotation}
                 fallOffsetRef={particleFallOffset}
@@ -598,51 +596,51 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 };
 
 // ===========================================
-// MONITOR BLOCK COMPONENT - with Paint Reveal on Hover
-// Uses proven two-box approach: painted box behind + sketch box with revealMaterial in front
+// 显示器块组件，支持悬停上色显现。
+// 双盒结构：彩色盒位于后方，带 revealMaterial 的速写盒位于前方。
 // ===========================================
 const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled, paintOnBeforeCompile, paintUniforms }) => {
-    // Position.y is updated directly by parent's useFrame via meshRef
+    // 父级 useFrame 通过 meshRef 直接更新 position.y。
     const paintedBoxRef = useRef();
     const hideDelayRef = useRef();
-    // RevealMaterial refs for each face (up to 6)
-    const matRef0 = useRef(); // +X right
-    const matRef1 = useRef(); // -X left
-    const matRef2 = useRef(); // +Y top
-    const matRef3 = useRef(); // -Y bottom
-    const matRef4 = useRef(); // +Z front
-    const matRef5 = useRef(); // -Z back
+    // 各面的 RevealMaterial 引用，最多六个。
+    const matRef0 = useRef(); // +X 右面。
+    const matRef1 = useRef(); // -X 左面。
+    const matRef2 = useRef(); // +Y 顶面。
+    const matRef3 = useRef(); // -Y 底面。
+    const matRef4 = useRef(); // +Z 正面。
+    const matRef5 = useRef(); // -Z 背面。
     const matRefs = [matRef0, matRef1, matRef2, matRef3, matRef4, matRef5];
 
-    // Check device types (prioritize Sanity 'device' field, fallback to platform defaults)
+    // 优先使用本地内容的 device 字段，缺省时按平台选择设备类型。
     const deviceShape = item.device || (PLATFORM_CONFIG[item.platform]?.shape) || 'monitor';
     const isBlogMonitor = deviceShape === 'monitor';
     const isTvMonitor = deviceShape === 'tv';
     const isPhoneMonitor = deviceShape === 'phone';
 
-    // Determine the URL for the front texture (custom or default)
+    // 确定正面纹理地址，使用自定义值或默认值。
     const frontTextureUrl = item.frontTexture || (
         isBlogMonitor ? '/textures/studio/monitor_front.webp' :
             isTvMonitor ? '/textures/studio/tv_front.webp' :
                 '/textures/studio/phone_front.webp'
     );
 
-    // Dynamic Dummy texture for touch devices 
+    // 触摸设备使用的动态占位纹理。
     const isTouch = isTouchDevice();
     const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
-    // Determine painted front texture URL
+    // 确定彩色正面纹理地址。
     const paintedFrontTextureUrl = isTouch ? dummyTex : (item.paintedFrontTexture || (
         isBlogMonitor ? '/textures/studio/monitor_front_painted.webp' :
             isTvMonitor ? '/textures/studio/tv_front_painted.webp' :
                 '/textures/studio/phone_front_painted.webp'
     ));
 
-    // Load dynamic front texture
+    // 加载动态正面纹理。
     const frontTex = useLoader(TextureLoader, frontTextureUrl);
     const frontPaintedTex = useLoader(TextureLoader, paintedFrontTextureUrl);
 
-    // Load Monitor textures (Blog) - shell + painted
+    // 加载博客显示器的外壳与彩色纹理。
     const monitorBack = useLoader(TextureLoader, '/textures/studio/monitor_back.webp');
     const monitorTop = useLoader(TextureLoader, '/textures/studio/monitor_top.webp');
     const monitorBottom = useLoader(TextureLoader, '/textures/studio/monitor_bottom.webp');
@@ -654,7 +652,7 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
     const monitorLeftPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/monitor_left_painted.webp');
     const monitorRightPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/monitor_right_painted.webp');
 
-    // Load TV textures (YouTube) - shell + painted
+    // 加载 YouTube 电视的外壳与彩色纹理。
     const tvBack = useLoader(TextureLoader, '/textures/studio/tv_back.webp');
     const tvTop = useLoader(TextureLoader, '/textures/studio/tv_top.webp');
     const tvBottom = useLoader(TextureLoader, '/textures/studio/tv_bottom.webp');
@@ -664,14 +662,14 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
     const tvBottomPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/tv_bottom_painted.webp');
     const tvSidePainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/tv_side_painted.webp');
 
-    // Load Phone textures (TikTok) - shell + painted
+    // 加载 TikTok 手机的外壳与彩色纹理。
     const phoneBack = useLoader(TextureLoader, '/textures/studio/phone_back.webp');
     const phoneSide = useLoader(TextureLoader, '/textures/studio/phone_side.webp');
     const phoneBackPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/phone_back_painted.webp');
     const phoneSidePainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/phone_side_painted.webp');
 
-    // Build texture config for current device type
-    // Each entry: { sketch, painted } — if painted is null, that face won't have reveal
+    // 构建当前设备类型的纹理配置。
+    // 每项为 { sketch, painted }；painted 为 null 时，该面没有显现效果。
     const faceConfig = useMemo(() => {
         if (isBlogMonitor) {
             return [
@@ -679,7 +677,7 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
                 { sketch: monitorLeft, painted: monitorLeftPainted },      // -X
                 { sketch: monitorTop, painted: monitorTopPainted },        // +Y
                 { sketch: monitorBottom, painted: monitorBottomPainted },  // -Y
-                { sketch: frontTex, painted: frontPaintedTex },            // +Z front
+                { sketch: frontTex, painted: frontPaintedTex },            // +Z 正面。
                 { sketch: monitorBack, painted: monitorBackPainted },      // -Z
             ];
         } else if (isTvMonitor) {
@@ -688,7 +686,7 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
                 { sketch: tvSide, painted: tvSidePainted },       // -X
                 { sketch: tvTop, painted: tvTopPainted },          // +Y
                 { sketch: tvBottom, painted: tvBottomPainted },    // -Y
-                { sketch: frontTex, painted: frontPaintedTex },    // +Z front
+                { sketch: frontTex, painted: frontPaintedTex },    // +Z 正面。
                 { sketch: tvBack, painted: tvBackPainted },        // -Z
             ];
         } else if (isPhoneMonitor) {
@@ -697,7 +695,7 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
                 { sketch: phoneSide, painted: phoneSidePainted },  // -X
                 { sketch: phoneSide, painted: phoneSidePainted },  // +Y
                 { sketch: phoneSide, painted: phoneSidePainted },  // -Y
-                { sketch: frontTex, painted: frontPaintedTex },    // +Z front
+                { sketch: frontTex, painted: frontPaintedTex },    // +Z 正面。
                 { sketch: phoneBack, painted: phoneBackPainted },  // -Z
             ];
         }
@@ -712,15 +710,15 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
         phoneBack, phoneSide, phoneBackPainted, phoneSidePainted
     ]);
 
-    // Painted materials for inner box (standard materials showing painted textures)
+    // 内部盒子的彩色材质，使用显示彩色纹理的标准材质。
     const paintedMaterials = useMemo(() => {
         if (!faceConfig) return null;
         return faceConfig.map(f => {
             const mat = new THREE.MeshBasicMaterial({
                 color: '#e0e0e0',
-                map: f.painted || f.sketch // Use sketch as fallback if no painted version
+                map: f.painted || f.sketch // 没有彩色版本时回退至速写。
             });
-            // Apply paint transition shader
+            // 应用上色过渡着色器。
             if (paintOnBeforeCompile) {
                 mat.onBeforeCompile = paintOnBeforeCompile;
                 mat.customProgramCacheKey = () => 'paintOnBeforeCompile_studio_painted';
@@ -731,13 +729,13 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
         });
     }, [faceConfig, paintOnBeforeCompile]);
 
-    // Sketch materials for outer box (standard materials, used for faces WITHOUT reveal)
+    // 外部盒子的速写标准材质，用于没有显现效果的面。
     const sketchMaterials = useMemo(() => {
         if (!faceConfig) return null;
         return faceConfig.map(f => {
-            if (f.painted) return null; // Will use revealMaterial instead
+            if (f.painted) return null; // 此处改用 revealMaterial。
             const mat = new THREE.MeshBasicMaterial({ color: '#e0e0e0', map: f.sketch });
-            // Apply paint transition shader
+            // 应用上色过渡着色器。
             if (paintOnBeforeCompile) {
                 mat.onBeforeCompile = paintOnBeforeCompile;
                 mat.customProgramCacheKey = () => 'paintOnBeforeCompile_studio_sketch';
@@ -748,7 +746,7 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
         });
     }, [faceConfig, paintOnBeforeCompile]);
 
-    // --- HOVER STATE MANAGEMENT (NO REACT RE-RENDERS!) ---
+    // 悬停状态管理，避免 React 重渲染。
     const isHoveredRef = useRef(false);
 
     const updatePaintState = useCallback(() => {
@@ -758,7 +756,7 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
         const targetProgress = shouldPaint ? 1.0 : 0.0;
         const duration = shouldPaint ? 0.8 : 0.5;
 
-        // Animate each revealMaterial face
+        // 为每个 revealMaterial 面执行动画。
         matRefs.forEach((ref) => {
             if (ref.current) {
                 gsap.to(ref.current, {
@@ -770,13 +768,13 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
             }
         });
 
-        // Show/hide painted box
+        // 显示或隐藏彩色盒子。
         if (shouldPaint) {
             if (hideDelayRef.current) hideDelayRef.current.kill();
             if (paintedBoxRef.current) paintedBoxRef.current.visible = true;
         } else {
-            // Hide painted box after reverse animation completes
-            // On initial mount (when hideDelay is empty), hide it very quickly (0.05s) just to allow 1-3 frames for compilation
+            // 反向动画结束后隐藏彩色盒子。
+            // 首次挂载、hideDelay 为空时，延迟 0.05 秒隐藏，留出 1 至 3 帧供编译。
             const delay = hideDelayRef.current === undefined ? 0.05 : (duration + 0.05);
             hideDelayRef.current = gsap.delayedCall(delay, () => {
                 if (paintedBoxRef.current) paintedBoxRef.current.visible = false;
@@ -784,13 +782,13 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
         }
     }, [faceConfig, isSelected, isTouch]);
 
-    // React to purely external changes (e.g., overlay closes and isSelected becomes false)
+    // 响应纯外部状态变化，例如遮罩关闭后 isSelected 变为 false。
     useEffect(() => {
         updatePaintState();
     }, [isSelected, updatePaintState]);
 
     if (!faceConfig) {
-        // Fallback for unknown platform
+        // 未知平台的回退。
         return (
             <group ref={meshRef} position={[item.x, item.baseY, item.z]} rotation={[0, item.rot, 0]}>
                 <mesh frustumCulled={false}>
@@ -824,7 +822,7 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
                 onMonitorClick(item);
             }}
         >
-            {/* PAINTED BOX (behind) — initially visible to force shader compilation during loading phase */}
+            {/* 后方彩色盒初始可见，让加载阶段强制编译着色器。 */}
             <mesh ref={paintedBoxRef} visible={true} frustumCulled={false}>
                 <boxGeometry args={[item.width, item.height, item.depth]} />
                 {paintedMaterials.map((mat, i) => (
@@ -832,12 +830,12 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
                 ))}
             </mesh>
 
-            {/* SKETCH BOX (front) — revealMaterial faces get discarded on hover */}
+            {/* 前方速写盒，悬停时丢弃 revealMaterial 面的像素。 */}
             <mesh frustumCulled={false}>
                 <boxGeometry args={[item.width, item.height, item.depth]} />
                 {faceConfig.map((face, i) => {
                     if (face.painted) {
-                        // This face has a painted version → use revealMaterial for brush-stroke discard
+                        // 有彩色版本的面使用 revealMaterial，实现笔刷丢弃。
                         return (
                             <revealMaterial color="#e0e0e0"
                                 key={`s${i}`}
@@ -852,7 +850,7 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
                             />
                         );
                     } else {
-                        // No painted version → standard material (no reveal)
+                        // 无彩色版本的面使用标准材质，不做显现。
                         return (
                             <primitive key={`s${i}`} attach={`material-${i}`} object={sketchMaterials[i]} />
                         );

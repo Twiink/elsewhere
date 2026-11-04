@@ -5,10 +5,10 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 
 /**
- * LoopDoors Component
+ * LoopDoors 循环门组件。
  * 
- * Double doors at the end of corridor that automatically open
- * when the camera approaches, creating an infinite loop illusion.
+ * 走廊尽头的双开门在相机靠近时自动打开，
+ * 营造无限循环的错觉。
  */
 const LoopDoors = ({
     position = [0, 0, -70],
@@ -22,20 +22,20 @@ const LoopDoors = ({
 
     const doorWidth = 1.2;
     const doorHeight = corridorHeight - 0.4;
-    const triggerDistance = 8; // When camera is this close, doors start opening
-    const loopDistance = 3; // When camera is this close, trigger loop
+    const triggerDistance = 8; // 相机到达此距离时开始开门。
+    const loopDistance = 3; // 相机到达此距离时触发循环。
 
-    // Check camera distance and trigger animations
+    // 检查相机距离并触发动画。
     useFrame(() => {
         if (!leftDoorRef.current || !rightDoorRef.current) return;
 
         const distance = camera.position.z - position[2];
 
-        // Start opening doors when approaching
+        // 靠近时开始开门。
         if (distance < triggerDistance && distance > loopDistance && !isOpenRef.current) {
             isOpenRef.current = true;
 
-            // Animate doors opening outward
+            // 向外打开双门。
             gsap.to(leftDoorRef.current.rotation, {
                 y: -Math.PI * 0.6,
                 duration: 1.2,
@@ -48,17 +48,17 @@ const LoopDoors = ({
             });
         }
 
-        // Trigger loop when very close
+        // 非常接近时触发循环。
         if (distance < loopDistance && !hasTriggeredRef.current && isOpenRef.current) {
             hasTriggeredRef.current = true;
             onLoopTriggered?.();
 
-            // Reset after loop
+            // 循环后重置。
             setTimeout(() => {
                 hasTriggeredRef.current = false;
                 isOpenRef.current = false;
 
-                // Close doors instantly (they'll be at the "end" again after loop)
+                // 立即关门，循环后它们又位于尽头。
                 if (leftDoorRef.current && rightDoorRef.current) {
                     leftDoorRef.current.rotation.y = 0;
                     rightDoorRef.current.rotation.y = 0;
@@ -69,25 +69,25 @@ const LoopDoors = ({
 
     return (
         <group position={position}>
-            {/* Door Frame */}
+            {/* 门框。 */}
             <mesh position={[0, doorHeight / 2 + 0.15, 0]}>
                 <boxGeometry args={[doorWidth * 2 + 0.3, 0.15, 0.15]} />
                 <meshBasicMaterial color="#2a2a2a" />
             </mesh>
 
-            {/* Left Door Frame */}
+            {/* 左门框。 */}
             <mesh position={[-doorWidth - 0.08, 0, 0]}>
                 <boxGeometry args={[0.12, doorHeight + 0.3, 0.15]} />
                 <meshBasicMaterial color="#2a2a2a" />
             </mesh>
 
-            {/* Right Door Frame */}
+            {/* 右门框。 */}
             <mesh position={[doorWidth + 0.08, 0, 0]}>
                 <boxGeometry args={[0.12, doorHeight + 0.3, 0.15]} />
                 <meshBasicMaterial color="#2a2a2a" />
             </mesh>
 
-            {/* Left Door - pivots from left edge */}
+            {/* 左门围绕左边缘旋转。 */}
             <group
                 ref={leftDoorRef}
                 position={[-doorWidth, 0, 0]}
@@ -97,7 +97,7 @@ const LoopDoors = ({
                     <meshBasicMaterial color="#f0ebe0" roughness={0.9} />
                 </mesh>
 
-                {/* Door panel details */}
+                {/* 门板细节。 */}
                 <mesh position={[doorWidth / 2, 0.3, 0.1]}>
                     <planeGeometry args={[doorWidth * 0.7, doorHeight * 0.35]} />
                     <meshBasicMaterial color="#e8e3d8" roughness={1} />
@@ -107,14 +107,14 @@ const LoopDoors = ({
                     <meshBasicMaterial color="#e8e3d8" roughness={1} />
                 </mesh>
 
-                {/* Handle */}
+                {/* 把手。 */}
                 <mesh position={[doorWidth - 0.15, 0, 0.12]}>
                     <sphereGeometry args={[0.05, 12, 12]} />
                     <meshBasicMaterial color="#333" metalness={0.6} roughness={0.3} />
                 </mesh>
             </group>
 
-            {/* Right Door - pivots from right edge */}
+            {/* 右门围绕右边缘旋转。 */}
             <group
                 ref={rightDoorRef}
                 position={[doorWidth, 0, 0]}
@@ -124,7 +124,7 @@ const LoopDoors = ({
                     <meshBasicMaterial color="#f0ebe0" roughness={0.9} />
                 </mesh>
 
-                {/* Door panel details */}
+                {/* 门板细节。 */}
                 <mesh position={[-doorWidth / 2, 0.3, 0.1]}>
                     <planeGeometry args={[doorWidth * 0.7, doorHeight * 0.35]} />
                     <meshBasicMaterial color="#e8e3d8" roughness={1} />
@@ -134,14 +134,14 @@ const LoopDoors = ({
                     <meshBasicMaterial color="#e8e3d8" roughness={1} />
                 </mesh>
 
-                {/* Handle */}
+                {/* 把手。 */}
                 <mesh position={[-doorWidth + 0.15, 0, 0.12]}>
                     <sphereGeometry args={[0.05, 12, 12]} />
                     <meshBasicMaterial color="#333" metalness={0.6} roughness={0.3} />
                 </mesh>
             </group>
 
-            {/* Light above doors - WYLACZONE */}
+            {/* 门上方灯光，已禁用。 */}
             {/* <pointLight
                 position={[0, 1.5, 1]}
                 intensity={0.8}

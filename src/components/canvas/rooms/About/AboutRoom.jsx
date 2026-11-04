@@ -9,12 +9,12 @@ import { useScene } from '../../../../context/SceneContext';
 import { useAchievements } from '../../../../context/AchievementsContext';
 import { useAudio } from '../../../../context/AudioManager';
 
-// Chunk length for looping flight effect (matches SkyChunk)
+// 循环飞行分块长度，与 SkyChunk 一致。
 const CHUNK_LENGTH = 40;
 
 // ============================================
-// ⚙️ AUDIO SETTINGS - TWEAK HERE
-// Edytuj te wartości, aby zmienić głośność i zasięg słyszalności szumu wiatru
+// ⚙️ 音频设置：在此调整。
+// 修改这些数值可调整风声的音量和可听范围。
 // ============================================
 export const AUDIO_SETTINGS = {
     volume: 2.5,
@@ -22,13 +22,13 @@ export const AUDIO_SETTINGS = {
     rolloff: 0.8
 };
 
-// Story sections - positions define where each milestone appears
-// Using CHUNK_LENGTH to create looping story (every ~40 units restarts)
+// 故事区域：位置定义各里程碑出现的地点。
+// 用 CHUNK_LENGTH 循环故事，约每 40 单位重新开始。
 const STORY_MILESTONES = [
-    { id: 'intro', position: [0, 0, -15], type: 'intro', title: 'ITOM', subtitle: '< creative developer />' },
-    { id: 'awards', position: [0, 0, -55], type: 'awards', title: 'AWARDS', subtitle: '1x SOTD Winner • 1x CSS Winner' },
-    { id: 'journey', position: [0, 0, -95], type: 'journey', title: 'JOURNEY', subtitle: 'Computer Science @ University of Opole' },
-    { id: 'skills', position: [0, 0, -135], type: 'skills', title: 'SKILLS', subtitle: 'React • Three.js • GSAP • Creative Code' },
+    { id: 'intro', position: [0, 0, -15], type: 'intro', title: 'ITOM', subtitle: "< 创意开发者 />" },
+    { id: 'awards', position: [0, 0, -55], type: 'awards', title: "奖项", subtitle: "每日最佳网站与 CSS Winner 获奖作品" },
+    { id: 'journey', position: [0, 0, -95], type: 'journey', title: "历程", subtitle: "奥波莱大学 · 计算机科学" },
+    { id: 'skills', position: [0, 0, -135], type: 'skills', title: "技能", subtitle: "React · Three.js · GSAP · 创意编程" },
 ];
 
 const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
@@ -45,7 +45,7 @@ const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         }
     }, [effectiveVolume]);
 
-    // Use ref to track overlay state for event listeners (avoids stale closures)
+    // 用 ref 保存遮罩状态，供事件监听读取，避免闭包过期。
     const overlayRef = useRef(overlayContent);
     useEffect(() => {
         overlayRef.current = overlayContent;
@@ -57,31 +57,31 @@ const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         }
     }, [isExiting, isTeleporting, hidePopup]);
 
-    // Track if we've signaled ready
+    // 跟踪是否已发出就绪信号。
     const hasSignaledReady = useRef(false);
     const frameCount = useRef(0);
     const FRAMES_TO_WAIT = 25;
 
-    // Momentum-based scroll state
+    // 带惯性的滚动状态。
     const scrollPosition = useRef(0);
     const scrollVelocity = useRef(0);
 
-    // Save base camera rotation on first render
+    // 首次渲染时保存相机基础旋转。
     const baseCameraRotation = useRef({ x: 0, y: 0, z: 0 });
     const isFlightActive = useRef(false);
 
-    // Smoothed flight effect values
+    // 平滑后的飞行效果值。
     const currentBank = useRef(0);
     const currentPitch = useRef(0);
 
-    // Ref for the entire room to manage frustum culling
+    // 整个房间的引用，用于管理视锥裁剪。
     const roomRef = useRef();
     const airplaneGroupRef = useRef();
 
-    // Reset camera rotation when teleporting starts
+    // 传送开始时重置相机旋转。
     useEffect(() => {
         if (isTeleporting) {
-            // Reset flight effect to prevent tilted camera after teleport
+            // 重置飞行效果，防止传送后相机倾斜。
             currentBank.current = 0;
             currentPitch.current = 0;
             isFlightActive.current = false;
@@ -91,10 +91,10 @@ const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         }
     }, [isTeleporting]);
 
-    // Ready detection + flight animation
+    // 就绪检测与飞行动画。
     useFrame((state, delta) => {
         if (!hasSignaledReady.current) {
-            // Force rendering of all objects (even outside frustum) to compile shaders
+            // 强制渲染全部对象，包括视锥外对象，以编译着色器。
             if (roomRef.current) {
                 roomRef.current.traverse((child) => {
                     if (child.isMesh) child.frustumCulled = false;
@@ -103,7 +103,7 @@ const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 
             frameCount.current++;
             if (frameCount.current >= FRAMES_TO_WAIT) {
-                // Restore frustum culling for performance
+                // 恢复视锥裁剪，提升性能。
                 if (roomRef.current) {
                     roomRef.current.traverse((child) => {
                         if (child.isMesh) child.frustumCulled = true;
@@ -112,43 +112,43 @@ const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 
                 hasSignaledReady.current = true;
                 onReady?.();
-                // trigger achievement hint when showing the room
+                // 展示房间时触发成就提示。
                 if (!isTeleporting && !isExiting) {
                     if (!isWarmup) setTimeout(() => showTutorial('about_fly'), 2000);
                 }
             }
         }
 
-        // === TELEPORTING: Stop all camera control ===
-        // TeleportRoom handles camera position/rotation during teleport
+        // 传送期间停止全部相机控制。
+        // 传送期间由 TeleportRoom 管理相机位置与旋转。
         if (isTeleporting) {
             return;
         }
 
-        // Apply velocity to position (momentum)
+        // 将速度累加至位置，产生惯性。
         scrollPosition.current += scrollVelocity.current * delta * 60;
-        // No clamp - allow flying backward too!
+        // 不限制范围，也允许向后飞行。
 
-        // Friction
+        // 摩擦力。
         scrollVelocity.current *= 0.95;
         if (Math.abs(scrollVelocity.current) < 0.001) {
             scrollVelocity.current = 0;
         }
 
-        // Unlock achievement if user scrolled enough
+        // 用户滚动足够距离时解锁成就。
         if (scrollPosition.current > 15) {
             unlockAchievement('about_fly');
         }
 
-        // === EXITING: Disable control completely ===
-        // DoorSection handles the exit animation (position + rotation)
-        // We must STOP touching the camera to avoid conflicts/snapping
+        // 退出时完全禁用控制。
+        // DoorSection 负责退出动画的位置与旋转。
+        // 停止修改相机，避免冲突和跳变。
         if (isExiting) {
             return;
         }
 
-        // === FLIGHT EFFECT (camera rotation only) ===
-        // Activate flight only after first scroll
+        // 飞行效果，仅修改相机旋转。
+        // 首次滚动后才启用飞行。
         if (!isFlightActive.current && scrollPosition.current > 0.5) {
             isFlightActive.current = true;
             baseCameraRotation.current = {
@@ -159,46 +159,46 @@ const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         }
 
         if (isFlightActive.current) {
-            // Get position within current chunk (0 to 1)
+            // 获取当前分块内的进度，范围 0..1。
             const chunkProgress = (scrollPosition.current % CHUNK_LENGTH) / CHUNK_LENGTH;
 
-            // Flight maneuver pattern - loops back to start at each chunk
-            // Slow down the start: if chunkProgress is small, multiply by a curve
+            // 飞行动作模式，每个分块从头循环。
+            // 分块进度较小时乘以曲线，放缓起步。
             let bankAngle = Math.sin(chunkProgress * Math.PI * 2) * 0.12;
             let pitchAngle = Math.sin(chunkProgress * Math.PI * 4) * 0.05;
 
-            // Ease in the flight effect during the first few units
+            // 在最初几个单位内逐渐引入飞行效果。
             const flightProgress = Math.min(1, (scrollPosition.current - 0.5) / 5.0);
             bankAngle *= flightProgress;
             pitchAngle *= flightProgress;
 
-            // Smooth lerp
+            // 平滑插值。
             const lerpSpeed = 1 - Math.pow(0.02, delta);
             currentBank.current = THREE.MathUtils.lerp(currentBank.current, bankAngle, lerpSpeed);
             currentPitch.current = THREE.MathUtils.lerp(currentPitch.current, pitchAngle, lerpSpeed);
 
-            // Apply to camera (base + effect)
+            // 相机值为基础值加效果偏移。
             camera.rotation.x = baseCameraRotation.current.x + currentPitch.current;
             camera.rotation.z = baseCameraRotation.current.z + currentBank.current;
         } else {
-            // Unconditionally keep these zero before flight active
+            // 飞行未启用时始终归零。
             currentBank.current = 0;
             currentPitch.current = 0;
         }
 
-        // Apply to airplane unconditionally so it stays properly aligned
-        // When pitch is 0, rotation.x is 0.1
-        // When bank is 0, rotation.z is 0
+        // 始终同步应用于纸飞机，保持正确对齐。
+        // pitch 为 0 时，rotation.x 为 0.1。
+        // bank 为 0 时，rotation.z 为 0。
         if (airplaneGroupRef.current) {
             airplaneGroupRef.current.rotation.x = currentPitch.current * 3 + 0.1;
             airplaneGroupRef.current.rotation.z = -currentBank.current * 2;
         }
     });
 
-    // Handle scroll wheel (desktop)
+    // 处理桌面端滚轮。
     useEffect(() => {
         const handleWheel = (e) => {
-            if (overlayRef.current) return; // BLOCK SCROLL IF OVERLAY IS OPEN
+            if (overlayRef.current) return; // 遮罩打开时禁止滚动。
             scrollVelocity.current += e.deltaY * 0.002;
         };
 
@@ -206,7 +206,7 @@ const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         return () => window.removeEventListener('wheel', handleWheel);
     }, []);
 
-    // Handle touch (mobile) - vertical swipe = scroll
+    // 移动端触摸：纵向滑动转换为滚动。
     const lastTouchY = useRef(0);
     useEffect(() => {
         const handleTouchStart = (e) => {
@@ -216,11 +216,11 @@ const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         };
 
         const handleTouchMove = (e) => {
-            if (overlayRef.current) return; // BLOCK SCROLL IF OVERLAY IS OPEN
+            if (overlayRef.current) return; // 遮罩打开时禁止滚动。
             if (e.touches.length === 1) {
                 const deltaY = lastTouchY.current - e.touches[0].clientY;
                 lastTouchY.current = e.touches[0].clientY;
-                // Convert touch movement to scroll velocity
+                // 将触摸位移转换为滚动速度。
                 scrollVelocity.current += deltaY * 0.005;
             }
         };
@@ -248,7 +248,7 @@ const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 />
             )}
 
-            {/* === PAPER AIRPLANE (follows camera maneuvers) === */}
+            {/* 跟随相机动作的纸飞机。 */}
             <group ref={airplaneGroupRef} position={[0, -0.3, 1]}>
                 <PaperAirplane
                     scale={0.8}
@@ -256,10 +256,10 @@ const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 />
             </group>
 
-            {/* === INFINITE SKY WITH CLOUDS + STORY MILESTONES === */}
+            {/* 无限天空、云层与故事里程碑。 */}
             <InfiniteSkyManager scrollProgressRef={scrollPosition} />
 
-            {/* === SKY BACKDROP === */}
+            {/* 天空背景。 */}
             <mesh position={[0, 0, -200]}>
                 <planeGeometry args={[300, 150]} />
                 <meshBasicMaterial color="#87CEEB" side={THREE.DoubleSide} />

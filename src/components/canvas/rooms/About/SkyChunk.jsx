@@ -3,24 +3,24 @@ import { useFrame, useThree, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 
 /**
- * SkyChunk Component
+ * SkyChunk 天空分块组件。
  * 
- * A single repeatable segment of sky with clouds.
- * Hard world-space clipping - no camera-relative fade.
+ * 带云层的可重复天空分段。
+ * 按世界空间硬裁切，不使用相机相对淡出。
  */
 const CHUNK_LENGTH = 40;
 const CHUNK_WIDTH = 20;
 const CHUNK_HEIGHT = 12;
 
-// === TWARDA LINIA ZANIKANIA (WORLD SPACE) ===
-// Pokój About jest na Z = -25 (group position w AboutRoom.jsx)
-// Wszystko z world Z > CORRIDOR_CLIP_Z jest NATYCHMIAST niewidoczne
+// 世界空间中的硬裁切边界。
+// 关于我房间位于 Z=-25，对应 AboutRoom.jsx 中的组位置。
+// 世界 Z > CORRIDOR_CLIP_Z 的内容立即隐藏。
 const CORRIDOR_CLIP_Z = -8.0;
 
-// Pozycja pokoju w world space (hardcoded, bo AboutRoom ma position=[0,0,-25])
+// 固定房间世界坐标，因为 AboutRoom 的 position=[0,0,-25]。
 const ROOM_Z = -25;
 
-// Available cloud textures
+// 可用云纹理。
 const CLOUD_TEXTURES = [
     '/textures/clouds/1131c3eb-dfae-423f-924b-ff39d8ccd6dc.webp',
     '/textures/clouds/254b8ec8-d6f7-4275-956f-7bab65b2ce2d.webp',
@@ -38,7 +38,7 @@ const SkyChunk = ({ chunkIndex = 0, seed = 0, scrollProgressRef }) => {
     const clouds = useMemo(() => {
         const items = [];
         const random = seededRandom(seed + chunkIndex * 1000);
-        const cloudCount = 15 + Math.floor(random() * 8); // Significantly more clouds
+        const cloudCount = 15 + Math.floor(random() * 8); // 显著增加云的数量。
 
         for (let i = 0; i < cloudCount; i++) {
             const x = (random() - 0.5) * CHUNK_WIDTH;
@@ -51,11 +51,11 @@ const SkyChunk = ({ chunkIndex = 0, seed = 0, scrollProgressRef }) => {
                 scale: 0.8 + random() * 1.5,
                 baseOpacity: 0.5 + random() * 0.4,
                 textureIndex: Math.floor(random() * CLOUD_TEXTURES.length),
-                // Animation properties - unique per cloud
-                driftSpeed: 0.3 + random() * 0.4,  // How fast it sways
-                driftAmount: 0.5 + random() * 1.0, // How far it sways (X)
-                bobAmount: 0.1 + random() * 0.2,   // Vertical bob amount
-                timeOffset: random() * Math.PI * 2, // Phase offset so clouds don't sync
+                // 每朵云独立的动画属性。
+                driftSpeed: 0.3 + random() * 0.4,  // 摆动速度。
+                driftAmount: 0.5 + random() * 1.0, // X 方向摆动幅度。
+                bobAmount: 0.1 + random() * 0.2,   // 竖向浮动幅度。
+                timeOffset: random() * Math.PI * 2, // 相位偏移，避免所有云同步运动。
             });
         }
 
@@ -82,7 +82,7 @@ const SkyChunk = ({ chunkIndex = 0, seed = 0, scrollProgressRef }) => {
     );
 };
 
-// Cloud with hard world-space clipping + drift animation
+// 带世界空间硬裁切和漂移动画的云。
 const Cloud = ({
     position,
     scale,
@@ -98,13 +98,13 @@ const Cloud = ({
     const materialRef = useRef();
     const { camera } = useThree();
 
-    // Store base position for animation
+    // 保存动画基础位置。
     const basePosition = useRef(position);
 
-    // Load the specific cloud texture
+    // 加载指定云纹理。
     const texture = useLoader(THREE.TextureLoader, CLOUD_TEXTURES[textureIndex]);
 
-    // LEGACY FIX: Use original aspect ratios to prevent stretching after POT conversion
+    // 使用原始宽高比，防止二次幂尺寸转换后拉伸。
     const legacyCloudAspects = {
         '1131c3eb-dfae-423f-924b-ff39d8ccd6dc.webp': 1.894,
         '254b8ec8-d6f7-4275-956f-7bab65b2ce2d.webp': 2.459,
@@ -117,7 +117,7 @@ const Cloud = ({
     };
 
     const cloudFile = CLOUD_TEXTURES[textureIndex].split('/').pop();
-    const aspectRatio = legacyCloudAspects[cloudFile] || 1.8; // Default to common ratio
+    const aspectRatio = legacyCloudAspects[cloudFile] || 1.8; // 默认使用通用比例。
     const width = 3 * scale;
     const height = width / aspectRatio;
 
@@ -126,47 +126,47 @@ const Cloud = ({
 
         const time = state.clock.elapsedTime;
 
-        // === TWARDA LINIA CLIP (RĘCZNE OBLICZENIE WORLD Z) ===
-        // worldZ = pokój(-25) + scrollProgress + lokalna pozycja chmury
-        // NIE używamy getWorldPosition() bo useFrame dzieci odpala się PRZED rodzicem!
+        // 硬裁切线，手动计算世界 Z。
+        // 世界 Z = 房间位置 -25 + scrollProgress + 云的局部位置。
+        // 不使用 getWorldPosition()，因为子组件的 useFrame 先于父组件执行。
         const scrollProgress = scrollProgressRef?.current || 0;
         const cloudLocalZ = basePosition.current[2];
         const worldZ = ROOM_Z + scrollProgress + cloudLocalZ;
 
-        // === CLOUD EVASION EFFECT ===
-        // As clouds get closer to the camera, they move aside to keep the center clear
+        // 云的避让效果。
+        // 靠近相机时向两侧移动，保持中央视野清晰。
         const evasionStart = -60;
         const evasionEnd = -10;
         let evasionFactor = 0;
 
         if (worldZ > evasionStart && worldZ < evasionEnd) {
             evasionFactor = (worldZ - evasionStart) / (evasionEnd - evasionStart);
-            // Smoothstep for natural ease in and out
+            // 使用 smoothstep 自然缓入缓出。
             evasionFactor = evasionFactor * evasionFactor * (3 - 2 * evasionFactor);
         } else if (worldZ >= evasionEnd) {
             evasionFactor = 1;
         }
 
-        // Push left/right based on initial X position to open up the middle
+        // 按初始 X 位置向左右推开，腾出中间空间。
         const dirX = basePosition.current[0] >= 0 ? 1 : -1;
         const maxEvasion = 15;
         const evasionX = evasionFactor * maxEvasion * dirX;
 
-        // === DRIFT ANIMATION ===
+        // 漂移动画。
         const driftX = Math.sin(time * driftSpeed + timeOffset) * driftAmount;
         const driftY = Math.sin(time * driftSpeed * 0.7 + timeOffset + 1.5) * bobAmount;
 
-        // Apply drift and evasion to position
+        // 将漂移和避让叠加到位置。
         meshRef.current.position.x = basePosition.current[0] + driftX + evasionX;
         meshRef.current.position.y = basePosition.current[1] + driftY;
         meshRef.current.position.z = basePosition.current[2];
 
-        // Jeśli chmura jest za linią clipu → natychmiast niewidoczna
+        // 云越过裁切线后立即隐藏。
         if (materialRef.current) {
             materialRef.current.opacity = worldZ > CORRIDOR_CLIP_Z ? 0 : baseOpacity;
         }
 
-        // Billboard effect - always face camera, turned 90° left
+        // 广告牌效果：始终朝向相机，再向左旋转 90°。
         const offsetRotation = new THREE.Euler(0, -Math.PI / 3, 0);
         const offsetQuaternion = new THREE.Quaternion().setFromEuler(offsetRotation);
         meshRef.current.quaternion.copy(camera.quaternion).multiply(offsetQuaternion);

@@ -3,38 +3,38 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Text, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
-import '../shaders/RevealMaterial'; // Registers alpha-discard reveal shader
+import '../shaders/RevealMaterial'; // 注册使用透明度丢弃的显现着色器。
 import { playBackgroundMusic } from '../../../utils/audioManager';
 import { useAchievements } from '../../../context/AchievementsContext';
 import { isTouchDevice } from '../../../utils/deviceDetect';
 
-// Use same font as App.jsx preload (Inter) - works reliably
-const FONT_URL = 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff';
+// 使用本地中文字体。
+const FONT_URL = '/fonts/LXGWWenKaiLite-Regular.ttf';
 
 
 
 /**
- * EntranceDoors Component - 3D Entrance to the Corridor
+ * EntranceDoors：走廊的三维入口组件。
  * 
- * Doors that open and camera flies through.
- * EmptyCorridor provides the surrounding corridor context.
+ * 门打开后，相机穿过入口。
+ * EmptyCorridor 提供周围的走廊环境。
  */
 const EntranceDoors = ({
     position = [0, 0, 22],
     onComplete,
-    corridorHeight = 8, // Taller wall
-    corridorWidth = 15 // Wider wall
+    corridorHeight = 8, // 较高的墙面。
+    corridorWidth = 15 // 较宽的墙面。
 }) => {
     const leftDoorRef = useRef();
     const rightDoorRef = useRef();
     const leftHandleRef = useRef();
     const rightHandleRef = useRef();
-    const rightDoorMaterialRef = useRef(); // GSAP shader control
-    const leftDoorMaterialRef = useRef(); // Left door reveal control
-    const leftHandleMaterialRef = useRef(); // Left handle reveal control
-    const rightHandleMaterialRef = useRef(); // Right handle reveal control
-    const leftHandlePaintedRef = useRef(); // Painted handle mesh visibility
-    const rightHandlePaintedRef = useRef(); // Painted handle mesh visibility
+    const rightDoorMaterialRef = useRef(); // GSAP 着色器控制。
+    const leftDoorMaterialRef = useRef(); // 左门显现控制。
+    const leftHandleMaterialRef = useRef(); // 左把手显现控制。
+    const rightHandleMaterialRef = useRef(); // 右把手显现控制。
+    const leftHandlePaintedRef = useRef(); // 彩色把手网格的可见状态。
+    const rightHandlePaintedRef = useRef(); // 彩色把手网格的可见状态。
     const groupRef = useRef();
     const [isOpen, setIsOpen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
@@ -50,7 +50,7 @@ const EntranceDoors = ({
         setIsMobile(isTouchDevice() || window.innerWidth < 1000);
     }, []);
 
-    // Dla hooków tekstur musimy obliczyć to raz na starcie
+    // 纹理 Hook 所需值在初始化时只计算一次。
     const isMobileDevice = typeof window !== 'undefined' && (isTouchDevice() || window.innerWidth < 1000);
     const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
@@ -58,7 +58,7 @@ const EntranceDoors = ({
     const doorLeftTexture = useTexture('/textures/doors/door_left_sketch.webp');
     const doorRightTexture = useTexture('/textures/doors/door_right_sketch.webp');
 
-    // Mobile optimization: Don't load painted textures or handles on phones
+    // 移动端优化：手机不加载彩色纹理与把手。
     const doorRightPaintedTexture = useTexture(isMobileDevice ? dummyTex : '/textures/doors/door_right_painted.webp');
     const doorLeftPaintedTexture = useTexture(isMobileDevice ? dummyTex : '/textures/doors/door_left_painted.webp');
     const handleLeftTexture = useTexture('/textures/doors/handle_left_sketch.webp');
@@ -66,13 +66,13 @@ const EntranceDoors = ({
     const handleRightTexture = useTexture('/textures/doors/handle_right_sketch.webp');
     const handleRightPaintedTexture = useTexture(isMobileDevice ? dummyTex : '/textures/doors/handle_right_painted.webp');
 
-    // Dynamic textures for mobile
+    // 移动端动态纹理。
     const doorBackTexture = useTexture(isMobileDevice ? '/textures/doors/door_back.webp' : '/textures/doors/door_back_left_sketch.webp');
     const edgeTexture = useTexture(isMobileDevice ? '/textures/doors/pien_sketch.webp' : '/textures/doors/pien.webp');
 
     const bricksTexture = useTexture('/textures/entrance/wall_bricks_2.webp');
     const stonePathTexture = useTexture('/textures/entrance/stone-path.webp');
-    // const catTexture = useTexture('/textures/entrance/cat_sketch.webp'); // Old side cat
+    // const catTexture = useTexture('/textures/entrance/cat_sketch.webp'); // 旧版侧边猫。
     const catFrontBodyTexture = useTexture('/textures/entrance/cat_front_body.webp');
     const windowSketchTexture = useTexture('/textures/entrance/window_sketch.webp');
     const avatarWindowTexture = useTexture('/textures/entrance/avatar_window.webp');
@@ -83,46 +83,46 @@ const EntranceDoors = ({
     const inkSplashTexture = useTexture('/images/ink-splash.webp');
     const speechBubbleTexture = useTexture('/textures/entrance/speech_bubble.webp');
 
-    // Cat Ref
+    // 猫的引用。
     const leftPupilRef = useRef();
     const rightPupilRef = useRef();
-    const catGroupRef = useRef(); // To get world position for tracking
+    const catGroupRef = useRef(); // 获取世界位置以便跟踪。
     const bugRef = useRef();
 
-    // Bug Click Animation State
+    // 程序错误点击动画状态。
     const [isBugClicked, setIsBugClicked] = useState(false);
     const [textVisible, setTextVisible] = useState(false);
-    const [clipProgress, setClipProgress] = useState(0); // 0-1 for pencil drawing reveal
+    const [clipProgress, setClipProgress] = useState(0); // 铅笔绘制显现进度，范围 0..1。
     const inkSplashRef = useRef();
-    const handleHideDelayRef = useRef(); // Track pending gsap.delayedCall for handle visibility
+    const handleHideDelayRef = useRef(); // 跟踪控制把手显隐的待执行 gsap.delayedCall。
     const bugFixedTextRef = useRef();
-    const bugClickPos = useRef({ x: 0, y: 0 }); // Store click position
+    const bugClickPos = useRef({ x: 0, y: 0 }); // 保存点击位置。
 
-    // Duck Speech Bubble State (Rubber Duck Debugging)
+    // 橡皮鸭调试法的对话气泡状态。
     const [isDuckSpeaking, setIsDuckSpeaking] = useState(false);
     const [duckQuote, setDuckQuote] = useState('');
     const speechBubbleRef = useRef();
 
-    // Rubber Duck Debugging Quotes
+    // 橡皮鸭调试语录。
     const duckQuotes = [
-        "Have you tried console.log()?",
-        "Did you clear the cache?",
-        "It works on my machine! 🤷",
-        "Have you turned it off and on again?",
-        "Maybe it's a CSS issue?",
-        "Check for missing semicolons!",
-        "Did you read the error message?",
-        "Have you tried Stack Overflow?",
-        "Is it plugged in?",
-        "Works in production! 🚀",
+        "试试 console.log() 吧？",
+        "清理过缓存了吗？",
+        "在我电脑上明明能运行！🤷",
+        "试过关闭后重新启动吗？",
+        "会不会是 CSS 的问题？",
+        "看看是不是少了分号！",
+        "仔细看过报错信息了吗？",
+        "试试去 Stack Overflow 找找？",
+        "电源插好了吗？",
+        "生产环境运行正常！🚀",
     ];
 
-    // Bug Click Handler
+    // 处理程序错误图案点击。
     const handleBugClick = (e) => {
         e.stopPropagation();
-        if (isBugClicked) return; // Already clicked
+        if (isBugClicked) return; // 已经点击过。
 
-        // Store bug position at click time
+        // 点击时保存程序错误图案的位置。
         if (bugRef.current) {
             bugClickPos.current = {
                 x: bugRef.current.position.x,
@@ -133,9 +133,9 @@ const EntranceDoors = ({
         setIsBugClicked(true);
         document.body.style.cursor = "auto";
 
-        // Animate ink splash scale up
+        // 墨水飞溅放大动画。
         if (inkSplashRef.current) {
-            // Position ink splash at bug's last position
+            // 墨水飞溅置于程序错误图案的最后位置。
             inkSplashRef.current.position.x = bugClickPos.current.x;
             inkSplashRef.current.position.y = bugClickPos.current.y;
             inkSplashRef.current.scale.set(0, 0, 0);
@@ -150,7 +150,7 @@ const EntranceDoors = ({
             });
         }
 
-        // Pencil drawing effect - smooth reveal from left to right
+        // 铅笔绘制效果，从左至右平滑显现。
         setTextVisible(true);
         setClipProgress(0);
 
@@ -159,7 +159,7 @@ const EntranceDoors = ({
             bugFixedTextRef.current.position.y = bugClickPos.current.y;
         }
 
-        // Animate clip progress from 0 to 1 (reveals text like pencil drawing)
+        // 裁切进度从 0 到 1，像铅笔绘制一样显现文字。
         gsap.to({ progress: 0 }, {
             progress: 1,
             duration: 0.8,
@@ -168,7 +168,7 @@ const EntranceDoors = ({
                 setClipProgress(this.targets()[0].progress);
             },
             onComplete: () => {
-                // Fade out after a delay
+                // 延迟后淡出。
                 setTimeout(() => {
                     if (inkSplashRef.current) {
                         gsap.to(inkSplashRef.current.material, {
@@ -182,17 +182,17 @@ const EntranceDoors = ({
         });
     };
 
-    // Duck Click Handler (Rubber Duck Debugging)
+    // 橡皮鸭点击处理，用于橡皮鸭调试。
     const handleDuckClick = (e) => {
         e.stopPropagation();
-        if (isDuckSpeaking) return; // Already speaking
+        if (isDuckSpeaking) return; // 已经在说话。
 
-        // Pick random quote
+        // 随机选择语录。
         const randomQuote = duckQuotes[Math.floor(Math.random() * duckQuotes.length)];
         setDuckQuote(randomQuote);
         setIsDuckSpeaking(true);
 
-        // Scale in animation for speech bubble
+        // 对话气泡缩放进入动画。
         if (speechBubbleRef.current) {
             speechBubbleRef.current.scale.set(0, 0, 0);
             gsap.to(speechBubbleRef.current.scale, {
@@ -204,7 +204,7 @@ const EntranceDoors = ({
             });
         }
 
-        // Hide after 3 seconds
+        // 3 秒后隐藏。
         setTimeout(() => {
             if (speechBubbleRef.current) {
                 gsap.to(speechBubbleRef.current.scale, {
@@ -221,22 +221,22 @@ const EntranceDoors = ({
         }, 3000);
     };
 
-    // ... (lines omitted)
+    // ……省略部分行。
 
 
 
-    // Door dimensions - calculated from texture proportions (332x848 = 1:2.55)
-    // Door dimensions - calculated from texture proportions (332x848 = 1:2.55)
+    // 门尺寸按纹理比例 332×848 计算，约为 1:2.55。
+    // 门尺寸按纹理比例 332×848 计算，约为 1:2.55。
     const doorWidth = 0.94;
     const doorHeight = 2.4;
-    const doorOpeningWidth = doorWidth * 2; // Both doors together
+    const doorOpeningWidth = doorWidth * 2; // 两扇门合计。
     const wallThickness = 0.07;
 
-    // Frame dimensions from texture (718x877 = 1:1.22)
-    const frameWidth = doorOpeningWidth + 0.16; // Extra for frame borders
-    const frameHeight = frameWidth * (877 / 718); // Maintain texture aspect ratio
+    // 门框尺寸按纹理 718×877 计算，约为 1:1.22。
+    const frameWidth = doorOpeningWidth + 0.16; // 额外预留门框边缘。
+    const frameHeight = frameWidth * (877 / 718); // 保持纹理宽高比。
 
-    // Floor Y must remain at standard level (-1.75) regardless of wall height
+    // 无论墙高如何，地面 Y 始终保持标准值 -1.75。
     const floorY = -1.75;
     const doorBottomY = floorY;
     const doorCenterY = doorBottomY + doorHeight / 2;
@@ -247,15 +247,15 @@ const EntranceDoors = ({
 
 
 
-    // Cat Interaction State
+    // 猫的交互状态。
 
 
-    // Handle click
+    // 处理点击。
     const handleClick = (e) => {
         e.stopPropagation();
         if (isOpen || isAnimating) return;
 
-        // Reset cursor immediately on transition start
+        // 过渡开始时立即重置光标。
         document.body.style.cursor = "auto";
 
         setIsOpen(true);
@@ -269,7 +269,7 @@ const EntranceDoors = ({
             }
         });
 
-        // Press handles down fully (like really opening)
+        // 完全压下把手，模拟真实开门。
         if (leftHandleRef.current) {
             tl.to(leftHandleRef.current.rotation, {
                 z: 0.4,
@@ -285,7 +285,7 @@ const EntranceDoors = ({
             }, 0);
         }
 
-        // Open doors - smoother angle (matches SegmentDoors)
+        // 开门角度更平滑，与 SegmentDoors 一致。
         tl.to(leftDoorRef.current.rotation, {
             y: -Math.PI * 0.55,
             duration: 0.9,
@@ -298,22 +298,22 @@ const EntranceDoors = ({
             ease: 'power2.out'
         }, 0.1);
 
-        // Camera flies through - STOP CLOSER to avatar/ITOM
+        // 相机穿过门，停在更靠近人物与 ITOM 的位置。
         tl.to(camera.position, {
-            z: 11,  // Closer stop point (was 11)
-            y: 0.2, // Match hook's base Y position
+            z: 11,  // 终点更靠近人物，原值为 11。
+            y: 0.2, // 与 Hook 的基础 Y 位置一致。
             duration: 1.8,
             ease: 'power2.inOut'
         }, 0.3);
     };
 
-    // Handle hover - doors slightly open to indicate interactivity
+    // 悬停时微开门，提示可交互。
     const handlePointerEnter = () => {
         if (isOpen || isAnimating || isMobile) return;
         setIsHovered(true);
         document.body.style.cursor = "pointer";
 
-        // Slightly open doors on hover
+        // 悬停时稍微开门。
         gsap.to(leftDoorRef.current.rotation, {
             y: -0.08,
             duration: 0.3,
@@ -327,7 +327,7 @@ const EntranceDoors = ({
             overwrite: true
         });
 
-        // Rotate handles down slightly (hint effect)
+        // 略微压下把手，作为提示。
         if (leftHandleRef.current) {
             gsap.to(leftHandleRef.current.rotation, {
                 z: 0.1,
@@ -345,7 +345,7 @@ const EntranceDoors = ({
             });
         }
 
-        // Brush-stroke reveal: discard sketch pixels to show painted door beneath
+        // 笔刷显现：丢弃速写像素，露出下方彩色门。
         if (rightDoorMaterialRef.current) {
             gsap.to(rightDoorMaterialRef.current, {
                 uProgress: 1.0,
@@ -378,7 +378,7 @@ const EntranceDoors = ({
                 overwrite: true
             });
         }
-        // Show painted handles (kill any pending hide from previous leave)
+        // 显示彩色把手，并取消之前移出事件留下的隐藏任务。
         if (handleHideDelayRef.current) handleHideDelayRef.current.kill();
         if (leftHandlePaintedRef.current) leftHandlePaintedRef.current.visible = true;
         if (rightHandlePaintedRef.current) rightHandlePaintedRef.current.visible = true;
@@ -389,7 +389,7 @@ const EntranceDoors = ({
         setIsHovered(false);
         document.body.style.cursor = "auto";
 
-        // Close doors back
+        // 重新关门。
         gsap.to(leftDoorRef.current.rotation, {
             y: 0,
             duration: 0.3,
@@ -403,7 +403,7 @@ const EntranceDoors = ({
             overwrite: true
         });
 
-        // Reset handles
+        // 重置把手。
         if (leftHandleRef.current) {
             gsap.to(leftHandleRef.current.rotation, {
                 z: 0,
@@ -421,7 +421,7 @@ const EntranceDoors = ({
             });
         }
 
-        // Reverse brush-stroke reveal
+        // 反向执行笔刷显现。
         if (rightDoorMaterialRef.current) {
             gsap.to(rightDoorMaterialRef.current, {
                 uProgress: 0.0,
@@ -455,7 +455,7 @@ const EntranceDoors = ({
             });
         }
 
-        // Hide painted handles after reverse animation completes
+        // 反向动画完成后隐藏彩色把手。
         handleHideDelayRef.current = gsap.delayedCall(0.55, () => {
             if (leftHandlePaintedRef.current) leftHandlePaintedRef.current.visible = false;
             if (rightHandlePaintedRef.current) rightHandlePaintedRef.current.visible = false;
@@ -464,46 +464,46 @@ const EntranceDoors = ({
 
 
 
-    // --- Cat Eye Tracking Logic ---
+    // 猫眼跟踪逻辑。
     useFrame((state) => {
         if (!leftPupilRef.current || !rightPupilRef.current) return;
 
-        // Mouse position in normalized device reference (-1 to +1)
+        // 鼠标标准设备坐标，范围 -1 至 +1。
         const { x, y } = state.pointer;
 
-        // Configuration
-        const MAX_EYE_MOVEMENT = 0.015; // How far pupils can move from center
+        // 配置。
+        const MAX_EYE_MOVEMENT = 0.015; // 瞳孔离中心的最大移动距离。
 
-        // Simple mapping
+        // 简单映射。
         const targetX = x * MAX_EYE_MOVEMENT * 2;
         const targetY = y * MAX_EYE_MOVEMENT * 2;
 
-        // Smoothly interpolate current pupil position to target
-        // Left Eye Original: [-0.063, 0.27]
+        // 将当前瞳孔位置平滑插值至目标。
+        // 左眼原位置：[-0.063, 0.27]。
         leftPupilRef.current.position.x = THREE.MathUtils.lerp(leftPupilRef.current.position.x, -0.075 + targetX, 0.1);
         leftPupilRef.current.position.y = THREE.MathUtils.lerp(leftPupilRef.current.position.y, 0.28 + targetY, 0.1);
 
-        // Right Eye Original: [0.0615, 0.27]
+        // 右眼原位置：[0.0615, 0.27]。
         rightPupilRef.current.position.x = THREE.MathUtils.lerp(rightPupilRef.current.position.x, 0.043 + targetX, 0.1);
         rightPupilRef.current.position.y = THREE.MathUtils.lerp(rightPupilRef.current.position.y, 0.28 + targetY, 0.1);
     });
 
-    // --- Mouse Swinging Animation ---
+    // 悬挂鼠标摆动动画。
     const mousePivotRef = useRef();
     useFrame(({ clock }) => {
         if (mousePivotRef.current) {
-            // Gentle swing: sin wave
-            // Amplitude: 0.05 radians (approx 3 degrees)
-            // Speed: 1.5
+            // 用正弦波产生轻柔摆动。
+            // 振幅 0.05 弧度，约 3°。
+            // 速度：1.5。
             mousePivotRef.current.rotation.x = Math.sin(clock.elapsedTime * 1.5) * 0.05;
         }
 
-        // --- Bug Animation ---
+        // 程序错误图案动画。
         if (bugRef.current) {
             const time = clock.elapsedTime;
-            // Wandering logic: slightly complex sine waves for "random" walking felt
-            // Initial Pos: [2.5, floorY + 3.0, 0.16] (Above window)
-            // Range: +/- 0.3 in X, +/- 0.3 in Y
+            // 用多重正弦波模拟随机漫步。
+            // 初始位置：[2.5, floorY + 3.0, 0.16]，位于窗上方。
+            // 移动范围：X、Y 均为 ±0.3。
 
             const xOffset = Math.sin(time * 0.8) * 0.3 + Math.sin(time * 1.5) * 0.1;
             const yOffset = Math.cos(time * 0.6) * 0.2 + Math.cos(time * 1.1) * 0.1;
@@ -511,14 +511,14 @@ const EntranceDoors = ({
             bugRef.current.position.x = 3 + xOffset;
             bugRef.current.position.y = (floorY + 3.8) + yOffset;
 
-            // Random rotation jitter
+            // 随机旋转抖动。
             bugRef.current.rotation.z = Math.sin(time * 5) * 0.1 + Math.atan2(yOffset, xOffset) * 0.2;
         }
     });
 
 
 
-    // Helper for window hover
+    // 窗户悬停辅助函数。
     const handleWindowEnter = (e) => {
         e.stopPropagation();
         setIsWindowHovered(true);
@@ -561,22 +561,22 @@ const EntranceDoors = ({
         }
     };
 
-    // Frame center Y - aligned with doors
+    // 门框中心 Y，与门对齐。
     const frameCenterY = doorBottomY + frameHeight / 2;
 
     const facadeYOffset = -1.65;
 
 
     const pathWidth = frameWidth + 0.4;
-    // New texture is 1005x2317 (approx 1:2.3 ratio). 
-    // Width 2.44 * 2.3 = ~5.6 height.
+    // 新纹理为 1005×2317，比例约 1:2.3。
+    // 宽 2.44，乘以 2.3 后高约 5.6。
     const pathLength = 5.62;
 
     return (
         <group ref={groupRef} position={[position[0], 0, position[2]]}>
 
-            {/* === STONE PATH FLOOR (On Top - in front of entrance) === */}
-            {/* WYSOKOŚĆ STONE PATH: zmień 'floorY + 0.02' - większa liczba = wyżej */}
+            {/* 入口前方上层的石板路地面。 */}
+            {/* 石板路高度：调整 floorY + 0.02，数值越大越高。 */}
             <mesh
                 position={[0, floorY + 0.02, pathLength / 2]}
                 rotation={[-Math.PI / 2, 0, 0]}
@@ -589,32 +589,32 @@ const EntranceDoors = ({
             </mesh>
 
 
-            {/* LEFT WALL PANEL */}
+            {/* 左侧墙面板。 */}
             <mesh position={[-(doorOpeningWidth / 2 + sideWallWidth / 2), wallCenterY, 0]}>
                 <boxGeometry args={[sideWallWidth, corridorHeight, wallThickness]} />
                 <meshBasicMaterial color="#e0e0e0" roughness={0.95} />
             </mesh>
 
-            {/* RIGHT WALL PANEL */}
+            {/* 右侧墙面板。 */}
             <mesh position={[(doorOpeningWidth / 2 + sideWallWidth / 2), wallCenterY, 0]}>
                 <boxGeometry args={[sideWallWidth, corridorHeight, wallThickness]} />
                 <meshBasicMaterial color="#e0e0e0" roughness={0.95} />
             </mesh>
 
-            {/* TOP WALL PANEL */}
+            {/* 顶部墙面板。 */}
             <mesh position={[0, topWallCenterY, 0]}>
                 <boxGeometry args={[doorOpeningWidth, topWallHeight, wallThickness]} />
                 <meshBasicMaterial color="#e0e0e0" roughness={0.95} />
             </mesh>
 
-            {/* === BRICK FACADE === */}
+            {/* 砖墙立面。 */}
             {/* 
-                DOSTOSOWANIE OBRAZKA (TEXTURE ADJUSTMENT):
-                1. args={[Szerokość, Wysokość]} - Rozmiar obrazka
-                2. facadeYOffset - Przesunięcie góra/dół (np. -1 obniży, 1 podwyższy)
+                图片纹理调节：
+                1. args={[宽度, 高度]}：图片尺寸。
+                2. facadeYOffset：上下偏移，如 -1 下移、1 上移。
             */}
             <mesh position={[0, wallCenterY + facadeYOffset + 1.65, 0.15]}>
-                {/* args={[Szerokość, Wysokość]} - Zmieniaj te liczby (np. 7, 8) */}
+                {/* 修改 args={[宽度, 高度]} 中的数值，例如 7、8。 */}
                 <planeGeometry args={[16., 8]} />
                 <meshBasicMaterial color="#e0e0e0"
                     map={bricksTexture}
@@ -624,7 +624,7 @@ const EntranceDoors = ({
                 />
             </mesh>
 
-            {/* === TEXTURED FRAME === */}
+            {/* 带纹理的门框。 */}
             <mesh position={[0, frameCenterY, 0.12]}>
                 <planeGeometry args={[frameWidth, frameHeight]} />
                 <meshBasicMaterial color="#e0e0e0"
@@ -636,9 +636,9 @@ const EntranceDoors = ({
                 />
             </mesh>
 
-            {/* LEFT DOOR */}
+            {/* 左门。 */}
             <group ref={leftDoorRef} position={[-doorWidth, doorCenterY, 0]}>
-                {/* Solid 3D Door Body with edge texture */}
+                {/* 带边缘纹理的实体三维门体。 */}
                 <mesh
                     position={[doorWidth / 2, 0, 0.06]}
                     onClick={handleClick}
@@ -649,7 +649,7 @@ const EntranceDoors = ({
                     <meshBasicMaterial color="#e0e0e0" map={edgeTexture} roughness={0.9} />
                 </mesh>
 
-                {/* Painted layer (behind sketch) - left door */}
+                {/* 左门的后方彩色层。 */}
                 {!isMobile && (
                     <mesh position={[doorWidth / 2, 0, 0.088]}>
                         <planeGeometry args={[doorWidth, doorHeight]} />
@@ -662,7 +662,7 @@ const EntranceDoors = ({
                     </mesh>
                 )}
 
-                {/* Sketch overlay (front) - left door brush-stroke reveal */}
+                {/* 左门的前方速写叠加层，使用笔刷显现。 */}
                 <mesh position={[doorWidth / 2, 0, 0.09]}>
                     <planeGeometry args={[doorWidth, doorHeight]} />
                     <revealMaterial color="#e0e0e0"
@@ -676,7 +676,7 @@ const EntranceDoors = ({
                     />
                 </mesh>
 
-                {/* Back Texture Face (mirrored) */}
+                {/* 镜像背面纹理平面。 */}
                 <mesh position={[doorWidth / 2, 0, 0.03]} rotation={[0, Math.PI, 0]} scale={[-1, 1, 1]}>
                     <planeGeometry args={[doorWidth, doorHeight]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -688,9 +688,9 @@ const EntranceDoors = ({
                     />
                 </mesh>
 
-                {/* Handle Layer (animated) - pivot at screw center (292,459 on 332x848 texture) */}
+                {/* 把手动画层，以螺丝中心为轴；332×848 纹理中的 (292,459)。 */}
                 <group ref={leftHandleRef} position={[doorWidth / 2 + 0.357, -0.099, 0.10]}>
-                    {/* Painted handle (behind) - hidden until hover */}
+                    {/* 彩色把手位于后方，悬停前隐藏。 */}
                     {!isMobile && (
                         <mesh ref={leftHandlePaintedRef} position={[-0.357, 0.09, -0.001]} visible={false}>
                             <planeGeometry args={[doorWidth, doorHeight]} />
@@ -702,7 +702,7 @@ const EntranceDoors = ({
                             />
                         </mesh>
                     )}
-                    {/* Sketch handle overlay (front) */}
+                    {/* 前方速写把手叠加层。 */}
                     <mesh position={[-0.357, 0.099, 0]}>
                         <planeGeometry args={[doorWidth, doorHeight]} />
                         <revealMaterial color="#e0e0e0"
@@ -717,9 +717,9 @@ const EntranceDoors = ({
                 </group>
             </group>
 
-            {/* RIGHT DOOR */}
+            {/* 右门。 */}
             <group ref={rightDoorRef} position={[doorWidth, doorCenterY, 0]}>
-                {/* Solid 3D Door Body with edge texture */}
+                {/* 带边缘纹理的实体三维门体。 */}
                 <mesh
                     position={[-doorWidth / 2, 0, 0.06]}
                     onClick={handleClick}
@@ -730,7 +730,7 @@ const EntranceDoors = ({
                     <meshBasicMaterial color="#e0e0e0" map={edgeTexture} roughness={0.9} />
                 </mesh>
 
-                {/* Painted layer (behind sketch) - revealed when sketch fades out on hover */}
+                {/* 后方彩色层，悬停时通过速写层淡出而显现。 */}
                 {!isMobile && (
                     <mesh position={[-doorWidth / 2, 0, 0.088]}>
                         <planeGeometry args={[doorWidth, doorHeight]} />
@@ -743,7 +743,7 @@ const EntranceDoors = ({
                     </mesh>
                 )}
 
-                {/* Sketch overlay (front) - brush-stroke discard reveals painted beneath */}
+                {/* 前方速写叠加层通过笔刷丢弃露出底层彩色图。 */}
                 <mesh position={[-doorWidth / 2, 0, 0.09]}>
                     <planeGeometry args={[doorWidth, doorHeight]} />
                     <revealMaterial color="#e0e0e0"
@@ -757,7 +757,7 @@ const EntranceDoors = ({
                     />
                 </mesh>
 
-                {/* Back Texture Face */}
+                {/* 背面纹理平面。 */}
                 <mesh position={[-doorWidth / 2, 0, 0.03]} rotation={[0, Math.PI, 0]}>
                     <planeGeometry args={[doorWidth, doorHeight]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -768,9 +768,9 @@ const EntranceDoors = ({
                     />
                 </mesh>
 
-                {/* Handle Layer (animated) - pivot at screw center (40,459 on 332x848 texture) */}
+                {/* 把手动画层，以螺丝中心为轴；332×848 纹理中的 (40,459)。 */}
                 <group ref={rightHandleRef} position={[-doorWidth / 2 - 0.357, -0.099, 0.10]}>
-                    {/* Painted handle (behind) - hidden until hover */}
+                    {/* 彩色把手位于后方，悬停前隐藏。 */}
                     {!isMobile && (
                         <mesh ref={rightHandlePaintedRef} position={[0.357, 0.09, -0.001]} visible={false}>
                             <planeGeometry args={[doorWidth, doorHeight]} />
@@ -782,7 +782,7 @@ const EntranceDoors = ({
                             />
                         </mesh>
                     )}
-                    {/* Sketch handle overlay (front) */}
+                    {/* 前方速写把手叠加层。 */}
                     <mesh position={[0.357, 0.099, 0]}>
                         <planeGeometry args={[doorWidth, doorHeight]} />
                         <revealMaterial color="#e0e0e0"
@@ -797,14 +797,14 @@ const EntranceDoors = ({
                 </group>
             </group>
 
-            {/* Warm lighting - WYLACZONE */}
+            {/* 暖色光照，已禁用。 */}
             {/* <pointLight
                 position={[0, doorBottomY + doorHeight + 1, 1]}
                 intensity={0.8}
                 color="#fff8e8"
                 distance={10}
             /> */}
-            {/* AVATAR - separate from window group, behind bricks */}
+            {/* 人物独立于窗户组，位于砖墙后。 */}
             <mesh
                 ref={windowAvatarRef}
                 position={[3.5, 0, 0.04]}
@@ -817,13 +817,13 @@ const EntranceDoors = ({
                 />
             </mesh>
 
-            {/* WINDOW - positioned to the right of doors */}
+            {/* 窗户位于门右侧。 */}
             <group
                 position={[2.5, 0, 0.1]}
                 onPointerEnter={handleWindowEnter}
                 onPointerLeave={handleWindowLeave}
             >
-                {/* Window Frame Sketch - in front of bricks */}
+                {/* 窗框速写，位于砖墙前。 */}
                 <mesh position={[0, 0, 0.2]}>
                     <planeGeometry args={[1.5, 1.5]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -833,9 +833,9 @@ const EntranceDoors = ({
                 </mesh>
             </group>
 
-            {/* DUCK POT (Right Side - Under Window) */}
+            {/* 鸭子花盆，右侧窗下。 */}
             <group position={[2.5, floorY + 0.45, 0.4]}>
-                {/* Pot texture */}
+                {/* 花盆纹理。 */}
                 <mesh>
                     <planeGeometry args={[3, 1.8]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -846,7 +846,7 @@ const EntranceDoors = ({
                     />
                 </mesh>
 
-                {/* Invisible hitbox just for the duck (right side of pot) */}
+                {/* 仅覆盖花盆右侧鸭子的不可见交互区域。 */}
                 <mesh
                     position={[0.38, 0.1, 0.01]}
                     onClick={handleDuckClick}
@@ -857,7 +857,7 @@ const EntranceDoors = ({
                     <meshBasicMaterial color="#e0e0e0" transparent opacity={0} />
                 </mesh>
 
-                {/* Speech Bubble */}
+                {/* 对话气泡。 */}
                 <group
                     ref={speechBubbleRef}
                     position={[0.9, 0.8, 0.1]}
@@ -873,9 +873,9 @@ const EntranceDoors = ({
                         />
                     </mesh>
 
-                    {/* Quote Text */}
-                    {/* ROZMIAR TEKSTU: fontSize - mniejsza = mniejszy tekst */}
-                    {/* ZAWIJANIE: maxWidth - mniejsza = wcześniejsze zawijanie */}
+                    {/* 语录文字。 */}
+                    {/* 文字尺寸：fontSize 越小，文字越小。 */}
+                    {/* 换行宽度：maxWidth 越小，越早换行。 */}
                     <Text
                         position={[0, 0.1, 0.01]}
                         fontSize={0.07}
@@ -883,16 +883,17 @@ const EntranceDoors = ({
                         anchorX="center"
                         anchorY="middle"
                         font={FONT_URL}
+                        overflowWrap="break-word"
                         maxWidth={1.4}
                         textAlign="center"
-                        visible={isDuckSpeaking} // Toggle visibility instead of mounting/unmounting
+                        visible={isDuckSpeaking} // 切换可见性，避免反复挂载与卸载。
                     >
                         {duckQuote || " "}
                     </Text>
                 </group>
             </group>
 
-            {/* ANIMATED BUG (Right Side - Above Window) */}
+            {/* 窗上方右侧的程序错误图案动画。 */}
             {!isBugClicked && (
                 <mesh
                     ref={bugRef}
@@ -911,12 +912,12 @@ const EntranceDoors = ({
                 </mesh>
             )}
 
-            {/* INK SPLASH - always mounted to preload texture/shader */}
+            {/* 墨水飞溅始终挂载，以预加载纹理与着色器。 */}
             <mesh
                 ref={inkSplashRef}
                 position={[2.5, floorY + 2.8, 0.17]}
                 scale={[0, 0, 0]}
-            // Removed conditional 'visible' to ensure GPU upload
+            // 移除条件 visible，确保上传 GPU。
             >
                 <planeGeometry args={[2, 2]} />
                 <meshBasicMaterial color="#e0e0e0"
@@ -927,29 +928,29 @@ const EntranceDoors = ({
                 />
             </mesh>
 
-            {/* BUG FIXED! Text - always mounted to preload font */}
+            {/* “错误已修复”文字始终挂载，以预加载字体。 */}
             <Text
                 ref={bugFixedTextRef}
-                position={[2.5, floorY + 2.8, 0.35]} // Default pos, updated on click
-                fontSize={0.25} // Increased size slightly for CabinSketch
+                position={[2.5, floorY + 2.8, 0.35]} // 默认位置，点击时更新。
+                fontSize={0.25} // 略微增大字号。
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Bold.ttf"
+                font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 outlineWidth={0.015}
                 outlineColor="#ffffff"
                 clipRect={[-1, -0.5, -1 + (clipProgress * 2.5), 0.5]}
             >
-                BUG FIXED!
+                问题已修复！
             </Text>
 
 
 
 
 
-            {/* TREE & MOUSE (Left Side) */}
+            {/* 左侧树与悬挂鼠标。 */}
             <group position={[-2.9, floorY + 2.7, 1]}>
-                {/* Tree */}
+                {/* 树。 */}
                 <mesh position={[0, 0, 0]}>
                     <planeGeometry args={[6, 8]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -959,14 +960,14 @@ const EntranceDoors = ({
                         depthWrite={false}
                     />
                 </mesh>
-                {/* Mouse Hanging - Pivot Group for swinging */}
-                {/* Pivot is moved UP by ~2.0 to be near the top of the string/branch */}
-                {/* Original Mesh Y was 0.02. New Pivot Y is 0.02 + 2.0 = 2.02 */}
-                {/* Mouse Hanging - Pivot Group for swinging */}
-                {/* Pivot: 421, 597px. Offset relative to center: X=0.351, Y=-0.456 */}
-                {/* Group Position shift: (-0.01, 0.02) + (0.351, -0.456) = (0.341, -0.436) */}
+                {/* 悬挂鼠标：用于摆动的旋转轴组。 */}
+                {/* 旋转轴上移约 2.0，靠近悬线或树枝顶部。 */}
+                {/* 网格原 Y=0.02，新旋转轴 Y=0.02+2.0=2.02。 */}
+                {/* 悬挂鼠标：用于摆动的旋转轴组。 */}
+                {/* 旋转轴像素为 (421,597)，相对中心偏移 X=0.351、Y=-0.456。 */}
+                {/* 组位置偏移：(-0.01, 0.02)+(0.351, -0.456)=(0.341, -0.436)。 */}
                 <group ref={mousePivotRef} position={[0.341, 0.02 - 0.456, 0]}>
-                    {/* Mesh moves opposite to pivot offset to keep visual position */}
+                    {/* 网格沿旋转轴偏移的反方向移动，保持视觉位置。 */}
                     <mesh position={[-0.351, 0.456, 0]}>
                         <planeGeometry args={[6, 8]} />
                         <meshBasicMaterial color="#e0e0e0"
@@ -979,9 +980,9 @@ const EntranceDoors = ({
                 </group>
             </group>
 
-            {/* CAT SKETCH (Front Facing) */}
+            {/* 正面猫速写。 */}
             <group position={[-1.5, floorY + 0.6, 0.8]} ref={catGroupRef}>
-                {/* Body */}
+                {/* 身体。 */}
                 <mesh>
                     <planeGeometry args={[1.5, 1.5]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -992,21 +993,21 @@ const EntranceDoors = ({
                     />
                 </mesh>
 
-                {/* Left Pupil */}
+                {/* 左瞳孔。 */}
                 <mesh
                     ref={leftPupilRef}
-                    position={[-0.063, 0.27, -0.02]} // Behind cat
+                    position={[-0.063, 0.27, -0.02]} // 位于猫后方。
                 >
                     <circleGeometry args={[0.020, 32]} />
                     <meshBasicMaterial color="black" />
-                    {/* Oval Scale */}
+                    {/* 椭圆缩放。 */}
                     <group scale={[0.8, 1.2, 1]} />
                 </mesh>
 
-                {/* Right Pupil */}
+                {/* 右瞳孔。 */}
                 <mesh
                     ref={rightPupilRef}
-                    position={[0.0615, 0.27, -0.02]} // Behind cat
+                    position={[0.0615, 0.27, -0.02]} // 位于猫后方。
                 >
                     <circleGeometry args={[0.020, 32]} />
                     <meshBasicMaterial color="black" />

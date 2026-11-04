@@ -2,18 +2,18 @@ import * as THREE from 'three';
 import { extend } from '@react-three/fiber';
 
 /**
- * PaintRevealMaterial - extends MeshStandardMaterial for brush-stroke paint reveal.
+ * PaintRevealMaterial：扩展 MeshStandardMaterial，实现笔刷上色显现。
  * 
- * Instead of discarding pixels (like RevealMaterial), this material BLENDS
- * between the base sketch texture (map) and a painted version (uMapPainted)
- * using the same noisy brush-stroke mask pattern.
+ * 通过混合基础速写纹理 map 与彩色纹理 uMapPainted，
+ * 实现颜色过渡，
+ * 使用与其他显现材质相同的噪声笔刷遮罩。
  * 
- * Usage: <paintRevealMaterial map={sketchTex} uMapPainted={paintedTex} uProgress={0-1} />
- * As uProgress goes from 0→1, pixels transition from sketch to painted with noisy edges.
+ * 用法：<paintRevealMaterial map={sketchTex} uMapPainted={paintedTex} uProgress={0-1} />
+ * uProgress 从 0 到 1 时，像素沿噪声边缘从速写过渡为彩色。
  */
 class PaintRevealMaterial extends THREE.MeshBasicMaterial {
     constructor(params = {}) {
-        // Extract custom params before passing to super
+        // 传入 super 前先提取自定义参数。
         const { uMapPainted, ...standardParams } = params;
         super(standardParams);
         this._uProgress = 0.0;
@@ -46,7 +46,7 @@ class PaintRevealMaterial extends THREE.MeshBasicMaterial {
         shader.uniforms.uProgress = { value: this._uProgress };
         shader.uniforms.uMapPainted = { value: this._uMapPainted };
 
-        // Inject uniforms and noise into fragment shader
+        // 向片元着色器注入 uniform 和噪声函数。
         shader.fragmentShader = shader.fragmentShader.replace(
             '#include <common>',
             /* glsl */`#include <common>
@@ -69,21 +69,21 @@ class PaintRevealMaterial extends THREE.MeshBasicMaterial {
             `
         );
 
-        // After the map fragment (which samples the base texture into sampledDiffuseColor),
-        // blend with the painted texture based on uProgress
+        // 基础纹理经 map 片段采样到 sampledDiffuseColor 后，
+        // 按 uProgress 混合彩色纹理。
         shader.fragmentShader = shader.fragmentShader.replace(
             '#include <map_fragment>',
             /* glsl */`#include <map_fragment>
 
-            // Brush-stroke blend: progressively swap sketch→painted
+            // 笔刷混合：逐渐从速写切换到彩色。
             if (uProgress > 0.001) {
                 vec4 paintedColor = texture2D(uMapPainted, vMapUv);
                 float rn = paintNoise(vMapUv * 15.0) * 0.15;
-                // Reveal from bottom-left to top-right for organic feel
+                // 从左下向右上显现，营造自然感。
                 float maskValue = (1.0 - vMapUv.y) + rn;
                 float threshold = uProgress * 1.5;
                 if (maskValue < threshold) {
-                    // Replace the diffuseColor with painted version
+                    // 用彩色版本替换 diffuseColor。
                     diffuseColor = vec4(paintedColor.rgb, 1.0);
                 }
             }
@@ -92,7 +92,7 @@ class PaintRevealMaterial extends THREE.MeshBasicMaterial {
     }
 }
 
-// Register so R3F can use <paintRevealMaterial />
+// 注册后，R3F 可使用 <paintRevealMaterial />。
 extend({ PaintRevealMaterial });
 
 export { PaintRevealMaterial };

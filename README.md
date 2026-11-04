@@ -1,95 +1,84 @@
-# 🎨 ITom Dev | Interactive 3D WebGL Portfolio
+# ITom：中文 3D 交互作品集
 
-<div align="center">
-  <img src="https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react" alt="React" />
-  <img src="https://img.shields.io/badge/Three.js-0.182-black?style=for-the-badge&logo=threedotjs" alt="Three.js" />
-  <img src="https://img.shields.io/badge/R3F-9.4-purple?style=for-the-badge&logo=react" alt="React Three Fiber" />
-  <img src="https://img.shields.io/badge/GSAP-3.14-green?style=for-the-badge&logo=greensock" alt="GSAP" />
-  <img src="https://img.shields.io/badge/Vite-7.2-646CFF?style=for-the-badge&logo=vite" alt="Vite" />
-</div>
+这是基于 Tomasz “ITom” Szmajda 作品集的中文版本，使用 React 19、Three.js、React Three Fiber、GSAP 和 Vite。用户从入口进入无限走廊，探索作品画廊、内容工作室、关于我和联系我四个房间；`/start` 是独立的静态链接页。
 
-<br/>
+## 本地运行
 
-Welcome to the open-source repository of **Tomasz "ITom" Szmajda's** interactive 3D Web Developer portfolio. This project pushes the limits of modern web technologies by blending spatial WebGL computing, complex React ecosystems, and highly optimized frontend engineering.
+安装符合 Vite 7 要求的 Node.js：20.19+ 或 22.12+。
 
-> [!NOTE]
-> Ensure hardware acceleration is enabled in your browser settings to experience the smooth 60 FPS high-tier rendering of this application.
-
-## 🚀 Key Performance Architectures (2026 Standards)
-
-This application is strictly optimized for cross-device operability, achieving zero lag spikes even on mobile processors through several bespoke architectural implementations:
-
-1. **Invisible Semantic SEO Fallback:** Bypasses WebGL canvas SEO limitations via strategic `sr-only-seo` indexing DOM injections, rendering fully visible semantic trees to native search-engine crawlers without mounting heavy bundles.
-2. **Asynchronous Shader Compilation:** Enforces `gl.compileAsync` during the Preloading phase inside a hidden `RoomWarmup` Suspense boundary. This allows Three.js to pre-compile complex materials asynchronously without blocking the main React update thread.
-3. **Baked Global Tinting & Lighing Extraction:** Replaced real-time WebGL shadow maps and infinite light rays with baked-in global textures (`apply_global_tint.js`), dropping the GPU compute overhead entirely while maintaining visual depth.
-4. **DOM Mutation Bypassing:** Critical animation properties (like SVG preloader states tracking 130+ concurrent HTTP texture requests) write directly to the `ref.current.style`, intentionally bypassing React’s `setState` render cycles to conserve CPU.
-5. **Adaptive Device Tiering:** Auto-detects `navigator.deviceMemory`, hardware concurrency, and viewport sizes to scale WebGL resolutions (`dpr`), antialiasing algorithms, and texture loading strictness on the fly.
-
----
-
-## 🏗️ 3D Scene Architecture
-
-```mermaid
-graph TD;
-    A[App.jsx] --> B[SceneProvider Context];
-    A --> C[canvas];
-    A --> D[2D DOM / SEO / HUD];
-    
-    C --> E[Experience.jsx];
-    E --> F[RoomWarmup Pre-compiler];
-    E --> G[Infinite Corridor Manager];
-    
-    G --> H[Gallery Room];
-    G --> I[Studio Room];
-    G --> J[Contact Room];
-    G --> K[About Room];
-    
-    H -.-> L{useTexture & useGLTF};
-    L -.-> M(GPU Memory);
+```bash
+npm install
+npm run dev
 ```
 
----
+开发地址以终端输出为准，默认是 `http://localhost:5173`。浏览器需支持 WebGL；启用硬件加速有助于流畅显示。
 
-## 🛠️ Local Development Setup
+```bash
+# 生产构建
+npm run build
 
-To run this application natively on your local machine:
+# 预览构建结果
+npm run preview
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/ITomPoland/portfolio-itom.git
-   cd portfolio-itom
-   ```
+# 代码检查
+npm run lint
 
-2. **Install dependencies:**
-   Make sure you are on Node.js v20+.
-   ```bash
-   npm install
-   ```
+# 本地内容、中文校验和静态起始页的行为检查
+node --test scripts/test-content.mjs scripts/test-contact-validation.mjs scripts/test-start.mjs
+```
 
-3. **Start the local Dev Server:**
-   ```bash
-   npm run dev
-   ```
+## 内容维护
 
-> [!IMPORTANT]
-> Since this project heavily utilizes `vite-plugin-compression` and hundreds of high-res textures, your initial local load might take a few seconds as the dev-server buffers asset delivery. For performance testing, always run `npm run build && npm run preview`.
+网站直接读取仓库内的 JSON 与图片，不需要内容管理后台、后台账号、SQLite 或其他数据库。修改内容后，开发服务会更新页面；发布环境需重新构建部署。
 
-## 🤝 Contributing & Feedback
+| 文件或目录 | 用途 |
+| --- | --- |
+| `src/data/content.json` | 实际使用的中文内容，后续替换的主要入口 |
+| `src/data/content.original.json` | 已发布内容的原始返回备份，保留原文和资产引用供对照，不参与运行或构建 |
+| `src/data/content.js` | 将本地内容整理为页面、奖项分组与预加载数据 |
+| `src/hooks/useContentData.js` | 各房间读取本地内容的入口 |
+| `public/content/` | 本地保存的内容图片，JSON 中以 `/content/文件名.webp` 引用 |
+| `public/textures/` | 原有场景、门牌、纸张及装饰纹理 |
+| `public/start/` | 独立静态起始页的 HTML、CSS、脚本 |
 
-All PRs improving the shader physics, 3D math logic, or component memoization runtimes are welcome. Please refer to our new `.github` Issue and Pull Request templates when submitting!
+`content.json` 完整保留此次导出的 40 条记录：
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingRoom`)
+| 字段 | 内容 | 数量 |
+| --- | --- | --- |
+| `site` | 站点标题、简介、个人介绍、域名及社交链接 | 1 |
+| `projects` | 画廊项目 | 4 |
+| `studio` | 文章、视频与社交内容 | 11 |
+| `awards` | 获奖证书 | 16 |
+| `faq` | 常见问题 | 8 |
 
+画廊项目的 `title`、`description`、`url`、`front`、`painted`、`techStack` 控制卡片文字、链接、正反面相关纹理及技术图标。工作室内容的 `platform`、`device`、`frontTexture` 和 `paintedFrontTexture` 控制平台标签、设备外形与屏幕纹理；`device` 使用 `monitor`、`tv` 或 `phone`。证书的 `category` 使用 `sotd`、`sotm` 或 `other`。
 
-## License
+`seoTitle` 和 `seoDescription` 用于搜索正文与结构化数据。`seo-plugin.js` 在开发和构建时读取同一份本地 JSON，并生成中文静态正文、JSON-LD 和 `/llms.txt`；首页标题、简介与规范域名也来自 `site`。FAQ 和长篇个人介绍主要呈现在搜索正文中。
 
-The code in this repository is licensed under the [MIT License](LICENSE). 
-**Note:** All personal assets, 3D textures, images, and copywriting are copyright of Tomasz Szmajda and may not be reused or reproduced without explicit permission.
-3. Commit your Changes (`git commit -m 'feat: Added realistic liquid simulation to Contact Room'`)
-4. Push to the Branch (`git push origin feature/AmazingRoom`)
-5. Open a Pull Request
+替换图片时，将文件放入 `public/content/`，再修改 JSON 中的路径。保留现有图片的宽高比可减少场景布局调整。此次本地图片沿用原页面请求的显示尺寸与质量参数，未修改图内文字和图案；原始返回中的资源标识保存在备份 JSON 中。
 
----
+入口文字、导航、教程、成就、联系表单、各房间固定标题以及源码说明注释均已中文化；ITom、作者姓名、技术和平台名称保留原名。固定交互文案仍位于对应的 `src/components/` 与 `src/context/` 组件中，`/start` 的文案位于其 HTML 中。原图和图中嵌入的文字留待后续替换。
 
-*Designed and Developed by [Tomasz Szmajda (ITom Dev)](https://itomdev.com).*
+## 字体
+
+中文 DOM 与三维文字使用本地 `public/fonts/LXGWWenKaiLite-Regular.ttf`（霞鹜文楷轻便版），保证汉字显示；ITOM 品牌字母保留原有拉丁字体。字体许可证保存在 `public/fonts/LXGWWenKaiLite-OFL.txt`。新增中文文字时应继续使用这份中文字体。
+
+## 外部服务
+
+内容展示与 SEO 构建均已改为本地读取，原内容服务的客户端依赖、管理后台、请求代理和读取 Hook 已移除。
+
+项目仍保留原有可选的邮件提交和访问统计集成：
+
+- `VITE_WEB3FORMS_KEY`：联系表单的 Web3Forms 配置，放在本地 `.env` 或部署平台环境变量中。表单还保留 `MessagePaper.jsx` 中的 `ALLOWED_ORIGINS` 域名限制；换域名时需要同步修改。原逻辑在 localhost 和未允许域名上不发送真实邮件。
+- `VITE_POSTHOG_KEY`、`VITE_POSTHOG_HOST`：PostHog 访问统计配置。
+- 社交链接和项目外链继续指向原作者地址，替换个人内容时请同步检查联系房间与 `/start` 页中的固定链接。
+
+这些配置不影响本地 JSON 的读取，也不提供内容管理功能。凭据和私人配置不要写入 Git。
+
+## 场景结构
+
+`App.jsx` 组合三维画布、全局状态和 DOM 界面。`Experience.jsx` 挂载入口与无限走廊；`DoorSection.jsx` 负责房间加载、开关门和相机过渡。`RoomWarmup.jsx` 预编译房间着色器，`PerformanceContext.jsx` 按设备能力调整画质。动画中的高频位置更新尽量通过 ref 和 `useFrame` 完成。
+
+## 许可与署名
+
+代码采用 [MIT 许可证](LICENSE)。原作者为 [Tomasz Szmajda（ITom Dev）](https://itomdev.com)。原项目中的个人素材、3D 纹理、图片和文案版权属于原作者；未经明确许可，不得擅自复用或复制。中文化和本地内容改造不改变原素材的权利归属。

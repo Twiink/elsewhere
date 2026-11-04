@@ -3,22 +3,22 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Local fonts for sketch-style typography (TTF format required by troika)
+// 本地字体；troika 需要 TTF 格式。
 const RUBIK_SCRIBBLE_URL = '/fonts/RubikScribble-Regular.ttf';
-const CABIN_SKETCH_URL = '/fonts/CabinSketch-Regular.ttf';
+const CABIN_SKETCH_URL = '/fonts/LXGWWenKaiLite-Regular.ttf';
 
-// Global flag - draw animation only happens ONCE per page load
+// 全局标记：每次页面加载只执行一次绘制动画。
 let hasPlayedDrawAnimation = false;
 
 /**
- * HeroText Component - Hand-drawn Style with Sketch Fonts
+ * HeroText：使用手绘字体的标题组件。
  * 
- * WOW Effects for Awwwards SOTD:
- * - ITOM in Rubik Scribble font (splits into letters during scroll)
- * - Creative developer in Cabin Sketch font (also splits)
- * - Floating micro-animations
- * - Parallax split effect
- * - RESPONSIVE: scales down on mobile
+ * 面向 Awwwards 每日最佳网站的视觉效果：
+ * - ITOM 使用 Rubik Scribble，滚动时拆分为字母。
+ * - “创意开发者”使用本地中文字体，滚动时同样拆分。
+ * - 轻微漂浮动画。
+ * - 视差拆分效果。
+ * - 移动端缩小尺寸。
  */
 const HeroText = ({ position = [0, 0.3, 0] }) => {
     const groupRef = useRef();
@@ -26,7 +26,7 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
     const taglineRefs = useRef([]);
     const { camera } = useThree();
 
-    // Responsive scale based on screen width - FLUID (no breakpoints)
+    // 按屏幕宽度连续缩放，不使用断点。
     const [scale, setScale] = useState(1);
 
     useEffect(() => {
@@ -47,14 +47,14 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
         return () => window.removeEventListener('resize', updateScale);
     }, []);
 
-    // Split and dodge state
+    // 拆分与躲避状态。
     const splitAmount = useRef(0);
     const targetSplit = useRef(0);
     const floatY = useRef(0);
-    // Pre-allocate Vector3 to avoid per-frame garbage collection
+    // 预先分配 Vector3，避免逐帧垃圾回收。
     const worldPosVec = useRef(new THREE.Vector3());
 
-    // Letter positions for ITOM split effect
+    // ITOM 拆分效果的字母位置。
     const letters = useMemo(() => [
         { char: 'I', baseX: -0.95, splitDir: -1.6, delay: 0 },
         { char: 'T', baseX: -0.43, splitDir: -0.6, delay: 0 },
@@ -62,21 +62,21 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
         { char: 'M', baseX: 0.95, splitDir: 1.8, delay: 0 },
     ], []);
 
-    // Tagline words for split effect
+    // 标语拆分效果的词语。
     const taglineWords = useMemo(() => [
         { text: '<', baseX: -0.85, splitDir: -1.5, delay: 0 },
-        { text: 'creative', baseX: -0.4, splitDir: -0.8, delay: 0 },
-        { text: 'developer', baseX: 0.4, splitDir: 0.8, delay: 0 },
+        { text: "创意", baseX: -0.4, splitDir: -0.8, delay: 0 },
+        { text: "开发者", baseX: 0.4, splitDir: 0.8, delay: 0 },
         { text: '/>', baseX: 0.85, splitDir: 1.5, delay: 0 },
     ], []);
 
-    // Animation loop
+    // 动画循环。
     useFrame((state, delta) => {
         if (!groupRef.current) return;
 
         const time = state.clock.elapsedTime;
 
-        // === SPLIT LOGIC based on camera distance ===
+        // 按相机距离拆分。
         groupRef.current.getWorldPosition(worldPosVec.current);
         const distance = camera.position.z - worldPosVec.current.z;
 
@@ -97,12 +97,12 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
 
         splitAmount.current = THREE.MathUtils.lerp(splitAmount.current, targetSplit.current, 0.08);
 
-        // Apply split to each letter of ITOM
+        // 对 ITOM 每个字母应用拆分。
         letterRefs.current.forEach((ref, i) => {
             if (ref) {
-                // Ensure opacity is 1
+                // 确保透明度为 1。
                 if (ref.material) ref.material.opacity = 1;
-                ref.scale.setScalar(1); // Ensure scale is 1, no lingering pop effect
+                ref.scale.setScalar(1); // 确保缩放为 1，不残留弹出效果。
 
                 const letter = letters[i];
                 ref.position.x = letter.baseX + letter.splitDir * splitAmount.current;
@@ -111,10 +111,10 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
             }
         });
 
-        // Apply split to tagline words
+        // 对标语词语应用拆分。
         taglineRefs.current.forEach((ref, i) => {
             if (ref) {
-                // Ensure opacity is 1
+                // 确保透明度为 1。
                 if (ref.material) ref.material.opacity = 1;
 
                 const word = taglineWords[i];
@@ -123,15 +123,15 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
             }
         });
 
-        // === FLOATING ANIMATION ===
+        // 漂浮动画。
         floatY.current = Math.sin(time * 0.5) * 0.02;
-        // Don't override Y position entirely, add to base
+        // 在基础 Y 位置上叠加，不完全覆盖。
         groupRef.current.position.y = position[1] + floatY.current;
     });
 
     return (
         <group ref={groupRef} position={position} scale={[scale, scale, 1]}>
-            {/* ITOM Letters - Rubik Scribble font with fade-in animation */}
+            {/* ITOM 字母：Rubik Scribble 字体与淡入动画。 */}
             {letters.map((letter, i) => (
                 <Text
                     key={letter.char}
@@ -150,7 +150,7 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
                 </Text>
             ))}
 
-            {/* Tagline words - Cabin Sketch font with fade-in animation */}
+            {/* 标语词语：本地中文字体与淡入动画。 */}
             {taglineWords.map((word, i) => (
                 <Text
                     key={word.text}
@@ -167,7 +167,7 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
                 </Text>
             ))}
 
-            {/* Small decorative doodles around title */}
+            {/* 标题周围的小涂鸦。 */}
             <SmallStar position={[-1.2, 0.55, 0]} scale={0.07} />
             <SmallStar position={[1.25, 0.45, 0]} scale={0.05} />
             <SmallStar position={[-1.0, -0.6, 0]} scale={0.04} />
@@ -176,12 +176,12 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
     );
 };
 
-// Easing function
+// 缓动函数。
 const easeOutQuad = (t) => t * (2 - t);
 
 /**
- * Small decorative star - STATIC to avoid useFrame overhead
- * Parent HeroText already handles all animations
+ * 静态小星星装饰，避免 useFrame 开销。
+ * 父组件 HeroText 已处理全部动画。
  */
 const SmallStar = ({ position, scale = 0.1 }) => {
     return (

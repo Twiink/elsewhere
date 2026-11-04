@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "peer": {
+    "id": "github.com-twiink-elsewhere"
+  },
+  "recall": {
+    "enabled": true,
+    "peer_scope": "actor"
+  },
+  "capture": {
+    "enabled": true
+  }
+}

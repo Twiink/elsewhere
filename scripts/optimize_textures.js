@@ -43,29 +43,29 @@ async function optimize() {
           const newWidth = getNearestPowerOfTwo(width);
           const newHeight = getNearestPowerOfTwo(height);
 
-          console.log(`Optimizing ${file}: ${width}x${height} -> ${newWidth}x${newHeight}`);
+          console.log(`优化 ${file}： ${width}x${height} -> ${newWidth}x${newHeight}`);
 
-          // Backup original
+          // 备份原图。
           const backupPath = path.join(BACKUP_DIR, file);
           if (!fs.existsSync(backupPath)) {
             fs.copyFileSync(fullPath, backupPath);
           }
 
-          // Resize
+          // 调整尺寸。
           const buffer = await sharp(backupPath)
             .resize(newWidth, newHeight, { fit: 'fill' })
             .toBuffer();
           
           fs.writeFileSync(fullPath, buffer);
-          console.log(`Done: ${file}`);
+          console.log(`完成： ${file}`);
         } else {
-          console.log(`Skipping ${file} (already POT): ${width}x${height}`);
+          console.log(`跳过 ${file}（已为二次幂尺寸）： ${width}x${height}`);
         }
       } catch (err) {
-        console.error(`Error processing ${file}: ${err.message}`);
+        console.error(`处理失败： ${file}: ${err.message}`);
       }
     }
   }
 }
 
-optimize().then(() => console.log('Optimization complete.'));
+optimize().then(() => console.log('优化完成。'));

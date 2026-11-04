@@ -14,22 +14,24 @@ import GlobalOverlay from './components/ui/GlobalOverlay';
 import ScreenReaderOverlay from './components/ui/ScreenReaderOverlay';
 import { useDocumentMeta } from './hooks/useDocumentMeta';
 import posthog from 'posthog-js';
-import { loadSanityData } from './hooks/useSanityData';
+import { getContentTextures, certificateImages } from './data/content';
 
-// Initialize PostHog
-posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
-  api_host: import.meta.env.VITE_POSTHOG_HOST,
-  person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
-});
+// 初始化 PostHog。
+if (import.meta.env.VITE_POSTHOG_KEY) {
+  posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
+    api_host: import.meta.env.VITE_POSTHOG_HOST,
+    person_profiles: 'identified_only', // 设为 'always' 时也为匿名用户创建画像。
+  });
+}
 
-// Lazy load the heavy 3D experience
+// 延迟加载体积较大的 3D 场景。
 const Experience = lazy(() => import('./components/canvas/Experience'));
 
 import './styles/main.scss';
 
-// --- CONDITIONAL ASSET PRELOADING ---
-// On high-end devices, preloads everything for zero stutter.
-// On mobile/low-end devices, only preloads core textures to prevent Out Of Memory crashes.
+// 按设备条件预加载资源
+// 高性能设备预加载全部资源，避免卡顿。
+// 移动端和低性能设备只预加载核心纹理，防止内存耗尽。
 import { 
   ENTRANCE_TEXTURES, 
   CORRIDOR_TEXTURES, 
@@ -42,7 +44,7 @@ import {
 } from './config/texturePreloadList';
 import { TextureLoader } from 'three';
 
-// Standard Browser-level Image Preloader (for <img> tags)
+// 标准浏览器图片预加载（用于 <img> 标签）。
 const preloadBrowserImage = (path) => {
   if (typeof window === 'undefined') return;
   const img = new Image();
@@ -55,29 +57,28 @@ const isLowRAM = typeof navigator.deviceMemory !== 'undefined' && navigator.devi
 const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 450;
 const isLowEnd = isMobileDevice || isWeakCPU || isLowRAM || isSmallScreen;
 
-// Refined check for "hover capability" (non-touch devices should have hover: hover)
-// Laptops with touch screens (which also have a mouse/trackpad) will return true here.
+// 精确检测悬停能力；非触摸设备应支持 hover: hover。
+// 带鼠标或触控板的触屏笔记本在此也会返回 true。
 const supportsHover = typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches;
 
-// Trigger Three.js preloads at module level (as standard for Drei)
+// 按 Drei 惯例在模块级触发 Three.js 预加载。
 if (isLowEnd) {
-  const CORE_TEXTURES = [...ENTRANCE_TEXTURES, ...CORRIDOR_TEXTURES, ...UI_TEXTURES, ...IMAGE_ASSETS];
+  const CORE_TEXTURES = [...ENTRANCE_TEXTURES, ...CORRIDOR_TEXTURES, ...UI_TEXTURES, ...IMAGE_ASSETS, ...getContentTextures(supportsHover)];
   const filteredCore = filterTexturesByDevice(CORE_TEXTURES, supportsHover);
   const filteredAbout = filterTexturesByDevice(ABOUT_TEXTURES, supportsHover);
 
   filteredCore.forEach(path => useTexture.preload(path));
   filteredAbout.forEach(path => useLoader.preload(TextureLoader, path));
 } else {
-  const filteredAll = filterTexturesByDevice(PRELOAD_ALL, supportsHover);
+  const filteredAll = filterTexturesByDevice([...PRELOAD_ALL, ...getContentTextures(supportsHover)], supportsHover);
   const filteredLoader = filterTexturesByDevice(PRELOAD_LOADER, supportsHover);
   
   filteredAll.forEach(path => useTexture.preload(path));
   filteredLoader.forEach(path => useLoader.preload(TextureLoader, path));
 }
 
-const FONT_URL = 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff';
 
-// Helper component to handle global audio enable on interaction
+// 在用户交互时启用全局音频的辅助组件。
 const GlobalAudioEnabler = () => {
   const { enableAudio } = useAudio();
   useEffect(() => {
@@ -94,7 +95,7 @@ const GlobalAudioEnabler = () => {
   return null;
 };
 
-// Scene background using corridor wall texture (static, no animation)
+// 使用走廊墙面纹理的静态场景背景。
 const PaperSceneBackground = () => {
   const { scene } = useThree();
   const texture = useTexture('/textures/paper-texture.webp');
@@ -111,18 +112,18 @@ const PaperSceneBackground = () => {
   return null;
 };
 
-// Bridge component to use hooks inside SceneProvider
-// Handles dynamic meta tags + deep link auto-teleport
+// 桥接组件，用于在 SceneProvider 内调用 Hook。
+// 处理动态元标签和深层链接自动传送。
 function DocumentMetaBridge() {
   useDocumentMeta();
 
   const { initialRoom, deeplinkHandled, hasEntered, teleportTo, markEntered } = useScene();
 
-  // Deep linking: if user lands on e.g. /gallery, auto-teleport after scene loads
+  // 深层链接：直接访问 /gallery 等路径时，场景加载后自动传送。
   useEffect(() => {
     if (initialRoom && hasEntered && !deeplinkHandled.current) {
       deeplinkHandled.current = true;
-      // Small delay to let the corridor render first
+      // 稍作延迟，让走廊先完成渲染。
       setTimeout(() => teleportTo(initialRoom), 300);
     }
   }, [initialRoom, hasEntered, teleportTo, deeplinkHandled]);
@@ -134,10 +135,10 @@ function AppContent() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
 
-  // Use Performance Context
+  // 使用性能上下文。
   const { settings, downgradeTier, tier } = usePerformance();
 
-  // Force initialize audio in the background on mount
+  // 挂载时在后台初始化音频。
   useEffect(() => {
     initAudio();
   }, []);
@@ -154,7 +155,7 @@ function AppContent() {
         <DocumentMetaBridge />
         <GlobalAudioEnabler />
         <div className="app">
-          {/* Full screen 3D Canvas */}
+          {/* 全屏 3D 画布。 */}
           <div className="canvas-wrapper">
             <Canvas
               camera={{
@@ -176,14 +177,14 @@ function AppContent() {
               <color attach="background" args={['#fafafa']} />
               <fog attach="fog" args={['#fafafa', 15, 50]} />
 
-              {/* Scale performance down if fps drops */}
+              {/* 帧率下降时降低渲染开销。 */}
               <PerformanceMonitor
                 onDecline={() => downgradeTier()}
                 flipflops={3}
                 onFallback={() => downgradeTier()}
               />
 
-              {/* Advanced FPS & Performance Monitor */}
+              {/* 帧率与性能监视器。 */}
               {/* <Perf position="top-left" minimal={false} /> */}
 
               <Suspense fallback={null}>
@@ -197,7 +198,7 @@ function AppContent() {
             </Canvas>
           </div>
 
-          {/* Navigation UI - Hamburger, Map, Back, Audio */}
+          {/* 导航界面：菜单、地图、返回和音频。 */}
           {isLoaded && (
             <>
               <NavigationUI />
@@ -207,7 +208,7 @@ function AppContent() {
             </>
           )}
 
-          {/* 2D Preloader */}
+          {/* 二维加载界面。 */}
           <Preloader
             ready={sceneReady}
             onComplete={() => setIsLoaded(true)}
@@ -221,14 +222,11 @@ function AppContent() {
 import { AchievementsProvider } from './context/AchievementsContext';
 
 export default function App() {
-  // Preload browser-based images (for standard <img> tags) immediately upon mounting App
-  // This ensures they are in the network waterfall during the initial loading phase.
+  // App 挂载后立即预加载浏览器图片（用于标准 <img> 标签）。
+  // 让这些资源在初始加载阶段便进入网络请求队列。
   useEffect(() => {
-    // Eagerly preload Sanity CMS data and images
-    loadSanityData();
-
-    const filteredImages = filterTexturesByDevice(IMAGE_ASSETS, supportsHover);
-    // console.log(`[Preload] Triggering browser-level image preloads for ${filteredImages.length} assets.`);
+    const filteredImages = filterTexturesByDevice([...IMAGE_ASSETS, ...certificateImages], supportsHover);
+    // console.log(`[Preload] 开始在浏览器预加载图片，数量： ${filteredImages.length} 个。`);
     filteredImages.forEach(path => preloadBrowserImage(path));
   }, []);
 

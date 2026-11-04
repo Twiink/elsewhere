@@ -15,7 +15,7 @@ function getNearestPowerOfTwo(n) {
 
 async function fix() {
   const files = fs.readdirSync(TARGET_DIR).filter(f => f.match(/\.(webp|jpg|jpeg|png)$/i));
-  console.log(`Found ${files.length} files to check.`);
+  console.log(`找到 ${files.length} 个待检查文件。`);
   
   for (const file of files) {
     const fullPath = path.join(TARGET_DIR, file);
@@ -30,22 +30,22 @@ async function fix() {
         const newWidth = getNearestPowerOfTwo(width);
         const newHeight = getNearestPowerOfTwo(height);
 
-        console.log(`Fixing ${file}: ${width}x${height} -> ${newWidth}x${newHeight}`);
+        console.log(`正在修复 ${file}： ${width}x${height} -> ${newWidth}x${newHeight}`);
         
         await sharp(inputBuffer)
           .resize(newWidth, newHeight, { fit: 'fill' })
           .toFile(tmpPath);
           
         fs.renameSync(tmpPath, fullPath);
-        console.log(`Success: ${file}`);
+        console.log(`成功： ${file}`);
       } else {
-        console.log(`Skipping ${file} - Already POT: ${width}x${height}`);
+        console.log(`跳过 ${file}，已为二次幂尺寸： ${width}x${height}`);
       }
     } catch (e) {
-      console.error(`Error with ${file}: ${e.message}`);
+      console.error(`处理出错： ${file}: ${e.message}`);
       if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
     }
   }
 }
 
-fix().then(() => console.log('Done!'));
+fix().then(() => console.log('完成！'));

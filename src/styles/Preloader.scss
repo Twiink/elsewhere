@@ -1,5 +1,5 @@
 // =============================================================================
-// PRELOADER STYLES - Paper Tear Edition
+// 加载界面样式：撕纸版本。
 // =============================================================================
 
 @use 'variables' as *;
@@ -8,7 +8,7 @@
 .preloader {
     @include fullscreen;
     z-index: $z-preloader;
-    // No background on container itself, the halves handle it
+    // 容器自身无背景，由两半纸张处理。
     pointer-events: auto;
     cursor: auto;
 
@@ -16,31 +16,31 @@
         position: absolute;
         top: 0;
         bottom: 0;
-        width: 100%; // Each half takes full width but is clipped
+        width: 100%; // 每半部分占满宽度后再裁切。
         height: 100%;
         background-color: $color-white;
         background-image: url('/textures/paper-texture.webp');
         background-size: cover;
         background-position: center;
-        // background-blend-mode: multiply; // Optional depending on look
+        // background-blend-mode: multiply; // 按视觉需要选用。
 
-        will-change: transform; // Optimize for the big move
+        will-change: transform; // 为大幅移动优化。
 
-        // Shadow to give depth to the tear? 
-        // Hard to do with clip-path on the element itself.
-        // We'd need an inner wrapper or drop-shadow filter (heavy).
-        // Let's keep it flat for now or maybe add a slight filter.
+        // 可考虑用阴影增强撕裂深度。
+        // 元素自身使用 clip-path 时不易实现。
+        // 需要额外内层或开销较大的 drop-shadow 滤镜。
+        // 当前保持平面效果，或仅添加轻微滤镜。
         filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.1));
     }
 
     &__half--left {
         left: 0;
-        // clip-path set inline
+        // clip-path 在内联样式中设置。
     }
 
     &__half--right {
         right: 0;
-        // clip-path set inline
+        // clip-path 在内联样式中设置。
     }
 
     &__overlay {
@@ -52,8 +52,8 @@
         z-index: 10;
         pointer-events: none;
 
-        // Depending on implementation, SVG might need to scale differently
-        // We used preserveAspectRatio="none" in JSX to stretch it to viewport
+        // 不同实现可能需要不同 SVG 缩放。
+        // JSX 中使用 preserveAspectRatio="none"，拉伸至整个视口。
     }
 
     &__percentage {
@@ -61,10 +61,10 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        font-family: $font-handwritten; // Or title font
+        font-family: '霞鹜文楷', $font-handwritten; // 或使用标题字体。
         font-size: 2rem;
-        color: $color-black; // Or opacity
+        color: $color-black; // 或使用透明度。
         z-index: 20;
-        mix-blend-mode: multiply; // Make it look written on paper
+        mix-blend-mode: multiply; // 使其看起来像写在纸上。
     }
 }

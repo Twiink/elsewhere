@@ -1,214 +1,67 @@
-# 🎨 Portfolio ITOM - Project Documentation
+# ITom 中文作品集：项目说明
 
-> **For AI Agents**: Read this file first to understand the project before making changes.
+本项目是 React 19 + React Three Fiber 的沉浸式三维作品集。入口连接无限走廊，左右门通往作品画廊、内容工作室、关于我和联系我。视觉以手绘线条、纸张和速写纹理为主，交互时可显现彩色层。
 
-## 📋 Project Overview
+## 当前内容架构
 
-This is an **immersive 3D portfolio website** built with React Three Fiber. The user navigates through an infinite corridor with doors leading to different "rooms" (sections). The entire visual style is **hand-drawn black/white sketch aesthetic**.
+- 实际内容位于 `src/data/content.json`，通过 `src/data/content.js` 整理，供 `src/hooks/useContentData.js` 和搜索输出使用。
+- `content.original.json` 是原始已发布响应的只读参考备份，不导入运行代码。
+- 内容图片保存在 `public/content/`。场景与装饰纹理保存在 `public/textures/`。
+- 当前保留站点信息 1 份、画廊项目 4 个、工作室内容 11 条、证书 16 张、FAQ 8 条。
+- 内容读取同步完成，不需要网络内容查询、管理后台或数据库。
+- `seo-plugin.js` 在开发和构建时从本地内容生成中文语义正文、JSON-LD 和 `/llms.txt`。
+- 文字与源码说明注释使用中文，技术标识、品牌及平台名保留原名。图片内的文字仍为原素材内容。
 
-### Key Experience Flow
-1. **Entrance** → User enters through an animated door
-2. **Infinity Corridor** → Endless corridor with doors on both sides
-3. **Rooms** → Each door leads to a unique interactive section:
-   - 🖼️ **Gallery** - Projects hanging on clothesline
-   - 💼 **Studio** - Infinite tower of content monitors
-   - 👤 **About** - Flying through clouds/sky
-   - 📬 **Contact** - Dock/pier with message in a bottle
+## 关键路径
 
----
+| 位置 | 职责 |
+| --- | --- |
+| `src/App.jsx` | 画布、预加载、上下文、导航及遮罩 |
+| `src/components/canvas/Experience.jsx` | 主三维场景 |
+| `src/components/canvas/entrance/` | 开门入口与装饰 |
+| `src/components/canvas/corridor/` | 走廊分段、门、相机过渡与房间预热 |
+| `src/components/canvas/rooms/Gallery/` | 衣绳上悬挂的可翻转项目卡片 |
+| `src/components/canvas/rooms/Studio/` | 可旋转、循环移动的内容显示器塔 |
+| `src/components/canvas/rooms/About/` | 云中飞行、经历、奖项与技能气球 |
+| `src/components/canvas/rooms/Contact/` | 海面、码头、社交木桶与纸张表单 |
+| `src/components/ui/` | 导航、地图、内容弹层、成就和屏幕阅读器界面 |
+| `src/context/SceneContext.jsx` | 房间、传送、退出请求与全局弹层状态 |
+| `src/hooks/useInfiniteCamera.js` | 走廊滚动、侧看与视差 |
+| `public/start/` | 独立静态链接页 |
 
-## 🛠️ Tech Stack
+## 字体与纹理
 
-| Technology | Purpose |
-|------------|---------|
-| React 18 | UI Framework |
-| React Three Fiber | 3D Rendering (Three.js wrapper) |
-| @react-three/drei | R3F helpers (Text, useTexture, Html, etc.) |
-| GSAP | Animations |
-| Vite | Build tool & dev server |
-| SCSS | Styling |
+中文三维文字必须指定 `/fonts/LXGWWenKaiLite-Regular.ttf`。DOM 字体在 `src/styles/_base.scss` 注册为“霞鹜文楷”；原有拉丁手绘字体不包含中文，不能单独用于汉字。
 
----
-
-## 📁 Project Structure
-
-```
-src/
-├── components/
-│   ├── canvas/           # All 3D components
-│   │   ├── corridor/     # Corridor, doors, segments
-│   │   ├── entrance/     # Entry experience
-│   │   ├── rooms/        # Room interiors
-│   │   │   ├── About/
-│   │   │   ├── Contact/  # ⭐ Message paper feature
-│   │   │   ├── Gallery/
-│   │   │   └── Studio/
-│   │   └── Experience.jsx  # Main 3D scene
-│   └── dom/              # 2D UI overlays
-├── context/
-│   └── SceneContext.jsx  # Global state (room, overlay, etc.)
-├── hooks/
-│   └── useInfiniteCamera.js  # Scroll-based camera movement
-└── styles/
-```
-
----
-
-## 🎨 Visual Style Guide
-
-### Core Aesthetic
-- **Hand-drawn / Sketchy** - Everything looks like pencil drawings
-- **Black & White** with subtle gray tones
-- **Paper textures** - Crumpled, torn edges
-- **Fonts**: `CabinSketch-Regular.ttf`, `CabinSketch-Bold.ttf`
-
-### Textures Location
-```
-public/textures/
-├── corridor/      # Wall, floor, signs
-├── doors/         # Door frames, handles
-├── entrance/      # Entry scene assets
-├── gallery/       # Project cards
-├── studio/        # Monitor textures
-├── contact/       # Paper, button (NEW)
-└── paper-texture.webp  # General paper
-```
-
-### Colors Palette
-- Background: `#f0f0f0` (off-white)
-- Lines/Text: `#333333` (dark gray)
-- Accents: `#666666`, `#888888`
-
----
-
-## 🚪 Room System
-
-### How Rooms Work
-1. User approaches door in corridor
-2. Click on door → Camera zooms in
-3. Door opens → Camera enters room
-4. Room component mounts and signals ready via `onReady()`
-5. On exit → Camera backs out, door closes
-
-### Room Component Pattern
 ```jsx
-const ExampleRoom = ({ showRoom, onReady, isExiting }) => {
-    // Signal ready after content loads
-    useEffect(() => {
-        if (showRoom) {
-            // Load assets...
-            onReady?.();
-        }
-    }, [showRoom]);
-
-    return (
-        <group>
-            {/* Room content */}
-        </group>
-    );
-};
-```
-
----
-
-## 📬 Contact Room - Message Paper Feature
-
-### Current Implementation
-- **Paper texture**: `public/textures/contact/paper_form.png`
-- **Button texture**: `public/textures/contact/send_button.png`
-- **Component**: `src/components/canvas/rooms/Contact/MessagePaper.jsx`
-
-### Features
-- 3 input fields: Email, Subject, Message
-- Hidden HTML inputs with drei `<Html>` for keyboard capture
-- Text rendered with `<Text>` component (CabinSketch font)
-- Blinking cursor that follows text
-- Word-wrap with long word breaking
-- Hand-drawn send button with hover effect
-
-### Key Files
-| File | Purpose |
-|------|---------|
-| `ContactRoom.jsx` | Main room, camera animation |
-| `MessagePaper.jsx` | Interactive paper form |
-| `TornPaperGeometry.js` | Torn edge geometry generator |
-
----
-
-## 🎥 Camera System
-
-### Infinite Corridor Camera
-- Controlled by `useInfiniteCamera.js`
-- Scroll-based movement along corridor
-- Mouse-look for subtle head movement
-- Disabled when inside a room
-
-### Room Camera
-- Each room can control camera independently
-- Uses GSAP for smooth animations
-- Returns to corridor camera on exit
-
----
-
-## 🔧 Common Patterns
-
-### Loading Textures
-```jsx
-import { useTexture } from '@react-three/drei';
-const texture = useTexture('/textures/example.webp');
-```
-
-### 3D Text
-```jsx
-import { Text } from '@react-three/drei';
-<Text
-    font="/fonts/CabinSketch-Regular.ttf"
-    fontSize={0.05}
-    color="#333333"
->
-    Hello
+<Text font="/fonts/LXGWWenKaiLite-Regular.ttf" fontSize={0.05}>
+    中文文字
 </Text>
 ```
 
-### Animation
-```jsx
-import gsap from 'gsap';
-gsap.to(ref.current.position, { x: 1, duration: 0.5 });
-```
+本地图片路径以 `/content/` 或 `/textures/` 开头，对应 `public/` 下的文件。替换图像时注意原始宽高比、透明通道与设备分支。彩色纹理通常只在支持悬停的设备上加载。不要改变图片内的文字，除非用户另外要求。
 
----
+## 房间和相机
 
-## ⚠️ Important Notes
+`DoorSection.jsx` 将墙、门与标签作为一个单元，接管相机后对齐门，等待房间 `onReady`，再开门进入。退出时反向执行动画。房间需在退出和传送期间停止相机更新，避免与 GSAP 冲突。
 
-1. **No HTML inside Canvas** - Use `<Html>` from drei for DOM elements
-2. **Textures must be WebP/PNG** - For transparency support
-3. **Fonts in public/fonts/** - TTF format
-4. **All coordinates are in Three.js units** - Not pixels
-5. **Y is up** - Standard Three.js coordinate system
+`useInfiniteCamera` 在走廊中负责滚动和视差；进入房间时暂停。高频动画通过 ref、`useFrame` 和 GSAP 更新对象，尽量避免逐帧 setState 或创建向量。
 
----
+## 联系表单
 
-## 🚀 Development
+`MessagePaper.jsx` 用隐藏的 DOM 输入框接收键盘输入，用 Drei Text 显示邮箱、主题和留言。中文换行按实际字宽处理；`src/utils/contactValidation.js` 对中文与拉丁词语分别处理，避免正常中文被误判为空内容。
+
+表单仍使用 Web3Forms；需配置 `VITE_WEB3FORMS_KEY` 和 `ALLOWED_ORIGINS`。开发域名默认不真实发送邮件。测试只验证本地逻辑，不提交真实邮件。频率限制与时间陷阱属于原有行为。
+
+## 开发与验证
 
 ```bash
-# Start dev server
 npm run dev
-
-# Build for production
 npm run build
+npm run preview
+node --test scripts/test-content.mjs scripts/test-contact-validation.mjs scripts/test-start.mjs
 ```
 
-**Default port**: http://localhost:5173
+`npm run lint` 包含项目原有的检查问题，修改时需比较基线，避免混入不相关清理。内容改动需验证 JSON、图片存在性、搜索输出与对应房间的显示。
 
----
-
-## 📝 TODO / Future Features
-
-- [ ] Connect contact form to email service (EmailJS/Formspree)
-- [ ] Message rolls into bottle animation
-- [ ] Throw bottle into sea animation
-- [ ] Mobile optimization
-
----
-
-*Last updated: 2026-01-22*
+代码采用 MIT 许可证，个人纹理、图片和文案仍受原作者的单独版权声明约束，详见 README。

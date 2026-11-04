@@ -3,11 +3,11 @@ import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 /**
- * useScrollCamera Hook
+ * useScrollCamera 滚动相机 Hook。
  * 
- * Scroll-based camera movement along Z axis.
- * For corridor: z=8 (start) to z=-15 (deep into corridor).
- * User can approach avatar, pass it, and continue walking through corridor.
+ * 根据滚动沿 Z 轴移动相机。
+ * 走廊范围从起点 z=8 至内部 z=-15。
+ * 用户可接近人物、穿过人物并继续沿走廊前进。
  */
 const useScrollCamera = ({
     minZ = 8,
@@ -19,11 +19,11 @@ const useScrollCamera = ({
     const targetZ = useRef(minZ);
     const currentZ = useRef(minZ);
 
-    // Handle wheel events
+    // 处理滚轮事件。
     const handleWheel = useCallback((e) => {
         e.preventDefault();
 
-        // Scroll down = move forward (decrease Z)
+        // 向下滚动即向前，Z 减小。
         const delta = e.deltaY * speed;
         targetZ.current = THREE.MathUtils.clamp(
             targetZ.current - delta,
@@ -32,9 +32,9 @@ const useScrollCamera = ({
         );
     }, [speed, minZ, maxZ]);
 
-    // Add wheel listener
+    // 添加滚轮监听。
     useEffect(() => {
-        // Listen on window for full coverage
+        // 监听 window，覆盖整个页面。
         window.addEventListener('wheel', handleWheel, { passive: false });
 
         return () => {
@@ -42,7 +42,7 @@ const useScrollCamera = ({
         };
     }, [handleWheel]);
 
-    // Smooth camera movement with lerping
+    // 使用线性插值平滑移动相机。
     useFrame(() => {
         currentZ.current = THREE.MathUtils.lerp(
             currentZ.current,
@@ -53,7 +53,7 @@ const useScrollCamera = ({
         camera.position.z = currentZ.current;
     });
 
-    // Return progress for external use (0 = start, 1 = end)
+    // 返回进度供外部使用，0 为起点，1 为终点。
     const getProgress = useCallback(() => {
         return (minZ - currentZ.current) / (minZ - maxZ);
     }, [minZ, maxZ]);

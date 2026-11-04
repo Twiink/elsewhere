@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import { useAudio } from '../../context/AudioManager';
 
-// Reusable SVG Line Component (now accepts ref)
+// 可复用 SVG 线条组件，现支持 ref。
 const TearLineSVG = ({ svgPathData, pathLength, strokeDashoffset, pathRef }) => (
   <svg
     className="preloader__overlay"
@@ -27,7 +27,7 @@ const TearLineSVG = ({ svgPathData, pathLength, strokeDashoffset, pathRef }) => 
   </svg>
 );
 
-// New Ring Loader - Cleaner circle that spins around text
+// 环形加载器：围绕文字旋转的简洁圆环。
 const RingLoader = () => (
   <div className="preloader__ring">
     <svg width="120" height="120" viewBox="0 0 100 100" style={{ overflow: 'visible' }}>
@@ -98,7 +98,7 @@ const percentageStyle = {
 const Preloader = ({ onComplete, ready }) => {
   const [isDone, setIsDone] = useState(false);
 
-  // Custom throttled progress state to prevent React 'Maximum update depth exceeded'
+  // 节流更新进度状态，避免 React 报更新深度超限。
   const [realProgress, setRealProgress] = useState(0);
   const [active, setActive] = useState(true);
 
@@ -128,7 +128,7 @@ const Preloader = ({ onComplete, ready }) => {
       
       const loadEnd = performance.now();
       const loadDuration = ((loadEnd - loadStartTime.current) / 1000).toFixed(2);
-      // console.info(`📦 Assets Loaded: ${loadDuration}s`);
+      // console.info(`📦 资源加载完成： ${loadDuration}s`);
       
       origOnLoad?.();
     };
@@ -141,13 +141,13 @@ const Preloader = ({ onComplete, ready }) => {
   }, []);
 
   const { play } = useAudio();
-  // Track audio handle to stop loop
+  // 跟踪音频句柄，以便停止循环。
   const pencilSoundRef = useRef(null);
 
-  // Performance Tracking
+  // 性能跟踪。
   const loadStartTime = useRef(performance.now());
 
-  // Use refs for animation targets
+  // 动画目标使用 ref。
   const containerRef = useRef(null);
   const leftHalfRef = useRef(null);
   const rightHalfRef = useRef(null);
@@ -156,7 +156,7 @@ const Preloader = ({ onComplete, ready }) => {
   const textLeftRef = useRef(null);
   const textRightRef = useRef(null);
 
-  // Track visual progress entirely in refs to skip React renders 60x/sec!
+  // 视觉进度完全保存在 ref 中，避免每秒 60 次 React 渲染。
   const [targetProgress, setTargetProgress] = useState(0);
   const displayProgressRef = useRef(0);
   const trackerRef = useRef({ val: 0 });
@@ -165,11 +165,11 @@ const Preloader = ({ onComplete, ready }) => {
   useEffect(() => { readyRef.current = ready; }, [ready]);
 
   // ----------------------------------------
-  // GENERATE TEAR PATH
+  // 生成撕裂路径。
   // ----------------------------------------
   const tearPoints = useMemo(() => {
     const points = [];
-    const segments = 12; // Fewer segments
+    const segments = 12; // 减少分段数。
 
     points.push([50, 0]);
 
@@ -204,7 +204,7 @@ const Preloader = ({ onComplete, ready }) => {
 
 
   // ----------------------------------------
-  // SMOOTH LOADING LOGIC
+  // 平滑加载逻辑。
   // ----------------------------------------
   useEffect(() => {
     let newTarget = 0;
@@ -221,9 +221,9 @@ const Preloader = ({ onComplete, ready }) => {
     setTargetProgress(prev => Math.max(prev, newTarget));
   }, [realProgress, active, ready]);
 
-  // Handle Pencil Sound & Exit checking dynamically
+  // 动态处理铅笔音效与退出检查。
   const checkProgressTriggers = (val) => {
-    // Pencil Sound
+    // 铅笔音效。
     if (val < 99 && !pencilSoundRef.current) {
       pencilSoundRef.current = play('pencil', { loop: true, volume: 0.5 });
     }
@@ -232,7 +232,7 @@ const Preloader = ({ onComplete, ready }) => {
       pencilSoundRef.current = null;
     }
 
-    // Exit phase
+    // 退出阶段。
     if (val >= 99.5 && readyRef.current && !exitStarted.current) {
       exitStarted.current = true;
       startExit();
@@ -266,7 +266,7 @@ const Preloader = ({ onComplete, ready }) => {
       val: targetProgress,
       duration: duration,
       ease: "power2.out",
-      overwrite: true, // Auto kill previous tweens on trackerRef
+      overwrite: true, // 自动终止 trackerRef 上的旧动画。
       onUpdate: () => {
         const val = trackerRef.current.val;
         displayProgressRef.current = val;
@@ -275,7 +275,7 @@ const Preloader = ({ onComplete, ready }) => {
         const strokeDashoffset = 120 - (120 * safeProgress) / 100;
         const percentageText = `${Math.round(safeProgress)}%`;
 
-        // Direct DOM manipulation - BYPASS React Render!
+        // 直接更新 DOM，绕过 React 渲染。
         if (textLeftRef.current) textLeftRef.current.innerText = percentageText;
         if (textRightRef.current) textRightRef.current.innerText = percentageText;
         if (pathLeftRef.current) pathLeftRef.current.style.strokeDashoffset = strokeDashoffset;
@@ -289,11 +289,11 @@ const Preloader = ({ onComplete, ready }) => {
 
 
   // ----------------------------------------
-  // EXIT SEQUENCE
+  // 退出流程。
   // ----------------------------------------
   const exitStarted = useRef(false);
 
-  // Fallback trigger if ready becomes true AFTER 99.5% reached
+  // 达到 99.5% 后才就绪时，使用回退触发。
   useEffect(() => {
     if (displayProgressRef.current >= 99.5 && ready && !exitStarted.current) {
       exitStarted.current = true;
@@ -316,19 +316,19 @@ const Preloader = ({ onComplete, ready }) => {
         
         const exitEnd = performance.now();
         const totalDuration = ((exitEnd - loadStartTime.current) / 1000).toFixed(2);
-        // console.group("⏱️ Portfolio Loading Performance");
-        // console.log(`- Start: %c${loadStartTime.current.toFixed(0)}ms`, "color: #888");
-        // console.log(`- Total Duration: %c${totalDuration}s`, "color: #00ff00; font-weight: bold;");
+        // console.group("⏱️ 作品集加载性能");
+        // console.log(`- 开始： %c${loadStartTime.current.toFixed(0)}ms`, "color: #888");
+        // console.log(`- 总时长： %c${totalDuration}s`, "color: #00ff00; font-weight: bold;");
         // console.groupEnd();
         
         onComplete?.();
       }
     });
 
-    // 1. Quick pause before tear
+    // 1. 撕开前短暂停顿。
     tl.to({}, { duration: 0.1 });
 
-    // 2. Tear Apart
+    // 2. 撕开纸张。
     tl.to(leftHalfRef.current, {
       xPercent: -100,
       rotation: -2,
@@ -343,7 +343,7 @@ const Preloader = ({ onComplete, ready }) => {
       ease: "power3.inOut"
     }, 'tear');
 
-    // 3. Fade container
+    // 3. 淡出容器。
     tl.to(containerRef.current, {
       opacity: 0,
       duration: 0.5
@@ -353,42 +353,42 @@ const Preloader = ({ onComplete, ready }) => {
   if (isDone) return null;
 
   const pathLength = 120;
-  // Initialize values
+  // 初始化数值。
   const safeProgress = Math.min(100, Math.max(0, displayProgressRef.current));
   const strokeDashoffset = pathLength - (pathLength * safeProgress) / 100;
   const percentageText = `${Math.round(safeProgress)}%`;
 
   return (
     <div className="preloader" ref={containerRef}>
-      {/* LEFT HALF */}
+      {/* 左半部分。 */}
       <div
         className="preloader__half preloader__half--left"
         ref={leftHalfRef}
         style={{ clipPath: leftClipPoly }}
       >
-        {/* Content: Percentage & Line */}
+        {/* 内容：百分比与线条。 */}
         <div className="preloader__percentage" style={percentageStyle}>
           <span ref={textLeftRef}>{percentageText}</span>
           <RingLoader />
         </div>
 
-        {/* SVG is now INSIDE the clipped half */}
+        {/* SVG 现位于裁切后的半张纸内。 */}
         <TearLineSVG pathRef={pathLeftRef} svgPathData={svgPathData} pathLength={pathLength} strokeDashoffset={strokeDashoffset} />
       </div>
 
-      {/* RIGHT HALF */}
+      {/* 右半部分。 */}
       <div
         className="preloader__half preloader__half--right"
         ref={rightHalfRef}
         style={{ clipPath: rightClipPoly }}
       >
-        {/* Content: Percentage & Line */}
+        {/* 内容：百分比与线条。 */}
         <div className="preloader__percentage" style={percentageStyle}>
           <span ref={textRightRef}>{percentageText}</span>
           <RingLoader />
         </div>
 
-        {/* SVG is now INSIDE the clipped half */}
+        {/* SVG 现位于裁切后的半张纸内。 */}
         <TearLineSVG pathRef={pathRightRef} svgPathData={svgPathData} pathLength={pathLength} strokeDashoffset={strokeDashoffset} />
       </div>
     </div>

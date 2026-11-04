@@ -12,4 +12,4 @@ content = content.replace(
 );
 
 fs.writeFileSync(FILE_PATH, content, 'utf8');
-console.log('Modifications applied successfully.');
+console.log('修改已成功应用。');

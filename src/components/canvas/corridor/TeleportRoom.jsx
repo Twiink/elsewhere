@@ -2,8 +2,8 @@ import { memo, useEffect, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import { useScene } from '../../../context/SceneContext';
 
-// Door positions (Global Z for Segment 0)
-// Calculation: 10 (Start Z) + Relative Z + 2 (Door Offset)
+// 门位置：第 0 段的全局 Z。
+// 计算：10（起点 Z）+ 相对 Z + 2（门偏移）。
 const DOOR_POSITIONS_Z = {
     'gallery': -6,   // 10 - 18 + 2
     'studio': -20,   // 10 - 32 + 2
@@ -12,14 +12,14 @@ const DOOR_POSITIONS_Z = {
 };
 
 /**
- * TeleportRoom Component
+ * TeleportRoom 传送房间组件。
  * 
- * Handles moving the camera to the correct corridor position during teleport.
- * Instead of rendering the room, it:
- * 1. Moves camera to ~8 units before the door
- * 2. During FAST teleport: triggers completeTeleport immediately (paper stays closed)
- * 3. During normal teleport: signals PaperTransition to open
- * 4. SceneContext then triggers 'pendingDoorClick' which DoorSection picks up
+ * 传送时将相机移到正确的走廊位置。
+ * 此组件不渲染房间，而是：
+ * 1. 将相机移到门前约 8 单位处。
+ * 2. 快速传送时立即触发 completeTeleport，纸幕保持关闭。
+ * 3. 正常传送时通知 PaperTransition 打开。
+ * 4. SceneContext 触发 pendingDoorClick，由 DoorSection 接收。
  */
 const TeleportRoom = memo(() => {
     const {
@@ -33,47 +33,47 @@ const TeleportRoom = memo(() => {
     const { camera } = useThree();
     const hasPositioned = useRef(false);
 
-    // Position camera when entering 'teleporting' phase
+    // 进入 teleporting 阶段时定位相机。
     useEffect(() => {
         if (teleportPhase === 'teleporting' && teleportTarget && !hasPositioned.current) {
             const doorZ = DOOR_POSITIONS_Z[teleportTarget];
 
             if (doorZ !== undefined) {
-                // Place camera 8 units "before" the door (towards positive Z)
-                // Center of corridor (X=0)
-                // Height standard (Y=0.2)
+                // 相机位于门前 8 单位，即 +Z 方向。
+                // 走廊中心 X=0。
+                // 标准高度 Y=0.2。
                 const targetZ = doorZ + 8;
 
-                // Instantly teleport camera
+                // 立即传送相机。
                 camera.position.set(0, 0.2, targetZ);
 
-                // Reset rotation to look straight down corridor (towards negative Z)
-                // This ensures we start "neutral" before the door click animation takes over
+                // 重置旋转，沿走廊正向看向 -Z。
+                // 确保门点击动画接管前，相机处于中立状态。
                 camera.rotation.set(0, 0, 0);
 
                 hasPositioned.current = true;
 
-                // Small delay to ensure frame update
+                // 短暂延迟，确保帧更新。
                 setTimeout(() => {
                     if (isFastTeleport) {
-                        // FAST TELEPORT: Skip paper open, go straight to door click
-                        // Paper stays closed, DoorSection will call signalRoomReady when done
+                        // 快速传送：跳过打开纸幕，直接触发门点击。
+                        // 纸幕保持关闭，DoorSection 完成后调用 signalRoomReady。
                         completeTeleport();
                     } else {
-                        // NORMAL TELEPORT: Open paper first (not currently used, but kept for flexibility)
+                        // 正常传送：先打开纸幕，当前未使用，保留以便扩展。
                         openTeleportTransition();
                     }
                 }, 50);
             }
         }
 
-        // Reset flag when teleportation ends
+        // 传送结束时重置标记。
         if (!isTeleporting) {
             hasPositioned.current = false;
         }
     }, [teleportPhase, teleportTarget, isTeleporting, isFastTeleport, camera, openTeleportTransition, completeTeleport]);
 
-    // Don't render anything - we just manipulate camera
+    // 不渲染内容，仅操作相机。
     return null;
 });
 

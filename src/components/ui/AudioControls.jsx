@@ -4,7 +4,7 @@ import '../../styles/AudioControls.scss';
 const AudioControls = () => {
     const { isMuted, toggleMute, globalVolume, setGlobalVolume } = useAudio();
 
-    // Hand-drawn SVG Icons
+    // 手绘 SVG 图标。
     const SoundOnIcon = () => (
         <svg viewBox="0 0 24 24">
             <path d="M11 5L6 9H2v6h4l5 4V5z" strokeWidth="2.5" />
@@ -23,7 +23,7 @@ const AudioControls = () => {
 
     return (
         <div className="audio-controls">
-            {/* Volume Slider - Revealed on Hover via CSS */}
+            {/* 音量滑块，通过 CSS 在悬停时显示。 */}
             <div className="volume-slider-container">
                 <input
                     type="range"
@@ -32,15 +32,15 @@ const AudioControls = () => {
                     step="0.01"
                     value={globalVolume}
                     onChange={(e) => setGlobalVolume(parseFloat(e.target.value))}
-                    aria-label="Volume"
+                    aria-label="音量"
                 />
             </div>
 
-            {/* Mute Toggle Button */}
+            {/* 静音切换按钮。 */}
             <button
                 className="mute-btn"
                 onClick={toggleMute}
-                aria-label={isMuted ? "Unmute" : "Mute"}
+                aria-label={isMuted ? "开启声音" : "静音"}
             >
                 {isMuted || globalVolume === 0 ? <SoundOffIcon /> : <SoundOnIcon />}
             </button>

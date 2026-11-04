@@ -12,7 +12,7 @@ async function list() {
       const metadata = await sharp(fullPath).metadata();
       console.log(`${file}: ${metadata.width}x${metadata.height}`);
     } catch (e) {
-      console.log(`Error with ${file}: ${e.message}`);
+      console.log(`处理出错： ${file}: ${e.message}`);
     }
   }
 }

@@ -4,33 +4,33 @@ import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
 /**
- * Tunnel Component
+ * Tunnel 隧道组件。
  * 
- * Creates an infinite tunnel effect using an inverted cylinder
- * with a paper texture. Fades into white fog at the end.
+ * 使用内翻圆柱体与纸张纹理营造无限隧道，
+ * 末端逐渐融入白雾。
  */
 const Tunnel = ({ parallax = { x: 0, y: 0 } }) => {
     const meshRef = useRef();
 
-    // Load paper texture
+    // 加载纸张纹理。
     const paperTexture = useTexture('/textures/paper-texture.webp');
 
-    // Configure texture for tiling
+    // 配置纹理平铺。
     useMemo(() => {
         paperTexture.wrapS = paperTexture.wrapT = THREE.RepeatWrapping;
         paperTexture.repeat.set(3, 6);
         paperTexture.colorSpace = THREE.SRGBColorSpace;
     }, [paperTexture]);
 
-    // Animate tunnel rotation based on parallax
+    // 根据视差驱动隧道旋转。
     useFrame((state, delta) => {
         if (!meshRef.current) return;
 
-        // Subtle rotation based on mouse parallax
+        // 随鼠标视差轻微旋转。
         const targetRotationZ = parallax.x * 0.08;
         const targetRotationX = Math.PI / 2 + parallax.y * 0.04;
 
-        // Smooth interpolation
+        // 平滑插值。
         meshRef.current.rotation.z = THREE.MathUtils.lerp(
             meshRef.current.rotation.z,
             targetRotationZ,

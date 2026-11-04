@@ -3,15 +3,15 @@ import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
 /**
- * Corridor Component - Hand-drawn Style
+ * Corridor：手绘风格走廊组件。
  * 
- * More sketchy, paper-like aesthetic.
+ * 偏速写、纸张质感的视觉风格。
  */
 const Corridor = ({ length = 100 }) => {
     const corridorWidth = 4;
     const corridorHeight = 3.5;
 
-    // Load paper texture
+    // 加载纸张纹理。
     const paperTexture = useTexture('/textures/paper-texture.webp');
 
     useMemo(() => {
@@ -23,7 +23,7 @@ const Corridor = ({ length = 100 }) => {
 
     return (
         <group>
-            {/* Floor - cream/paper color */}
+            {/* 地面：奶油色纸张。 */}
             <mesh
                 position={[0, -corridorHeight / 2, zOffset]}
                 rotation={[-Math.PI / 2, 0, 0]}
@@ -36,14 +36,14 @@ const Corridor = ({ length = 100 }) => {
                 />
             </mesh>
 
-            {/* Floor grid - notebook style */}
+            {/* 地面网格：笔记本风格。 */}
             <gridHelper
                 args={[length, length * 2, '#d0d0d0', '#e5e5e5']}
                 position={[0, -corridorHeight / 2 + 0.01, zOffset]}
                 rotation={[0, Math.PI / 2, 0]}
             />
 
-            {/* Ceiling */}
+            {/* 天花板。 */}
             <mesh
                 position={[0, corridorHeight / 2, zOffset]}
                 rotation={[Math.PI / 2, 0, 0]}
@@ -55,7 +55,7 @@ const Corridor = ({ length = 100 }) => {
                 />
             </mesh>
 
-            {/* Left Wall */}
+            {/* 左墙。 */}
             <mesh
                 position={[-corridorWidth / 2, 0, zOffset]}
                 rotation={[0, Math.PI / 2, 0]}
@@ -67,7 +67,7 @@ const Corridor = ({ length = 100 }) => {
                 />
             </mesh>
 
-            {/* Right Wall */}
+            {/* 右墙。 */}
             <mesh
                 position={[corridorWidth / 2, 0, zOffset]}
                 rotation={[0, -Math.PI / 2, 0]}
@@ -79,7 +79,7 @@ const Corridor = ({ length = 100 }) => {
                 />
             </mesh>
 
-            {/* Sketch-style decorations */}
+            {/* 速写风格装饰。 */}
             <SketchDecorations
                 corridorWidth={corridorWidth}
                 corridorHeight={corridorHeight}
@@ -87,7 +87,7 @@ const Corridor = ({ length = 100 }) => {
                 zOffset={zOffset}
             />
 
-            {/* End wall */}
+            {/* 尽头墙面。 */}
             <mesh position={[0, 0, zOffset - length / 2 + 0.5]}>
                 <planeGeometry args={[corridorWidth, corridorHeight]} />
                 <meshBasicMaterial color="#f0ede8" roughness={1} />
@@ -97,10 +97,10 @@ const Corridor = ({ length = 100 }) => {
 };
 
 /**
- * Sketch-style decorations - hand-drawn lines and marks
+ * 速写装饰：手绘线条与笔触。
  */
 const SketchDecorations = ({ corridorWidth, corridorHeight, length, zOffset }) => {
-    // Wall accents - vertical sketch lines
+    // 墙面装饰：竖向速写线。
     const wallLines = useMemo(() => {
         const lines = [];
         for (let z = -5; z > -length + 10; z -= 12) {
@@ -111,7 +111,7 @@ const SketchDecorations = ({ corridorWidth, corridorHeight, length, zOffset }) =
 
     return (
         <group>
-            {/* Baseboard sketch lines */}
+            {/* 踢脚线速写。 */}
             <mesh position={[-corridorWidth / 2 + 0.01, -corridorHeight / 2 + 0.08, zOffset]} rotation={[0, Math.PI / 2, 0]}>
                 <planeGeometry args={[length, 0.06]} />
                 <meshBasicMaterial color="#ccc" side={2} />
@@ -121,7 +121,7 @@ const SketchDecorations = ({ corridorWidth, corridorHeight, length, zOffset }) =
                 <meshBasicMaterial color="#ccc" side={2} />
             </mesh>
 
-            {/* Crown molding sketch */}
+            {/* 顶角线速写。 */}
             <mesh position={[-corridorWidth / 2 + 0.01, corridorHeight / 2 - 0.05, zOffset]} rotation={[0, Math.PI / 2, 0]}>
                 <planeGeometry args={[length, 0.04]} />
                 <meshBasicMaterial color="#ddd" side={2} />
@@ -131,7 +131,7 @@ const SketchDecorations = ({ corridorWidth, corridorHeight, length, zOffset }) =
                 <meshBasicMaterial color="#ddd" side={2} />
             </mesh>
 
-            {/* Vertical accent lines on walls */}
+            {/* 墙面的竖向装饰线。 */}
             {wallLines.map((z, i) => (
                 <group key={i}>
                     <mesh position={[-corridorWidth / 2 + 0.01, 0, z]}>
@@ -145,14 +145,14 @@ const SketchDecorations = ({ corridorWidth, corridorHeight, length, zOffset }) =
                 </group>
             ))}
 
-            {/* Random sketch marks on walls - like pencil marks */}
+            {/* 墙面随机速写痕迹，类似铅笔笔触。 */}
             <SketchMarks corridorWidth={corridorWidth} zOffset={zOffset} length={length} />
         </group>
     );
 };
 
 /**
- * Random pencil-like marks on walls
+ * 墙面随机铅笔笔触。
  */
 const SketchMarks = ({ corridorWidth, zOffset, length }) => {
     const marks = useMemo(() => {

@@ -3,17 +3,17 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 
 /**
- * usePaintMaterial
- * Exposes a ref to the material and handles compiling the noise-based transition effect.
+ * usePaintMaterial 上色材质 Hook。
+ * 暴露材质引用，并编译基于噪声的过渡效果。
  * 
- * Uses uRoomOrigin to make the reveal effect position-independent:
- * the shader works relative to the room's origin, not absolute world coordinates.
- * This fixes the paint animation not working in far corridor chunks.
+ * 通过 uRoomOrigin 让显现效果与绝对位置无关：
+ * 着色器使用相对房间原点的坐标。
+ * 修复远处走廊分段中上色动画失效的问题。
  * 
- * Options:
- *   dirX, dirY, dirZ  — reveal direction vector (default: -1, 0, 0.1 for Gallery left-side rooms)
- *   startDist, endDist — range mapping for the reveal progress
- *   noiseAxes          — which local axes to sample noise from: 'yz' (default), 'xz', 'xy'
+ * 选项：
+ *   dirX、dirY、dirZ：显现方向向量，左侧画廊默认 (-1, 0, 0.1)。
+ *   startDist、endDist：显现进度映射范围。
+ *   noiseAxes：噪声采样轴，默认 yz，也支持 xz、xy。
  */
 export const usePaintMaterial = (options = {}) => {
     const {
@@ -30,16 +30,16 @@ export const usePaintMaterial = (options = {}) => {
         uRoomOrigin: { value: new THREE.Vector3(0, 0, 0) }
     }), []);
 
-    // Build noise sampling code based on noiseAxes option
+    // 按 noiseAxes 构造噪声采样代码。
     const noiseComponent1 = noiseAxes === 'xz' ? 'localPos.xz' : noiseAxes === 'xy' ? 'localPos.xy' : 'localPos.yz';
     const noiseComponent2 = noiseComponent1;
 
     const onBeforeCompile = useMemo(() => (shader) => {
-        // Add uniforms
+        // 添加 uniform。
         shader.uniforms.uPaintProgress = uniformsData.uPaintProgress;
         shader.uniforms.uRoomOrigin = uniformsData.uRoomOrigin;
 
-        // 1. Vertex Shader: Inject varying and compute worldpos
+        // 1. 顶点着色器：注入 varying 并计算世界位置。
         shader.vertexShader = `
             varying vec3 vWorldPositionColor;
             ${shader.vertexShader}
@@ -52,7 +52,7 @@ export const usePaintMaterial = (options = {}) => {
             `
         );
 
-        // 2. Fragment Shader: Inject varying and noise functions in common block
+        // 2. 片元着色器：在公共区块注入 varying 与噪声函数。
         shader.fragmentShader = `
             uniform float uPaintProgress;
             uniform vec3 uRoomOrigin;
@@ -65,7 +65,7 @@ export const usePaintMaterial = (options = {}) => {
             `
             #include <common>
 
-            // Simple 2D noise
+            // 简单二维噪声。
             float paintHash(vec2 p) {
                 return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
             }
@@ -81,44 +81,44 @@ export const usePaintMaterial = (options = {}) => {
             `
         );
 
-        // 3. Fragment Shader: Inject logic to discard pixels and glow edges
+        // 3. 片元着色器：注入像素丢弃与边缘发光逻辑。
         shader.fragmentShader = shader.fragmentShader.replace(
             '#include <dithering_fragment>',
             `
             #include <dithering_fragment>
 
-            // === KIERUNEK ZAMALOWYWANIA ===
-            // Compute position relative to room origin so the effect works
-            // regardless of which corridor segment (chunk) the room is in
+            // 上色方向。
+            // 相对于房间原点计算位置，使效果
+            // 不受房间所在走廊分段的影响。
             vec3 localPos = vWorldPositionColor - uRoomOrigin;
 
             vec3 revealDir = normalize(vec3(${dirX.toFixed(1)}, ${dirY.toFixed(1)}, ${dirZ.toFixed(1)}));
 
-            // Mapowanie postępu na odległość wzdłuż wektora
+            // 将进度映射为沿向量的距离。
             float startDist = ${startDist.toFixed(1)}; 
             float endDist = ${endDist.toFixed(1)};
             float targetDist = mix(startDist, endDist, uPaintProgress);
             
-            // Odległość pixela wzdłuż wybranego kierunku (relative to room origin)
+            // 像素沿选定方向的距离，相对于房间原点。
             float distFromPlane = targetDist - dot(localPos, revealDir);
             
-            // Szum — noise sampling axes configured per room
+            // 噪声采样轴按房间配置。
             float n = paintNoise(${noiseComponent1} * 2.0) * 2.0;
             float n2 = paintNoise(${noiseComponent2} * 8.0) * 0.5;
             float combinedNoise = n + n2;
 
-            // Modulacja granicy szumem
+            // 用噪声调制边界。
             float boundary = distFromPlane + combinedNoise;
 
-            // Give a generous margin before discarding to allow a ragged edge
+            // 丢弃前留出足够边距，形成不规则边缘。
             if (boundary < 0.0) {
                 discard;
             }
 
-            // Create a glowing "wet paint" edge
+            // 创建发光的湿颜料边缘。
             float glow = smoothstep(2.0, 0.0, boundary);
             
-            // Brighten edge to look like fresh digital paint
+            // 提亮边缘，呈现新鲜数字颜料效果。
             if (uPaintProgress < 0.999 && boundary < 2.0) {
                 gl_FragColor.rgb += vec3(glow * 0.4, glow * 0.5, glow * 0.7);
             }
@@ -126,7 +126,7 @@ export const usePaintMaterial = (options = {}) => {
         );
     }, [uniformsData]);
 
-    // Animate method to trigger the transition
+    // 触发过渡的动画方法。
     const animatePaint = (delay = 0, duration = 2.5) => {
         gsap.to(uniformsData.uPaintProgress, {
             value: 1.0,
@@ -141,7 +141,7 @@ export const usePaintMaterial = (options = {}) => {
         uniformsData.uPaintProgress.value = 0.0;
     };
 
-    // Update room origin from a group ref's world position
+    // 由组引用的世界位置更新房间原点。
     const updateRoomOrigin = (groupRef) => {
         if (groupRef?.current) {
             groupRef.current.getWorldPosition(uniformsData.uRoomOrigin.value);

@@ -2,15 +2,15 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import * as THREE from 'three';
 
 /**
- * useParallax Hook
+ * useParallax 视差 Hook。
  * 
- * Tracks mouse movement and device orientation to create parallax effects.
- * Returns normalized values (-1 to 1) for X and Y axes.
+ * 跟踪鼠标与设备方向，生成视差效果。
+ * 返回 X、Y 轴 -1..1 的归一化值。
  * 
- * @param {Object} options - Configuration options
- * @param {number} options.sensitivity - Mouse movement sensitivity
- * @param {number} options.smoothing - Interpolation smoothness
- * @param {boolean} options.enableDeviceOrientation - Enable mobile device orientation
+ * @param {Object} options - 配置选项。
+ * @param {number} options.sensitivity - 鼠标移动灵敏度。
+ * @param {number} options.smoothing - 插值平滑度。
+ * @param {boolean} options.enableDeviceOrientation - 是否启用移动端设备方向。
  */
 const useParallax = ({
     sensitivity = 0.5,
@@ -22,31 +22,31 @@ const useParallax = ({
     const currentRef = useRef({ x: 0, y: 0 });
     const animationFrameRef = useRef();
 
-    // Handle mouse movement
+    // 处理鼠标移动。
     const handleMouseMove = useCallback((e) => {
-        // Normalize to -1 to 1 range
+        // 归一化至 -1..1 范围。
         const x = ((e.clientX / window.innerWidth) * 2 - 1) * sensitivity;
         const y = ((e.clientY / window.innerHeight) * 2 - 1) * sensitivity;
 
         targetRef.current = { x, y };
     }, [sensitivity]);
 
-    // Handle device orientation (mobile)
+    // 处理移动端设备方向。
     const handleDeviceOrientation = useCallback((e) => {
         if (!e.gamma || !e.beta) return;
 
-        // gamma: left/right tilt (-90 to 90)
-        // beta: front/back tilt (-180 to 180)
+        // gamma：左右倾斜，范围 -90 至 90。
+        // beta：前后倾斜，范围 -180 至 180。
         const x = THREE.MathUtils.clamp(e.gamma / 45, -1, 1) * sensitivity;
         const y = THREE.MathUtils.clamp((e.beta - 45) / 45, -1, 1) * sensitivity;
 
         targetRef.current = { x, y };
     }, [sensitivity]);
 
-    // Animation loop for smooth interpolation
+    // 平滑插值动画循环。
     useEffect(() => {
         const animate = () => {
-            // Lerp current toward target
+            // 将当前值线性插值至目标值。
             currentRef.current.x = THREE.MathUtils.lerp(
                 currentRef.current.x,
                 targetRef.current.x,
@@ -58,7 +58,7 @@ const useParallax = ({
                 smoothing
             );
 
-            // Update state (batched for performance)
+            // 批量更新状态，减少开销。
             setParallax({
                 x: currentRef.current.x,
                 y: currentRef.current.y
@@ -76,19 +76,19 @@ const useParallax = ({
         };
     }, [smoothing]);
 
-    // Set up event listeners
+    // 注册事件监听。
     useEffect(() => {
-        // Desktop: mouse movement
+        // 桌面端鼠标移动。
         window.addEventListener('mousemove', handleMouseMove);
 
-        // Mobile: device orientation (if supported and enabled)
+        // 移动端设备方向，需支持且已启用。
         let orientationSupported = false;
 
         if (enableDeviceOrientation && window.DeviceOrientationEvent) {
-            // Check if we need to request permission (iOS 13+)
+            // 检查是否需请求 iOS 13 及以上权限。
             if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                // Permission needs to be requested on user gesture
-                // For now, we'll skip this and rely on mouse/touch
+                // 权限需由用户手势触发请求。
+                // 当前跳过，使用鼠标与触摸作为回退。
             } else {
                 window.addEventListener('deviceorientation', handleDeviceOrientation);
                 orientationSupported = true;

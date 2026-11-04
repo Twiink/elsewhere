@@ -1,13 +1,13 @@
 /**
- * Texture Preload List - ALL textures for the entire experience
- * Everything loads during the initial preloader for zero stutter when entering rooms.
+ * 整个体验的纹理预加载列表。
+ * 初始加载阶段预加载资源，减少进入房间时的卡顿。
  */
 
-// Entrance scene textures
+// 入口场景纹理。
 export const ENTRANCE_TEXTURES = [
-    // Core
+    // 核心资源。
     '/textures/paper-texture.webp',
-    // Doors
+    // 门。
     '/textures/doors/frame_sketch.webp',
     '/textures/doors/door_left_sketch.webp',
     '/textures/doors/door_right_sketch.webp',
@@ -15,13 +15,13 @@ export const ENTRANCE_TEXTURES = [
     '/textures/doors/handle_right_sketch.webp',
     '/textures/doors/door_back_left_sketch.webp',
     '/textures/doors/pien.webp',
-    // Environment
+    // 环境。
     '/textures/entrance/wall_bricks_2.webp',
     '/textures/entrance/stone-path.webp',
     '/textures/entrance/floor_paper.webp',
     '/textures/entrance/belka.webp',
     '/textures/entrance/sign.webp',
-    // Characters/Objects
+    // 角色与物体。
     '/textures/entrance/cat_front_body.webp',
     '/textures/entrance/window_sketch.webp',
     '/textures/entrance/avatar_window.webp',
@@ -30,27 +30,26 @@ export const ENTRANCE_TEXTURES = [
     '/textures/entrance/pot_with_duck.webp',
     '/textures/entrance/bug_sketch.webp',
     '/textures/entrance/speech_bubble.webp',
-    // Images
+    // 图片。
     '/images/ink-splash.webp',
 ];
 
-// Corridor scene textures
+// 走廊场景纹理。
 export const CORRIDOR_TEXTURES = [
-    // Walls/Floor/Ceiling
+    // 墙面、地面与天花板。
     '/textures/corridor/wall_texture.webp',
     '/textures/corridor/kawalekpodlogi.webp',
     '/textures/corridor/texturadoprogow.webp',
     '/textures/corridor/texturadrewnadonozekbiurka.webp',
     '/textures/corridor/ceiling_texture.webp',
-    '/textures/corridor/avatar_sketch.webp',
-    // Double doors (end of corridor)
+    // 走廊尽头的双开门。
     '/textures/corridor/doors/frame_sketch.webp',
     '/textures/corridor/doors/doorrleft.webp',
     '/textures/corridor/doors/dorright.webp',
     '/textures/corridor/doors/handle_left_sketch.webp',
     '/textures/corridor/doors/handle_right_sketch.webp',
     '/textures/corridor/doors/pien.webp',
-    // Single side doors
+    // 侧面单门。
     '/textures/corridor/doors/ramkasingledoors.webp',
     '/textures/corridor/doors/klamkadodrzwi.webp',
     '/textures/corridor/doors/backsingledoors.webp',
@@ -62,9 +61,9 @@ export const CORRIDOR_TEXTURES = [
     '/textures/corridor/doors/drzwisocial_painted.webp',
     '/textures/corridor/doors/drzwiabout_painted.webp',
     '/textures/corridor/doors/drzwikontakt_painted.webp',
-    // Signs
+    // 标牌。
     '/textures/corridor/pustatabliczka.webp',
-    // Decorations
+    // 装饰。
     '/textures/corridor/decorations/while_true_loop.webp',
     '/textures/corridor/decorations/coffee_debug.webp',
     '/textures/corridor/decorations/idea_process.webp',
@@ -72,7 +71,7 @@ export const CORRIDOR_TEXTURES = [
     '/textures/corridor/decorations/paper_airplane.webp',
     '/textures/corridor/decorations/pencil.webp',
     '/textures/corridor/decorations/coffee_cup.webp',
-    // CorridorDecorations - frames, furniture, lamps
+    // CorridorDecorations：画框、家具与灯具。
     '/textures/corridor/ramkanazdjecieduza.webp',
     '/textures/corridor/ramkanazdjecieduza_painted.webp',
     '/textures/corridor/ramkanazdjeciemala.webp',
@@ -86,16 +85,14 @@ export const CORRIDOR_TEXTURES = [
     '/textures/corridor/szafkaprzodgora.webp',
     '/textures/corridor/rysuneknaobraz1.webp',
     '/textures/corridor/rysuneknaobrazek3.webp',
-    // DoorSection extras
+    // DoorSection 附加资源。
     '/textures/corridor/strzalka.webp',
     '/textures/corridor/doors/door_back.webp',
     '/textures/corridor/doors/klamkadodrzwi_painted.webp',
 ];
 
-// Standard HTML Image assets (preloaded via new Image() in App.jsx)
+// 标准 HTML 图片资源，通过 App.jsx 的 new Image() 预加载。
 export const IMAGE_ASSETS = [
-    '/images/avatar-thinking.webp',
-    '/images/avatar-hero.webp',
     '/images/ink-splash.webp',
     '/images/map.webp',
     '/images/map_about_painted.webp',
@@ -106,7 +103,7 @@ export const IMAGE_ASSETS = [
     '/images/pin-slot.webp',
 ];
 
-// Additional textures from App.jsx and avatar animations
+// App.jsx 与人物动画的附加纹理。
 export const UI_TEXTURES = [
     '/textures/corridor/avatar_anim/1.webp',
     '/textures/corridor/avatar_anim/2.webp',
@@ -120,11 +117,11 @@ export const UI_TEXTURES = [
 ];
 
 // ============================================
-// ROOM TEXTURES - Preloaded for instant room entry
+// 房间纹理，预加载以加快进入。
 // ============================================
 
-// Gallery Room textures (loaded via useTexture / drei)
-// These are organized to handle conditional painted vs standard versions
+// 画廊纹理，通过 Drei 的 useTexture 加载。
+// 按条件组织彩色与普通版本。
 export const GALLERY_TEXTURES_BASE = [
     '/textures/gallery/floor.webp',
     '/textures/gallery/railing.webp',
@@ -136,15 +133,15 @@ export const GALLERY_TEXTURES_BASE = [
 ];
 
 export const GALLERY_TEXTURES_VERSIONED = [
-    // Project cards
+    // 项目卡片。
     'monetuneprzod',
     'timberkittyprzod',
     'youngmultiprzod',
     'bioprzod',
-    // Card back
+    // 卡片背面。
     'tylkartki',
     'przyciskdotylukartki',
-    // Tech stack logos
+    // 技术栈标志。
     'csslogo',
     'elementorlogo',
     'firebaselogo',
@@ -165,7 +162,7 @@ export const GALLERY_TEXTURES = [
     ])
 ];
 
-// Contact Room textures (loaded via useTexture / drei)
+// 联系我房间纹理，通过 Drei 的 useTexture 加载。
 export const CONTACT_TEXTURES = [
     '/textures/contact/faletopdown.webp',
     '/textures/contact/molo.webp',
@@ -177,11 +174,11 @@ export const CONTACT_TEXTURES = [
     '/textures/contact/beczka_painted.webp',
 ];
 
-// About Room textures (loaded via useLoader(TextureLoader))
+// 关于我房间纹理，通过 useLoader(TextureLoader) 加载。
 export const ABOUT_TEXTURES = [
-    // Avatar
+    // 人物。
     '/textures/about/awatarnachmurce.webp',
-    // Awards
+    // 奖项。
     '/textures/about/SOTY.webp',
     '/textures/about/SOTY_painted.webp',
     '/textures/about/SOTD.webp',
@@ -190,29 +187,29 @@ export const ABOUT_TEXTURES = [
     '/textures/about/SOTM_painted.webp',
     '/textures/about/button.webp',
     '/textures/about/button_painted.webp',
-    // Award images (for overlay)
+    // 遮罩中的奖项图片。
     '/textures/about/SOTDAYYOUNGMULTICSSWINNER.webp',
     '/textures/about/SOTDAYYOUNGMULTIGSAP.webp',
     '/textures/about/SOTDAYYOUNGMULTIORPETRON.webp',
     '/textures/about/SOTDAYYOUNGMULTIDESIGNNOMINESS.webp',
-    // Journey islands
+    // 经历岛屿。
     '/textures/about/uowyspa.webp',
     '/textures/about/freelancewyspa.webp',
-    // Skill balloons - large
+    // 大技能气球。
     '/textures/about/reactduzybalon.webp',
     '/textures/about/reactduzybalon_painted.webp',
     '/textures/about/threejsduzybalon.webp',
     '/textures/about/threejsduzybalon_painted.webp',
     '/textures/about/GSAPduzybalon.webp',
     '/textures/about/GSAPduzybalon_painted.webp',
-    // Skill balloons - medium
+    // 中技能气球。
     '/textures/about/JSSREDNIBALON.webp',
     '/textures/about/JSSREDNIBALON_painted.webp',
     '/textures/about/csssrednibalon.webp',
     '/textures/about/csssrednibalon_painted.webp',
     '/textures/about/nextjssrednibalon.webp',
     '/textures/about/nextjssrednibalon_painted.webp',
-    // Skill balloons - small
+    // 小技能气球。
     '/textures/about/htmlmalybalon.webp',
     '/textures/about/htmlmalybalon_painted.webp',
     '/textures/about/gitmalybalon.webp',
@@ -221,7 +218,7 @@ export const ABOUT_TEXTURES = [
     '/textures/about/figmamalybalon_painted.webp',
     '/textures/about/firebasemalybalon.webp',
     '/textures/about/firebasemalybalon_painted.webp',
-    // Clouds
+    // 云层。
     '/textures/clouds/1131c3eb-dfae-423f-924b-ff39d8ccd6dc.webp',
     '/textures/clouds/254b8ec8-d6f7-4275-956f-7bab65b2ce2d.webp',
     '/textures/clouds/2cc88dd1-483c-466d-b07e-f8308c61ccbe.webp',
@@ -232,9 +229,9 @@ export const ABOUT_TEXTURES = [
     '/textures/clouds/f6e358bc-d27c-41dd-95f4-6787a835c41e.webp',
 ];
 
-// Studio Room textures (loaded via useLoader(TextureLoader))
+// 工作室纹理，通过 useLoader(TextureLoader) 加载。
 export const STUDIO_TEXTURES = [
-    // Monitor (blog)
+    // 博客显示器。
     '/textures/studio/monitor_front.webp',
     '/textures/studio/monitor_front_painted.webp',
     '/textures/studio/monitor_back.webp',
@@ -247,7 +244,7 @@ export const STUDIO_TEXTURES = [
     '/textures/studio/monitor_left_painted.webp',
     '/textures/studio/monitor_right.webp',
     '/textures/studio/monitor_right_painted.webp',
-    // TV (youtube)
+    // YouTube 电视。
     '/textures/studio/tv_front.webp',
     '/textures/studio/tv_front_painted.webp',
     '/textures/studio/tv_back.webp',
@@ -258,14 +255,14 @@ export const STUDIO_TEXTURES = [
     '/textures/studio/tv_bottom_painted.webp',
     '/textures/studio/tv_side.webp',
     '/textures/studio/tv_side_painted.webp',
-    // Phone (tiktok)
+    // TikTok 手机。
     '/textures/studio/phone_front.webp',
     '/textures/studio/phone_front_painted.webp',
     '/textures/studio/phone_back.webp',
     '/textures/studio/phone_back_painted.webp',
     '/textures/studio/phone_side.webp',
     '/textures/studio/phone_side_painted.webp',
-    // Custom content front textures
+    // 自定义内容正面纹理。
     '/textures/studio/monitorfront_postnafbdoublewinner.webp',
     '/textures/studio/monitorfront_postnafbdoublewinner_painted.webp',
     '/textures/studio/phonefront_followmeontiktok.webp',
@@ -277,10 +274,10 @@ export const STUDIO_TEXTURES = [
 ];
 
 // ============================================
-// COMBINED EXPORTS
+// 合并导出。
 // ============================================
 
-// Textures loaded via useTexture (drei) - entrance, corridor, UI, gallery, contact
+// Drei useTexture 加载的纹理：入口、走廊、界面、画廊和联系我。
 export const PRELOAD_ALL = [
     ...ENTRANCE_TEXTURES,
     ...CORRIDOR_TEXTURES,
@@ -291,49 +288,49 @@ export const PRELOAD_ALL = [
 ];
 
 
-// Textures loaded via useLoader(TextureLoader) - about, studio
+// useLoader(TextureLoader) 加载的纹理：关于我与工作室。
 export const PRELOAD_LOADER = [
     ...ABOUT_TEXTURES,
     ...STUDIO_TEXTURES,
 ];
 
 /**
- * Filters the preload list based on whether the device supports hover (desktop) 
- * or is a touch-only device (mobile/tablet).
- * @param {string[]} list The list of texture paths to filter
- * @param {boolean} usePainted Whether to prioritize _painted versions
- * @returns {string[]} The filtered list
+ * 根据设备是否支持桌面悬停，
+ * 或仅支持手机、平板触摸，过滤预加载列表。
+ * @param {string[]} list - 待过滤的纹理路径列表。
+ * @param {boolean} usePainted - 是否优先使用 _painted 版本。
+ * @returns {string[]} 过滤后的列表。
  */
 export const filterTexturesByDevice = (list, usePainted) => {
-    // 1. Identify all paths that have a _painted version available
+    // 1. 查找所有存在 _painted 版本的路径。
     const paintedVersions = new Set(list.filter(p => p.includes('_painted.webp')));
     
-    // Also include the special css3logo case
+    // 同时处理 css3logo 特例。
     const hasCss3Painted = list.some(p => p.includes('css3logo_painted.webp'));
     
     return list.filter(path => {
         const isPainted = path.includes('_painted.webp');
         const isCss3 = path.includes('css3logo_painted.webp');
         
-        // Find the "standard" version for this path if it's a painted one
+        // 彩色路径需先找到对应普通路径。
         let standardVersion = null;
         if (isPainted) {
             standardVersion = path.replace('_painted.webp', '.webp');
         } else if (isCss3) {
             standardVersion = path.replace('css3logo_painted.webp', 'csslogo.webp');
         } else {
-            // Check if this standard path HAS a painted version in the list
+            // 检查普通路径在列表中是否有彩色版本。
             const pVersion = path.replace('.webp', '_painted.webp');
             const css3Version = path.replace('csslogo.webp', 'css3logo_painted.webp');
             if (list.includes(pVersion) || (path.includes('csslogo.webp') && hasCss3Painted)) {
-                // Return true to keep the standard version! Both desktop and mobile need it.
+                // 返回 true 保留普通版本，桌面端与移动端均需要。
                 return true; 
             }
-            // If it doesn't have a painted version, it's a static texture (always keep)
+            // 没有彩色版本时视为静态纹理，始终保留。
             return true;
         }
 
-        // It's a painted version
+        // 此项为彩色版本。
         return usePainted;
     });
 };

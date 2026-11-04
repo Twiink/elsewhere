@@ -1,4 +1,4 @@
-/* Standalone progressive enhancement. The HTML links work before this runs. */
+/* 独立的渐进增强脚本；运行前 HTML 链接即可使用。 */
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const states = [];
 
@@ -44,7 +44,7 @@ for (const link of document.querySelectorAll('.work-link')) {
       const center = state.centers[index];
       const distance = Math.hypot(state.pointer.x - center.x, (state.pointer.y - center.y) * .7);
       const pressure = Math.max(0, 1 - distance / center.radius);
-      // A small, monotonic depression. CSS controls the short settling time.
+      // 小幅、单调的下压效果；CSS 控制短暂的回弹时间。
       const smooth = pressure * pressure * (3 - 2 * pressure);
       unit.style.setProperty('--press', smooth.toFixed(3));
     });
@@ -76,7 +76,7 @@ for (const link of document.querySelectorAll('.work-link')) {
     link.classList.add('is-pressed');
   });
   link.addEventListener('pointerup', () => {
-    // Never delay, cancel, or replay a real navigation for the visual feedback.
+    // 视觉反馈不应延迟、取消或重复触发实际导航。
     state.release = setTimeout(() => link.classList.remove('is-pressed'), 160);
   });
 }
@@ -100,14 +100,14 @@ for (const link of document.querySelectorAll('[data-pending]')) {
   link.addEventListener('click', event => {
     event.preventDefault();
     clearTimeout(noticeTimer);
-    notice.textContent = `${link.dataset.pending} — link coming soon.`;
+    notice.textContent = `${link.dataset.pending}：链接即将上线。`;
     notice.classList.add('is-visible');
     noticeTimer = setTimeout(dismissNotice, 3500);
   });
 }
 document.addEventListener('keydown', event => { if (event.key === 'Escape') { dismissNotice(); resetAll(); } });
 
-/* Video Scrubbing */
+/* 拖动式视频进度控制 */
 const scrubVideo = document.getElementById('scrub-video');
 if (scrubVideo && window.matchMedia('(hover: hover)').matches) {
   let targetTime = 0;
@@ -122,10 +122,10 @@ if (scrubVideo && window.matchMedia('(hover: hover)').matches) {
   });
 
   const updateVideo = () => {
-    // Używamy wyższego współczynnika (0.4 zamiast 0.1), aby reagowało natychmiast, zachowując minimalne wygładzenie
+    // 使用较高系数（0.4，而非 0.1），兼顾即时响应与少量平滑。
     currentTime += (targetTime - currentTime) * 0.4;
     
-    // Jeśli jesteśmy wystarczająco blisko, wyrównujemy i zatrzymujemy pętlę
+    // 足够接近目标时对齐并停止循环。
     if (Math.abs(targetTime - currentTime) > 0.01) {
       if (isMetadataLoaded || scrubVideo.readyState >= 1) {
         try {
@@ -134,7 +134,7 @@ if (scrubVideo && window.matchMedia('(hover: hover)').matches) {
       }
       rafId = requestAnimationFrame(updateVideo);
     } else {
-      // Wyrównanie do celu na sam koniec
+      // 最后精确对齐目标。
       try { scrubVideo.currentTime = targetTime; } catch(e){}
       currentTime = targetTime;
       rafId = null;
@@ -142,7 +142,7 @@ if (scrubVideo && window.matchMedia('(hover: hover)').matches) {
   };
 
   const handleMouseMove = (event) => {
-    // Disable on touch devices or if reduced motion is enabled
+    // 触摸设备或启用减少动态效果时禁用。
     if (reducedMotion.matches || event.pointerType === 'touch') return;
     
     const yPos = Math.max(0, Math.min(1, event.clientY / window.innerHeight));

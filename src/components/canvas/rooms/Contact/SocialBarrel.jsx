@@ -6,7 +6,7 @@ import gsap from 'gsap';
 import '../../shaders/RevealMaterial';
 import { isTouchDevice } from '../../../../utils/deviceDetect';
 
-// Reusable Vector3 to avoid allocations in useFrame
+// 复用 Vector3，避免 useFrame 中分配对象。
 const _tempScale = new THREE.Vector3();
 
 const SocialBarrel = ({ position, rotation = [0, 0, 0], texturePath, label, onClick, scale = [2.12, 2.3], paintOnBeforeCompile, paintUniforms }) => {
@@ -15,11 +15,11 @@ const SocialBarrel = ({ position, rotation = [0, 0, 0], texturePath, label, onCl
     const paintedRef = useRef();
     const hideDelayRef = useRef();
 
-    // Load texture based on prop. 
-    // Note: If you change the texture on the fly, this might suspend. 
-    // Ideally textures are preloaded or consistent.
+    // 根据属性加载纹理。
+    // 注意：运行时切换纹理可能触发挂起。
+    // 最好预加载纹理或保持纹理稳定。
     const texture = useTexture(texturePath);
-    // Determine the painted texture path from the base texture path
+    // 由基础纹理路径推导彩色纹理路径。
     const isTouch = isTouchDevice();
     const paintedTexturePath = isTouch ? texturePath : texturePath.replace('.png', '_painted.png').replace('.webp', '_painted.webp');
     const texturePainted = useTexture(paintedTexturePath);
@@ -31,23 +31,23 @@ const SocialBarrel = ({ position, rotation = [0, 0, 0], texturePath, label, onCl
         if (meshRef.current) {
             const time = state.clock.getElapsedTime();
 
-            // Synced with sea waves (speed ~0.8, amp ~0.15)
-            // Added random phase offset based on x position to prevent them continuously bobbing in perfect unison
+            // 与海浪同步，速度约 0.8、振幅约 0.15。
+            // 按 X 位置加入相位偏移，避免所有木桶完全同步浮动。
             const phaseOffset = position[0] * 0.5;
             meshRef.current.position.y = position[1] + Math.sin(time * 0.8 + phaseOffset) * 0.15;
 
-            // Horizontal drift (gentle left/right)
+            // 轻微左右漂移。
             meshRef.current.position.x = position[0] + Math.sin(time * 0.4 + phaseOffset) * 0.2;
 
-            // Gentle rotation drift
+            // 轻微旋转漂移。
             meshRef.current.rotation.z = rotation[2] + Math.sin(time * 0.6 + phaseOffset) * 0.05;
 
-            // Hover scale
+            // 悬停缩放。
             const targetScale = hovered ? 1.1 : 1;
-            // Apply base scale * hover factor
+            // 实际缩放 = 基础缩放 × 悬停系数。
             meshRef.current.scale.lerp(_tempScale.set(targetScale, targetScale, 1), 0.1);
 
-            // Paint Transition for Text
+            // 文字上色过渡。
             if (paintUniforms && textRef.current) {
                 const localPos = meshRef.current.position;
                 const revealDir = new THREE.Vector3(1.0, 0.0, -0.1).normalize();
@@ -111,7 +111,7 @@ const SocialBarrel = ({ position, rotation = [0, 0, 0], texturePath, label, onCl
             onPointerOver={handlePointerOver}
             onPointerOut={handlePointerOut}
         >
-            {/* Painted Layer (Behind) */}
+            {/* 后方彩色层。 */}
             <mesh ref={paintedRef} position={[0, 0, -0.001]} visible={false}>
                 <planeGeometry args={scale} />
                 <meshBasicMaterial color="#e0e0e0"
@@ -124,7 +124,7 @@ const SocialBarrel = ({ position, rotation = [0, 0, 0], texturePath, label, onCl
                 />
             </mesh>
 
-            {/* Sketch overlay (Front) - brush-stroke discard reveals painted beneath */}
+            {/* 前方速写叠加层，通过笔刷丢弃露出底层彩色图。 */}
             <mesh position={[0, 0, 0]}>
                 <planeGeometry args={scale} />
                 <revealMaterial color="#e0e0e0"
@@ -141,10 +141,10 @@ const SocialBarrel = ({ position, rotation = [0, 0, 0], texturePath, label, onCl
             {label && (
                 <Text
                     ref={textRef}
-                    position={[0, scale[1] * 0.26, 0.05]} // Adjust Y position to hit the wooden board on top of the barrel
-                    rotation={[0, 0, 0.03]} // Slight tilt to match a drawn wooden board
+                    position={[0, scale[1] * 0.26, 0.05]} // 调整 Y，让文字落在木桶顶部木牌上。
+                    rotation={[0, 0, 0.03]} // 轻微倾斜，匹配手绘木牌。
                     fontSize={scale[0] * 0.14}
-                    font="/fonts/CabinSketch-Bold.ttf"
+                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                     color="#111111"
                     fillOpacity={paintUniforms ? 0 : 1}
                     anchorX="center"

@@ -3,82 +3,82 @@ import { Text } from '@react-three/drei';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Eagerly import room components - textures are preloaded during the preloader phase
+// 直接导入房间组件，纹理在加载阶段预加载。
 import GalleryRoom from '../rooms/Gallery/GalleryRoom';
 import StudioRoom from '../rooms/Studio/StudioRoom';
 import AboutRoom from '../rooms/About/AboutRoom';
 import ContactRoom from '../rooms/Contact/ContactRoom';
 
-// Room configurations
+// 房间配置。
 const ROOM_CONFIG = {
-    corridorWidth: 2.2,   // Wider "vestibule" feeling
+    corridorWidth: 2.2,   // 较宽的前厅感。
     corridorHeight: 2.4,  // frameHeight - 0.1
-    corridorDepth: 2,     // Shorter - quick transition
+    corridorDepth: 2,     // 较短，便于快速过渡。
     roomWidth: 30,
     roomHeight: 20,
     roomDepth: 25
 };
 
 const SUBTITLES = {
-    'THE GALLERY': 'Explore my creative projects',
-    'THE STUDIO': 'Watch behind the scenes',
-    'DEV DIARY': 'My development journey',
-    "LET'S CONNECT": 'Get in touch with me'
+    "作品画廊": "探索我的创意项目",
+    "内容工作室": "了解创作幕后",
+    "开发日志": "我的开发历程",
+    "联系我": "欢迎与我联系"
 };
 
-// Naturalny kafelek listwy: 1582x94px przy wysokości 0.15 → ~2.524 units szerokości
+// 踢脚线自然平铺：1582×94 像素，高 0.15 时宽约 2.524 单位。
 const NATURAL_TILE_W = (1582 / 94) * 0.15;
 
 /**
- * RoomInterior Component
+ * RoomInterior 房间内部组件。
  *
- * Memoized room geometry to prevent re-renders and improve performance.
- * Contains corridor + giant room at the end.
+ * 缓存房间几何体，减少重复渲染并提升性能。
+ * 包含过渡走廊和尽头的大房间。
  */
 const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
     const { corridorWidth, corridorHeight, corridorDepth, roomWidth, roomHeight, roomDepth } = ROOM_CONFIG;
     const halfDepth = corridorDepth / 2;
     const roomZ = -corridorDepth - roomDepth / 2;
 
-    // Load corridor textures
+    // 加载走廊纹理。
     const floorTexSrc = useTexture('/textures/corridor/kawalekpodlogi.webp');
     const wallTexSrc = useTexture('/textures/corridor/wall_texture.webp');
     const ceilingTexSrc = useTexture('/textures/corridor/ceiling_texture.webp');
     const bbTexSrc = useTexture('/textures/corridor/texturadoprogow.webp');
 
-    // Memoize textured materials for mini-corridor
+    // 缓存小走廊的纹理材质。
     const materials = useMemo(() => {
-        // Floor
+        // 地面。
         const floorTex = floorTexSrc.clone();
         floorTex.needsUpdate = true;
         floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
         floorTex.repeat.set(corridorDepth / 2.5, corridorWidth / 2.5);
 
-        // Left wall
+        // 左墙。
         const wallTexL = wallTexSrc.clone();
         wallTexL.needsUpdate = true;
         wallTexL.wrapS = wallTexL.wrapT = THREE.RepeatWrapping;
         wallTexL.repeat.set(corridorDepth / 2, corridorHeight / 2);
 
-        // Right wall (same settings)
+        // 右墙，采用相同设置。
         const wallTexR = wallTexSrc.clone();
         wallTexR.needsUpdate = true;
         wallTexR.wrapS = wallTexR.wrapT = THREE.RepeatWrapping;
         wallTexR.repeat.set(corridorDepth / 2, corridorHeight / 2);
 
-        // Ceiling
+        // 天花板。
         const ceilTex = ceilingTexSrc.clone();
         ceilTex.needsUpdate = true;
         ceilTex.wrapS = ceilTex.wrapT = THREE.RepeatWrapping;
         ceilTex.repeat.set(corridorDepth / 2.5, corridorWidth / 2.5);
 
-        // Baseboard left
+        // 左侧踢脚线。
         const bbLeft = bbTexSrc.clone();
         bbLeft.needsUpdate = true;
         bbLeft.wrapS = bbLeft.wrapT = THREE.RepeatWrapping;
         bbLeft.repeat.set(corridorDepth / NATURAL_TILE_W, 1);
 
-        // Baseboard right
+        // 右侧踢脚线。
         const bbRight = bbTexSrc.clone();
         bbRight.needsUpdate = true;
         bbRight.wrapS = bbRight.wrapT = THREE.RepeatWrapping;
@@ -101,7 +101,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
 
                 side: THREE.DoubleSide
             }),
-            // Room materials (keep flat for rooms that have their own content)
+            // 房间材质；已有自定义内容的房间保持平面风格。
             roomFloor: new THREE.MeshBasicMaterial({ color: '#e5e5e5', side: THREE.DoubleSide }),
             roomCeiling: new THREE.MeshBasicMaterial({ color: '#fafafa', side: THREE.DoubleSide }),
             roomWall: new THREE.MeshBasicMaterial({ color: '#f0f0f0', side: THREE.DoubleSide }),
@@ -109,7 +109,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
         };
     }, [floorTexSrc, wallTexSrc, ceilingTexSrc, bbTexSrc]);
 
-    // Memoize geometries
+    // 缓存几何体。
     const geometries = useMemo(() => ({
         corridorSideWall: new THREE.PlaneGeometry(corridorDepth, corridorHeight),
         corridorFloorCeiling: new THREE.PlaneGeometry(corridorWidth, corridorDepth),
@@ -120,19 +120,19 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
         roomBackWall: new THREE.PlaneGeometry(roomWidth, roomHeight)
     }), []);
 
-    const isGallery = label === 'THE GALLERY';
+    const isGallery = label === "作品画廊";
 
-    // Trigger onReady for generic rooms (which don't have their own component to do it)
+    // 通用房间没有独立组件负责就绪通知，需在此触发 onReady。
     useEffect(() => {
-        if (showRoom && !['THE GALLERY', 'THE STUDIO', 'THE ABOUT', "LET'S CONNECT"].includes(label)) {
+        if (showRoom && !["作品画廊", "内容工作室", "关于我", "联系我"].includes(label)) {
             onReady?.();
         }
     }, [showRoom, label, onReady]);
 
     return (
         <group position={[0, -0.149, 0]}>
-            {/* === CORRIDOR (The "Mini-Corridor" Transition) === */}
-            {/* Left wall */}
+            {/* 小走廊过渡区域。 */}
+            {/* 左墙。 */}
             <mesh
                 position={[-corridorWidth / 2, 0, -halfDepth]}
                 rotation={[0, Math.PI / 2, 0]}
@@ -140,7 +140,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                 material={materials.corridorWallL}
             />
 
-            {/* Right wall */}
+            {/* 右墙。 */}
             <mesh
                 position={[corridorWidth / 2, 0, -halfDepth]}
                 rotation={[0, -Math.PI / 2, 0]}
@@ -148,7 +148,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                 material={materials.corridorWallR}
             />
 
-            {/* Floor */}
+            {/* 地面。 */}
             <mesh
                 position={[0, -corridorHeight / 2, -halfDepth]}
                 rotation={[-Math.PI / 2, 0, 0]}
@@ -156,7 +156,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                 material={materials.corridorFloor}
             />
 
-            {/* Ceiling */}
+            {/* 天花板。 */}
             <mesh
                 position={[0, corridorHeight / 2, -halfDepth]}
                 rotation={[Math.PI / 2, 0, 0]}
@@ -164,7 +164,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                 material={materials.corridorCeiling}
             />
 
-            {/* Baseboard Left */}
+            {/* 左侧踢脚线。 */}
             <mesh
                 position={[-corridorWidth / 2 + 0.01, -corridorHeight / 2 + 0.075, -halfDepth]}
                 rotation={[0, Math.PI / 2, 0]}
@@ -172,7 +172,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                 material={materials.bbLeft}
             />
 
-            {/* Baseboard Right */}
+            {/* 右侧踢脚线。 */}
             <mesh
                 position={[corridorWidth / 2 - 0.01, -corridorHeight / 2 + 0.075, -halfDepth]}
                 rotation={[0, -Math.PI / 2, 0]}
@@ -180,7 +180,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                 material={materials.bbRight}
             />
 
-            {/* === THRESHOLD (End of Mini-Corridor) === */}
+            {/* 小走廊末端的门槛。 */}
             <mesh
                 position={[0, -corridorHeight / 2 + 0.005, -corridorDepth]}
                 rotation={[-Math.PI / 2, 0, 0]}
@@ -188,42 +188,42 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                 material={materials.threshold}
             />
 
-            {/* === ROOM CONTENT === */}
+            {/* 房间内容。 */}
             {showRoom && (
                 <group>
                     {isGallery ? (
-                        // === NEW GALLERY ROOM ===
-                        // Positioned at the end of the corridor
+                        // 画廊房间。
+                        // 位于走廊末端。
                         <group position={[0, -0.5, -corridorDepth]}>
                             <Suspense fallback={null}>
                                 <GalleryRoom showRoom={showRoom} onReady={onReady} isExiting={isExiting} />
                             </Suspense>
                         </group>
-                    ) : label === 'THE STUDIO' ? (
-                        // === NEW STUDIO ROOM ===
+                    ) : label === "内容工作室" ? (
+                        // 工作室房间。
                         <group position={[0, -0.5, -corridorDepth]}>
                             <Suspense fallback={null}>
                                 <StudioRoom showRoom={showRoom} onReady={onReady} isExiting={isExiting} />
                             </Suspense>
                         </group>
-                    ) : label === 'THE ABOUT' ? (
-                        // === NEW ABOUT ROOM ===
+                    ) : label === "关于我" ? (
+                        // 关于我房间。
                         <group position={[0, -0.5, -corridorDepth]}>
                             <Suspense fallback={null}>
                                 <AboutRoom showRoom={showRoom} onReady={onReady} isExiting={isExiting} />
                             </Suspense>
                         </group>
-                    ) : label === "LET'S CONNECT" ? (
-                        // === NEW CONTACT ROOM ===
+                    ) : label === "联系我" ? (
+                        // 联系我房间。
                         <group position={[0, -0.5, -corridorDepth]}>
                             <Suspense fallback={null}>
                                 <ContactRoom showRoom={showRoom} onReady={onReady} isExiting={isExiting} />
                             </Suspense>
                         </group>
                     ) : (
-                        // === DEFAULT GENERIC ROOM (For other sections) ===
+                        // 其他区域使用的默认通用房间。
                         <group position={[0, roomHeight / 2 - corridorHeight / 2, roomZ]}>
-                            {/* Floor */}
+                            {/* 地面。 */}
                             <mesh
                                 position={[0, -roomHeight / 2, 0]}
                                 rotation={[-Math.PI / 2, 0, 0]}
@@ -231,13 +231,13 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                                 material={materials.roomFloor}
                             />
 
-                            {/* Floor grid */}
+                            {/* 地面网格。 */}
                             <gridHelper
                                 args={[Math.min(roomWidth, roomDepth), 20, '#cccccc', '#dddddd']}
                                 position={[0, -roomHeight / 2 + 0.01, 0]}
                             />
 
-                            {/* Ceiling */}
+                            {/* 天花板。 */}
                             <mesh
                                 position={[0, roomHeight / 2, 0]}
                                 rotation={[Math.PI / 2, 0, 0]}
@@ -245,14 +245,14 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                                 material={materials.roomCeiling}
                             />
 
-                            {/* Back wall */}
+                            {/* 后墙。 */}
                             <mesh
                                 position={[0, 0, -roomDepth / 2]}
                                 geometry={geometries.roomBackWall}
                                 material={materials.roomBackWall}
                             />
 
-                            {/* Left wall */}
+                            {/* 左墙。 */}
                             <mesh
                                 position={[-roomWidth / 2, 0, 0]}
                                 rotation={[0, Math.PI / 2, 0]}
@@ -260,7 +260,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                                 material={materials.roomWall}
                             />
 
-                            {/* Right wall */}
+                            {/* 右墙。 */}
                             <mesh
                                 position={[roomWidth / 2, 0, 0]}
                                 rotation={[0, -Math.PI / 2, 0]}
@@ -268,33 +268,35 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                                 material={materials.roomWall}
                             />
 
-                            {/* Title */}
+                            {/* 标题。 */}
                             <Text
                                 position={[0, 2, -roomDepth / 2 + 2]}
                                 fontSize={4}
                                 color="#1a1a1a"
                                 anchorX="center"
                                 anchorY="middle"
+                                overflowWrap="break-word"
                                 maxWidth={roomWidth * 0.8}
                                 textAlign="center"
                             >
                                 {label}
                             </Text>
 
-                            {/* Subtitle */}
+                            {/* 副标题。 */}
                             <Text
                                 position={[0, -1, -roomDepth / 2 + 2]}
                                 fontSize={0.8}
                                 color="#666666"
                                 anchorX="center"
                                 anchorY="middle"
+                                overflowWrap="break-word"
                                 maxWidth={roomWidth * 0.7}
                                 textAlign="center"
                             >
                                 {SUBTITLES[label] || ''}
                             </Text>
 
-                            {/* Lighting - WYLACZONE */}
+                            {/* 光照，已禁用。 */}
                             {/* <pointLight position={[0, roomHeight / 2 - 2, 0]} intensity={1} distance={40} color="#ffffff" /> */}
                             {/* <pointLight position={[0, 0, -roomDepth / 4]} intensity={0.5} distance={30} color="#fffaf0" /> */}
                         </group>

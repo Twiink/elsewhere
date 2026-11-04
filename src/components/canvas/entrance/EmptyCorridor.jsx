@@ -4,23 +4,23 @@ import * as THREE from 'three';
 import { useTexture } from '@react-three/drei';
 
 /**
- * EmptyCorridor Component
+ * EmptyCorridor 空走廊组件。
  * 
- * Simple corridor walls for loading phase.
- * No doors, no decorations, no ITOM - just the corridor structure.
- * Used during preloader auto-scroll.
+ * 加载阶段使用的简单走廊墙面。
+ * 仅保留走廊结构，不包含门、装饰或 ITOM。
+ * 用于加载期间自动滚动。
  */
 const EmptyCorridor = ({ camera }) => {
-    const corridorWidth = 25; // Wide floor
-    const corridorHeight = 3.5; // Standard height for floor level calculation
+    const corridorWidth = 25; // 宽地面。
+    const corridorHeight = 3.5; // 用于计算地面位置的标准高度。
     const [segmentBase, setSegmentBase] = useState(0);
 
-    // Load floor texture
+    // 加载地面纹理。
     const floorTexture = useTexture('/textures/entrance/floor_paper.webp');
     floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-    floorTexture.repeat.set(6.6, 20); // Adjust repeat to match aspect ratio (2816x1536) and new width
+    floorTexture.repeat.set(6.6, 20); // 根据 2816×1536 的比例与新宽度调整重复次数。
 
-    // Update segment base when camera moves to a new segment (not every frame)
+    // 相机进入新分段时才更新分段基准，避免逐帧更新。
     useFrame(() => {
         if (!camera) return;
         const segmentLength = 40;
@@ -30,7 +30,7 @@ const EmptyCorridor = ({ camera }) => {
         }
     });
 
-    // Generate corridor segments around camera
+    // 在相机周围生成走廊分段。
     const segments = useMemo(() => {
         const result = [];
         for (let i = -2; i <= 2; i++) {
@@ -55,7 +55,7 @@ const EmptyCorridor = ({ camera }) => {
 };
 
 /**
- * Single empty corridor segment
+ * 单个空走廊分段。
  */
 const CorridorSegmentEmpty = ({ zStart, corridorWidth, corridorHeight, floorTexture }) => {
     const length = 40;
@@ -63,8 +63,8 @@ const CorridorSegmentEmpty = ({ zStart, corridorWidth, corridorHeight, floorText
 
     return (
         <group>
-            {/* Floor with Paper Texture */}
-            {/* Y position: -1.75 is floor level. Lower value = lower floor */}
+            {/* 带纸张纹理的地面。 */}
+            {/* Y=-1.75 为地面高度，数值越小地面越低。 */}
             <mesh
                 position={[0, -2, zCenter]}
                 rotation={[-Math.PI / 2, 0, 0]}
@@ -76,11 +76,11 @@ const CorridorSegmentEmpty = ({ zStart, corridorWidth, corridorHeight, floorText
                     alphaTest={0.1}
                     roughness={1}
                     metalness={0}
-                    color="#e0e0e0" // Keep white base
+                    color="#e0e0e0" // 保持白色基底。
                 />
             </mesh>
 
-            {/* Simple lighting - WYLACZONE */}
+            {/* 简单光照，已禁用。 */}
             {/* <pointLight
                 position={[0, 1.2, zCenter]}
                 intensity={0.4}

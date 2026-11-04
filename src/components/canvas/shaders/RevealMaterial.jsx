@@ -2,15 +2,15 @@ import * as THREE from 'three';
 import { extend } from '@react-three/fiber';
 
 /**
- * RevealMaterial - extends MeshBasicMaterial for brush-stroke reveal effect.
+ * RevealMaterial：扩展 MeshBasicMaterial，实现笔刷显现。
  * 
- * KEY INSIGHT: Only modifies the DISCARD logic (alpha), NOT the color/lighting.
- * Colors and lighting stay 100% standard MeshBasicMaterial pipeline.
- * The custom shader only decides WHICH pixels to hide (with noisy brush-stroke edge).
+ * 关键：只修改透明度丢弃逻辑，不修改颜色和光照。
+ * 颜色与光照完全沿用 MeshBasicMaterial 标准管线。
+ * 自定义着色器只决定沿噪声笔刷边缘隐藏哪些像素。
  * 
- * Usage: <revealMaterial color="#e0e0e0" map={sketchTex} uProgress={0-1} transparent={true} ... />
- * Place behind a painted texture mesh. As uProgress increases, sketch pixels get 
- * discarded from bottom to top with noisy edges, revealing the painted door beneath.
+ * 用法：<revealMaterial color="#e0e0e0" map={sketchTex} uProgress={0-1} transparent={true} ... />
+ * 速写层叠加在彩色纹理网格上方；uProgress 增大时，
+ * 速写像素自下而上沿噪声边缘丢弃，露出底层彩色门。
  */
 class RevealMaterial extends THREE.MeshBasicMaterial {
     constructor(params = {}) {
@@ -47,7 +47,7 @@ class RevealMaterial extends THREE.MeshBasicMaterial {
         this._paintConfig = { ...this._paintConfig, ...v };
     }
 
-    // Ensure Three.js doesn't reuse a cached standard shader program
+    // 确保 Three.js 不复用缓存的标准着色器程序。
     customProgramCacheKey() {
         return this._paintProgress ? 'RevealMaterial_v3_paint' : 'RevealMaterial_v3';
     }
@@ -82,7 +82,7 @@ class RevealMaterial extends THREE.MeshBasicMaterial {
             varying vec3 vWorldPositionColor;
         ` : '';
 
-        // Inject uProgress uniform and noise functions into fragment shader
+        // 向片元着色器注入 uProgress 和噪声函数。
         shader.fragmentShader = shader.fragmentShader.replace(
             '#include <common>',
             /* glsl */`#include <common>
@@ -105,13 +105,13 @@ class RevealMaterial extends THREE.MeshBasicMaterial {
             `
         );
 
-        // After standard alpha test (which handles transparent sketch edges),
-        // apply our brush-stroke progressive discard based on uProgress
+        // 标准透明度测试处理速写透明边缘后，
+        // 再按 uProgress 执行笔刷式渐进像素丢弃。
         shader.fragmentShader = shader.fragmentShader.replace(
             '#include <alphatest_fragment>',
             /* glsl */`#include <alphatest_fragment>
 
-            // Brush-stroke reveal: progressively discard pixels from bottom to top
+            // 笔刷显现：逐渐自下而上丢弃像素。
             if (uProgress > 0.001) {
                 float rn = revealNoise(vMapUv * 15.0) * 0.15;
                 float maskValue = (1.0 - vMapUv.y) + rn;
@@ -129,7 +129,7 @@ class RevealMaterial extends THREE.MeshBasicMaterial {
                 '#include <dithering_fragment>',
                 /* glsl */`#include <dithering_fragment>
 
-                // === PAINT TRANSITION ===
+                // 上色过渡。
                 vec3 localPos = vWorldPositionColor - uRoomOrigin;
                 vec3 revealDir = normalize(vec3(${this._paintConfig.dirX.toFixed(1)}, ${this._paintConfig.dirY.toFixed(1)}, ${this._paintConfig.dirZ.toFixed(1)}));
                 
@@ -156,7 +156,7 @@ class RevealMaterial extends THREE.MeshBasicMaterial {
     }
 }
 
-// Register so R3F can use <revealMaterial color="#e0e0e0" />
+// 注册后，R3F 可使用 <revealMaterial color="#e0e0e0" />。
 extend({ RevealMaterial });
 
 export { RevealMaterial };

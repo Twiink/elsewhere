@@ -1,4 +1,4 @@
-// GlobalOverlay Styles - Torn Paper Aesthetic
+// GlobalOverlay 样式：撕纸美感。
 
 @font-face {
     font-family: 'Cabin Sketch';
@@ -32,7 +32,7 @@
     position: relative;
     background: #ffffff;
 
-    // Paper texture background
+    // 纸张纹理背景。
     &::before {
         content: '';
         position: absolute;
@@ -47,27 +47,27 @@
         pointer-events: none;
     }
 
-    // Torn paper edges using clip-path
-    clip-path: polygon( // Top edge - torn
+    // 使用 clip-path 形成撕纸边缘。
+    clip-path: polygon( // 顶部撕边。
         0% 0%, 4% 1%, 8% 0%, 12% 1%, 16% 0%, 20% 1%, 24% 0%, 28% 1%, 32% 0%, 36% 1%,
         40% 0%, 44% 1%, 48% 0%, 52% 1%, 56% 0%, 60% 1%, 64% 0%, 68% 1%, 72% 0%, 76% 1%,
         80% 0%, 84% 1%, 88% 0%, 92% 1%, 96% 0%, 100% 0%,
-        // Right edge - torn
+        // 右侧撕边。
         100% 0%, 99% 3%, 100% 6%, 98% 10%, 100% 14%, 99% 18%, 100% 22%, 98% 26%,
         100% 30%, 99% 35%, 100% 40%, 98% 45%, 100% 50%, 99% 55%, 100% 60%,
         98% 65%, 100% 70%, 99% 75%, 100% 80%, 98% 85%, 100% 90%, 99% 95%,
-        // Bottom edge - torn (going left)
+        // 底部撕边，向左。
         100% 100%, 96% 99%, 92% 100%, 88% 98%, 84% 100%, 80% 99%, 76% 100%,
         72% 98%, 68% 100%, 64% 99%, 60% 100%, 56% 98%, 52% 100%, 48% 99%,
         44% 100%, 40% 98%, 36% 100%, 32% 99%, 28% 100%, 24% 98%, 20% 100%,
         16% 99%, 12% 100%, 8% 98%, 4% 100%, 0% 99%,
-        // Left edge - torn (going up)
+        // 左侧撕边，向上。
         0.5% 99.5%, 1% 95%, 0% 90%, 2% 85%, 0% 80%, 1% 75%, 0% 70%, 2% 65%,
         0% 60%, 1% 55%, 0% 50%, 2% 45%, 0% 40%, 1% 35%, 0% 30%, 2% 26%,
         0% 22%, 1% 18%, 0% 14%, 2% 10%, 0% 6%, 1% 3%, 0% 0%);
 
-    // Filter shadow doesn't work well directly on clipped elements in all browsers,
-    // so we apply a drop-shadow on its wrapper in inline styles.
+    // 部分浏览器对裁切元素直接应用阴影的效果不佳，
+    // 因此在包装层内联样式中应用 drop-shadow。
 }
 
 .studio-close-btn {
@@ -112,7 +112,7 @@
     overflow: hidden;
     background: #000;
     position: relative;
-    padding-top: 56.25%; // 16:9 Aspect Ratio
+    padding-top: 56.25%; // 16:9 宽高比。
 
     iframe,
     video {
@@ -135,7 +135,7 @@
         justify-content: center;
         background: #e0e0e0;
         color: #666;
-        font-family: 'Rubik Scribble', cursive;
+        font-family: '霞鹜文楷', 'Rubik Scribble', cursive;
         font-weight: 700;
         font-size: 1.5rem;
     }
@@ -154,12 +154,12 @@
     text-transform: uppercase;
     letter-spacing: 2px;
     font-size: 1.2rem;
-    font-family: 'Cabin Sketch', cursive;
+    font-family: '霞鹜文楷', 'Cabin Sketch', cursive;
     transition: all 0.2s;
     cursor: pointer;
     margin-top: auto;
 
-    // Slight sketch styling
+    // 轻微速写风格。
     border-radius: 2px 255px 3px 255px / 255px 5px 225px 3px;
 
     &:hover {
@@ -175,7 +175,7 @@
     }
 }
 
-// Hide native scrollbar — custom torn-paper scrollbar replaces it
+// 隐藏原生滚动条，改用自定义撕纸滚动条。
 .awards-scroll-container {
     scrollbar-width: none; // Firefox
     -ms-overflow-style: none; // IE/Edge
@@ -185,7 +185,7 @@
     }
 }
 
-// Custom torn-paper scroll track
+// 自定义撕纸滚动轨道。
 .torn-scroll-track {
     position: absolute;
     right: 0;
@@ -197,14 +197,14 @@
     overflow: visible;
 }
 
-// Sketchy wavy scroll track line
+// 速写风格的波浪轨道线。
 .torn-scroll-line {
     position: absolute;
     right: 8px;
     top: 5%;
     height: 90%;
     width: 2px;
-    // Hand-drawn dashed line
+    // 手绘虚线。
     background: repeating-linear-gradient(to bottom,
             rgba(26, 26, 26, 0.2) 0px,
             rgba(26, 26, 26, 0.2) 4px,
@@ -212,7 +212,7 @@
             transparent 8px);
 }
 
-// Pencil-mark scroll thumb
+// 铅笔笔触风格的滚动滑块。
 .torn-scroll-thumb {
     position: absolute;
     right: 2px;
@@ -232,12 +232,12 @@
         height: 28px;
         background: rgba(26, 26, 26, 0.15);
         border: 1.5px solid rgba(26, 26, 26, 0.4);
-        // Sketchy irregular border-radius
+        // 不规则速写圆角。
         border-radius: 3px 255px 4px 255px / 255px 4px 225px 3px;
         transition: background 0.2s ease, border-color 0.2s ease;
     }
 
-    // Little horizontal pencil strokes inside thumb
+    // 滑块内部的短横向铅笔笔触。
     &::after {
         content: '';
         position: absolute;

@@ -3,7 +3,7 @@ const fs = require('fs');
 const FILE_PATH = 'c:/Users/tomsz/Desktop/portfolio/portfolio-itom/src/components/canvas/rooms/About/InfiniteSkyManager.jsx';
 let content = fs.readFileSync(FILE_PATH, 'utf8');
 
-// ==== 1. Fix AwardButton ====
+// 1. 修正 AwardButton。
 content = content.replace(
     /if \(hideDelayRef\.current\) hideDelayRef\.current\.kill\(\);\s+if \(paintedRef\.current\) paintedRef\.current\.visible = true;/g,
     `if (hideDelayRef.current) hideDelayRef.current.kill();
@@ -40,8 +40,8 @@ content = content.replace(
             </mesh>`
 );
 
-// ==== 2. Fix makeCardHoverHandler ====
-// We can't use simple replace because the handler is inside InfiniteSkyManager. So we target unique text:
+// 2. 修正 makeCardHoverHandler。
+// 处理函数位于 InfiniteSkyManager 内，需匹配唯一文本，不能简单替换。
 content = content.replace(
     /const makeCardHoverHandler = \(revealRef, paintedRef, hideDelayRef\) => \(isHovered\) => \{\s+if \(isHovered\) \{\s+if \(revealRef\.current\) \{\s+gsap\.to\(revealRef\.current, \{\s+uProgress: 1\.0,\s+duration: 0\.8,\s+ease: 'power2\.out',\s+overwrite: true\s+\}\);\s+\}\s+if \(hideDelayRef\.current\) hideDelayRef\.current\.kill\(\);\s+if \(paintedRef\.current\) paintedRef\.current\.visible = true;\s+\} else \{\s+if \(revealRef\.current\) \{\s+gsap\.to\(revealRef\.current, \{\s+uProgress: 0\.0,\s+duration: 0\.5,\s+ease: 'power2\.out',\s+overwrite: true\s+\}\);\s+\}\s+hideDelayRef\.current = gsap\.delayedCall\(0\.55, \(\) => \{\s+if \(paintedRef\.current\) paintedRef\.current\.visible = false;\s+\}\);\s+\}\s+\};/g,
     `const makeCardHoverHandler = (revealRef, paintedRef, hideDelayRef) => (isHovered) => {
@@ -78,7 +78,7 @@ content = content.replace(
 );
 
 
-// ==== 3. Fix AwardsMilestone meshes ====
+// 3. 修正 AwardsMilestone 网格。
 content = content.replace(
     /<mesh ref=\{sotdCardPaintedRef\} position=\{\[0, 0, -0\.001\]\} visible=\{false\}>\s+<planeGeometry args=\{\[cardHeight \* sotdAspect, cardHeight\]\} \/>\s+<meshBasicMaterial color="#e0e0e0"\s+map=\{sotdPaintedTexture\}\s+transparent\s+side=\{THREE\.DoubleSide\}\s+alphaTest=\{0\.5\}\s+\/>\s+<\/mesh>/g,
     `<mesh ref={sotdCardPaintedRef} position={[0, 0, -0.001]} visible={true}>
@@ -122,7 +122,7 @@ content = content.replace(
 );
 
 
-// ==== 4. Fix SkillBalloon handlers ====
+// 4. 修正 SkillBalloon 处理函数。
 content = content.replace(
     /if \(hideDelayRef\.current\) hideDelayRef\.current\.kill\(\);\s+if \(paintedMeshRef\.current\) paintedMeshRef\.current\.visible = true;/g,
     `if (hideDelayRef.current) hideDelayRef.current.kill();
@@ -137,14 +137,14 @@ content = content.replace(
         });`
 );
 
-// Spawn reset
+// 重生重置。
 content = content.replace(
     /if \(balloonRevealRef\.current\) balloonRevealRef\.current\.uProgress = 0;\s+if \(paintedMeshRef\.current\) paintedMeshRef\.current\.visible = false;\s+if \(paintedMatRef\.current\) paintedMatRef\.current\.opacity = 1;/g,
     `if (balloonRevealRef.current) balloonRevealRef.current.uProgress = 0;
                 if (paintedMatRef.current) paintedMatRef.current.opacity = 0;`
 );
 
-// Skill balloon mesh
+// 技能气球网格。
 content = content.replace(
     /<mesh ref=\{paintedMeshRef\} visible=\{false\}>\s+<planeGeometry args=\{\[baseHeight \* aspect, baseHeight\]\} \/>\s+<meshBasicMaterial color="#e0e0e0"\s+ref=\{paintedMatRef\}\s+map=\{paintedTexture\}\s+transparent\s+side=\{THREE\.DoubleSide\}\s+alphaTest=\{0\.5\}\s+depthWrite=\{false\}\s+\/>\s+<\/mesh>/g,
     `<mesh ref={paintedMeshRef} visible={true}>
@@ -163,4 +163,4 @@ content = content.replace(
 
 
 fs.writeFileSync(FILE_PATH, content, 'utf8');
-console.log('Modifications applied successfully.');
+console.log('修改已成功应用。');

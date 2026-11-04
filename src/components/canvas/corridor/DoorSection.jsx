@@ -4,101 +4,101 @@ import { Text, useTexture, PositionalAudio } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import RoomInterior from './RoomInterior';
-import '../shaders/RevealMaterial'; // Registers alpha-discard reveal shader
+import '../shaders/RevealMaterial'; // 注册使用透明度丢弃的显现着色器。
 import { useScene } from '../../../context/SceneContext';
 import { useAchievements } from '../../../context/AchievementsContext';
 import { useAudio } from '../../../context/AudioManager';
 import { isTouchDevice } from '../../../utils/deviceDetect';
 
-// Constants from CorridorSegment
+// 来自 CorridorSegment 的常量。
 const WALL_X_OUTER = 3.5;
 const WALL_X_INNER = 1.7;
 const DOOR_Z_SPAN = 4;
 const CORRIDOR_HEIGHT = 3.5;
 
 const DOOR_AUDIO_SETTINGS = {
-    hoverVolume: 0.8, // Volume for "uchyleniedrzwi" (hovering the door)
-    openVolume: 0.2,  // Volume for "otwarciedrzwi" (opening the door fully)
-    closeVolume: 0.2, // Volume when door closes (playing same sound reversed/again)
-    distance: 3,      // Reference distance for spatial audio before it starts dropping off
-    rolloff: 2,       // How fast the sound fades away (exponential)
-    closeDelay: 0.5   // Seconds to wait before playing the close door sound
+    hoverVolume: 0.8, // 悬停门时播放的 uchyleniedrzwi 音量。
+    openVolume: 0.2,  // 完全开门时播放的 otwarciedrzwi 音量。
+    closeVolume: 0.2, // 关门音量，使用相同音效反向或再次播放。
+    distance: 3,      // 空间音频开始衰减前的参考距离。
+    rolloff: 2,       // 声音随距离指数衰减的速度。
+    closeDelay: 0.5   // 关门音效播放前的等待秒数。
 };
 
-// Calculate sawtooth wall geometry
+// 计算锯齿形墙面几何。
 const WALL_DX = WALL_X_OUTER - WALL_X_INNER; // 1.8
 const WALL_DZ = DOOR_Z_SPAN; // 4
 const WALL_LENGTH = Math.sqrt(WALL_DX * WALL_DX + WALL_DZ * WALL_DZ);
-const BASE_WALL_ANGLE = Math.atan2(WALL_DX, WALL_DZ); // Sawtooth angle (~24 degrees)
+const BASE_WALL_ANGLE = Math.atan2(WALL_DX, WALL_DZ); // 锯齿角度约 24°。
 
-// Camera look-at angle when aligning with door (adjust this to fix alignment)
-// Math.PI * 0.33 is ~60 degrees
+// 相机对齐门时的注视角度，可调节以修正对齐。
+// Math.PI × 0.33 约为 60°。
 const DOOR_LOOK_ANGLE = Math.PI * 0.334;
 
-// Camera X offset when aligning with door (adjust this to move camera left/right relative to door)
-// Higher value = further from door center horizontally
+// 对齐门时相机的 X 偏移，可调节相机相对于门的左右位置。
+// 数值越大，水平方向离门中心越远。
 const DOOR_ALIGN_X = 1.2;
 
-// Door texture mapping - maps label to texture file
+// 门纹理映射：标签对应纹理文件。
 const DOOR_TEXTURES = {
-    'THE GALLERY': '/textures/corridor/doors/drzwiprojekty.webp',
-    'THE STUDIO': '/textures/corridor/doors/drzwisocial.webp',
-    'THE ABOUT': '/textures/corridor/doors/drzwiabout.webp',
-    "LET'S CONNECT": '/textures/corridor/doors/drzwikontakt.webp',
+    "作品画廊": '/textures/corridor/doors/drzwiprojekty.webp',
+    "内容工作室": '/textures/corridor/doors/drzwisocial.webp',
+    "关于我": '/textures/corridor/doors/drzwiabout.webp',
+    "联系我": '/textures/corridor/doors/drzwikontakt.webp',
 };
 
-// Painted (colored) variants for brush-stroke reveal on hover
+// 悬停时用笔刷显现的彩色版本。
 const DOOR_PAINTED_TEXTURES = {
-    'THE GALLERY': '/textures/corridor/doors/drzwiprojekty_painted.webp',
-    'THE STUDIO': '/textures/corridor/doors/drzwisocial_painted.webp',
-    'THE ABOUT': '/textures/corridor/doors/drzwiabout_painted.webp',
-    "LET'S CONNECT": '/textures/corridor/doors/drzwikontakt_painted.webp',
+    "作品画廊": '/textures/corridor/doors/drzwiprojekty_painted.webp',
+    "内容工作室": '/textures/corridor/doors/drzwisocial_painted.webp',
+    "关于我": '/textures/corridor/doors/drzwiabout_painted.webp',
+    "联系我": '/textures/corridor/doors/drzwikontakt_painted.webp',
 };
 
 
 /**
- * DoorSection Component
+ * DoorSection 门区域组件。
  * 
- * Groups the angled wall + door + label as one unit.
- * Uses 2D textures for door, frame, and handle (like entrance doors).
- * Pivots from the OUTER edge (where wall connects to corridor).
- * Dynamic tilt: starts nearly flat, tilts more when camera approaches.
+ * 倾斜墙面、门及标签组成一个单元。
+ * 与入口门一样，门、门框和把手均使用二维纹理。
+ * 以墙面接入走廊的外边缘为旋转轴。
+ * 动态倾斜：初始接近平直，相机靠近时倾角增大。
  */
 const DoorSection = ({
-    position, // [x, y, z] - center of the wall segment
+    position, // [x, y, z]：墙段中心。
     side = 'left',
     label,
-    roomId, // ID for context updates (gallery, studio, etc)
+    roomId, // 用于更新上下文的 ID，如 gallery、studio。
     icon,
     onEnter,
     autoCloseDelay = 3000,
-    enterDistance = 8, // Default fly-through distance
-    setCameraOverride, // Function to take control of camera from hook
+    enterDistance = 8, // 默认穿行距离。
+    setCameraOverride, // 从相机 Hook 接管控制的函数。
     segmentIndex
 }) => {
-    const groupRef = useRef(); // Main group that tilts
+    const groupRef = useRef(); // 执行倾斜的主组。
     const doorRef = useRef();
     const handleRef = useRef();
-    const doorMaterialRef = useRef(); // RevealMaterial ref for door sketch
-    const handleMaterialRef = useRef(); // RevealMaterial ref for handle sketch
-    const handlePaintedRef = useRef(); // Painted handle mesh visibility
-    const doorPaintedRef = useRef(); // Painted door mesh visibility
-    const handleHideDelayRef = useRef(); // Track pending gsap.delayedCall for handle visibility
+    const doorMaterialRef = useRef(); // 门速写的 RevealMaterial 引用。
+    const handleMaterialRef = useRef(); // 把手速写的 RevealMaterial 引用。
+    const handlePaintedRef = useRef(); // 彩色把手网格的可见状态。
+    const doorPaintedRef = useRef(); // 彩色门网格的可见状态。
+    const handleHideDelayRef = useRef(); // 跟踪控制把手显隐的待执行 gsap.delayedCall。
     const [isHovered, setIsHovered] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [isAnimating, setIsAnimating] = useState(false);
     const isNearRef = useRef(false);
     const [isInsideRoom, setIsInsideRoom] = useState(false);
-    const [isTiltLocked, setIsTiltLocked] = useState(false); // Lock tilt when entering room
-    const [shouldRenderRoom, setShouldRenderRoom] = useState(false); // Lazy loading state
-    const [roomReady, setRoomReady] = useState(false); // Room signaled it's ready
+    const [isTiltLocked, setIsTiltLocked] = useState(false); // 进入房间时锁定倾斜。
+    const [shouldRenderRoom, setShouldRenderRoom] = useState(false); // 延迟加载状态。
+    const [roomReady, setRoomReady] = useState(false); // 房间已发出就绪信号。
     const { camera } = useThree();
     const closeTimerRef = useRef(null);
-    const loadTimeoutRef = useRef(null); // Ref for the room loading fallback timeout
+    const loadTimeoutRef = useRef(null); // 房间加载回退定时器引用。
 
-    // Get exit request signal from context
+    // 从上下文获取退出请求信号。
     const {
-        currentRoom, // We need to know if the global room changed (teleportation)
+        currentRoom, // 检测全局房间是否因传送而改变。
         exitRequested,
         clearExitRequest,
         exitRoom: contextExitRoom,
@@ -107,114 +107,114 @@ const DoorSection = ({
         isTeleporting,
         isFastTeleport,
         signalRoomReady,
-        teleportPhase // We need this to delay reset until curtain is closed
+        teleportPhase // 用于将重置延迟到幕布关闭后。
     } = useScene();
 
     const { unlockAchievement } = useAchievements();
     const { globalVolume, isMuted } = useAudio();
 
-    // Audio Refs for 3D positional sound
+    // 三维位置音频引用。
     const hoverAudioRef = useRef();
     const openAudioRef = useRef();
     const closeAudioRef = useRef();
 
-    // Map label to ID for teleport matching
+    // 将标签映射为 ID，以匹配传送目标。
     const doorId = useMemo(() => {
         if (roomId) return roomId;
 
-        // Fallback for older code
-        if (label === 'THE GALLERY') return 'gallery';
-        if (label === 'THE STUDIO') return 'studio';
-        if (label === 'THE ABOUT') return 'about';
-        if (label === "LET'S CONNECT") return 'contact';
+        // 兼容旧代码的回退。
+        if (label === "作品画廊") return 'gallery';
+        if (label === "内容工作室") return 'studio';
+        if (label === "关于我") return 'about';
+        if (label === "联系我") return 'contact';
         return null;
     }, [label, roomId]);
 
-    // Listen for pending door click (auto-click after teleport)
+    // 监听待处理的门点击，传送后自动点击。
     useEffect(() => {
-        // Only trigger for segment 0 doors (closest to start) and matching ID
-        // We assume teleport always goes to segment 0
+        // 仅触发最靠近起点的第 0 段中 ID 匹配的门。
+        // 假定传送始终前往第 0 段。
         const isSegment0 = segmentIndex === 0;
 
         if (pendingDoorClick && pendingDoorClick === doorId && isSegment0 && !isOpen && !isAnimating) {
-            handleClick({ stopPropagation: () => { }, isTeleport: true }); // Trigger click simulation with TELEPORT flag
+            handleClick({ stopPropagation: () => { }, isTeleport: true }); // 带上传送标记，触发模拟点击。
         }
     }, [pendingDoorClick, doorId, segmentIndex, isOpen, isAnimating]);
 
-    // --- SILENT RESET FOR TELEPORTATION ---
-    // If a teleport starts (users clicks map), and we are inside THIS room,
-    // we must silently reset our state so we are "outside" and "closed"
-    // BUT only after the curtain is closed (phase === 'teleporting').
+    // 传送时静默重置。
+    // 传送开始且用户位于当前房间时，
+    // 静默重置状态为门外和关闭状态，
+    // 但需等待幕布关闭，即 phase === 'teleporting'。
     useEffect(() => {
-        // FIX: Added (currentRoom === doorId) check to ensure we only reset the OLD room
-        // FIX: Added (teleportPhase === 'teleporting') to wait for curtain to close
+        // 加入 currentRoom === doorId 检查，仅重置原房间。
+        // 加入 teleportPhase === 'teleporting' 检查，等待幕布关闭。
         if (isTeleporting && teleportPhase === 'teleporting' && isInsideRoom && currentRoom === doorId) {
-            // console.log(`[DoorSection ${label}] Silent Reset triggered by teleport (Old Room)`);
+            // console.log(`[DoorSection ${label}] 传送时静默重置原房间`);
 
-            // 1. Reset Internal State immediately
+            // 1. 立即重置内部状态。
             setIsOpen(false);
             setIsInsideRoom(false);
             setIsAnimating(false);
-            setShouldRenderRoom(false); // Unmount room content
+            setShouldRenderRoom(false); // 卸载房间内容。
             setIsTiltLocked(false);
             setRoomReady(false);
             roomReadyRef.current = false;
 
-            // 2. Reset Door/Handle Rotation (Visuals)
-            // We can do this instantly or very quickly since screen is covered
+            // 2. 重置门和把手的旋转状态。
+            // 此时屏幕已遮挡，可立即或快速完成。
             if (doorRef.current) doorRef.current.rotation.y = 0;
             if (handleRef.current) handleRef.current.rotation.z = 0;
 
-            // 3. Reset Camera Override 
-            // Important: DO NOT RELEASE control here. 
-            // Experience.jsx manages the override during "isTeleporting".
-            // If we release it here, useInfiniteCamera takes over before the new room is ready.
-            // setCameraOverride?.(false); <--- REMOVED
+            // 3. 重置相机接管状态。
+            // 注意：此处不要释放相机控制权。
+            // isTeleporting 期间由 Experience.jsx 管理相机接管。
+            // 此处释放会使 useInfiniteCamera 在新房间就绪前接管。
+            // 已移除：setCameraOverride?.(false)。
 
-            // 4. Reset Timers
+            // 4. 重置计时器。
             if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
         }
     }, [isTeleporting, teleportPhase, isInsideRoom, currentRoom, doorId, label, setCameraOverride]);
 
-    // Save camera state before entering room (for ESC exit)
-    // Save camera state before entering room (for ESC exit)
-    // Now saving FULL rotation (x, y, z) to prevent snap on exit
+    // 保存进入前的相机状态，用于按 Esc 退出。
+    // 保存进入前的相机状态，用于按 Esc 退出。
+    // 保存完整的 x、y、z 旋转，防止退出时跳变。
     const savedCameraState = useRef({ x: 0, y: 0, z: 0, rotationX: 0, rotationY: 0, rotationZ: 0 });
-    // Save position ALIGNED with door (intermediate step for exit)
+    // 保存对齐门后的状态，作为退出中间步骤。
     const doorAlignedState = useRef({ x: 0, y: 0, z: 0, rotationY: 0 });
-    // Save position after flying through corridor (before final rotation) 
+    // 保存穿过走廊后、最终旋转前的位置。
     const roomEntryState = useRef({ x: 0, y: 0, z: 0, rotationY: 0 });
 
-    // Dynamic tilt state
+    // 动态倾斜状态。
     const currentTilt = useRef(0);
 
-    // Load wall texture
+    // 加载墙面纹理。
     const originalWallTexture = useTexture('/textures/corridor/wall_texture.webp');
 
-    // Clone texture to have independent repeat settings (fixes scaling issues)
+    // 克隆纹理，独立设置重复次数，修正缩放问题。
     const wallTexture = useMemo(() => {
         const tex = originalWallTexture.clone();
         tex.needsUpdate = true;
         tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
 
-        // ShapeGeometry uses world-space UVs (1 unit = 1 meter), unlike PlaneGeometry (0..1)
-        // We want 1 repeat every 2 meters (0.5 density), so we set repeat to 0.5
+        // ShapeGeometry 使用世界空间 UV（1 单位=1 米），PlaneGeometry 则为 0..1。
+        // 每 2 米重复一次，所以将 repeat 设为 0.5。
         tex.repeat.set(0.5, 0.5);
 
-        // Adjust offset to center texture (optional, nice for alignment)
+        // 可选：调整偏移，让纹理居中对齐。
         tex.offset.set(0.5, 0.5);
 
         return tex;
     }, [originalWallTexture]);
 
-    // Load door textures - use the right texture based on label
-    const doorTexturePath = DOOR_TEXTURES[label] || DOOR_TEXTURES['THE GALLERY'];
+    // 按门标签加载对应纹理。
+    const doorTexturePath = DOOR_TEXTURES[label] || DOOR_TEXTURES["作品画廊"];
     const doorTexture = useTexture(doorTexturePath);
 
     const isTouch = isTouchDevice();
     const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
-    const doorPaintedTexturePath = DOOR_PAINTED_TEXTURES[label] || DOOR_PAINTED_TEXTURES['THE GALLERY'];
+    const doorPaintedTexturePath = DOOR_PAINTED_TEXTURES[label] || DOOR_PAINTED_TEXTURES["作品画廊"];
     const doorPaintedTexture = useTexture(isTouch ? dummyTex : doorPaintedTexturePath);
     const frameTexture = useTexture('/textures/corridor/doors/ramkasingledoors.webp');
     const handleTexture = useTexture('/textures/corridor/doors/klamkadodrzwi.webp');
@@ -222,18 +222,18 @@ const DoorSection = ({
     const doorBackTexture = useTexture('/textures/corridor/doors/backsingledoors.webp');
     const arrowTexture = useTexture('/textures/corridor/strzalka.webp');
 
-    // Baseboard texture for door sections (1582x94 px, aspect 16.83:1)
+    // 门区域的踢脚线纹理：1582×94 像素，比例 16.83:1。
     const baseboardTexture = useTexture('/textures/corridor/texturadoprogow.webp');
     baseboardTexture.wrapS = baseboardTexture.wrapT = THREE.RepeatWrapping;
     baseboardTexture.colorSpace = THREE.SRGBColorSpace;
 
-    // Pre-create baseboard textures via useMemo (same pattern as legTexture above)
+    // 通过 useMemo 预先创建踢脚线纹理，与上方 legTexture 的方式相同。
     const doorBoardWidth = (WALL_LENGTH - 1.1) / 2;
-    const NATURAL_TILE_W = (1582 / 94) * 0.15; // = 2.524 units per natural tile
+    const NATURAL_TILE_W = (1582 / 94) * 0.15; // 每次自然平铺宽度为 2.524 单位。
     const doorBbTexLeft = useMemo(() => {
         const tex = baseboardTexture.clone();
         tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-        tex.rotation = 0; // Reset rotation (shared texture may have PI/2 from threshold)
+        tex.rotation = 0; // 重置旋转，共享纹理可能已被门槛设为 PI/2。
         tex.offset.set(0, 0);
         tex.needsUpdate = true;
         tex.repeat.set(doorBoardWidth / NATURAL_TILE_W, 1);
@@ -243,30 +243,30 @@ const DoorSection = ({
     const doorBbTexRight = useMemo(() => {
         const tex = baseboardTexture.clone();
         tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-        tex.rotation = 0; // Reset rotation (shared texture may have PI/2 from threshold)
+        tex.rotation = 0; // 重置旋转，共享纹理可能已被门槛设为 PI/2。
         tex.offset.set(0, 0);
         tex.needsUpdate = true;
         tex.repeat.set(doorBoardWidth / NATURAL_TILE_W, 1);
         return tex;
     }, [baseboardTexture]);
 
-    // Door dimensions - based on legacy texture aspect ratio (approx 0.376)
-    const doorRatio = label === 'THE STUDIO' ? 0.388 : 0.376;
+    // 门尺寸按原始纹理宽高比计算，约为 0.376。
+    const doorRatio = label === "内容工作室" ? 0.388 : 0.376;
     const doorHeight = 2.5;
     const doorWidth = doorHeight * doorRatio * 1.12;
 
-    // Frame dimensions - based on legacy ratio 762/1759 (0.433)
+    // 门框按原始比例 762/1759≈0.433 计算。
     const frameHeight = 2.5;
     const frameWidth = frameHeight * 0.5;
 
-    // Hole dimensions - MUST fit inside wall
+    // 门洞尺寸必须位于墙内。
     const holeWidth = doorWidth - 0.03;
     const holeHeight = doorHeight - 0.1;
-    const holeOffsetY = -0.55; // Same as door group Y offset
+    const holeOffsetY = -0.55; // 与门组的 Y 偏移一致。
 
-    // Create wall geometry with door hole
+    // 创建带门洞的墙面几何体。
     const wallWithHoleGeometry = useMemo(() => {
-        // Create wall shape
+        // 创建墙面形状。
         const wallShape = new THREE.Shape();
         const halfW = WALL_LENGTH / 2;
         const halfH = CORRIDOR_HEIGHT / 2;
@@ -277,11 +277,11 @@ const DoorSection = ({
         wallShape.lineTo(-halfW, halfH);
         wallShape.lineTo(-halfW, -halfH);
 
-        // Create hole for door
+        // 创建门洞。
         const holePath = new THREE.Path();
         const holeHalfW = holeWidth / 2;
         const holeHalfH = holeHeight / 2;
-        const holeY = holeOffsetY; // Center of hole
+        const holeY = holeOffsetY; // 门洞中心。
 
         holePath.moveTo(-holeHalfW, holeY - holeHalfH);
         holePath.lineTo(holeHalfW, holeY - holeHalfH);
@@ -295,25 +295,25 @@ const DoorSection = ({
         return new THREE.ShapeGeometry(wallShape);
     }, [holeWidth, holeHeight, holeOffsetY]);
 
-    // Tilt parameters
-    const BASE_ROTATION = Math.PI / 2; // 90 degrees - side wall orientation
-    const BASE_TILT = 0.02;   // ~1 degree additional tilt towards camera
-    const MAX_TILT = BASE_WALL_ANGLE + 0.1; // Sawtooth angle + extra (~27 degrees total tilt)
-    const TILT_START = 15;    // Start tilting when camera is 15 units away
-    const TILT_PEAK = 3;      // Max tilt at 3 units
+    // 倾斜参数。
+    const BASE_ROTATION = Math.PI / 2; // 90°，侧墙朝向。
+    const BASE_TILT = 0.02;   // 额外朝相机倾斜约 1°。
+    const MAX_TILT = BASE_WALL_ANGLE + 0.1; // 锯齿角加额外角度，总倾角约 27°。
+    const TILT_START = 15;    // 相机距离 15 单位时开始倾斜。
+    const TILT_PEAK = 3;      // 距离 3 单位时达到最大倾角。
 
-    // Pivot offset - the group pivots from the OUTER edge
+    // 旋转轴偏移，组围绕外边缘旋转。
     const pivotX = side === 'left' ? -WALL_X_OUTER : WALL_X_OUTER;
 
-    // Wall offset from pivot - wall extends FROM pivot INWARD
+    // 墙面相对旋转轴的偏移，由轴向内延伸。
     const wallOffsetX = side === 'left'
         ? WALL_LENGTH / 2
         : -WALL_LENGTH / 2;
 
-    // Force shader compilation: let the painted versions render for 2 frames during preloader, then hide
+    // 强制编译着色器：加载阶段让彩色版本渲染两帧，再隐藏。
     const compileFramesRef = useRef(0);
     useFrame(() => {
-        // === SHADER COMPILE (first 2 frames only) ===
+        // 着色器编译，仅前两帧。
         if (compileFramesRef.current < 2) {
             compileFramesRef.current++;
             if (compileFramesRef.current === 2) {
@@ -324,53 +324,53 @@ const DoorSection = ({
             }
         }
 
-        // === TILT ANIMATION ===
+        // 倾斜动画。
         if (!groupRef.current) return;
 
         let targetTilt = BASE_TILT;
 
-        // If tilt is locked (clicked/entering), force it to MAX_TILT (fully facing user)
+        // 点击进入后锁定倾角，强制使用 MAX_TILT，完全朝向用户。
         if (isTiltLocked) {
             targetTilt = MAX_TILT;
         } else {
-            // Normal proximity-based tilting
+            // 正常状态下按距离倾斜。
             const distance = Math.abs(camera.position.z - position[2]);
             isNearRef.current = distance < 8;
 
             if (distance < TILT_START && distance > TILT_PEAK) {
                 const t = (TILT_START - distance) / (TILT_START - TILT_PEAK);
-                const easedT = t * (2 - t); // easeOutQuad
+                const easedT = t * (2 - t); // 二次缓出。
                 targetTilt = BASE_TILT + (MAX_TILT - BASE_TILT) * easedT;
             } else if (distance <= TILT_PEAK) {
                 targetTilt = MAX_TILT;
             }
         }
 
-        // Smooth interpolation
+        // 平滑插值。
         currentTilt.current = THREE.MathUtils.lerp(currentTilt.current, targetTilt, 0.06);
 
-        // Apply rotation: BASE_ROTATION (90°) + dynamic tilt
+        // 应用旋转：BASE_ROTATION（90°）加动态倾角。
         const baseDir = side === 'left' ? 1 : -1;
         const tiltDir = side === 'left' ? -1 : 1;
 
-        // Calculate the actual rotation angle
+        // 计算实际旋转角。
         const currentRotation = (BASE_ROTATION * baseDir) + (currentTilt.current * tiltDir);
         groupRef.current.rotation.y = currentRotation;
 
-        // Trigonometric Scaling Fix:
-        // We want the Z-projection of the wall to ALWAYS be exactly DOOR_Z_SPAN (4.0m).
-        // Formula: Scale = DOOR_Z_SPAN / (WALL_LENGTH * sin(Angle))
+        // 三角函数缩放修正：
+        // 墙面沿 Z 轴的投影始终保持 DOOR_Z_SPAN，即 4.0 米。
+        // 公式：缩放 = DOOR_Z_SPAN / (WALL_LENGTH × sin(角度))。
 
         const absSinAngle = Math.abs(Math.sin(currentRotation));
 
-        // Safety to prevent division by zero (angle is clamped ~60-90 deg)
+        // 防止除零，角度被限制在约 60° 至 90°。
         let exactScale = 1.0;
         if (absSinAngle > 0.1) {
-            // -0.01 safety margin to prevent Z-fighting on the exact edge
+            // 留出 -0.01 的边距，避免边缘深度冲突。
             exactScale = (DOOR_Z_SPAN - 0.01) / (WALL_LENGTH * absSinAngle);
         }
 
-        // Clamp scale to avoid explosion if math goes wrong, but allow gentle flex
+        // 限制缩放范围，避免计算异常导致尺寸失控，同时允许轻微形变。
         const currentScale = THREE.MathUtils.clamp(exactScale, 0.8, 1.1);
 
         groupRef.current.scale.set(currentScale, 1, 1);
@@ -384,7 +384,7 @@ const DoorSection = ({
     }, []);
 
     const handleClick = useCallback((e) => {
-        // e might be null or synthetic from teleport
+        // e 可能为 null，也可能是传送生成的事件。
         e?.stopPropagation?.();
         const isTeleport = e?.isTeleport || false;
         if (isAnimating) return;
@@ -394,18 +394,18 @@ const DoorSection = ({
             return;
         }
 
-        // Reset cursor on transition
+        // 过渡时重置光标。
         document.body.style.cursor = "auto";
 
         setIsAnimating(true);
 
-        // Take control of camera from hook
+        // 从 Hook 接管相机控制。
         setCameraOverride?.(true);
 
-        // Lock tilt so the corridor doesn't rotate while we fly through
+        // 锁定倾斜，避免穿行时走廊旋转。
         setIsTiltLocked(true);
 
-        // Save camera state BEFORE entering (for ESC exit)
+        // 保存进入前的相机状态，用于按 Esc 退出。
         savedCameraState.current = {
             x: camera.position.x,
             y: camera.position.y,
@@ -415,47 +415,47 @@ const DoorSection = ({
             rotationZ: camera.rotation.z
         };
 
-        // If this is a TELEPORT entry, overwrite the saved state with a "Safe Corridor Position"
-        // This prevents the camera from jumping back to the OLD room position on exit.
+        // 传送进入时，将保存状态替换为安全的走廊位置。
+        // 避免退出时跳回原房间位置。
         if (e && e.isTeleport) {
-            // Use a NATURAL corridor glance angle (~8.5 degrees), NOT the intense door-aligned angle (60°)
-            // This creates a visible head turn: from looking at door (60°) → subtle corridor glance (8.5°)
-            // The angle is smaller because we end up 4m back from the door, not right next to it
+            // 使用自然的走廊注视角，约 8.5°，而非对齐门时的 60°。
+            // 形成可见的转头过程：从看门的 60° 转为轻看走廊的 8.5°。
+            // 角度较小，因为终点位于门后方 4 米，而非紧贴门边。
             const corridorGlanceY = side === 'left' ? 0.15 : -0.15;
 
             savedCameraState.current = {
                 x: 0,
-                y: 0.2, // Correct height matching useInfiniteCamera
-                z: position[2] + 4, // 4 meters back from the door Z
+                y: 0.2, // 高度与 useInfiniteCamera 一致。
+                z: position[2] + 4, // 位于门的 Z 坐标后方 4 米。
                 rotationX: 0,
-                rotationY: corridorGlanceY, // Natural corridor glance, not intense door stare
+                rotationY: corridorGlanceY, // 自然地看向走廊。
                 rotationZ: 0
             };
         }
 
-        // FAST TELEPORT: Use ultra-fast animation durations (almost instant)
-        // The paper is closed so user won't see the fast motion
+        // 快速传送使用几乎瞬时的动画时长。
+        // 纸幕已关闭，用户看不到快速移动。
         const useFastMode = isTeleport && isFastTeleport;
         const alignDuration = useFastMode ? 0.01 : 1.0;
 
-        // Get door world position
+        // 获取门的世界坐标。
         const doorWorldPos = new THREE.Vector3();
         groupRef.current.getWorldPosition(doorWorldPos);
 
-        // Camera moves to be at door's Z level (so door is centered when we look at it)
-        // and slightly towards the door's side
+        // 相机移至与门相同的 Z，使注视时门位于中心，
+        // 并略微移向门所在侧。
         const cameraTargetZ = doorWorldPos.z;
         const cameraTargetX = side === 'left' ? DOOR_ALIGN_X : -DOOR_ALIGN_X;
 
-        // Calculate the target rotation to look at the door
-        // We need to account for the camera PARENT's rotation (sway), so we get a consistent WORLD angle
-        // Current Sway (Parent Rotation) + Camera Rotation = World Rotation
-        // World Rotation Target = DOOR_LOOK_ANGLE
-        // Camera Target = World Target - Parent Rotation
+        // 计算看向门的目标旋转。
+        // 考虑父级的摇摆旋转，获得一致的世界角度。
+        // 当前父级摇摆 + 相机局部旋转 = 世界旋转。
+        // 世界旋转目标 = DOOR_LOOK_ANGLE。
+        // 相机目标 = 世界目标 - 父级旋转。
 
         let parentRotationY = 0;
         if (camera.parent) {
-            // Get parent's world rotation Y (approximate, assuming mostly Y rotation for sway)
+            // 获取父级世界 Y 旋转，假定摇摆主要绕 Y 轴。
             const parentWorldQuat = new THREE.Quaternion();
             camera.parent.getWorldQuaternion(parentWorldQuat);
             const parentEuler = new THREE.Euler().setFromQuaternion(parentWorldQuat, 'YXZ');
@@ -463,19 +463,19 @@ const DoorSection = ({
         }
 
         const worldTargetRotationY = side === 'left'
-            ? DOOR_LOOK_ANGLE   // Target WORLD angle
-            : -DOOR_LOOK_ANGLE; // Target WORLD angle
+            ? DOOR_LOOK_ANGLE   // 目标世界角度。
+            : -DOOR_LOOK_ANGLE; // 目标世界角度。
 
-        // Compensate for parent sway to get consistent local rotation
+        // 补偿父级摇摆，使局部旋转保持一致。
         const targetRotationY = worldTargetRotationY - parentRotationY;
 
-        // Store initial rotation
+        // 保存初始旋转。
         const startRotationY = camera.rotation.y;
 
-        // Create a proxy object for the rotation animation
+        // 创建旋转动画的代理对象。
         const rotationProxy = { y: startRotationY };
 
-        // Animate camera position and rotation simultaneously
+        // 同时动画更新相机位置与旋转。
         gsap.to(camera.position, {
             x: cameraTargetX,
             z: cameraTargetZ,
@@ -491,7 +491,7 @@ const DoorSection = ({
                 camera.rotation.y = rotationProxy.y;
             },
             onComplete: () => {
-                // Save aligned state for reverse animation
+                // 保存对齐状态，用于反向动画。
                 doorAlignedState.current = {
                     x: camera.position.x,
                     y: camera.position.y,
@@ -499,25 +499,25 @@ const DoorSection = ({
                     rotationY: camera.rotation.y
                 };
 
-                // Lazy Load Room:
-                // 1. Camera is now aligned.
-                // 2. Start rendering the room.
-                // 3. Door will open when room signals ready via onReady callback
-                //    OR after fallback timeout for rooms without onReady support
+                // 延迟加载房间：
+                // 1. 相机已对齐。
+                // 2. 开始渲染房间。
+                // 3. 房间通过 onReady 通知就绪后开门，
+                //    或在不支持 onReady 时等待回退超时。
                 setShouldRenderRoom(true);
 
-                // During FAST teleport, we still want to WAIT for the room to be ready!
-                // So we do NOT open immediately anymore. We let the onReady callback handle it.
-                // But we still set the flag so handleRoomReady knows to use fast animation.
+                // 快速传送时也需要等待房间就绪。
+                // 不再立即开门，改由 onReady 回调处理。
+                // 仍设置模式标记，让 handleRoomReady 使用快速动画。
 
-                // Fallback: If room doesn't call onReady within 8000ms, open door anyway
-                // This ensures all rooms work even if they don't implement onReady
+                // 回退：房间在 8000 毫秒内未调用 onReady 时仍然开门。
+                // 保证没有实现 onReady 的房间也可进入。
                 loadTimeoutRef.current = setTimeout(() => {
                     if (!roomReadyRef.current) {
-                        console.warn(`[DoorSection ${label}] Room load timeout - forcing open`);
+                        console.warn(`[DoorSection ${label}] 房间加载超时，继续开门`);
                         roomReadyRef.current = true;
                         setRoomReady(true);
-                        // If it timed out, we still use the current mode preference
+                        // 超时后仍使用当前模式设置。
                         openDoor(useFastMode);
                     }
                 }, 8000);
@@ -538,12 +538,12 @@ const DoorSection = ({
             openAudioRef.current.play();
         }
 
-        // FAST MODE: Ultra-fast durations for teleport entry
+        // 快速模式：传送进入采用极短时长。
         const handleDuration = fastMode ? 0.01 : 0.15;
         const doorDuration = fastMode ? 0.01 : 0.7;
         const flyDuration = fastMode ? 0.01 : 1.5;
 
-        // Animate handle down first
+        // 先向下转动把手。
         if (handleRef.current) {
             gsap.to(handleRef.current.rotation, {
                 z: side === 'left' ? 0.4 : -0.4,
@@ -557,25 +557,25 @@ const DoorSection = ({
             duration: doorDuration,
             ease: fastMode ? 'none' : 'power2.out',
             onComplete: () => {
-                // Door is open, now fly camera through the door
-                // Get the direction the camera is looking AT THE START
+                // 门已打开，将相机移入房间。
+                // 获取动画开始时的相机朝向。
                 const direction = new THREE.Vector3();
                 camera.getWorldDirection(direction);
 
-                const flyDistance = enterDistance; // Fly through short vestibule (3) + into room
+                const flyDistance = enterDistance; // 穿过短前厅（3 单位）进入房间。
 
-                // Calculate TARGET position BEFORE animating (so flight path is straight)
+                // 动画前先计算目标位置，保证飞行路径为直线。
                 const targetX = camera.position.x + direction.x * flyDistance;
                 const targetZ = camera.position.z + direction.z * flyDistance;
 
-                // STEP 1: Fly camera forward in a STRAIGHT LINE
+                // 步骤 1：沿直线向前移动相机。
                 gsap.to(camera.position, {
                     x: targetX,
                     z: targetZ,
                     duration: flyDuration,
                     ease: fastMode ? 'none' : 'power2.inOut',
                     onComplete: () => {
-                        // Save position AFTER flight
+                        // 保存飞行后的位置。
                         roomEntryState.current = {
                             x: camera.position.x,
                             y: camera.position.y,
@@ -583,18 +583,18 @@ const DoorSection = ({
                             rotationY: camera.rotation.y
                         };
 
-                        // NO ROTATION needed - we are already looking perpendicular to corridor
-                        // Just mark as inside
+                        // 无需旋转，此时已垂直看向走廊侧面。
+                        // 标记为已进入。
                         setIsAnimating(false);
                         setIsInsideRoom(true);
 
-                        // Defer context update exactly 250ms to strictly avoid any
-                        // stutter during the very last frames of the GSAP animation loop.
+                        // 将上下文更新延迟 250 毫秒，
+                        // 避免 GSAP 动画最后几帧卡顿。
                         setTimeout(() => {
-                            enterRoom(doorId); // Use ID ('gallery') not label ('THE GALLERY')
+                            enterRoom(doorId); // 使用 ID（gallery），而非标签（作品画廊）。
                             onEnter?.();
 
-                            // FAST TELEPORT: Signal that room is ready - this opens the paper
+                            // 快速传送：发出房间就绪信号，以打开纸幕。
                             if (fastMode) {
                                 signalRoomReady();
                             }
@@ -605,24 +605,24 @@ const DoorSection = ({
         });
     }, [side, onEnter, camera, enterRoom, doorId, signalRoomReady]);
 
-    // Handle room ready callback - open door when room is fully loaded
-    // Use ref to prevent multiple calls (state might not update fast enough)
+    // 处理房间就绪回调，加载完成后开门。
+    // 使用 ref 防止重复调用，因为状态更新可能不够及时。
     const roomReadyRef = useRef(false);
 
     const handleRoomReady = useCallback(() => {
-        // Guard: only call openDoor once
+        // 确保 openDoor 只调用一次。
         if (roomReadyRef.current) return;
 
-        // Clear the fallback timeout since we are ready
+        // 就绪后清除回退定时器。
         if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
 
         roomReadyRef.current = true;
         setRoomReady(true);
-        // Use the current context state to decide if we should do a fast open
+        // 按当前上下文状态决定是否快速开门。
         openDoor(isFastTeleport);
     }, [openDoor, isFastTeleport]);
 
-    // Exit room function - TRUE REVERSE animation (like rewinding video)
+    // 退出房间：像倒放视频一样反向执行动画。
     const exitRoom = useCallback(() => {
         if (!isInsideRoom || isAnimating) return;
 
@@ -631,23 +631,23 @@ const DoorSection = ({
         const saved = savedCameraState.current;
         const aligned = doorAlignedState.current;
 
-        // Store current rotation as starting point for exit
-        // This captures the "tilted" state if coming from About/Flight
+        // 保存当前旋转，作为退出起点。
+        // 从关于我飞行场景返回时，也保存倾斜状态。
         const startRotation = {
             x: camera.rotation.x,
             y: camera.rotation.y,
             z: camera.rotation.z
         };
 
-        // REVERSE STEP 1: Walk backwards through corridor to ALIGNED position (in front of door)
-        // AND smoothly rotate to "aligned" state (level horizon)
+        // 反向步骤 1：沿走廊后退至门前的对齐位置，
+        // 同时平滑恢复水平视角。
 
-        // Proxy for Step 1 rotation
+        // 步骤 1 的旋转代理。
         const step1RotationProxy = { ...startRotation };
 
-        // Target for Step 1: Position = aligned position (in front of door)
-        // Rotation = 0 pitch/bank, Y facing the door (approx same as aligned.rotationY)
-        // We assume 'aligned.rotationY' is the correct facing for the door
+        // 步骤 1 的目标位置为门前对齐点。
+        // 俯仰和侧倾归零，Y 轴朝向门，约等于 aligned.rotationY。
+        // 假定 aligned.rotationY 为正确的门朝向。
 
         gsap.to(camera.position, {
             x: aligned.x,
@@ -657,21 +657,21 @@ const DoorSection = ({
             ease: 'power2.inOut'
         });
 
-        // Simultaneously animate rotation to level out
+        // 同步旋转以恢复水平。
         gsap.to(step1RotationProxy, {
-            x: 0, // Level pitch
-            y: aligned.rotationY, // Face door
-            z: 0, // Level bank
+            x: 0, // 俯仰归零。
+            y: aligned.rotationY, // 朝向门。
+            z: 0, // 侧倾归零。
             duration: 1.5,
             ease: 'power2.inOut',
             onUpdate: () => {
                 camera.rotation.set(step1RotationProxy.x, step1RotationProxy.y, step1RotationProxy.z);
             },
             onComplete: () => {
-                // REVERSE STEP 2: Move back to original center position & rotate to original view
-                // This is the reverse of the "align to door" animation
+                // 反向步骤 2：返回原中心位置，并恢复原视角。
+                // 这是对齐门动画的反向过程。
 
-                // 2a. Position
+                // 2a. 位置。
                 gsap.to(camera.position, {
                     x: saved.x,
                     y: saved.y,
@@ -680,8 +680,8 @@ const DoorSection = ({
                     ease: 'power2.inOut'
                 });
 
-                // 2b. Rotation
-                // Animate ALL axes to saved state
+                // 2b. 旋转。
+                // 所有轴都动画恢复至保存状态。
                 const step2RotationProxy = {
                     x: camera.rotation.x,
                     y: camera.rotation.y,
@@ -698,21 +698,21 @@ const DoorSection = ({
                         camera.rotation.set(step2RotationProxy.x, step2RotationProxy.y, step2RotationProxy.z);
                     },
                     onComplete: () => {
-                        // Restore precise full rotation (just in case)
+                        // 精确恢复完整旋转。
                         camera.rotation.set(saved.rotationX, saved.rotationY, saved.rotationZ);
 
-                        // Spread state updates across frames to prevent jank
-                        // Frame 1: ANIMATION FINISHED BUT STATE STILL "INSIDE" TO PREVENT ROOM WAKEUP
-                        // We keep isInsideRoom=true and isAnimating=true (or effectively "exiting")
-                        // so that AboutRoom sees "isExiting" as true until it's unmounted.
+                        // 跨帧分散状态更新，避免卡顿。
+                        // 第 1 帧：动画结束，但仍保持房间内状态，避免重新激活房间。
+                        // 保持 isInsideRoom=true 和 isAnimating=true，或等效的退出状态，
+                        // 让 AboutRoom 在卸载前始终保持 isExiting=true。
 
                         requestAnimationFrame(() => {
-                            // Frame 2: Close door FIRST
-                            // Room logic is still "held" in exit state
+                            // 第 2 帧：先关门。
+                            // 房间逻辑仍保持退出状态。
 
-                            // Close door, THEN hide room and reset state
+                            // 关门后再隐藏房间并重置状态。
                             closeDoor(() => {
-                                // Door is now closed. NOW we are officially "out"
+                                // 门已关闭，此时才正式标记为门外。
                                 setIsInsideRoom(false);
                                 setIsAnimating(false);
                                 setIsTiltLocked(false);
@@ -730,7 +730,7 @@ const DoorSection = ({
         });
     }, [isInsideRoom, isAnimating, camera, setCameraOverride, contextExitRoom]);
 
-    // ESC key listener for exiting room
+    // 监听 Esc 键退出房间。
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'Escape' && isInsideRoom && !isAnimating) {
@@ -742,15 +742,15 @@ const DoorSection = ({
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isInsideRoom, isAnimating, exitRoom]);
 
-    // Listen for exit request from UI back button
+    // 监听界面返回按钮发出的退出请求。
     useEffect(() => {
         if (exitRequested && isInsideRoom && !isAnimating) {
-            // Note: We deliberately do NOT call clearExitRequest() here.
-            // Calling it triggers an immediate global React Context update exactly
-            // when we want to start a 60 FPS GSAP animation. 
-            // setExitRequested(false) will be handled safely at the end of the 
-            // animation by contextExitRoom().
-            exitRoom(); // Trigger the exit animation
+            // 此处有意不调用 clearExitRequest()，
+            // 因为它会立刻触发全局 React 上下文更新，
+            // 干扰即将开始的每秒 60 帧 GSAP 动画。
+            // setExitRequested(false) 由 contextExitRoom()
+            // 在动画末尾安全处理。
+            exitRoom(); // 触发退出动画。
         }
     }, [exitRequested, isInsideRoom, isAnimating, exitRoom]);
 
@@ -772,7 +772,7 @@ const DoorSection = ({
             }, DOOR_AUDIO_SETTINGS.closeDelay * 1000);
         }
 
-        // Reset handle
+        // 重置把手。
         if (handleRef.current) {
             gsap.to(handleRef.current.rotation, {
                 z: 0,
@@ -781,7 +781,7 @@ const DoorSection = ({
             });
         }
 
-        // Reverse brush-stroke reveal (un-paint the door)
+        // 反向执行笔刷显现，去除门上的彩色层。
         if (doorMaterialRef.current) {
             gsap.to(doorMaterialRef.current, {
                 uProgress: 0.0,
@@ -798,7 +798,7 @@ const DoorSection = ({
                 overwrite: true
             });
         }
-        // Hide painted layers after animation
+        // 动画完成后隐藏彩色层。
         if (handleHideDelayRef.current) handleHideDelayRef.current.kill();
         handleHideDelayRef.current = gsap.delayedCall(0.65, () => {
             if (handlePaintedRef.current) handlePaintedRef.current.visible = false;
@@ -812,13 +812,13 @@ const DoorSection = ({
             onComplete: () => {
                 setIsOpen(false);
                 setIsAnimating(false);
-                // Call optional completion callback
+                // 调用可选的完成回调。
                 onDoorClosed?.();
             }
         });
     }, [isOpen]);
 
-    // Handle hover effects
+    // 处理悬停效果。
     const handlePointerEnter = () => {
         if (isOpen || isAnimating) return;
         setIsHovered(true);
@@ -828,15 +828,15 @@ const DoorSection = ({
             const vol = isMuted ? 0 : DOOR_AUDIO_SETTINGS.hoverVolume * globalVolume;
             hoverAudioRef.current.setVolume(vol);
             
-            // Only play if AudioContext is already running to avoid console warnings
-            // Browsers block audio until a user click, and hover is not always enough.
+            // 仅在 AudioContext 已运行时播放，避免控制台警告。
+            // 浏览器通常需点击后才允许音频，悬停不一定足够。
             if (hoverAudioRef.current.isPlaying) hoverAudioRef.current.stop();
             if (hoverAudioRef.current.context.state === 'running') {
                 hoverAudioRef.current.play();
             }
         }
 
-        // Slightly open door on hover
+        // 悬停时稍微开门。
         if (doorRef.current) {
             gsap.to(doorRef.current.rotation, {
                 y: side === 'left' ? 0.15 : -0.15,
@@ -845,7 +845,7 @@ const DoorSection = ({
             });
         }
 
-        // Slightly rotate handle on hover
+        // 悬停时略微转动把手。
         if (handleRef.current) {
             gsap.to(handleRef.current.rotation, {
                 z: side === 'left' ? 0.1 : -0.1,
@@ -854,7 +854,7 @@ const DoorSection = ({
             });
         }
 
-        // Brush-stroke reveal: discard sketch pixels to show painted door beneath
+        // 笔刷显现：丢弃速写像素，露出下方彩色门。
         if (doorMaterialRef.current) {
             gsap.to(doorMaterialRef.current, {
                 uProgress: 1.0,
@@ -871,7 +871,7 @@ const DoorSection = ({
                 overwrite: true
             });
         }
-        // Show painted layers (kill any pending hide from previous leave)
+        // 显示彩色层，并取消上次移出事件留下的隐藏任务。
         if (handleHideDelayRef.current) handleHideDelayRef.current.kill();
         if (handlePaintedRef.current) handlePaintedRef.current.visible = true;
         if (doorPaintedRef.current) doorPaintedRef.current.visible = true;
@@ -886,7 +886,7 @@ const DoorSection = ({
             hoverAudioRef.current.stop();
         }
 
-        // Close door
+        // 关门。
         if (doorRef.current) {
             gsap.to(doorRef.current.rotation, {
                 y: 0,
@@ -895,7 +895,7 @@ const DoorSection = ({
             });
         }
 
-        // Reset handle
+        // 重置把手。
         if (handleRef.current) {
             gsap.to(handleRef.current.rotation, {
                 z: 0,
@@ -904,7 +904,7 @@ const DoorSection = ({
             });
         }
 
-        // Reverse brush-stroke reveal
+        // 反向执行笔刷显现。
         if (doorMaterialRef.current) {
             gsap.to(doorMaterialRef.current, {
                 uProgress: 0.0,
@@ -922,21 +922,21 @@ const DoorSection = ({
             });
         }
 
-        // Hide painted layers after reverse animation completes
+        // 反向动画结束后隐藏彩色层。
         handleHideDelayRef.current = gsap.delayedCall(0.55, () => {
             if (handlePaintedRef.current) handlePaintedRef.current.visible = false;
             if (doorPaintedRef.current) doorPaintedRef.current.visible = false;
         });
     };
 
-    // Door pivot position - hinges on the side
+    // 门的旋转轴位于侧边铰链处。
     const doorPivotX = side === 'left' ? -doorWidth / 2 : doorWidth / 2;
     const doorMeshX = side === 'left' ? doorWidth / 2 : -doorWidth / 2;
 
-    // Handle position on door (based on texture - handle is on the right side for left doors)
+    // 把手位置按纹理确定，左侧门的把手在右边。
     const handlePivotX = side === 'left' ? doorWidth * 0.25 : -doorWidth * 0.25;
 
-    // Sign texture mapping - now uses a single empty sign texture
+    // 标牌纹理映射，现统一使用空白标牌纹理。
     const signTextureUrl = '/textures/corridor/pustatabliczka.webp';
     const signLegacyRatio = 1.792; // 2752x1536
     const signHeight = 0.55;
@@ -944,23 +944,23 @@ const DoorSection = ({
     const signTexture = useTexture(signTextureUrl);
 
     return (
-        // Outer group at pivot position (outer edge of wall)
+        // 外组位于墙外边缘的旋转轴处。
         <group position={[pivotX, position[1], position[2]]}>
-            {/* Inner group that rotates - contains wall + door */}
+            {/* 可旋转内组，包含墙面与门。 */}
             <group ref={groupRef}>
-                {/* Wall segment with door hole */}
+                {/* 带门洞的墙段。 */}
                 <mesh position={[wallOffsetX, 0, 0]} geometry={wallWithHoleGeometry}>
                     <meshBasicMaterial color="#e0e0e0" map={wallTexture} roughness={1} metalness={0} side={THREE.DoubleSide} />
                 </mesh>
 
-                {/* === ARROW DECORATION === */}
-                {/* Pointing to door. Left arrow. */}
+                {/* 箭头装饰。 */}
+                {/* 指向门的左侧箭头。 */}
                 {/* ===================================================
-                    REGULACJA STRZAŁKI LEWEJ:
+                    左箭头调节：
                     position={[wallOffsetX - 0.9, 0, 0.02]}
-                      - wallOffsetX - 0.9 → odległość od środka drzwi (zwiększ 0.9 = dalej od drzwi)
-                      - Y = 0             → wysokość (0 = środek ściany, + = wyżej, - = niżej)
-                    scale={[0.5, 0.5, 1]} → rozmiar strzałki
+                      - wallOffsetX - 0.9：距门中心的距离，增大 0.9 会远离门。
+                      - Y=0：高度；0 为墙面中间，正值上移，负值下移。
+                    scale={[0.5, 0.5, 1]}：箭头尺寸。
                     =================================================== */}
                 <mesh
                     position={[wallOffsetX - 1.1, 0, 0.02]}
@@ -977,13 +977,13 @@ const DoorSection = ({
                     />
                 </mesh>
 
-                {/* === ARROW DECORATION (RIGHT, MIRRORED) === */}
+                {/* 右侧镜像箭头装饰。 */}
                 {/* ===================================================
-                    REGULACJA STRZAŁKI PRAWEJ:
+                    右箭头调节：
                     position={[wallOffsetX + 0.9, -0.3, 0.02]}
-                      - wallOffsetX + 0.9 → odległość od środka drzwi (prawa strona)
-                      - Y = -0.3          → trochę niżej niż lewa strzałka
-                    scale={[-0.5, 0.5, 1]} → ujemny X = lustrzane odbicie
+                      - wallOffsetX + 0.9：距门中心的距离，位于右侧。
+                      - Y=-0.3：略低于左箭头。
+                    scale={[-0.5, 0.5, 1]}：X 为负值时镜像。
                     =================================================== */}
                 <mesh
                     position={[wallOffsetX + 1.1, -0.3, 0.02]}
@@ -1000,7 +1000,7 @@ const DoorSection = ({
                     />
                 </mesh>
 
-                {/* Baseboard (Listwa) Left side of door */}
+                {/* 门左侧踢脚线。 */}
                 <mesh position={[wallOffsetX - 1.4, -CORRIDOR_HEIGHT / 2 + 0.075, 0.02]}>
                     <planeGeometry args={[doorBoardWidth, 0.15]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -1010,7 +1010,7 @@ const DoorSection = ({
                     />
                 </mesh>
 
-                {/* Baseboard (Listwa) Right side of door */}
+                {/* 门右侧踢脚线。 */}
                 <mesh position={[wallOffsetX + 1.4, -CORRIDOR_HEIGHT / 2 + 0.075, 0.02]}>
                     <planeGeometry args={[doorBoardWidth, 0.15]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -1020,12 +1020,12 @@ const DoorSection = ({
                     />
                 </mesh>
 
-                {/* === THRESHOLD STRIPE (Próg przy drzwiach bocznych) === */}
+                {/* 侧门门槛条。 */}
                 {(() => {
-                    // Próg leży na podłodze, prostopadle do ściany bocznej
-                    // Szerokość progu = szerokość otworu drzwiowego (~1.1)
-                    const THRESH_W = 1.1;   // Szerokość (wzdłuż X lokalnego = wzdłuż ściany)
-                    const THRESH_D = 0.15;  // Głębokość (wzdłuż Z lokalnego = w głąb korytarza)
+                    // 门槛铺在地面上，与侧墙垂直。
+                    // 门槛宽度等于门洞宽度，约 1.1。
+                    const THRESH_W = 1.1;   // 宽度沿局部 X 轴，即沿墙面方向。
+                    const THRESH_D = 0.15;  // 深度沿局部 Z 轴，即伸入走廊方向。
                     const threshTex = baseboardTexture.clone();
                     threshTex.needsUpdate = true;
                     threshTex.wrapS = threshTex.wrapT = THREE.RepeatWrapping;
@@ -1048,17 +1048,17 @@ const DoorSection = ({
                     );
                 })()}
 
-                {/* Door and frame - centered on wall */}
+                {/* 门与门框在墙上居中。 */}
                 <group position={[wallOffsetX, -0.4, 0]}>
-                    {/* === TEXTURED SIGN === */}
+                    {/* 带纹理的标牌。 */}
                     <group position={[0, doorHeight / 2 + 0.45, 0.08]}>
                         {/* 
-                            WIELKOŚĆ TABLICZKI (SIGN SIZE):
-                            Zmień liczby w args={[Szerokość, Wysokość]}
-                            Obecnie: 1.3 szerokości, 0.65 wysokości
+                            标牌尺寸：
+                            修改 args={[宽度, 高度]} 中的数值。
+                            当前宽 1.3、高 0.65。
                         */}
                         <mesh>
-                            {/* Adjusted size for the signs - assuming rectangular aspect ratio */}
+                            {/* 按矩形宽高比调整标牌尺寸。 */}
                             <planeGeometry args={[1.3, 0.65]} />
                             <meshBasicMaterial color="#e0e0e0"
                                 map={signTexture}
@@ -1068,83 +1068,83 @@ const DoorSection = ({
                             />
                         </mesh>
 
-                        {/* === DYNAMIC TEXT FOR SIGNS === */}
-                        {label === 'THE GALLERY' && (
+                        {/* 标牌动态文字。 */}
+                        {label === "作品画廊" && (
                             <group position={[0, 0, 0.01]}>
                                 <Text
-                                    font="/fonts/CabinSketch-Bold.ttf"
+                                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
                                     anchorY="bottom"
                                     position={[0, -0.02, 0]}
                                 >
-                                    THE
+                                    我的
                                 </Text>
                                 <Text
-                                    font="/fonts/CabinSketch-Bold.ttf"
+                                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
                                     anchorY="top"
                                     position={[0, +0.02, 0]}
                                 >
-                                    GALLERY
+                                    画廊
                                 </Text>
                             </group>
                         )}
-                        {label === 'THE STUDIO' && (
+                        {label === "内容工作室" && (
                             <group position={[0, 0, 0.01]}>
                                 <Text
-                                    font="/fonts/CabinSketch-Bold.ttf"
+                                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
                                     anchorY="bottom"
                                     position={[0, -0.02, 0]}
                                 >
-                                    THE
+                                    我的
                                 </Text>
                                 <Text
-                                    font="/fonts/CabinSketch-Bold.ttf"
+                                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
                                     anchorY="top"
                                     position={[0, +0.03, 0]}
                                 >
-                                    STUDIO
+                                    工作室
                                 </Text>
                             </group>
                         )}
-                        {label === 'THE ABOUT' && (
+                        {label === "关于我" && (
                             <Text
-                                font="/fonts/CabinSketch-Bold.ttf"
+                                font="/fonts/LXGWWenKaiLite-Regular.ttf"
                                 fontSize={0.30}
                                 color="#111111"
                                 anchorX="center"
                                 anchorY="middle"
                                 position={[0, 0, 0.01]}
                             >
-                                ABOUT
+                                关于我
                             </Text>
                         )}
-                        {label === "LET'S CONNECT" && (
+                        {label === "联系我" && (
                             <Text
-                                font="/fonts/CabinSketch-Bold.ttf"
+                                font="/fonts/LXGWWenKaiLite-Regular.ttf"
                                 fontSize={0.25}
                                 color="#111111"
                                 anchorX="center"
                                 anchorY="middle"
                                 position={[0, 0, 0.01]}
                             >
-                                CONTACT
+                                联系我
                             </Text>
                         )}
                     </group>
 
-                    {/* === DOOR FRAME (textured) === */}
-                    {/* Moved to Z = 0.04 to sit in front of baseboards (Z=0.02), hiding the hole edges */}
+                    {/* 带纹理的门框。 */}
+                    {/* 移至 Z=0.04，位于踢脚线 Z=0.02 前方，遮住门洞边缘。 */}
                     <mesh position={[0, -0.1, 0.04]} scale={[side === 'right' ? -1 : 1, 1, 1]}>
                         <planeGeometry args={[frameWidth, frameHeight]} />
                         <meshBasicMaterial color="#e0e0e0"
@@ -1155,8 +1155,8 @@ const DoorSection = ({
                         />
                     </mesh>
 
-                    {/* === DOOR INTERIOR CORRIDOR + ROOM === */}
-                    {/* Always render, but pass showRoom prop for lazy loading giant room */}
+                    {/* 门内走廊与房间。 */}
+                    {/* 始终渲染走廊，通过 showRoom 延迟加载大房间。 */}
                     <RoomInterior
                         label={label}
                         showRoom={shouldRenderRoom}
@@ -1164,10 +1164,10 @@ const DoorSection = ({
                         isExiting={isInsideRoom && isAnimating}
                     />
 
-                    {/* === DOOR PANEL (pivots for opening) === */}
-                    {/* Pivot Z at 0.01 to be slightly behind frame but in front of wall if needed, or just flush */}
+                    {/* 可绕轴开合的门板。 */}
+                    {/* 旋转轴 Z=0.01，略靠门框后方，可位于墙前或与墙齐平。 */}
                     <group ref={doorRef} position={[doorPivotX, 0, 0.01]}>
-                        {/* Clickable hitbox (invisible) for pointer events */}
+                        {/* 不可见的点击区域，用于接收指针事件。 */}
                         <mesh
                             position={[doorMeshX, -0.2, 0.005]}
                             onClick={handleClick}
@@ -1178,11 +1178,11 @@ const DoorSection = ({
                             <meshBasicMaterial color="#e0e0e0" transparent={true} opacity={0} depthWrite={false} />
                         </mesh>
 
-                        {/* Painted layer (behind sketch) - hidden after 2 frames to precompile shader */}
+                        {/* 彩色底层在两帧后隐藏，用于预编译着色器。 */}
                         <mesh
                             ref={doorPaintedRef}
                             position={[doorMeshX, -0.2, -0.001]}
-                            scale={[(side === 'right' && label !== 'THE STUDIO') ? -1 : 1, 1, 1]}
+                            scale={[(side === 'right' && label !== "内容工作室") ? -1 : 1, 1, 1]}
                         >
                             <planeGeometry args={[doorWidth, doorHeight]} />
                             <meshBasicMaterial color="#e0e0e0"
@@ -1193,10 +1193,10 @@ const DoorSection = ({
                             />
                         </mesh>
 
-                        {/* Sketch overlay (front) - brush-stroke discard reveals painted beneath */}
+                        {/* 前方速写叠加层通过笔刷丢弃露出底层彩色图。 */}
                         <mesh
                             position={[doorMeshX, -0.2, 0]}
-                            scale={[(side === 'right' && label !== 'THE STUDIO') ? -1 : 1, 1, 1]}
+                            scale={[(side === 'right' && label !== "内容工作室") ? -1 : 1, 1, 1]}
                         >
                             <planeGeometry args={[doorWidth, doorHeight]} />
                             <revealMaterial color="#e0e0e0"
@@ -1209,7 +1209,7 @@ const DoorSection = ({
                             />
                         </mesh>
 
-                        {/* Door Back Texture */}
+                        {/* 门背面纹理。 */}
                         <mesh
                             position={[doorMeshX, -0.2, -0.01]}
                             rotation={[0, Math.PI, 0]}
@@ -1225,9 +1225,9 @@ const DoorSection = ({
                             />
                         </mesh>
 
-                        {/* Handle Layer - pivot at screw position */}
+                        {/* 把手层以螺丝位置为旋转轴。 */}
                         <group ref={handleRef} position={[doorMeshX + (side === 'left' ? 0.45 : -0.45), -0.29, 0.03]}>
-                            {/* Painted handle (behind) - hidden after 2 frames */}
+                            {/* 后方彩色把手，两帧后隐藏。 */}
                             <mesh ref={handlePaintedRef} position={[side === 'left' ? -0.50 : 0.50, 0.14, -0.001]} scale={[side === 'right' ? -1 : 1, 1, 1]}>
                                 <planeGeometry args={[doorWidth, doorHeight]} />
                                 <meshBasicMaterial color="#e0e0e0"
@@ -1237,7 +1237,7 @@ const DoorSection = ({
                                     depthWrite={false}
                                 />
                             </mesh>
-                            {/* Sketch handle overlay (front) */}
+                            {/* 前方速写把手叠加层。 */}
                             <mesh position={[side === 'left' ? -0.50 : 0.50, 0.14, 0]} scale={[side === 'right' ? -1 : 1, 1, 1]}>
                                 <planeGeometry args={[doorWidth, doorHeight]} />
                                 <revealMaterial color="#e0e0e0"
@@ -1253,7 +1253,7 @@ const DoorSection = ({
                     </group>
                 </group>
 
-                {/* SPATIAL AUDIO NODES (Attached slightly in front of the door) */}
+                {/* 空间音频节点，位于门前少许。 */}
                 <PositionalAudio
                     ref={hoverAudioRef}
                     url="/sounds/uchyleniedrzwi.mp3"

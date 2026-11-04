@@ -3,7 +3,7 @@ const fs = require('fs');
 const FILE_PATH = 'c:/Users/tomsz/Desktop/portfolio/portfolio-itom/src/components/canvas/rooms/About/InfiniteSkyManager.jsx';
 let content = fs.readFileSync(FILE_PATH, 'utf8');
 
-// ==== 1. Fix AwardButton ====
+// 1. 修正 AwardButton。
 content = content.replace(
     /const AwardButton = \(\{ onClick, texture, paintedTexture, width, height, position, onHoverChange \}\) => \{/,
     `const AwardButton = ({ onClick, texture, paintedTexture, width, height, position, onHoverChange }) => {
@@ -24,7 +24,7 @@ content = content.replace(
 );
 
 
-// ==== 2. Fix AwardsMilestone ====
+// 2. 修正 AwardsMilestone。
 content = content.replace(
     /const \{ camera \} = useThree\(\);/g,
     `const { camera, viewport } = useThree();
@@ -47,12 +47,12 @@ content = content.replace(
 );
 
 
-// ==== 3. Fix SkillBalloon ====
-// Note: SkillBalloon already has isMobile defined from viewport!
-// Let's replace the texture loading in SkillBalloon
+// 3. 修正 SkillBalloon。
+// 注意：SkillBalloon 已根据视口定义 isMobile。
+// 替换 SkillBalloon 中的纹理加载逻辑。
 content = content.replace(
     /const texture = useLoader\(THREE\.TextureLoader, config\.texture\);\s*const paintedTexture = useLoader\(THREE\.TextureLoader, config\.paintedTexture\);/g,
-    `const isMobileViewport = viewport.width < 8; // Local const for texture loading before state
+    `const isMobileViewport = viewport.width < 8; // 在状态定义前提供用于纹理加载的局部常量
     const texture = useLoader(THREE.TextureLoader, config.texture);
     const paintedTextureUrl = isMobileViewport ? config.texture : config.paintedTexture;
     const paintedTexture = useLoader(THREE.TextureLoader, paintedTextureUrl);`
@@ -71,6 +71,6 @@ content = content.replace(
 );
 
 
-// Rewrite the isMobile in SkillBalloon because it is defined AFTER the hook, but we used isMobileViewport above
+// isMobile 在 Hook 后才定义，因此在此前使用 isMobileViewport，并改写对应逻辑。
 fs.writeFileSync(FILE_PATH, content, 'utf8');
-console.log('Modifications applied successfully.');
+console.log('修改已成功应用。');

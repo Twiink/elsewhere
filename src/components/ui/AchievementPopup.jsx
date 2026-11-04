@@ -16,7 +16,7 @@ const AchievementPopup = () => {
     const isCompleted = activePopup.status === 'completed';
     const isHiding = activePopup.status === 'hiding';
 
-    // Specjalna logika dla corridor_enter (pytanie o dźwięk)
+    // corridor_enter 的特殊逻辑，用于询问是否开启声音。
     const isSoundPrompt = activePopup.id === 'corridor_enter';
 
     return (
@@ -24,7 +24,7 @@ const AchievementPopup = () => {
             className={`achievement-popup ${isCompleted ? 'completed' : ''} ${isHiding ? 'hiding' : ''} ${isSoundPrompt ? 'interactive' : ''}`}
             style={isSoundPrompt ? { pointerEvents: 'auto' } : {}}
         >
-            {/* SVG Border Overlay */}
+            {/* SVG 边框叠加层。 */}
             <svg
                 className="popup-border"
                 viewBox="0 0 100 100"
@@ -57,7 +57,7 @@ const AchievementPopup = () => {
                         <span className="description">{data.label}</span>
                     ) : (
                         <span className="description">
-                            Click a door to enter. Audio is currently
+                            点击门即可进入。当前声音
                             <button
                                 className={`inline-sound-toggle ${!isMuted ? 'on' : 'off'}`}
                                 onClick={(e) => {
@@ -65,22 +65,22 @@ const AchievementPopup = () => {
 
                                     const willMute = !isMuted;
 
-                                    // 1. Oprogramowujemy flagi MUTE (dla silnika i utilsa)
+                                    // 1. 同步音频引擎与工具的静音标记。
                                     if (isMuted !== willMute) toggleMute();
                                     if (getBgmMuted() !== willMute) toggleBgmMute();
 
-                                    // 2. Wymuszamy fizyczne zjechanie pasków głośności, 
-                                    // żeby menu się zsynchronizowało z ustawieniami z wejścia
+                                    // 2. 同时将音量条降至零，
+                                    // 使菜单与入口处的设置保持同步。
                                     if (willMute) {
                                         setGlobalVolume(0);
                                         setMusicVolume(0);
                                     } else {
-                                        setGlobalVolume(1.0); // 100% SFX
-                                        setMusicVolume(0.3);  // 30% BGM
+                                        setGlobalVolume(1.0); // 音效音量 100%。
+                                        setMusicVolume(0.3);  // 背景音乐音量 30%。
                                     }
                                 }}
                             >
-                                {!isMuted ? " [🔊 ON]" : " [🔇 OFF]"}
+                                {!isMuted ? " [🔊 已开启]" : " [🔇 已关闭]"}
                             </button>
                         </span>
                     )}

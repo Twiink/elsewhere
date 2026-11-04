@@ -19,7 +19,7 @@ const getAllFiles = (dirPath, arrayOfFiles) => {
   const files = fs.readdirSync(dirPath);
   arrayOfFiles = arrayOfFiles || [];
   files.forEach(file => {
-    if (file === 'backups') return; // Skip backup dir
+    if (file === 'backups') return; // 跳过备份目录。
     const fullPath = path.join(dirPath, file);
     if (fs.statSync(fullPath).isDirectory()) {
       arrayOfFiles = getAllFiles(fullPath, arrayOfFiles);
@@ -32,7 +32,7 @@ const getAllFiles = (dirPath, arrayOfFiles) => {
 
 async function optimize() {
   const allFiles = getAllFiles(ROOT_DIR);
-  console.log(`Recursively optimizing ${allFiles.length} files in Corridor (Downgrade Strategy)...`);
+  console.log(`正以降采样策略递归优化走廊的 ${allFiles.length} 个文件……`);
 
   for (const fullPath of allFiles) {
     const relPath = path.relative(ROOT_DIR, fullPath);
@@ -52,9 +52,9 @@ async function optimize() {
       const newHeight = getDownscalePowerOfTwo(height);
 
       if (newWidth !== width || newHeight !== height) {
-        console.log(`Downgrading ${relPath}: ${width}x${height} -> ${newWidth}x${newHeight}`);
+        console.log(`降采样 ${relPath}: ${width}x${height} -> ${newWidth}x${newHeight}`);
         
-        // Backup if not exists
+        // 没有备份时创建。
         if (!fs.existsSync(backupPath)) {
           fs.copyFileSync(fullPath, backupPath);
         }
@@ -66,14 +66,14 @@ async function optimize() {
           .toFile(tmpPath);
           
         fs.renameSync(tmpPath, fullPath);
-        console.log(`Success: ${relPath}`);
+        console.log(`成功： ${relPath}`);
       } else {
-        console.log(`Skipping ${relPath} - Already POT: ${width}x${height}`);
+        console.log(`跳过 ${relPath}，已为二次幂尺寸： ${width}x${height}`);
       }
     } catch (e) {
-      console.error(`Error with ${relPath}: ${e.message}`);
+      console.error(`处理出错： ${relPath}: ${e.message}`);
     }
   }
 }
 
-optimize().then(() => console.log('Recursive Corridor Optimization complete!'));
+optimize().then(() => console.log('走廊纹理递归优化完成！'));

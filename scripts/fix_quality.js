@@ -17,7 +17,7 @@ function getNextPowerOfTwo(n) {
   for (let p of pots) {
     if (p >= n) return p;
   }
-  return 8192; // Max fallback
+  return 8192; // 最大尺寸回退值
 }
 
 async function fix() {
@@ -26,7 +26,7 @@ async function fix() {
     const targetPath = path.join(TARGET_DIR, file);
 
     if (!fs.existsSync(originalPath)) {
-      console.log(`Original for ${file} not found in backups!`);
+      console.log(`备份中未找到 ${file} 的原图！`);
       continue;
     }
 
@@ -38,19 +38,19 @@ async function fix() {
       const newWidth = getNextPowerOfTwo(width);
       const newHeight = getNextPowerOfTwo(height);
 
-      console.log(`Quality Fix ${file}: ${width}x${height} -> ${newWidth}x${newHeight} (Q100)`);
+      console.log(`修复画质 ${file}： ${width}x${height} -> ${newWidth}x${newHeight} (Q100)`);
       
       await sharp(inputBuffer)
         .resize(newWidth, newHeight, { fit: 'fill' })
-        .webp({ quality: 100, lossless: false }) // 100 quality lossy is usually great
+        .webp({ quality: 100, lossless: false }) // 质量为 100 的有损压缩通常效果很好。
         .toFile(targetPath + '.tmp_q.webp');
         
       fs.renameSync(targetPath + '.tmp_q.webp', targetPath);
-      console.log(`Success: ${file}`);
+      console.log(`成功： ${file}`);
     } catch (e) {
-      console.error(`Error with ${file}: ${e.message}`);
+      console.error(`处理出错： ${file}: ${e.message}`);
     }
   }
 }
 
-fix().then(() => console.log('Quality Fix complete!'));
+fix().then(() => console.log('画质修复完成！'));

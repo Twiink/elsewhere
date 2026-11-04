@@ -2,12 +2,12 @@ import * as THREE from 'three';
 import { extend } from '@react-three/fiber';
 
 /**
- * RevealBasicMaterial - extends MeshBasicMaterial for brush-stroke reveal effect.
+ * RevealBasicMaterial：扩展 MeshBasicMaterial，实现笔刷显现。
  * 
- * Same logic as RevealMaterial but for MeshBasicMaterial (no lighting).
- * Used for UI elements like balloons and award cards that use meshBasicMaterial.
+ * 逻辑与 RevealMaterial 相同，但使用无光照的 MeshBasicMaterial。
+ * 用于采用 meshBasicMaterial 的气球、奖项卡片等界面元素。
  * 
- * Usage: <revealBasicMaterial map={sketchTex} uProgress={0-1} transparent={true} ... />
+ * 用法：<revealBasicMaterial map={sketchTex} uProgress={0-1} transparent={true} ... />
  */
 class RevealBasicMaterial extends THREE.MeshBasicMaterial {
     constructor(params = {}) {
@@ -57,7 +57,7 @@ class RevealBasicMaterial extends THREE.MeshBasicMaterial {
             '#include <alphatest_fragment>',
             /* glsl */`#include <alphatest_fragment>
 
-            // Brush-stroke reveal: progressively discard pixels from bottom to top
+            // 笔刷显现：逐渐自下而上丢弃像素。
             if (uProgress > 0.001) {
                 float rn = revealNoise(vMapUv * 15.0) * 0.15;
                 float maskValue = (1.0 - vMapUv.y) + rn;

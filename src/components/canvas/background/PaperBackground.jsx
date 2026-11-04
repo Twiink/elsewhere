@@ -3,13 +3,13 @@ import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
 /**
- * PaperBackground Component
+ * PaperBackground 纸张背景组件。
  * 
- * Creates a hand-drawn sketchbook feel with paper texture.
- * Simple planes arranged to create depth.
+ * 使用纸张纹理营造手绘速写本质感。
+ * 通过简单平面的排列产生层次。
  */
 const PaperBackground = () => {
-    // Load paper texture
+    // 加载纸张纹理。
     const paperTexture = useTexture('/textures/paper-texture.webp');
 
     useMemo(() => {
@@ -20,7 +20,7 @@ const PaperBackground = () => {
 
     return (
         <group>
-            {/* Main background plane - far back */}
+            {/* 主背景平面，置于远处。 */}
             <mesh position={[0, 0, -8]}>
                 <planeGeometry args={[25, 18]} />
                 <meshBasicMaterial
@@ -31,7 +31,7 @@ const PaperBackground = () => {
                 />
             </mesh>
 
-            {/* Floor plane with grid effect */}
+            {/* 带网格效果的地面平面。 */}
             <mesh position={[0, -2.5, -2]} rotation={[-Math.PI / 2.5, 0, 0]}>
                 <planeGeometry args={[20, 15]} />
                 <meshBasicMaterial
@@ -43,22 +43,22 @@ const PaperBackground = () => {
                 />
             </mesh>
 
-            {/* Grid lines on floor for perspective */}
+            {/* 地面透视网格线。 */}
             <GridLines />
 
-            {/* Subtle vignette corners using planes */}
+            {/* 用角落平面营造轻微暗角。 */}
             <VignetteCorners />
         </group>
     );
 };
 
 /**
- * Perspective grid lines - notebook style
+ * 笔记本风格的透视网格线。
  */
 const GridLines = () => {
     const lines = useMemo(() => {
         const result = [];
-        // Horizontal lines
+        // 水平线。
         for (let i = -5; i <= 5; i++) {
             result.push({
                 position: [0, -2.5 + i * 0.02, -2 - i * 0.8],
@@ -90,12 +90,12 @@ const GridLines = () => {
 };
 
 /**
- * Subtle vignette effect using corner shadows
+ * 用角落阴影营造轻微暗角。
  */
 const VignetteCorners = () => {
     return (
         <group>
-            {/* Top corners */}
+            {/* 顶部角落。 */}
             <mesh position={[-6, 4, 0]}>
                 <circleGeometry args={[3, 32]} />
                 <meshBasicMaterial

@@ -1,9 +1,9 @@
-# Ten plik służy tylko do wewnętrznych przekierowań ścieżek np:
-# /stara-strona /nowa-strona 301
-# Przekierowania z www na non-www ustawiamy bezpośrednio w zakładce "Rules -> Redirect Rules" w panelu głównym domeny w Cloudflare.
+# 此文件仅处理内部路径重写，例如：
+# /旧页面 /新页面 301
+# www 到主域名的重定向在 Cloudflare 域名面板的 Rules → Redirect Rules 中设置。
 
-# Lekka, statyczna strona startowa. Reguły dokładne muszą być przed trasami SPA.
+# 轻量静态起始页，精确规则必须放在单页应用路由之前。
 /start  /start/index.html  200
 /start/ /start/index.html  200
 
-# Pozostałe ścieżki (/gallery, /about itd.) obsługuje automatyczny fallback SPA Cloudflare Pages.
+# 其余路径（/gallery、/about 等）由 Cloudflare Pages 的单页应用回退处理。

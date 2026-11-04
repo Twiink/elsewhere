@@ -4,7 +4,7 @@ import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 // ============================================
-// CONFIG
+// 配置。
 // ============================================
 const PARTICLE_COUNT = 60;
 const MIN_RADIUS = 4;
@@ -12,34 +12,34 @@ const MAX_RADIUS = 12;
 const VERTICAL_SPREAD = 25;
 const BASE_OPACITY = 0.18;
 
-// Thresholds for seamless loop
+// 无缝循环阈值。
 const LOOP_BOTTOM = -15;
 const LOOP_TOP = 15;
 const LOOP_HEIGHT = LOOP_TOP - LOOP_BOTTOM;
 
-// Symbol definitions with their visual weight
+// 符号定义及其视觉权重。
 const SYMBOLS = [
-    // Code brackets - larger
+    // 代码括号，较大。
     { text: '{/}', size: 0.8, weight: 2 },
     { text: '</>', size: 0.8, weight: 2 },
     { text: '{ }', size: 0.7, weight: 1 },
     { text: '{ • }', size: 0.7, weight: 1 },
 
-    // Operators & punctuation - medium
+    // 运算符与标点，中等。
     { text: ';', size: 0.5, weight: 3 },
     { text: '::', size: 0.4, weight: 2 },
     { text: '=>', size: 0.5, weight: 2 },
     { text: '//', size: 0.5, weight: 2 },
     { text: '&&', size: 0.4, weight: 1 },
 
-    // Binary - small scattered
+    // 零散的二进制数字，较小。
     { text: '0', size: 0.3, weight: 4 },
     { text: '1', size: 0.3, weight: 4 },
     { text: '01', size: 0.35, weight: 3 },
     { text: '0101', size: 0.4, weight: 2 },
     { text: '00', size: 0.35, weight: 2 },
 
-    // Arrows & misc
+    // 箭头与其他符号。
     { text: '↑', size: 0.4, weight: 2 },
     { text: '→', size: 0.4, weight: 1 },
     { text: '←', size: 0.4, weight: 1 },
@@ -47,13 +47,13 @@ const SYMBOLS = [
     { text: '•', size: 0.25, weight: 3 },
     { text: '○', size: 0.3, weight: 2 },
 
-    // Pixel-like patterns
+    // 像素风图案。
     { text: '▪▪\n▪', size: 0.25, weight: 2 },
     { text: '▪ ▪\n ▪', size: 0.25, weight: 1 },
     { text: '▪▪▪', size: 0.2, weight: 2 },
 ];
 
-// Weighted random selection
+// 按权重随机选择。
 const getRandomSymbol = () => {
     const totalWeight = SYMBOLS.reduce((sum, s) => sum + s.weight, 0);
     let random = Math.random() * totalWeight;
@@ -65,20 +65,20 @@ const getRandomSymbol = () => {
     return SYMBOLS[0];
 };
 
-// Generate particle data once
-// Generate particle data once
+// 一次性生成粒子数据。
+// 一次性生成粒子数据。
 const generateParticles = () => {
     const particles = [];
 
-    // Bounds for 2D plane
-    const X_SPREAD = 50; // Match WRAP_WIDTH in useFrame
-    const Z_MIN = -4; // Behind monitors (monitors at ~ +/- 2.2 radius)
-    const Z_MAX = -8; // Further back
+    // 二维平面边界。
+    const X_SPREAD = 50; // 与 useFrame 中的 WRAP_WIDTH 一致。
+    const Z_MIN = -4; // 位于显示器后方，显示器半径约 ±2.2。
+    const Z_MAX = -8; // 更靠后。
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
         const symbol = getRandomSymbol();
 
-        // Random 3D position in a flat plane interaction volume
+        // 在扁平交互空间内生成随机三维位置。
         const x = (Math.random() - 0.5) * X_SPREAD;
         const y = (Math.random() - 0.5) * VERTICAL_SPREAD;
         const z = Z_MIN + Math.random() * (Z_MAX - Z_MIN);
@@ -86,9 +86,9 @@ const generateParticles = () => {
         particles.push({
             id: i,
             symbol,
-            position: new THREE.Vector3(x, y, z), // Initial position
-            initialX: x, // Store for logic
-            z: z,        // Store for logic
+            position: new THREE.Vector3(x, y, z), // 初始位置。
+            initialX: x, // 保存供逻辑使用。
+            z: z,        // 保存供逻辑使用。
             initialY: y,
             rotation: Math.random() * Math.PI * 2,
             driftSpeed: 0.1 + Math.random() * 0.2,
@@ -102,48 +102,48 @@ const generateParticles = () => {
     return particles;
 };
 
-// Main component - receives REFS from parent for smooth animation
-// fallOffsetRef is now VELOCITY (fallSpeed), not cumulative offset!
+// 主组件接收父级 ref，以实现平滑动画。
+// fallOffsetRef 现表示速度 fallSpeed，而非累计偏移。
 const FloatingCodeParticles = ({ towerRotationRef, fallOffsetRef }) => {
     const particles = useMemo(() => generateParticles(), []);
     const meshRefs = useRef([]);
 
-    // Track interpolated values for smoothing
+    // 跟踪插值后的数值以平滑运动。
     const smoothRotation = useRef(0);
 
-    // Track cumulative Y offset for each particle (never resets!)
+    // 跟踪各粒子的累计 Y 偏移，永不重置。
     const particleYOffsets = useRef(particles.map(() => 0));
 
-    // Single useFrame for ALL particles
+    // 所有粒子共用一个 useFrame。
     useFrame((state, delta) => {
         const time = state.clock.elapsedTime;
 
-        // Read velocity from parent
+        // 从父级读取速度。
         const towerRotation = towerRotationRef?.current || 0;
         const fallVelocity = fallOffsetRef?.current || 0;
 
-        // Smooth the rotation
+        // 平滑旋转。
         smoothRotation.current = THREE.MathUtils.lerp(smoothRotation.current, towerRotation, 0.08);
 
-        // Define X wrapping bounds - wide enough to cover screen
-        const WRAP_WIDTH = 50; // Total width before wrapping
+        // X 循环边界需足够宽，以覆盖屏幕。
+        const WRAP_WIDTH = 50; // 循环前的总宽度。
         const HALF_WIDTH = WRAP_WIDTH / 2;
 
         particles.forEach((particle, index) => {
             const mesh = meshRefs.current[index];
             if (!mesh) return;
 
-            // --- VERTICAL MOVEMENT (Unchanged) ---
-            // Accumulate Y offset based on velocity
+            // 竖向移动，逻辑保持不变。
+            // 根据速度累加 Y 偏移。
             particleYOffsets.current[index] -= fallVelocity * delta * particle.parallaxFactor * 1.5;
 
-            // Gentle floating motion
+            // 轻微漂浮动作。
             const floatY = Math.sin(time * particle.driftSpeed + particle.phaseOffset) * 0.3;
 
-            // Calculate final Y position
+            // 计算最终 Y 位置。
             let finalY = particle.initialY + particleYOffsets.current[index] + floatY;
 
-            // START: Vertical Loop
+            // 开始竖向循环。
             while (finalY < LOOP_BOTTOM) {
                 particleYOffsets.current[index] += LOOP_HEIGHT;
                 finalY += LOOP_HEIGHT;
@@ -154,42 +154,42 @@ const FloatingCodeParticles = ({ towerRotationRef, fallOffsetRef }) => {
             }
             mesh.position.y = finalY;
 
-            // --- HORIZONTAL MOVEMENT (New 2D Logic) ---
+            // 水平移动，新的二维逻辑。
 
-            // Link horizontal position to tower rotation
-            // rotation * factor -> linear translation
-            // "Rotate Left" (positive/negative depending on setup) -> "Fly Left"
-            // We'll multiply rotation by a scalar. 
-            // If the user wants "rotate left -> fly left", we need to check the sign.
-            // Usually: Rotate Tower Left = Tower rotates +Y (or -Y). 
-            // If Tower Rotates +Y (Left), we want Particles to move -X (Left)? 
-            // Or "fly to the left" means -X velocity.
-            // Let's use a standard parallax coefficient.
+            // 将水平位置与塔的旋转关联。
+            // 旋转量乘以系数，转换为直线位移。
+            // 向左旋转对应向左飞行，正负号取决于设置。
+            // 将旋转量乘以标量。
+            // 要实现左转时向左飞，需要核对符号。
+            // 塔向左转通常对应 +Y 或 -Y 旋转。
+            // 若塔绕 +Y 向左转，则希望粒子向 -X 左移。
+            // 向左飞对应负 X 速度。
+            // 使用标准视差系数。
 
-            const rotationOffset = smoothRotation.current * 5.0; // 5.0 is the "gear ratio" of rotation to pixels
+            const rotationOffset = smoothRotation.current * 5.0; // 5.0 为旋转量到像素位移的传动比。
 
-            // Calculate raw X based on initial position + rotation offset
-            // We subtract rotationOffset to make them move opposite to creating depth?
-            // User said: "jak sie obraca wierza w lewo to te cząsteczki leca w lewo"
-            // If I rotate the tower to the left (counter-clockwise, typically +RotationY), 
-            // the "face" sets moves left. 
-            // So if `towerRotation` increases, we want `x` to decrease?
-            // Let's try `initialX + rotationOffset`. If rotation is positive, X gets bigger (Right).
-            // This might mean "Rotate Left" -> "Fly Right" visually?
-            // Let's assume positive correlation first: Rotate Right -> Fly Right.
+            // 按初始位置加旋转偏移，计算原始 X。
+            // 减去 rotationOffset 可让粒子反向移动，形成深度感。
+            // 需求：塔向左转时，粒子也向左飞。
+            // 塔逆时针左转，通常为正 Y 旋转时，
+            // 可见面向左移动。
+            // 因此需核对 towerRotation 增加时，x 是否应减小。
+            // 先尝试 initialX + rotationOffset，正旋转会使 X 增大并右移。
+            // 视觉上可能表现为左转时向右飞。
+            // 先假定正相关：右转对应右移。
 
             let finalX = particle.initialX + (rotationOffset * particle.parallaxFactor);
 
-            // Manual modulo for wrapping between -HALF_WIDTH and +HALF_WIDTH
+            // 手动取模，将位置循环到 -HALF_WIDTH 至 +HALF_WIDTH。
             // ((x + half) % width + width) % width - half
             finalX = ((finalX + HALF_WIDTH) % WRAP_WIDTH + WRAP_WIDTH) % WRAP_WIDTH - HALF_WIDTH;
 
             mesh.position.x = finalX;
 
-            // --- DEPTH (Fixed Plane) ---
-            mesh.position.z = particle.z; // Fixed plane behind monitors
+            // 深度：固定平面。
+            mesh.position.z = particle.z; // 固定在显示器后方的平面。
 
-            // Gentle self-rotation (unchanged)
+            // 保持原有的轻微自转。
             mesh.rotation.z = particle.rotation + time * particle.rotationSpeed;
         });
     });
@@ -206,7 +206,7 @@ const FloatingCodeParticles = ({ towerRotationRef, fallOffsetRef }) => {
                     anchorX="center"
                     anchorY="middle"
                     fillOpacity={particle.opacity}
-                    font="/fonts/CabinSketch-Bold.ttf"
+                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 >
                     {particle.symbol.text}
                 </Text>

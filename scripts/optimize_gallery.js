@@ -31,7 +31,7 @@ async function optimizeFolder() {
             const newWidth = getNearestLowerPOT(metadata.width);
             const newHeight = getNearestLowerPOT(metadata.height);
             
-            console.log(`Optimizing ${file}: ${metadata.width}x${metadata.height} -> ${newWidth}x${newHeight}`);
+            console.log(`优化 ${file}： ${metadata.width}x${metadata.height} -> ${newWidth}x${newHeight}`);
             
             await sharp(filePath)
                 .resize(newWidth, newHeight, {
@@ -44,7 +44,7 @@ async function optimizeFolder() {
             fs.renameSync(tempPath, filePath.replace(/\.(png|jpg|jpeg)$/i, '.webp'));
             
         } catch (err) {
-            console.error(`Error processing ${file}:`, err);
+            console.error(`处理失败： ${file}:`, err);
         }
     }
 }

@@ -11,7 +11,7 @@ if (!fs.existsSync(BACKUP_DIR)) {
 
 function getDownscalePowerOfTwo(n) {
   const pots = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192];
-  // Find the largest POT such that p <= n
+  // 找到不超过 n 的最大二次幂尺寸 p。
   let best = pots[0];
   for (let p of pots) {
     if (p <= n) best = p;
@@ -22,7 +22,7 @@ function getDownscalePowerOfTwo(n) {
 
 async function optimize() {
   const files = fs.readdirSync(TARGET_DIR).filter(f => f.match(/\.(webp|jpg|jpeg|png)$/i));
-  console.log(`Optimizing ${files.length} files in About directory (Downgrade Strategy)...`);
+  console.log(`正以降采样策略优化关于我目录的 ${files.length} 个文件……`);
 
   for (const file of files) {
     const fullPath = path.join(TARGET_DIR, file);
@@ -37,9 +37,9 @@ async function optimize() {
       const newHeight = getDownscalePowerOfTwo(height);
 
       if (newWidth !== width || newHeight !== height) {
-        console.log(`Downgrading ${file}: ${width}x${height} -> ${newWidth}x${newHeight}`);
+        console.log(`降采样 ${file}: ${width}x${height} -> ${newWidth}x${newHeight}`);
         
-        // Backup
+        // 备份
         if (!fs.existsSync(backupPath)) {
           fs.copyFileSync(fullPath, backupPath);
         }
@@ -51,14 +51,14 @@ async function optimize() {
           .toFile(tmpPath);
           
         fs.renameSync(tmpPath, fullPath);
-        console.log(`Success: ${file}`);
+        console.log(`成功： ${file}`);
       } else {
-        console.log(`Skipping ${file} - Already POT: ${width}x${height}`);
+        console.log(`跳过 ${file}，已为二次幂尺寸： ${width}x${height}`);
       }
     } catch (e) {
-      console.error(`Error with ${file}: ${e.message}`);
+      console.error(`处理出错： ${file}: ${e.message}`);
     }
   }
 }
 
-optimize().then(() => console.log('About Optimization complete!'));
+optimize().then(() => console.log('关于我纹理优化完成！'));

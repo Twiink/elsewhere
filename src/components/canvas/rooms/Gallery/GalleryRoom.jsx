@@ -12,14 +12,14 @@ import PaperMaterial from './PaperMaterial';
 import GalleryClouds from './GalleryClouds';
 import { useAudio } from '../../../../context/AudioManager';
 import { usePaintMaterial } from './usePaintMaterial';
-import { useGalleryProjects } from '../../../../hooks/useSanityData';
+import { useGalleryProjects } from '../../../../hooks/useContentData';
 
-// Reusable Vector3 to avoid allocations in useFrame
+// 复用 Vector3，避免 useFrame 中分配对象。
 const _tempScale = new THREE.Vector3();
 
 // ============================================
-// ⚙️ AUDIO SETTINGS - TWEAK HERE
-// Edytuj te wartości, aby zmienić głośność i zasięg słyszalności szumu miasta
+// ⚙️ 音频设置：在此调整。
+// 修改这些值可调整城市环境声的音量与可听范围。
 // ============================================
 export const AUDIO_SETTINGS = {
     volume: 0.6,
@@ -28,61 +28,24 @@ export const AUDIO_SETTINGS = {
 };
 
 export const GALLERY_INTERACTION_AUDIO_SETTINGS = {
-    volume: 0.6,      // Volume for the paper clicking sound
-    distance: 2,      // Reference distance for spatial audio before it starts dropping off
-    rolloff: 2        // How fast the sound fades away (exponential)
+    volume: 0.6,      // 纸张点击音效音量。
+    distance: 2,      // 空间音频开始衰减前的参考距离。
+    rolloff: 2        // 声音随距离指数衰减的速度。
 };
 
-// Define the unique projects and their textures
-const FALLBACK_PROJECTS = [
-    {
-        id: 'monetune',
-        title: 'MONETUNE',
-        front: '/textures/gallery/monetuneprzod.webp',
-        painted: '/textures/gallery/monetuneprzod_painted.webp',
-        url: 'https://monetune.pl',
-        description: 'MoneTune is a step-by-step blueprint that teaches beginners how to generate passive income using AI-created music. Without any musical skills, you will learn how to easily produce professional tracks, publish them on platforms like Spotify, and monetize your digital assets.',
-        techStack: ['/textures/gallery/wordpresslogo.webp', '/textures/gallery/elementorlogo.webp', '/textures/gallery/phplogo.webp', '/textures/gallery/csslogo.webp']
-    },
-    {
-        id: 'timber',
-        title: 'TIMBERKITTY',
-        front: '/textures/gallery/timberkittyprzod.webp',
-        painted: '/textures/gallery/timberkittyprzod_painted.webp',
-        url: 'https://timberkitty.netlify.app',
-        description: 'TimberKitty is an addictive, free-to-play browser arcade game built in pure JavaScript. Players control a lumberjack cat to chop wood, save birds, complete daily missions, and compete on global leaderboards.',
-        techStack: ['/textures/gallery/jslogo.webp', '/textures/gallery/htmllogo.webp', '/textures/gallery/csslogo.webp', '/textures/gallery/firebaselogo.webp']
-    },
-    {
-        id: 'young',
-        title: 'YOUNG MULTI',
-        front: '/textures/gallery/youngmultiprzod.webp',
-        painted: '/textures/gallery/youngmultiprzod_painted.webp',
-        url: 'https://young-multi-strona.netlify.app',
-        description: 'A sleek, modern concept website dedicated to the Polish rapper and creator Young Multi. It serves as a promotional landing page designed to highlight his personal brand, music, and online presence.',
-        techStack: ['/textures/gallery/reactlogo.webp', '/textures/gallery/tailwindlogo.webp', '/textures/gallery/htmllogo.webp', '/textures/gallery/netlifylogo.webp']
-    },
-    {
-        id: 'bio',
-        title: 'BIO',
-        front: '/textures/gallery/bioprzod.webp',
-        painted: '/textures/gallery/bioprzod_painted.webp',
-        url: 'https://tomkingbio.netlify.app',
-        description: 'A fast, modern personal bio page serving as a central hub for my digital footprint. It showcases my latest coding projects, web development services, YouTube videos, and recommended music artists.',
-        techStack: ['/textures/gallery/htmllogo.webp', '/textures/gallery/csslogo.webp', '/textures/gallery/jslogo.webp', '/textures/gallery/netlifylogo.webp']
-    },
-];
+// 画廊内容来自统一的本地数据文件。
 
-const PROJECT_COUNT = 10; // Keep the count for the infinite scroll feel
+
+const PROJECT_COUNT = 10; // 保留足够数量，营造无限滚动感。
 const GAP = 2.5;
 
-// Zmień te wartości aby dopasować proporcje ptaka (legacy ratio 1.41)
+// 调整这些数值以匹配鸟的比例，原始比例 1.41。
 const BIRD_WIDTH = 0.49;
 const BIRD_HEIGHT = 0.35;
 
-// Adjust this value (0.0 to 1.0) to crop the right side of the "Houses" graphic.
-// 0.0 = No crop
-// 0.2 = 20% crop from the right (corridor side)
+// 调整 0..1 之间的数值，裁切房屋图像右侧。
+// 0.0 表示不裁切。
+// 0.2 表示从走廊侧，即右侧，裁掉 20%。
 const RIGHT_CROP_AMOUNT = 0.2;
 
 const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
@@ -112,39 +75,39 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         }
     }, [isExiting, isTeleporting, hidePopup]);
 
-    // Setup Paint Transition
+    // 配置上色过渡。
     const { onBeforeCompile, animatePaint, resetPaint, uniformsData, updateRoomOrigin } = usePaintMaterial();
     
-    // Track transition state to disable interactions
+    // 跟踪过渡状态以禁用交互。
     const [isTransitioning, setIsTransitioning] = useState(false);
     
-    // Track if user teleported into this room 
+    // 跟踪用户是否通过传送进入此房间。
     const wasTeleportedRef = useRef(false);
     useEffect(() => {
         if (isTeleporting) wasTeleportedRef.current = true;
     }, [isTeleporting]);
 
     useEffect(() => {
-        // When the room officially shows up (doors open and user flies in)
+        // 房间正式显示，即门打开且用户进入时。
         if (showRoom && !isWarmup) {
             if (wasTeleportedRef.current || isTeleporting) {
-                // Skip the painting transition entirely if teleporting via map
+                // 通过地图传送时跳过上色过渡。
                 uniformsData.uPaintProgress.value = 1.0;
                 setIsTransitioning(false);
             } else {
                 setIsTransitioning(true);
-                // resetPaint() in case we re-enter
+                // 重新进入时调用 resetPaint()。
                 resetPaint();
-                // Start the paint animation with a slight delay so it happens *during* fly-in
+                // 稍作延迟后开始上色，使动画与飞入过程重叠。
                 animatePaint(0.2, 2.5);
                 
-                // Re-enable interactions once painting finishes
+                // 上色完成后恢复交互。
                 setTimeout(() => {
                     setIsTransitioning(false);
                 }, 2700); // 0.2 + 2.5
             }
         } else {
-            // Immediately reveal for warmup or hide if not showing
+            // 预热时立即显现；不展示时隐藏。
             uniformsData.uPaintProgress.value = 1.0;
         }
     }, [showRoom, isWarmup, isTeleporting]);
@@ -152,7 +115,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     const handleCardClick = async (clickedIndex) => {
         if (globalIsAnimating || isTransitioning) return;
 
-        // Unlock inspect achievement
+        // 解锁查看成就。
         unlockAchievement('gallery_inspect');
 
         if (selectedCard === clickedIndex) {
@@ -175,14 +138,14 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         }
     };
 
-    // Track if we've signaled ready
+    // 跟踪是否已发出就绪信号。
     const hasSignaledReady = useRef(false);
     const frameCount = useRef(0);
     const FRAMES_TO_WAIT = 5;
 
     useFrame(() => {
-        // Update room origin each frame so the paint shader knows where.
-        // This is cheap (one getWorldPosition) and critical for far chunks.
+        // 每帧更新房间原点，让上色着色器获得正确位置。
+        // 只需一次 getWorldPosition，开销小，但对远处分块很关键。
         updateRoomOrigin(groupRef);
 
         if (hasSignaledReady.current) return;
@@ -191,26 +154,24 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             hasSignaledReady.current = true;
             onReady?.();
 
-            // Wait for the DoorSection 1.5s camera fly-in to finish before showing tutorial
+            // 等待 DoorSection 的 1.5 秒飞入动画结束后再显示教程。
             setTimeout(() => {
                 if (!isWarmup) showTutorial('gallery_inspect');
             }, 2000);
         }
     });
 
-    // Config
+    // 配置。
     const BALCONY_WIDTH = 5;
     const BALCONY_DEPTH = 3;
-    const RAILING_HEIGHT = 1.25; // Legacy ratio 20/(7 segments * 2.287)
+    const RAILING_HEIGHT = 1.25; // 原始比例 20/(7 段 × 2.287)。
 
-    // --- TEXTURES AND RESPONSIVENESS ---
-    // User requested: painted on desktop, regular on touch/phones (even if laptop has touch screen)
-    // We use matchMedia('(hover: hover)') to detect devices with a cursor/hover capability
+    // 纹理与响应式适配。
+    // 桌面端使用彩色图，触摸设备或手机使用普通图，包括触屏笔记本。
+    // 用 matchMedia('(hover: hover)') 检测鼠标与悬停能力。
     const [canHover, setCanHover] = useState(() => typeof window !== 'undefined' ? window.matchMedia('(hover: hover)').matches : true);
 
-    // Pobieranie danych z Sanity.io (fallback do starych danych)
-    const sanityProjects = useGalleryProjects();
-    const activeProjects = sanityProjects || FALLBACK_PROJECTS;
+    const activeProjects = useGalleryProjects();
 
     useEffect(() => {
         const mq = window.matchMedia('(hover: hover)');
@@ -219,20 +180,20 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         return () => mq.removeEventListener('change', handleHoverChange);
     }, []);
 
-    // Load all project front textures in a flat array
+    // 将全部项目正面纹理加载为扁平数组。
     const textureUrls = activeProjects.map(p => p.front);
     const projectTextures = useTexture(textureUrls);
 
-    // Load painted textures only on desktop, fallback to front if mobile/touch
+    // 仅桌面端加载彩色纹理，移动端或触摸设备回退至正面图。
     const paintedUrls = activeProjects.map(p => (canHover && p.painted) ? p.painted : p.front);
     const paintedTextures = useTexture(paintedUrls);
 
-    // Load the universal back texture and the button texture conditionally
+    // 按条件加载通用背面纹理与按钮纹理。
     const backTextureRaw = useTexture(canHover ? '/textures/gallery/tylkartki_painted.webp' : '/textures/gallery/tylkartki.webp');
     const overlayTextureRaw = useTexture(canHover ? '/textures/gallery/przyciskdotylukartki_painted.webp' : '/textures/gallery/przyciskdotylukartki.webp');
 
-    // Preload tech stack logos to prevent stuttering on first flip
-    // We use the same conditional logic: painted on desktop, regular on touch
+    // 预加载技术栈标志，避免首次翻面卡顿。
+    // 采用相同条件：桌面端彩色，触摸设备普通图。
     const allLogos = useMemo(() => {
         const names = [
             'csslogo', 'elementorlogo', 'firebaselogo', 'htmllogo',
@@ -248,17 +209,17 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     
     useTexture(allLogos);
 
-    // Construct the full list of projects (repeated) with textures attached
+    // 构造重复项目列表，并附加纹理。
     const projects = useMemo(() => {
         return Array.from({ length: PROJECT_COUNT }).map((_, i) => {
             const projectIndex = i % activeProjects.length;
             const projectData = activeProjects[projectIndex];
 
-            // Extract front texture
+            // 提取正面纹理。
             const frontTex = projectTextures[projectIndex];
             const paintedTex = paintedTextures[projectIndex];
 
-            // Configure textures
+            // 配置纹理。
             if (frontTex) {
                 frontTex.colorSpace = THREE.SRGBColorSpace;
                 // frontTex.encoding = THREE.sRGBEncoding;
@@ -273,9 +234,9 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 overlayTextureRaw.colorSpace = THREE.SRGBColorSpace;
             }
 
-            // Map tech stack logos to the correct version (painted or regular)
+            // 将技术栈标志映射至对应的彩色或普通版本。
             const techStack = projectData.techStack.map(path => {
-                if (!canHover) return path; // Keep regular
+                if (!canHover) return path; // 保留普通版本。
                 const name = path.split('/').pop().replace('.webp', '');
                 if (name === 'csslogo') return '/textures/gallery/css3logo_painted.webp';
                 return `/textures/gallery/${name}_painted.webp`;
@@ -293,7 +254,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         });
     }, [projectTextures, backTextureRaw, overlayTextureRaw]);
 
-    // Function to scroll to a specific project index
+    // 滚动到指定项目索引的函数。
     const scrollToIndex = (index, onComplete) => {
         const totalWidth = PROJECT_COUNT * GAP;
         const targetScrollValue = index * GAP;
@@ -320,10 +281,10 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         });
     };
 
-    // --- INTERACTION ---
+    // 交互。
     const lastTouchX = useRef(0);
     useEffect(() => {
-        // Observers enable us to normalize wheel, touch, and pointer events
+        // 使用 Observer 统一滚轮、触摸与指针事件。
         const scrollObserver = Observer.create({
             target: window,
             type: "wheel,touch,pointer",
@@ -359,7 +320,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         currentScroll.current = THREE.MathUtils.lerp(currentScroll.current, targetScroll.current, delta * 5);
     });
 
-    // --- GEOMETRY & MATERIALS ---
+    // 几何体与材质。
     const floorTexture = useTexture('/textures/gallery/floor.webp');
     const railingTexture = useTexture('/textures/gallery/railing.webp');
     const housesTexture = useTexture('/textures/gallery/domki.webp');
@@ -371,7 +332,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         if (floorTexture) {
             floorTexture.wrapS = THREE.MirroredRepeatWrapping;
             floorTexture.wrapT = THREE.MirroredRepeatWrapping;
-            floorTexture.repeat.set(0.5, 0.5 * 1.835); // Adjust repeat to keep scale with legacy 1.835 ratio
+            floorTexture.repeat.set(0.5, 0.5 * 1.835); // 按原始比例 1.835 调整重复次数，保持缩放一致。
             floorTexture.needsUpdate = true;
         }
         if (railingTexture) {
@@ -457,7 +418,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 />
             )}
             <group position={[0, -0.7, -2]}>
-                {/* Floor */}
+                {/* 地面。 */}
                 <mesh
                     rotation={[-Math.PI / 2, 0, 0]}
                     position={[0, 0, 0]}
@@ -466,7 +427,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                     <primitive object={materials.floor} />
                 </mesh>
 
-                {/* Floor Outline */}
+                {/* 地面轮廓。 */}
                 <line rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
                     <bufferGeometry>
                         <float32BufferAttribute
@@ -479,7 +440,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                     <lineBasicMaterial color="#999999" onBeforeCompile={onBeforeCompile} transparent={true} needsUpdate={true} />
                 </line>
 
-                {/* Railing */}
+                {/* 栏杆。 */}
                 <mesh position={[0, RAILING_HEIGHT / 2, -3.9]}>
                     <planeGeometry args={[20, RAILING_HEIGHT]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -492,7 +453,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                     />
                 </mesh>
 
-                {/* === THRESHOLD (At the end of the floor) === */}
+                {/* 地面末端的门槛。 */}
                 <mesh
                     position={[0, 0.01, -3.9]}
                     rotation={[-Math.PI / 2, 0, 0]}
@@ -501,11 +462,11 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                     <primitive object={materials.threshold} />
                 </mesh>
 
-                {/* === CLOTHESLINE SYSTEM === */}
+                {/* 晾衣绳系统。 */}
                 <group position={[0, 1.6, -4]}>
                     <mesh geometry={ropeGeometry} material={materials.rope} />
 
-                    {/* Proj Cards */}
+                    {/* 项目卡片。 */}
                     {projects.map((project, i) => (
                         <ProjectCard
                             key={i}
@@ -520,16 +481,16 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                             isSelected={selectedCard === i}
                             scrollToIndex={scrollToIndex}
                             onClick={handleCardClick}
-                            isMobile={!canHover} // Use hover capability for mobile behavior logic
-                            isTransitioning={isTransitioning} // Pass down to lock out individual pointer events just in case
+                            isMobile={!canHover} // 按悬停能力决定移动端行为。
+                            isTransitioning={isTransitioning} // 向下传递，以禁用各元素的指针事件。
                             paintProgress={uniformsData.uPaintProgress}
                             roomOrigin={uniformsData.uRoomOrigin}
                         />
                     ))}
                 </group>
 
-                {/* === SCENERY LAYERS === */}
-                {/* Houses - center */}
+                {/* 背景景物图层。 */}
+                {/* 中央房屋。 */}
                 <mesh position={[0, -1, -9]} scale={[1, 1, 1]}>
                     <planeGeometry args={[15, 15 / 2.357]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -540,7 +501,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                         onBeforeCompile={onBeforeCompile}
                     />
                 </mesh>
-                {/* Houses - left side (mirrored) */}
+                {/* 左侧镜像房屋。 */}
                 <mesh position={[-15, -1, -9]} scale={[-1, 1, 1]}>
                     <planeGeometry args={[15, 15 / 2.357]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -551,7 +512,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                         onBeforeCompile={onBeforeCompile}
                     />
                 </mesh>
-                {/* Houses - right side (mirrored) - CROPPED */}
+                {/* 右侧镜像房屋，已裁切。 */}
                 <RightSideHouses
                     texture={housesTexture}
                     baseWidth={15}
@@ -559,7 +520,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                     cropAmount={RIGHT_CROP_AMOUNT}
                 />
 
-                {/* City skyline - center */}
+                {/* 中央城市天际线。 */}
                 <mesh position={[0, 3.4, -17]} scale={[1, 1, 1]}>
                     <planeGeometry args={[30, 30 / 2.357]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -570,7 +531,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                         onBeforeCompile={onBeforeCompile}
                     />
                 </mesh>
-                {/* City skyline - left (mirrored) */}
+                {/* 左侧镜像城市天际线。 */}
                 <mesh position={[-30, 3.4, -17]} scale={[-1, 1, 1]}>
                     <planeGeometry args={[30, 30 / 2.357]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -581,7 +542,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                         onBeforeCompile={onBeforeCompile}
                     />
                 </mesh>
-                {/* City skyline - right (mirrored) */}
+                {/* 右侧镜像城市天际线。 */}
                 <mesh position={[30, 3.4, -17]} scale={[-1, 1, 1]}>
                     <planeGeometry args={[30, 30 / 2.357]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -593,13 +554,13 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                     />
                 </mesh>
 
-                {/* Flying Bird */}
+                {/* 飞鸟。 */}
                 <FlyingBird texture={birdTexture} />
 
-                {/* Clouds scattered above */}
+                {/* 上方散布的云层。 */}
                 <GalleryClouds count={65} seed={123} />
 
-                {/* Skybox/Environment */}
+                {/* 天空盒与环境。 */}
                 <mesh position={[0, 5, -20]}>
                     <sphereGeometry args={[40, 32, 32]} />
                     <meshBasicMaterial color="#f0f0f0" side={THREE.BackSide} transparent opacity={0.5} onBeforeCompile={onBeforeCompile} />
@@ -609,26 +570,26 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     );
 };
 
-// Flying bird animation component
+// 飞鸟动画组件。
 const FlyingBird = ({ texture }) => {
     const birdRef = useRef();
     const startX = -25;
     const endX = 25;
-    const speed = 2.5; // Zmniejszona prędkość lotu
+    const speed = 2.5; // 降低飞行速度。
 
-    // Zmienne do fizyki skoków
+    // 跳跃物理参数。
     const velocityY = useRef(0);
-    const gravity = -12.0; // Zmniejszona grawitacja dla większej płynności
-    const jumpStrength = 5.5; // Delikatniejszy skok
+    const gravity = -12.0; // 减小重力，使动作更平滑。
+    const jumpStrength = 5.5; // 轻柔跳跃。
     const jumpInterval = useRef(0);
 
     useFrame((state, delta) => {
         if (!birdRef.current) return;
 
-        // Zabezpieczenie przed zbyt dużym powiększeniem delty (przy lagach)
+        // 限制卡顿时过大的 delta。
         const safeDelta = Math.min(delta, 0.05);
 
-        // Ruch w poziomie
+        // 水平移动。
         birdRef.current.position.x += speed * safeDelta;
 
         if (birdRef.current.position.x > endX) {
@@ -639,37 +600,37 @@ const FlyingBird = ({ texture }) => {
             birdRef.current.rotation.z = 0;
         }
 
-        // Fizyka spadania
+        // 下落物理。
         velocityY.current += gravity * safeDelta;
         birdRef.current.position.y += velocityY.current * safeDelta;
 
-        // Skakanie (płynniejsze i przewidywalne)
+        // 更平滑、可预测的跳跃。
         jumpInterval.current -= safeDelta;
 
-        // Skok następuje po upływie czasu przewidzianego do następnego kliknięcia
+        // 到达下一次点击间隔时触发跳跃。
         if (jumpInterval.current <= 0 || birdRef.current.position.y < 3.2) {
             velocityY.current = jumpStrength;
-            // Rzadsze, bardziej rytmiczne skoki (np. co pełną sekundę)
+            // 降低跳跃频率并保持节奏，例如每整秒一次。
             jumpInterval.current = 0.9 + Math.random() * 0.3;
         }
 
-        // Ograniczenie dolne podłogi
+        // 地面下边界。
         if (birdRef.current.position.y < 3.0) {
             birdRef.current.position.y = 3.0;
             velocityY.current = jumpStrength;
         }
 
-        // Ograniczenie górne sufitu
+        // 天花板上边界。
         if (birdRef.current.position.y > 6.5) {
             birdRef.current.position.y = 6.5;
             velocityY.current = 0;
         }
 
-        // Rotacja ptaka
-        // W Flappy Bird ptak delikatnie opada dziobem w dół gdy spada, i kieruje wzrok do góry gdy skacze
+        // 鸟的旋转。
+        // 模拟 Flappy Bird：下落时鸟喙微向下，跳跃时向上看。
         const targetRotationZ = THREE.MathUtils.clamp(velocityY.current * 0.05, -Math.PI / 6, Math.PI / 8);
 
-        // Bardzo płynne obracanie (lerp)
+        // 使用 lerp 平滑旋转。
         birdRef.current.rotation.z = THREE.MathUtils.lerp(birdRef.current.rotation.z, targetRotationZ, safeDelta * 8);
     });
 
@@ -686,29 +647,29 @@ const FlyingBird = ({ texture }) => {
     );
 };
 
-// Sub-component for individual project cards
+// 单张项目卡片子组件。
 const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, currentScroll, materials, curve, isSelected, scrollToIndex, onClick, isMobile, isTransitioning, paintProgress, roomOrigin }, ref) => {
     const cardRef = useRef();
-    const paperRef = useRef(); // Ref for the moving part (Paper)
+    const paperRef = useRef(); // 可移动纸张部分的引用。
     const materialRef = useRef();
-    const textRef = useRef(); // Ref for the text that sticks to the paper
-    const buttonGroupRef = useRef(); // Ref for the interactive back button
-    const detailsGroupRef = useRef(); // Ref for the project details on the back
-    const techStackGroupRef = useRef(); // Ref for the tech stack section on the back
+    const textRef = useRef(); // 贴在纸张上的文字引用。
+    const buttonGroupRef = useRef(); // 背面交互按钮引用。
+    const detailsGroupRef = useRef(); // 背面项目详情引用。
+    const techStackGroupRef = useRef(); // 背面技术栈区域引用。
     const detailsTextRef1 = useRef();
     const detailsTextRef2 = useRef();
     const techTextRef = useRef();
     const openTextRef = useRef();
     const [hovered, setHovered] = useState(false);
     const [btnHovered, setBtnHovered] = useState(false);
-    const [isAnimating, setIsAnimating] = useState(false);  // True ONLY during flip animation
-    const [isScrolling, setIsScrolling] = useState(false);  // True during scroll phase
+    const [isAnimating, setIsAnimating] = useState(false);  // 仅在翻转动画期间为 true。
+    const [isScrolling, setIsScrolling] = useState(false);  // 滚动阶段为 true。
 
-    // Random sway properties
-    const swaySpeed = useRef(Math.random() * 0.2 + 0.3); // Slower sway speed
+    // 随机摆动属性。
+    const swaySpeed = useRef(Math.random() * 0.2 + 0.3); // 较慢的摆动速度。
     const swayOffset = useRef(Math.random() * 100);
 
-    // Audio Ref
+    // 音频引用。
     const paperAudioRef = useRef();
     const { globalVolume, isMuted } = useAudio();
 
@@ -732,7 +693,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                         setIsAnimating(false);
                         resolve();
 
-                        // Unpaint the card after it returns to the clothespin
+                        // 卡片返回衣夹后移除彩色效果。
                         if (project.paintedTexture && materialRef.current) {
                             gsap.to(materialRef.current, {
                                 uProgress: 0.0,
@@ -853,8 +814,8 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                             ease: 'power2.out'
                         }, '<');
 
-                        // Keep painted or finish painting to 1.0 when opened
-                        // Running with gsap.to independently to avoid blocking the timeline duration
+                        // 展开时保持彩色，或将上色进度补至 1.0。
+                        // 独立运行 gsap.to，避免延长时间线。
                         if (project.paintedTexture) {
                             gsap.to(materialRef.current, {
                                 uProgress: 1.0,
@@ -930,7 +891,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
         if (onClick) onClick(index);
     };
 
-    // Cursor change on hover
+    // 悬停时改变光标。
     useEffect(() => {
         if (btnHovered && isSelected) {
             document.body.style.cursor = 'pointer';
@@ -945,11 +906,11 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
     useFrame((state) => {
         if (!cardRef.current) return;
 
-        // Custom GSAP Paint logic for texts
-        // We delay the text reveal slightly so the card paints first (p > 0.4)
+        // 文字的自定义 GSAP 上色逻辑。
+        // 略微延迟文字显现，让卡片先上色至 p > 0.4。
         if (textRef.current && paintProgress) {
             const p = paintProgress.value;
-            // Instantly reveal if we teleported
+            // 传送进入时立即显现。
             const expectedOpacity = p >= 1.0 ? 1.0 : THREE.MathUtils.clamp((p - 0.3) * 2.0, 0.0, 1.0);
             
             if (textRef.current.fillOpacity !== expectedOpacity) {
@@ -970,7 +931,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
             }
         }
 
-        // --- Zrównaj pozycję tekstu Z z animacją zaginania i falowania kartki (PRZÓD) ---
+        // 让正面文字 Z 与纸张弯曲、起伏动画一致。
         if (textRef.current && materialRef.current) {
             const y = textRef.current.position.y;
             const uBend = materialRef.current.bend;
@@ -983,12 +944,12 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
 
             textRef.current.position.z = bendAmount + flutter + 0.02;
 
-            // Obrót tekstu by przylegał do krzywizny (pochodna dz/dy)
+            // 按曲率导数 dz/dy 旋转文字，使其贴合纸面。
             const dz_dy = 2.0 * y * uBend + 2.0 * Math.cos(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
             textRef.current.rotation.x = Math.atan(dz_dy);
         }
 
-        // --- Zrównaj pozycję przycisku Z z animacją pleców (TYŁ) ---
+        // 让背面按钮 Z 与纸背动画一致。
         if (buttonGroupRef.current && materialRef.current) {
             const y = buttonGroupRef.current.position.y;
             const uBend = materialRef.current.bend;
@@ -999,21 +960,21 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
             const totalWind = 0.02 + uWindStrength;
             const flutter = Math.sin(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
 
-            // PAMIĘTAJ! Cała płaszczyzna zgina się w przód (+Z względem rodzica).
-            // A że my jesteśmy PO ZEWNĘTRZNEJ stronie (z tyłu pleców), chcemy być ułamek za płaszczyzną, np -0.03
-            // Wcześniej omyłkowo odwróciłem znak całego równania ( -(bendAmount...) ), co odwróciło falowanie. Prawidłowo jest tak:
+            // 注意：整个平面向父级 +Z 方向弯曲。
+            // 按钮在背面外侧，应位于平面后少许，例如 -0.03。
+            // 不要将整个弯曲方程取负，否则会反转波动方向。
             buttonGroupRef.current.position.z = bendAmount + flutter - 0.03;
 
-            // Obrót przycisku by przylegał do krzywizny, będąc po przeciwnej stronie (dodatkowe odwrócenie o Pi)
+            // 按钮在另一侧，额外旋转 PI 以贴合曲面。
             const dz_dy = 2.0 * y * uBend + 2.0 * Math.cos(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
             buttonGroupRef.current.rotation.x = Math.PI + Math.atan(dz_dy);
 
-            // Hover animacja powiększania dla przycisku (napis się powiększa)
+            // 按钮悬停放大动画，文字随之放大。
             const targetScale = btnHovered ? 1.08 : 1;
             buttonGroupRef.current.scale.lerp(_tempScale.set(targetScale, targetScale, 1), 0.15);
         }
 
-        // --- Zrównaj pozycję górnego opisu (PROJECT DETAILS) ---
+        // 对齐顶部项目详情的位置。
         if (detailsGroupRef.current && materialRef.current) {
             const y = detailsGroupRef.current.position.y;
             const uBend = materialRef.current.bend;
@@ -1024,15 +985,15 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
             const totalWind = 0.02 + uWindStrength;
             const flutter = Math.sin(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
 
-            // Z tyłu (jak button)
+            // 位于背面，与按钮相同。
             detailsGroupRef.current.position.z = bendAmount + flutter - 0.03;
 
-            // Obrót
+            // 旋转。
             const dz_dy = 2.0 * y * uBend + 2.0 * Math.cos(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
             detailsGroupRef.current.rotation.x = Math.PI + Math.atan(dz_dy);
         }
 
-        // --- Zrównaj pozycję sekcji Tech Stack ---
+        // 对齐技术栈区域的位置。
         if (techStackGroupRef.current && materialRef.current) {
             const y = techStackGroupRef.current.position.y;
             const uBend = materialRef.current.bend;
@@ -1049,10 +1010,10 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
             techStackGroupRef.current.rotation.x = Math.PI + Math.atan(dz_dy);
         }
 
-        // Skip position updates ONLY during flip animation, NOT during scroll
+        // 仅在翻转动画期间跳过位置更新，滚动时仍更新。
         if (isAnimating || isSelected) return;
 
-        const totalWidth = PROJECT_COUNT * GAP; // GAP is available in scope because we are in the file where GAP is defined
+        const totalWidth = PROJECT_COUNT * GAP; // GAP 在当前文件中定义，可直接访问。
         let rawX = (index * GAP) - currentScroll.current;
         const halfWidth = totalWidth / 2;
         let displayX = ((rawX + halfWidth) % totalWidth + totalWidth) % totalWidth - halfWidth;
@@ -1063,14 +1024,14 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
 
         cardRef.current.position.set(pointOnCurve.x, pointOnCurve.y, pointOnCurve.z);
 
-        // Wind / Sway Animation
+        // 风与摆动动画。
         const time = state.clock.getElapsedTime();
         const wind = Math.sin(time * swaySpeed.current + swayOffset.current) * 0.05;
 
         cardRef.current.rotation.z = wind;
         cardRef.current.rotation.x = 0;
 
-        // Visibility Check (fade out if too far)
+        // 可见性检查，过远时淡出。
         const dist = Math.abs(displayX);
         const scale = THREE.MathUtils.clamp(1 - (dist / 50), 0.7, 1);
         cardRef.current.scale.setScalar(scale);
@@ -1085,7 +1046,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                 e.stopPropagation();
                 setHovered(true);
 
-                // Brush reveal animation
+                // 笔刷显现动画。
                 if (materialRef.current && project.paintedTexture && !isSelected) {
                     gsap.to(materialRef.current, {
                         uProgress: 1.0,
@@ -1100,7 +1061,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                 e.stopPropagation();
                 setHovered(false);
 
-                // Reverse brush reveal animation ONLY if NOT selected
+                // 仅在未选中时反向执行笔刷显现。
                 if (materialRef.current && project.paintedTexture && !isSelected) {
                     gsap.to(materialRef.current, {
                         uProgress: 0.0,
@@ -1111,7 +1072,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                 }
             }}
         >
-            {/* Clothespin (Top Center) - Does NOT move with paperRef */}
+            {/* 顶部中央衣夹，不随 paperRef 移动。 */}
             <mesh position={[0, -0.08, 0.15]} rotation={[0, 0, Math.PI]}>
                 <planeGeometry args={[0.3, 0.2]} />
                 <meshBasicMaterial color="#ffffff"
@@ -1122,7 +1083,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                 />
             </mesh>
 
-            {/* The Paper / Card hanging down - This moves independently now */}
+            {/* 下垂的纸张卡片，独立移动。 */}
             <group
                 ref={paperRef}
                 position={[0, -1.1, 0]}
@@ -1142,13 +1103,13 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                     />
                 </mesh>
 
-                {/* === PRZYCISK: OPEN NA PLECACH KARTKI === */}
+                {/* 卡片背面的打开按钮。 */}
                 <group
                     ref={buttonGroupRef}
                     position={[0, 0.75, 0]}
                     rotation={[Math.PI, 0, 0]}
                 >
-                    {/* Warstwa 1: Wizualna ramka przycisku (bez eventów) */}
+                    {/* 第 1 层：按钮外框，不接收事件。 */}
                     <mesh>
                         <planeGeometry args={[1.2, 1.2 / 3.613]} />
                         <meshBasicMaterial color="#ffffff"
@@ -1158,21 +1119,21 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                         />
                     </mesh>
 
-                    {/* Warstwa 2: Napis OPEN PROJECT (bez eventów) */}
+                    {/* 第 2 层：“打开项目”文字，不接收事件。 */}
                     <Text
                         ref={openTextRef}
                         position={[0, 0, 0.01]}
                         fontSize={0.11}
                         color={btnHovered ? "#333333" : "#1c1c1c"}
-                        font="/fonts/CabinSketch-Bold.ttf"
+                        font="/fonts/LXGWWenKaiLite-Regular.ttf"
                         anchorX="center"
                         anchorY="middle"
-                        fillOpacity={0} // Start hidden
+                        fillOpacity={0} // 初始隐藏。
                     >
-                        OPEN PROJECT
+                        查看项目
                     </Text>
 
-                    {/* Warstwa 3: Niewidoczny hit-area pokrywający cały przycisk - łapie WSZYSTKIE eventy */}
+                    {/* 第 3 层：覆盖整个按钮的不可见区域，接收全部事件。 */}
                     <mesh
                         position={[0, 0, 0.02]}
                         onClick={(e) => {
@@ -1199,46 +1160,47 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                     </mesh>
                 </group>
 
-                {/* === TEKST NA PLECACH KARTKI (PROJECT DETAILS) === */}
+                {/* 纸背面的项目详情文字。 */}
                 <group
                     ref={detailsGroupRef}
-                    position={[0, -0.5, 0]} // Miejsce u góry (gdy Y=0.75 to dół, to Y=-0.4 to góra)
+                    position={[0, -0.5, 0]} // 位于顶部；此坐标系 Y=0.75 为底部，Y=-0.4 为顶部。
                     rotation={[Math.PI, 0, 0]}
                 >
                     <Text
                         ref={detailsTextRef1}
-                        position={[0, 0.28, 0.01]} // Względem środka detailsGroupRef, wyżej
+                        position={[0, 0.28, 0.01]} // 相对于 detailsGroupRef 中心向上。
                         fontSize={0.10}
                         color="#1c1c1c"
-                        font="/fonts/CabinSketch-Bold.ttf"
+                        font="/fonts/LXGWWenKaiLite-Regular.ttf"
                         anchorX="center"
                         anchorY="middle"
-                        fillOpacity={0} // Start hidden
+                        fillOpacity={0} // 初始隐藏。
                     >
-                        PROJECT DETAILS:
+                        项目介绍：
                     </Text>
 
                     <Text
                         ref={detailsTextRef2}
-                        position={[0, 0.2, 0.01]} // Poniżej nagłówka
+                        position={[0, 0.2, 0.01]} // 位于标题下方。
                         fontSize={0.06}
                         color="#333333"
-                        font="/fonts/CabinSketch-Bold.ttf"
+                        font="/fonts/LXGWWenKaiLite-Regular.ttf"
                         anchorX="center"
                         anchorY="top"
-                        maxWidth={1.1} // Maksymalna szerokość zanim zacznie łamać linie
+                        maxWidth={1.1} // 触发换行前的最大宽度。
+                        overflowWrap="break-word"
                         lineHeight={1.4}
                         textAlign="center"
-                        fillOpacity={0} // Start hidden
+                        fillOpacity={0} // 初始隐藏。
                     >
-                        {project.description || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco."}
+                        {project.description || "项目介绍将在这里显示。"}
                     </Text>
                 </group>
 
-                {/* === SEKCJA TECH STACK NA PLECACH KARTKI === */}
+                {/* 纸背面的技术栈区域。 */}
                 <group
                     ref={techStackGroupRef}
-                    position={[0, 0.30, 0]} // Pomiędzy Project Details a przyciskiem Open Project
+                    position={[0, 0.30, 0]} // 位于项目详情与打开项目按钮之间。
                     rotation={[Math.PI, 0, 0]}
                 >
                     <Text
@@ -1246,18 +1208,18 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                         position={[0, 0.15, 0.01]}
                         fontSize={0.08}
                         color="#1c1c1c"
-                        font="/fonts/CabinSketch-Bold.ttf"
+                        font="/fonts/LXGWWenKaiLite-Regular.ttf"
                         anchorX="center"
                         anchorY="middle"
-                        fillOpacity={0} // Start hidden
+                        fillOpacity={0} // 初始隐藏。
                     >
-                        TECH STACK
+                        技术栈
                     </Text>
 
-                    {/* Kontener na loga układane poziomo */}
+                    {/* 横向排列标志的容器。 */}
                     <group position={[0, -0.05, 0.01]}>
                         {project.techStack && project.techStack.map((logoPath, idx) => {
-                            // Rozstawienie kwadracików (4 sztuki wyśrodkowane)
+                            // 四个方块居中排列的间距。
                             const spacing = 0.30;
                             const startX = -((project.techStack.length - 1) * spacing) / 2;
                             const xPos = startX + (idx * spacing);
@@ -1270,27 +1232,27 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                 </group>
 
                 {/* 
-                  === TEKST / TYTUŁY PROJEKTÓW ===
-                  Tu możesz łatwo dostosować wygląd każdego napisu.
+                  项目文字与标题。
+                  在此调整各段文字的外观。
                   
-                  position: [X, Y, Z] 
-                  > X to lewo/prawo (0 to środek)
-                  > Y to góra/dół (np. 0.75 to góra kartki, -0.75 dół)
-                  > Z nie ruszać. Skrypt powyżej sam wylicza Z, żeby napis zginał się i przyklejał do fali kartki!
+                  position：[X, Y, Z] 位置。
+                  > X 为左右方向，0 为中央。
+                  > Y 为上下方向，例如 0.75 为纸张顶部，-0.75 为底部。
+                  > 不要调整 Z，上方脚本会自动计算，让文字贴合纸张波动。
                   
-                  fontSize: rozmiar fontu (domyślnie 0.15)
-                  color: kolor napisu
-                  font: opcjonalnie dajesz tu inną czcionkę z folderu /public/fonts/
+                  fontSize：字号，默认 0.15。
+                  color：文字颜色。
+                  font：可选，可使用 /public/fonts/ 中的其他字体。
                 */}
                 <Text
                     ref={textRef}
-                    position={[0, 0.7, 0]} // Tylko dwa pierwsze parametry [X, Y] mają tutaj znaczenie
+                    position={[0, 0.7, 0]} // 这里只有前两个参数 X、Y 生效。
                     fontSize={0.20}
                     color="#1c1c1c"
-                    font="/fonts/CabinSketch-Bold.ttf"
+                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                     anchorX="center"
                     anchorY="middle"
-                    fillOpacity={0} // Start hidden
+                    fillOpacity={0} // 初始隐藏。
                 >
                     {project.title}
                 </Text>
@@ -1309,30 +1271,30 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
 }));
 
 
-// Component to handle the cropped right-side houses
+// 处理右侧房屋裁切的组件。
 const RightSideHouses = ({ texture, baseWidth, baseHeight, cropAmount }) => {
-    // Clone texture to allow independent UV manipulation
+    // 克隆纹理，独立调整 UV。
     const croppedTexture = useMemo(() => {
         const t = texture.clone();
-        // Because scale.x is -1 (mirrored), the "Right" side in world space
-        // corresponds to the "Left" side of the texture (U=0).
-        // To crop the world-right side, we need to crop the texture-left side.
-        // So we increase offset.x.
+        // scale.x=-1 表示镜像，因此世界空间的右侧
+        // 对应纹理左侧，即 U=0。
+        // 裁切世界右侧时，需要裁切纹理左侧。
+        // 因此增大 offset.x。
         t.offset.x = cropAmount;
         t.repeat.x = 1 - cropAmount;
         t.needsUpdate = true;
         return t;
     }, [texture, cropAmount]);
 
-    // Calculate new width and position
+    // 计算新宽度与位置。
     const newWidth = baseWidth * (1 - cropAmount);
 
-    // Original Inner Edge (World Left of this mesh) was at CenterX - Width/2
-    // For the Right Side Mesh: 
-    // Original Pos = 15. Width = 15.
-    // Inner Edge = 15 - 7.5 = 7.5.
-    // We want to keep Inner Edge at 7.5.
-    // New Center = Inner Edge + NewWidth / 2
+    // 该网格原先的世界左侧内边缘为 CenterX - Width/2。
+    // 对于右侧网格：
+    // 原位置为 15，宽度为 15。
+    // 内边缘为 15-7.5=7.5。
+    // 需要将内边缘保持在 7.5。
+    // 新中心 = 内边缘 + 新宽度/2。
     const newX = 7.5 + (newWidth / 2);
 
     return (
@@ -1348,7 +1310,7 @@ const RightSideHouses = ({ texture, baseWidth, baseHeight, cropAmount }) => {
     );
 };
 
-// Sub-component for individual tech stack logos
+// 单个技术栈标志子组件。
 const TechStackLogo = ({ path, position }) => {
     const texture = useTexture(path);
 

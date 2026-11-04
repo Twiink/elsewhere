@@ -6,41 +6,41 @@ const SceneContext = createContext(null);
 export const useScene = () => {
     const context = useContext(SceneContext);
     if (!context) {
-        throw new Error('useScene must be used within a SceneProvider');
+        throw new Error("useScene 必须在 SceneProvider 内使用");
     }
     return context;
 };
 
 export const SceneProvider = ({ children }) => {
-    // Deep linking: check if URL points to a specific room on first load
+    // 深层链接：首次加载时检查 URL 是否指向指定房间。
     const initialRoom = useRef(getInitialRoomFromUrl());
     const deeplinkHandled = useRef(false);
 
-    const [currentRoom, setCurrentRoom] = useState(null); // null = corridor, 'about', 'portfolio', etc.
-    const [hasEntered, setHasEntered] = useState(false);  // Has user clicked entrance doors?
-    const [exitRequested, setExitRequested] = useState(false); // Signal to request exit from room
-    const [overlayContent, setOverlayContent] = useState(null); // Content for overlay (Studio monitor etc)
+    const [currentRoom, setCurrentRoom] = useState(null); // null 表示走廊，其他值为 about、portfolio 等房间 ID。
+    const [hasEntered, setHasEntered] = useState(false);  // 用户是否点击过入口门。
+    const [exitRequested, setExitRequested] = useState(false); // 请求退出房间的信号。
+    const [overlayContent, setOverlayContent] = useState(null); // 遮罩内容，例如工作室显示器内容。
 
-    // Teleportation states
-    const [teleportTarget, setTeleportTarget] = useState(null); // Room ID to teleport to
-    const [isTeleporting, setIsTeleporting] = useState(false);  // Currently in teleport transition
-    const [teleportPhase, setTeleportPhase] = useState(null);   // 'closing' | 'teleporting' | 'opening' | null
-    const [pendingDoorClick, setPendingDoorClick] = useState(null); // Label of door to click after teleport
-    const [isFastTeleport, setIsFastTeleport] = useState(false); // Fast teleport in progress (skip animations)
+    // 传送状态。
+    const [teleportTarget, setTeleportTarget] = useState(null); // 目标房间 ID。
+    const [isTeleporting, setIsTeleporting] = useState(false);  // 当前处于传送过渡中。
+    const [teleportPhase, setTeleportPhase] = useState(null);   // 阶段：closing、teleporting、opening 或 null。
+    const [pendingDoorClick, setPendingDoorClick] = useState(null); // 传送后待点击的门标签。
+    const [isFastTeleport, setIsFastTeleport] = useState(false); // 快速传送进行中，跳过动画。
 
-    // Inspecting state removed to avoid global re-renders
+    // 移除查看状态，避免全局重渲染。
 
     const enterRoom = useCallback((roomId) => {
         setCurrentRoom(roomId);
-        setExitRequested(false); // Clear any pending exit request
-        setOverlayContent(null); // Clear overlay on room change
+        setExitRequested(false); // 清除待处理退出请求。
+        setOverlayContent(null); // 房间变化时清除遮罩。
 
-        // Teleportation cleanup - if we just teleported in
-        // Note: isFastTeleport is cleared by signalRoomReady, not here
-        // Don't clear teleportPhase if it's 'opening' - let the paper animation complete
+        // 刚传送进入时的清理。
+        // isFastTeleport 由 signalRoomReady 清除，不在此处处理。
+        // opening 阶段不清除 teleportPhase，让纸张动画完成。
         setIsTeleporting(false);
         setPendingDoorClick(null);
-        // teleportPhase is cleared by finishPaperOpen after animation
+        // 动画结束后由 finishPaperOpen 清除 teleportPhase。
     }, []);
 
     const exitRoom = useCallback(() => {
@@ -49,13 +49,13 @@ export const SceneProvider = ({ children }) => {
         setOverlayContent(null);
     }, []);
 
-    // Request exit - this signals to DoorSection to trigger exit animation
+    // 发出退出请求，通知 DoorSection 执行退出动画。
     const requestExit = useCallback(() => {
         setExitRequested(true);
         setOverlayContent(null);
     }, []);
 
-    // Clear exit request - called by DoorSection after handling
+    // DoorSection 处理完后清除退出请求。
     const clearExitRequest = useCallback(() => {
         setExitRequested(false);
     }, []);
@@ -72,62 +72,62 @@ export const SceneProvider = ({ children }) => {
         setOverlayContent(null);
     }, []);
 
-    // Teleportation functions
+    // 传送函数。
 
-    // Initiate teleport - called when user clicks room on map
+    // 用户点击地图房间时开始传送。
     const teleportTo = useCallback((roomId) => {
-        if (isTeleporting || roomId === currentRoom) return; // Prevent double teleport or same room
+        if (isTeleporting || roomId === currentRoom) return; // 防止重复传送或传往当前房间。
 
         setTeleportTarget(roomId);
         setIsTeleporting(true);
-        setIsFastTeleport(true); // Enable fast teleport mode
-        setTeleportPhase('closing'); // Paper starts closing
+        setIsFastTeleport(true); // 启用快速传送模式。
+        setTeleportPhase('closing'); // 纸张开始合拢。
         setOverlayContent(null);
     }, [isTeleporting, currentRoom]);
 
-    // Called when paper close animation completes - actually move camera
+    // 纸张闭合动画结束后调用，开始实际移动相机。
     const startTeleportTransition = useCallback(() => {
         setTeleportPhase('teleporting');
-        // Camera will be moved here by listening components
+        // 监听组件在此移动相机。
     }, []);
 
-    // Called when teleport is ready (room loaded) - start paper open animation
-    // During fast teleport, this is called AFTER camera is inside room
+    // 目标房间加载就绪后调用，开始纸张展开动画。
+    // 快速传送时在相机已进入房间后调用。
     const openTeleportTransition = useCallback(() => {
         setTeleportPhase('opening');
     }, []);
 
-    // Called when paper open animation completes - cleanup
+    // 纸张展开动画完成后清理。
     const completeTeleport = useCallback(() => {
-        // During FAST teleport: paper stays closed, trigger door click immediately
-        // The paper will open when signalRoomReady() is called by DoorSection
+        // 快速传送时纸张保持闭合，立即触发门点击。
+        // DoorSection 调用 signalRoomReady() 后才展开纸张。
         setPendingDoorClick(teleportTarget);
 
-        // Don't clear isTeleporting yet! Wait for enterRoom() logic to finish
-        // We only clear target here (phase cleared later)
+        // 此时不要清除 isTeleporting，需等待 enterRoom() 完成。
+        // 这里只清除 target，phase 稍后处理。
         setTeleportTarget(null);
-        // Note: teleportPhase stays at 'teleporting' during fast teleport so paper remains closed
+        // 快速传送时 teleportPhase 保持 teleporting，让纸张保持闭合。
     }, [teleportTarget]);
 
-    // Called by DoorSection when camera has finished entering the room during fast teleport
-    // This opens the paper and completes the teleport sequence
+    // 快速传送中，相机进入房间完成后由 DoorSection 调用。
+    // 此操作展开纸张并完成传送流程。
     const signalRoomReady = useCallback(() => {
         if (isFastTeleport) {
-            // Now open the paper
+            // 现在展开纸张。
             setTeleportPhase('opening');
             setIsFastTeleport(false);
         }
     }, [isFastTeleport]);
 
-    // Called by PaperTransition when paper open animation finishes
-    // This just clears the phase - teleport logic is already done
+    // PaperTransition 在纸张展开动画完成时调用。
+    // 传送逻辑已完成，只需清除阶段。
     const finishPaperOpen = useCallback(() => {
         setTeleportPhase(null);
     }, []);
 
-    // REMOVED clearPendingDoorClick - it's now handled in enterRoom
+    // clearPendingDoorClick 已移除，现由 enterRoom 处理。
 
-    // Cancel teleport (in case of error)
+    // 发生错误时取消传送。
     const cancelTeleport = useCallback(() => {
         setTeleportTarget(null);
         setIsTeleporting(false);
@@ -140,19 +140,19 @@ export const SceneProvider = ({ children }) => {
         currentRoom,
         hasEntered,
         exitRequested,
-        overlayContent, // Exposed
+        overlayContent, // 对外暴露。
         enterRoom,
         exitRoom,
         requestExit,
         clearExitRequest,
         markEntered,
-        openOverlay,    // Exposed
-        closeOverlay,   // Exposed
+        openOverlay,    // 对外暴露。
+        closeOverlay,   // 对外暴露。
         isInRoom: currentRoom !== null,
-        // Deep linking
+        // 深层链接。
         initialRoom: initialRoom.current,
         deeplinkHandled,
-        // Teleportation
+        // 传送。
         teleportTarget,
         isTeleporting,
         teleportPhase,
@@ -177,7 +177,7 @@ export const SceneProvider = ({ children }) => {
         markEntered,
         openOverlay,
         closeOverlay,
-        // Teleportation dependencies
+        // 传送依赖。
         teleportTarget,
         isTeleporting,
         teleportPhase,

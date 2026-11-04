@@ -4,26 +4,26 @@ import { useFrame, useThree } from '@react-three/fiber';
 import CorridorSegment, { SEGMENT_LENGTH } from './CorridorSegment';
 
 /**
- * Wrapper to toggle segment visibility based on camera position.
- * Massively reduces Draw Calls by hiding segments fully behind the camera.
+ * 按相机位置切换分段显隐的包装组件。
+ * 隐藏完全位于相机后方的分段，大幅减少绘制调用。
  */
 const SegmentVisibilityWrapper = ({ children, segmentIndex }) => {
     const groupRef = useRef();
     const { camera } = useThree();
 
-    // Z bounds for this segment
-    // Segment 0: Z=10 to Z=-70
-    // Segment 1: Z=-70 to Z=-150
+    // 当前分段的 Z 边界。
+    // 第 0 段：Z=10 至 Z=-70。
+    // 第 1 段：Z=-70 至 Z=-150。
     const startZ = 10 - (segmentIndex * SEGMENT_LENGTH);
     const endZ = startZ - SEGMENT_LENGTH;
 
     useFrame(() => {
         if (!groupRef.current) return;
-        // Camera looks towards -Z. 
-        // If camera is significantly "in front" of the segment (e.g., camera Z is much less than endZ), hide it.
-        // We reduce the buffer from 20 to 5. Once we pass the segment by 5 units, it disappears, freeing CPU.
+        // 相机朝向 -Z。
+        // 相机明显越过分段时（Z 远小于 endZ）隐藏该段。
+        // 缓冲从 20 缩小至 5；越过分段 5 单位即隐藏，以释放 CPU。
         const isBehindCamera = camera.position.z < endZ - 5;
-        // If camera is significantly "behind" the segment (e.g., camera Z is much greater than startZ + buffer), hide it.
+        // 相机远在分段后方时（Z 大于 startZ 加缓冲）也隐藏该段。
         const isFarAhead = camera.position.z > startZ + 30;
 
         const isVisible = !(isBehindCamera || isFarAhead);
@@ -41,42 +41,42 @@ const SegmentVisibilityWrapper = ({ children, segmentIndex }) => {
 };
 
 /**
- * InfiniteCorridorManager Component
+ * InfiniteCorridorManager 无限走廊管理组件。
  * 
- * Manages dynamic generation/removal of corridor segments.
+ * 动态生成和移除走廊分段。
  * 
- * hideDoorsForSegments: Array of segment indices that should hide their SegmentDoors
- * (used during entrance to avoid duplicate doors while keeping content preloaded)
+ * hideDoorsForSegments：需要隐藏 SegmentDoors 的分段索引数组。
+ * 入口阶段用于避免门重复，同时保留内容预加载。
  */
 const InfiniteCorridorManager = ({
     onDoorEnter,
-    hideDoorsForSegments = [], // Segments that should hide their SegmentDoors
-    clipSegmentNeg1 = false, // Whether to clip segment -1 at EntranceDoors
-    setCameraOverride // Function to take over camera control
+    hideDoorsForSegments = [], // 需要隐藏 SegmentDoors 的分段。
+    clipSegmentNeg1 = false, // 是否在 EntranceDoors 处裁切第 -1 段。
+    setCameraOverride // 接管相机控制的函数。
 }) => {
     const { camera } = useThree();
-    // Pre-mount segments 0 and 1 so shaders compile during preloader.
-    // Segment -1 is NOT pre-mounted to avoid visual collision with entrance doors.
-    // It mounts dynamically when camera reaches entrance (behind camera = invisible stutter).
+    // 预先挂载第 0、1 段，让着色器在加载阶段编译。
+    // 不预挂载第 -1 段，避免与入口门重叠。
+    // 相机到达入口时动态挂载，该段位于相机后方，卡顿不可见。
     const [activeSegments, setActiveSegments] = useState([0, 1]);
 
-    // Calculate which segment the camera is in
+    // 计算相机当前所在分段。
     const getSegmentFromZ = useCallback((z) => {
         return Math.floor((10 - z) / SEGMENT_LENGTH);
     }, []);
 
-    // Update active segments based on camera position
+    // 根据相机位置更新活动分段。
     useFrame(() => {
         const currentSegment = getSegmentFromZ(camera.position.z);
 
-        // Render previous, current, and next segment
+        // 渲染前一段、当前段和下一段。
         const shouldBeActive = [
             currentSegment - 1,
             currentSegment,
             currentSegment + 1
         ];
 
-        // Check if we need to update
+        // 检查是否需要更新。
         const needsUpdate = shouldBeActive.some(seg => !activeSegments.includes(seg)) ||
             activeSegments.some(seg => !shouldBeActive.includes(seg));
 

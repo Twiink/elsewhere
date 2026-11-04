@@ -21,7 +21,7 @@ function getDownscalePowerOfTwo(n) {
 
 async function optimize() {
   const files = fs.readdirSync(TARGET_DIR).filter(f => f.match(/\.(webp|jpg|jpeg|png)$/i));
-  console.log(`Optimizing NPOT files in Contact directory (Downgrade Strategy)...`);
+  console.log(`正以降采样策略优化联系我目录中的非二次幂纹理……`);
 
   for (const file of files) {
     const fullPath = path.join(TARGET_DIR, file);
@@ -36,28 +36,28 @@ async function optimize() {
       const newHeight = getDownscalePowerOfTwo(height);
 
       if (newWidth !== width || newHeight !== height) {
-        console.log(`Downgrading ${file}: ${width}x${height} -> ${newWidth}x${newHeight}`);
+        console.log(`降采样 ${file}: ${width}x${height} -> ${newWidth}x${newHeight}`);
         
-        // Backup
+        // 备份
         if (!fs.existsSync(backupPath)) {
           fs.copyFileSync(fullPath, backupPath);
         }
 
         const tmpPath = fullPath + '.tmp_contact.webp';
         await sharp(inputBuffer)
-          .resize(newWidth, newHeight, { fit: 'fill' }) // We use fill, but will fix ratio in code
+          .resize(newWidth, newHeight, { fit: 'fill' }) // 采用填充缩放，在代码中修正比例。
           .webp({ quality: 85 })
           .toFile(tmpPath);
           
         fs.renameSync(tmpPath, fullPath);
-        console.log(`Success: ${file}`);
+        console.log(`成功： ${file}`);
       } else {
-        console.log(`Skipping ${file} - Already POT: ${width}x${height}`);
+        console.log(`跳过 ${file}，已为二次幂尺寸： ${width}x${height}`);
       }
     } catch (e) {
-      console.error(`Error with ${file}: ${e.message}`);
+      console.error(`处理出错： ${file}: ${e.message}`);
     }
   }
 }
 
-optimize().then(() => console.log('Contact Optimization complete!'));
+optimize().then(() => console.log('联系我纹理优化完成！'));

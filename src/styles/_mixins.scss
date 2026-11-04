@@ -1,10 +1,10 @@
 // =============================================================================
-// SASS MIXINS - ITom Portfolio
+// ITom 作品集的 Sass 混入。
 // =============================================================================
 
 @use 'variables' as *;
 
-// Responsive breakpoints
+// 响应式断点。
 @mixin mobile {
     @media (max-width: #{$breakpoint-tablet - 1px}) {
         @content;
@@ -29,7 +29,7 @@
     }
 }
 
-// Flexbox shortcuts
+// Flexbox 快捷方式。
 @mixin flex-center {
     display: flex;
     align-items: center;
@@ -47,7 +47,7 @@
     justify-content: center;
 }
 
-// Full screen overlay
+// 全屏覆盖层。
 @mixin fullscreen {
     position: fixed;
     inset: 0;
@@ -55,7 +55,7 @@
     height: 100%;
 }
 
-// Hide scrollbar
+// 隐藏滚动条。
 @mixin hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -65,7 +65,7 @@
     }
 }
 
-// Smooth text rendering
+// 平滑文字渲染。
 @mixin smooth-text {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

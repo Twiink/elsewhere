@@ -1,0 +1,432 @@
+{
+  "site": {
+    "siteTitle": "ITom：获奖创意开发者与交互网站作品集",
+    "siteDescription": "Tomasz Szmajda（ITom）的作品集：这位获奖创意开发者通过流畅动画、故事叙述和清晰代码打造互动网站。",
+    "aboutMe": "Tomasz Szmajda，网名 ITom，是来自波兰的获奖创意开发者，擅长从零制作富有吸引力的互动网站。他目前就读于奥波莱大学计算机科学专业，专注于手工打磨的网页体验，通过流畅动画、滚动叙事和细致处理，让每个网站显得鲜活。他的核心工具包括 React、Next.js、JavaScript、GSAP（GreenSock 动画平台）和 CSS，用于实现平滑页面转场、微交互与滚动触发动画。项目需要时，也会采用 Three.js、WebGL 和自定义着色器，创造沉浸式浏览器体验；不过他最热衷的仍是结构清晰、动画精良、让人愿意探索的叙事网站。ITom 并非设计师，不使用 Figma 或 Photoshop，而是先在纸上勾勒想法，再直接通过代码边设计边实现。他也不在 Blender 中制作 3D 模型；但如果客户提供现成的 GLTF、GLB 等素材，他可以让模型在浏览器中运动、交互，并以每秒 60 帧运行。他的作品获得 FWA 每日最佳网站、GSAP 每日最佳网站、CSS Design Awards 和 Awwwards 提名等国际认可。除个人作品集外，他还开发采用 MediaPipe AI 的摄像头控制浏览器游戏“67 挑战”，以及运用自定义 DOM 虚拟化流畅处理 1000 多张图片的精品摄影工作室商业网站。ITom 面向全球客户提供自由职业创意开发服务。",
+    "url": "https://itomdev.com",
+    "githubUrl": "https://github.com/ITomPoland",
+    "instagramUrl": "https://www.instagram.com/itom.dev/",
+    "linkedinUrl": "https://www.linkedin.com/in/itomdev/",
+    "tiktokUrl": "https://www.tiktok.com/@itomdev",
+    "xUrl": "https://x.com/ITom_Dev",
+    "youtubeUrl": "https://www.youtube.com/@itomdev"
+  },
+  "projects": [
+    {
+      "id": "adam-and-ewa",
+      "title": "ADAM & EWA",
+      "description": "为婚礼摄影与摄像搭档打造的精品作品集网站，采用杂志式视觉设计、自定义 FLIP 灯箱转场和 DOM 虚拟化，可流畅展示多达 1000 张高清照片。",
+      "seoTitle": "Adam & Ewa：拥有流畅动画的精品摄影网站",
+      "seoDescription": "Adam & Ewa 是创意开发者 Tomasz Szmajda（ITom）为波兰婚礼摄影与摄像搭档从零打造的精品商业网站。项目用定制、无模板的体验替换使用了十年的旧站，采用 React Router v7、GSAP ScrollTrigger、Lenis 平滑滚动及无头内容管理系统。它包含带视差漂移的非对称散落式画廊、基于 FLIP 技术的共享元素灯箱转场、带渐进模糊显现的滚动文字动画，以及通过 IntersectionObserver 实现的自定义双层 DOM 虚拟化系统。这套虚拟化方案让包含多达 1000 张高清婚礼照片的画廊仍能以每秒 60 帧平滑滚动，完全通过前端代码解决了这一复杂工程问题。图片通过内容分发网络优化，支持按设备调整尺寸、自动使用 WebP/AVIF 格式，以及 LQIP 低清占位图逐步清晰效果。网站获得 Google Lighthouse 100/100 满分。暖蛋壳色背景上，标题使用 Cormorant Garamond 衬线字体，正文使用 Inter。客户可通过内容管理后台独立维护全部内容。",
+      "url": "https://www.adam-ewa.pl",
+      "front": "/content/af693ea4bb4aedadb05ff892769743646c71a830-1696x2528.webp",
+      "painted": "/content/eedf929fd3db1bcd22f4f5fc14b6f76c6da9e91f-1696x2528.webp",
+      "techStack": [
+        "/textures/gallery/reactlogo.webp",
+        "/textures/gallery/csslogo.webp",
+        "/textures/gallery/jslogo.webp",
+        "/textures/gallery/netlifylogo.webp"
+      ]
+    },
+    {
+      "id": "67-game",
+      "title": "67 挑战",
+      "description": "受热门“67”挑战启发的网页互动游戏，通过摄像头和 MediaPipe 手部追踪实时计算得分，并提供每日全球排行榜和 PDF 证书。",
+      "seoTitle": "67 挑战：通过摄像头实时识别动作的网页游戏",
+      "seoDescription": "67 挑战是 Tomasz Szmajda（ITom）开发的浏览器速度挑战游戏，摄像头就是控制器。玩家需在 15 秒内尽可能快地完成热门“67”动作，MediaPipe Pose Landmarker 以每秒 60 帧实时追踪手腕位置；全部运算都在浏览器中完成，无需下载或安装插件。游戏采用 React 19 和运行于 GPU 的 MediaPipe WASM，提供基于 Firebase 的全球每日排行榜、自动生成的带二维码 PDF 证书、Canvas 粒子效果，以及波兰语和英语双语支持。它在 2026 年奥波莱大学科学节首次亮相，吸引超过 100 人排队体验。孩子们反复挑战更快成绩，成年人则惊讶于浏览器竟可原生运行实时计算机视觉。这是一次拓展创意前端工程边界的尝试。",
+      "url": "https://sixsevengame.vercel.app",
+      "front": "/content/2614933b64da7547f04cdcae693e8ec2d882ae4b-1696x2528.webp",
+      "painted": "/content/4ebe5b223cb3726dfd9d61794e01cc5b059fb878-1696x2528.webp",
+      "techStack": [
+        "/textures/gallery/reactlogo.webp",
+        "/textures/gallery/htmllogo.webp",
+        "/textures/gallery/jslogo.webp",
+        "/textures/gallery/firebaselogo.webp"
+      ]
+    },
+    {
+      "id": "young",
+      "title": "YOUNG MULTI",
+      "description": "为波兰说唱歌手与创作者 Young Multi 设计的现代概念网站，以推广页面展示他的个人品牌、音乐作品和社交平台。",
+      "seoTitle": "Young Multi：采用 WebGL 图片扭曲效果的艺人网站",
+      "seoDescription": "Young Multi 是创意开发者 Tomasz Szmajda（ITom）为波兰嘻哈艺人 Young Multi 打造的沉浸式网站。项目通过自定义 WebGL 着色器捕捉音乐原始而充沛的能量：照片随鼠标移动实时扭曲、弯折，效果由 GPU 加速的片元着色器驱动，而非 CSS 滤镜或视觉技巧。深色而富有氛围的布局配合流畅的 GSAP 滚动转场，为摄影作品留出呼吸空间，同时保持强烈的视觉个性。这是 ITom 获得行业广泛认可的突破性项目，获得 CSS Design Awards（CSSDA）每日最佳网站和 Design Nominees 每日最佳网站，让他的作品进入国际创意开发视野。网站采用 React、WebGL 和 GSAP，展示了创意编程与自定义着色器如何将常规艺人页面变为真正符合音乐人品牌的互动体验。",
+      "url": "https://young-multi-strona.netlify.app",
+      "front": "/content/a9996670625ec17bd996c5cb2ccb249040d7bc83-1024x2048.webp",
+      "painted": "/content/9a5d30948bc614adc5078b04a5bc8ea3e87a56e2-1024x2048.webp",
+      "techStack": [
+        "/textures/gallery/reactlogo.webp",
+        "/textures/gallery/htmllogo.webp",
+        "/textures/gallery/tailwindlogo.webp",
+        "/textures/gallery/netlifylogo.webp"
+      ]
+    },
+    {
+      "id": "ui-components",
+      "title": "交互组件集",
+      "description": "开源的原生 JavaScript 组件库，包含富有创意的 GSAP 界面动画，可用于多种框架，并以具有真实翻页效果的 3D 手绘笔记本呈现。",
+      "seoTitle": "ITom 手绘笔记本：拥有手绘风格的动态交互组件",
+      "seoDescription": "ITom 手绘笔记本是创意开发者 Tomasz Szmajda 制作的自定义动态交互组件合集。每个组件都采用标志性的 ITom 手绘速写美学，将铅笔纹理应用于交互元素，并在 React 中通过流畅的 GSAP 转场驱动动画。它展示了界面并不需要遵循千篇一律的模式：一个手绘按钮或涂鸦导航，也可能比无数精致渐变更有吸引力。每个组件都轻量、响应灵敏，使用清晰代码实现。这个合集既是作者的个人创意试验场，也为希望项目风格有所不同的开发者提供开放资源。",
+      "url": "https://itom-ui-components.vercel.app",
+      "front": "/content/b74f1f8354f55b3025e57f9ab1d199b34058eb3d-1696x2528.webp",
+      "painted": "/content/cd01ad9070426cf84e8bd47adeb6d51afdbb2832-1696x2528.webp",
+      "techStack": [
+        "/textures/gallery/htmllogo.webp",
+        "/textures/gallery/csslogo.webp",
+        "/textures/gallery/jslogo.webp",
+        "/textures/gallery/netlifylogo.webp"
+      ]
+    }
+  ],
+  "studio": [
+    {
+      "id": "8d7c3ac8-13d1-4b54-8eee-0278d5ed964c",
+      "title": "ITom 手绘笔记本：交互组件集发布",
+      "description": "ITom 手绘笔记本正式发布，精选采用 React 和 GSAP 实现的手绘动态交互组件。",
+      "seoTitle": "ITom 手绘交互组件集发布：LinkedIn 与 X 分享",
+      "seoDescription": "Tomasz Szmajda（ITom）发布 ITom 手绘笔记本，一个采用 React 和 GSAP 制作的定制手绘动态交互组件集。帖子介绍：在多个项目中反复重建相似界面动画，促成了这个具有标志性速写美学、可复用的开放组件库。内容分享于 LinkedIn 和 X（Twitter）。",
+      "platform": "linkedin",
+      "device": "monitor",
+      "url": "https://www.linkedin.com/posts/itomdev_i-kept-rebuilding-the-same-ui-animations-activity-7472981452289163264-gANX",
+      "date": "2026-07-18",
+      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+    },
+    {
+      "id": "88522880-608b-4cbd-ac08-e12e99eb46d0",
+      "title": "我的 TikTok",
+      "description": "ITom 的 TikTok 频道，分享创意网页开发、优秀网站案例与代码实验短视频。",
+      "seoTitle": "ITom 的 TikTok：创意编程与网页灵感",
+      "seoDescription": "在 TikTok 关注 Tomasz Szmajda（ITom）的 @itomdev，观看短视频：展示互联网上出色的网站、创意编程实验及交互前端开发幕后。为网页设计爱好者带来节奏明快、直观有趣的内容。",
+      "platform": "tiktok",
+      "device": "phone",
+      "url": "https://www.tiktok.com/@itomdev",
+      "date": "2026-07-18",
+      "frontTexture": "/content/c8ad8f3e552d4151cb1b46618f8cad431316953f-1024x2048.webp",
+      "paintedFrontTexture": "/content/cff3658c47cc85a7ad676f540d26a8e6a0754c3c-512x1024.webp"
+    },
+    {
+      "id": "5479ed60-479d-446c-b643-1681e58b4e0d",
+      "title": "我的 Instagram",
+      "description": "在 Instagram 关注 ITom，了解创意网页项目幕后、网站灵感和短视频内容。",
+      "seoTitle": "ITom 的 Instagram：创意开发幕后",
+      "seoDescription": "在 Instagram 关注 Tomasz Szmajda（ITom）的 @itom.dev，观看创意开发短视频、网页设计灵感短片、获奖项目的幕后片段与艺术实验。ITom 会分享启发自己创意前端开发工作的网站和互动体验。",
+      "platform": "instagram",
+      "device": "phone",
+      "url": "https://www.instagram.com/itom.dev/",
+      "date": "2026-07-18",
+      "views": "999",
+      "frontTexture": "/content/c8ad8f3e552d4151cb1b46618f8cad431316953f-1024x2048.webp",
+      "paintedFrontTexture": "/content/cff3658c47cc85a7ad676f540d26a8e6a0754c3c-512x1024.webp"
+    },
+    {
+      "id": "1ee8bd4b-fa5d-49d5-9803-2ad3de7ec1ba",
+      "title": "我的 YouTube",
+      "description": "ITom 的 YouTube 频道，分享创意网页开发长视频、完整项目讲解和编程实录。",
+      "seoTitle": "ITom 的 YouTube 频道：创意网页开发视频",
+      "seoDescription": "Tomasz Szmajda 的 ITom YouTube 频道提供较长篇幅的创意网页开发内容，包括完整项目讲解、长时间编程实录、网站案例合集，以及用 React、GSAP、Three.js 和自定义着色器制作互动网站的幕后过程。订阅频道，获取深入的创意前端内容。",
+      "platform": "youtube",
+      "device": "tv",
+      "url": "https://www.youtube.com/@itomdev",
+      "date": "2026-07-18",
+      "frontTexture": "/content/0dca95901d02de9dbba8c0c7da5fffface9957b3-2048x1024.webp",
+      "paintedFrontTexture": "/content/097f06a47d4759e495af42f03528c82873e4c623-1720x860.webp"
+    },
+    {
+      "id": "61004a68-690e-4b1b-9a28-5c95f3c49d30",
+      "title": "斯切尔采居民成为世界顶尖网站创作者",
+      "description": "波兰地方新闻报道 Tomasz Szmajda 获得国际网页设计奖项，题为《斯切尔采奥波莱居民成为世界顶尖网站创作者》。",
+      "seoTitle": "波兰媒体报道：ITom 获誉世界顶尖网站创作者",
+      "seoDescription": "波兰地方媒体 Strzelce360.pl 报道了来自斯切尔采奥波莱的计算机科学专业学生 Tomasz Szmajda，如何以世界顶尖网站创作者之一的身份获得国际认可。文章重点介绍他在 itomdev.com 的手绘交互作品集获得 FWA 每日最佳网站，以及受到主要行业媒体关注的经历。这是一位创意开发者从家乡走向全球舞台的故事。",
+      "platform": "blog",
+      "device": "monitor",
+      "url": "https://www.strzelce360.pl/artykul/11843,strzelczanin-najlepszym-tworca-stron-internetowych-na-swiecie",
+      "date": "2026-07-12",
+      "readTime": "4 分钟",
+      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+    },
+    {
+      "id": "a491f10e-b9e6-489b-a4e0-a62950a696e3",
+      "title": "Google 反重力 2.0：AI 互动实验",
+      "description": "重新演绎经典 Google 反重力彩蛋，结合 AI 交互的创意编程实验。",
+      "seoTitle": "Google 反重力 2.0：ITom 的 AI 创意实验",
+      "seoDescription": "Tomasz Szmajda（ITom）的创意编程实验，以现代 AI 交互与创意前端技术重新演绎经典 Google 反重力彩蛋。这个有趣的业余项目展示了创意开发者如何探索传统作品集以外的实验性网页概念。内容分享于 LinkedIn 和 X（Twitter）。",
+      "platform": "linkedin",
+      "device": "monitor",
+      "url": "https://www.linkedin.com/posts/itomdev_ai-creativecoding-activity-7467908125593976832-o9HE",
+      "date": "2026-07-04",
+      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+    },
+    {
+      "id": "371407e3-2663-4721-a212-c28b3449f9b9",
+      "title": "67 挑战：超过 100 人现场体验",
+      "description": "记录 67 挑战在大学科学节首次亮相：孩子们排队挑战，成年人惊讶于游戏竟然可以直接在浏览器里运行。",
+      "seoTitle": "67 挑战科学节首秀：ITom 在 LinkedIn 与 X 的分享",
+      "seoDescription": "Tomasz Szmajda（ITom）分享摄像头控制的浏览器游戏“67 挑战”在奥波莱大学科学节首次亮相的经历。超过 100 名参与者排队游玩，在 Chrome 中完成热门“67”动作，由 MediaPipe 实时追踪。孩子们不断冲击更快成绩，家长也被拉来参与，成年人反复惊叹：“这只是一个网站？”项目采用 React 19、运行于 GPU 的 MediaPipe WASM、Firebase 排行榜和自动生成的 PDF 证书。",
+      "platform": "linkedin",
+      "device": "monitor",
+      "url": "https://www.linkedin.com/posts/itomdev_100-people-played-a-game-i-coded-using-activity-7462834233238097920-Eg-i",
+      "date": "2026-06-20",
+      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+    },
+    {
+      "id": "1b5dd93f-5177-40ef-a455-14cdf44d152c",
+      "title": "勾勒不可能：Codrops 专题",
+      "description": "Codrops 深度文章：介绍如何仅用平面几何、手绘贴图和自定义 GLSL 着色器，搭建一个没有独立 3D 模型的作品集。",
+      "seoTitle": "Codrops 专题：不使用独立 3D 模型的 ITom 作品集",
+      "seoDescription": "Tomasz Szmajda（ITom）在 Codrops（tympanus.net）发表专题文章《勾勒不可能：不使用任何独立 3D 模型的三维作品集》。文章深入解析：完全不懂 Blender，如何反而促成一个获奖互动走廊的诞生。整个项目在 React Three Fiber 中仅用平面几何、手绘铅笔贴图和自定义 GLSL 着色器上色显现效果搭建。文章发表于全球最受尊重的创意前端开发媒体之一。",
+      "platform": "codrops",
+      "device": "monitor",
+      "url": "https://tympanus.net/codrops/2026/06/11/sketching-the-impossible-a-3d-portfolio-built-without-a-single-3d-model/",
+      "date": "2026-06-11",
+      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+    },
+    {
+      "id": "7ef0eb6f-fe9a-45a0-b75c-8d4c6798b05e",
+      "title": "Adam & Ewa 网站发布",
+      "description": "精品摄影网站 Adam & Ewa 正式发布，展示流畅的 GSAP 动画、散落式画廊和可容纳 1000 张照片的虚拟化方案。",
+      "seoTitle": "Adam & Ewa 网站发布：ITom 在 LinkedIn 与 X 的分享",
+      "seoDescription": "Tomasz Szmajda（ITom）发布精品婚礼摄影网站 Adam & Ewa 的上线公告。帖子展示定制 React 实现、GSAP ScrollTrigger 动画、FLIP 技术灯箱转场，以及能够以每秒 60 帧处理多达 1000 张高清照片的自定义 DOM 虚拟化系统。内容分享于 LinkedIn 和 X（Twitter）。",
+      "platform": "linkedin",
+      "device": "monitor",
+      "url": "https://www.linkedin.com/posts/itomdev_webdesign-gsap-frontend-activity-7455173978056224768-dyhz",
+      "date": "2026-05-15",
+      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+    },
+    {
+      "id": "47eeb34b-2bcb-4d58-a785-2f633603cd21",
+      "title": "WebGPU 展示：纸张撕裂与手绘走廊",
+      "description": "ITom 作品集入选 WebGPU.com，专题题为《一张撕开的纸、一条手绘走廊，以及自己完成上色的速写》。",
+      "seoTitle": "WebGPU.com 展示：ITom 纸张撕裂作品集（2026）",
+      "seoDescription": "ITom 作品集入选领先的 WebGL 与 WebGPU 社区展示平台 WebGPU.com。文章题为《一张撕开的纸、一条手绘走廊，以及自己完成上色的速写》，介绍项目的独特方式：纸张撕开后，访客进入手绘走廊，走近铅笔速写画框时，画框会自动上色。相关技术标签包括 WebGL、Three.js、GLSL、GSAP、React Three Fiber 和卡通着色。",
+      "platform": "blog",
+      "device": "monitor",
+      "url": "https://www.webgpu.com/showcase/itom-portfolio-paper-tear-corridor/",
+      "date": "2026-04-13",
+      "readTime": "3 分钟",
+      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+    },
+    {
+      "id": "b5bc3c4d-bca0-4e2c-9988-76ece381397d",
+      "title": "个人作品集正式上线",
+      "description": "ITom 作品集上线公告，分享于 LinkedIn 和 X。",
+      "seoTitle": "ITom 个人作品集上线公告",
+      "seoDescription": "Tomasz Szmajda（ITom）最初在 LinkedIn 和 X（Twitter）发布的上线公告，分享位于 itomdev.com 的手绘交互作品集。帖子介绍可漫游的 3D 走廊、手绘贴图与自定义着色器效果；该项目随后获得 FWA 每日最佳网站、Awwwards 荣誉认可和 CSSDA 特别嘉奖。",
+      "platform": "linkedin",
+      "device": "monitor",
+      "url": "https://www.linkedin.com/posts/itomdev_its-finally-live-i-just-launched-my-new-activity-7441409690342825984-Kgbk",
+      "date": "2026-04-01",
+      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+    }
+  ],
+  "awards": [
+    {
+      "id": "1a0f9dfd-1259-4243-8a12-0c8a6398e370",
+      "title": "个人作品集",
+      "seoTitle": "Muzli 荣誉推荐：ITom 手绘交互作品集（2026）",
+      "seoDescription": "ITom 作品集获得 Muzli（muz.li）荣誉推荐。Muzli 是 InVision 旗下领先的设计灵感平台，全球数百万设计师使用它寻找灵感。平台精选互联网上优秀的数字作品，入选 Muzli 荣誉推荐，代表作品集的创意质量与互动网页设计方式受到肯定。Tomasz Szmajda 的这份作品集采用带速写纹理的 3D 走廊、自定义着色器和故事化导航，由 React 与 Three.js 构建。",
+      "category": "other",
+      "date": "2026-07-15",
+      "url": "https://muz.li/picked/interactive-3d-sketch-portfolio-itom/",
+      "image": "/content/9f1863c44d5d680e95e6dcfc594d2955ac5298c1-700x930.webp"
+    },
+    {
+      "id": "904bf9fe-949b-4ec1-add0-6f7683ebd39a",
+      "title": "个人作品集",
+      "seoTitle": "Top Design King 每日最佳网站：ITom 个人作品集（2026）",
+      "seoDescription": "ITom 位于 itomdev.com 的作品集获评 Top Design King（topdesignking.com）每日之王，即每日最佳网站。该国际网页设计评选平台依据设计、易用性和创新展示并推广创意网站。Tomasz Szmajda 的作品集具有手绘速写视觉、互动门导航和流畅的 GSAP 动画，是完全从零构建的手工网页体验。",
+      "category": "sotd",
+      "date": "2026-05-12",
+      "url": "https://topdesignking.com/website/3621/tomasz-itom-szmajda-portfolio",
+      "image": "/content/cd3301fca22d4d589025a2bfa91fadbcee33cd00-1652x2336.webp"
+    },
+    {
+      "id": "23a8d6a5-1c14-4608-a42d-2aaac80ec07e",
+      "title": "个人作品集",
+      "seoTitle": "CSSLight 每日精选：ITom 创意作品集（2026）",
+      "seoDescription": "ITom 作品集获选 CSSLight（csslight.com）每日精选。这个网页设计画廊关注在美学、创意和代码质量方面表现出色的专业网站。创意开发者 Tomasz Szmajda 的作品集采用独特的速写纹理互动走廊、自定义 GLSL 着色器和故事化导航，以 React、Three.js 和 GSAP 实现。",
+      "category": "sotd",
+      "date": "2026-05-08",
+      "url": "https://www.csslight.com/website/73073/Tomasz-ITom-Szmajda-Portfolio",
+      "image": "/content/6854d4bba74e97e4e739987227aeb9d0f56ded63-1652x2336.webp"
+    },
+    {
+      "id": "87598509-f4b6-4667-971f-21a429e0e749",
+      "title": "个人作品集",
+      "seoTitle": "Design Nominees 每日最佳网站：ITom 个人作品集（2026）",
+      "seoDescription": "ITom 位于 itomdev.com 的手绘互动作品集于 2026 年 5 月 2 日获选 Design Nominees 每日最佳网站。Design Nominees 是国际网页设计评选平台，从创意、设计质量与技术实现等方面评价项目。Tomasz Szmajda 的作品集包含可漫游的手绘纹理走廊、互动门导航与自定义着色器效果，全部通过 React 和 Three.js 从零实现。",
+      "category": "sotd",
+      "date": "2026-05-02",
+      "url": "https://www.designnominees.com/sites/tomasz-itom-szmajda-portfoio",
+      "image": "/content/f13a8fa17a10e57963663c40665ee615c117aca8-1652x2336.webp"
+    },
+    {
+      "id": "a43fcff2-0733-427d-8387-0872fab5df55",
+      "title": "个人作品集",
+      "seoTitle": "WD 每日网页设计奖：ITom 个人作品集（2026）",
+      "seoDescription": "ITom 位于 itomdev.com 的交互作品集获选 WD awards 每日网页设计。WD awards 是展示、推广创意数字项目的网页设计画廊。Tomasz Szmajda 的作品集采用手绘速写纹理、房间式交互导航、自定义着色器上色显现效果和流畅的 GSAP 动画，全部从零构建，不使用模板。",
+      "category": "sotd",
+      "date": "2026-05-01",
+      "url": "https://wdawards.com/web/tomasz-itom-szmajda-folio",
+      "image": "/content/e0ff92dc217fd09633b372e0de03a4a53e1e5934-1650x2336.webp"
+    },
+    {
+      "id": "0de8f2a1-b861-4d30-a641-be40f8ea5b23",
+      "title": "个人作品集",
+      "seoTitle": "Awwwards 荣誉提名：ITom 个人作品集（2026）",
+      "seoDescription": "Tomasz Szmajda 的 ITom 作品集于 2026 年 4 月获得 Awwwards 荣誉提名。Awwwards 是全球领先的网页设计与开发评选平台，评审来自世界各地的顶尖代理机构与工作室。该作品从设计、易用性、创意和内容等方面接受评估。项目采用 React、Three.js 和 GSAP，构建带速写纹理的互动走廊，访客通过门进入画廊、工作室和联系我等房间。这种以故事叙述为核心的作品集设计，获得了行业竞争极为激烈的平台认可。",
+      "category": "other",
+      "date": "2026-04-30",
+      "url": "https://www.awwwards.com/sites/tomasz-itom-szmajda-folio",
+      "image": "/content/6c7517ee36bc05c6148323332ccc95df511d33dc-2408x3194.webp"
+    },
+    {
+      "id": "baef69f5-7eb5-4840-867a-e5633ea16adc",
+      "title": "个人作品集",
+      "seoTitle": "CSSDA 公众体验奖：ITom 创意作品集（2026）",
+      "seoDescription": "Tomasz Szmajda 的 ITom 作品集于 2026 年 4 月通过社区投票获得 CSS Design Awards 公众体验奖。奖项肯定项目直观的用户体验：访客通过互动门探索带速写纹理的走廊，配合流畅动画，以及响应滚动、鼠标和移动端陀螺仪的相机系统。这体现了社区对作品集导航流程与交互设计的积极反馈。",
+      "category": "other",
+      "date": "2026-04-25",
+      "url": "https://www.cssdesignawards.com/sites/tomasz/49278/",
+      "image": "/content/57e43df691f1a23d5be8266550c281a387f9d3bd-1652x2336.webp"
+    },
+    {
+      "id": "70f768e8-3bb3-4b7a-bfa5-2a5de8106b03",
+      "title": "个人作品集",
+      "seoTitle": "CSSDA 公众创新奖：ITom 个人作品集（2026）",
+      "seoDescription": "CSS Design Awards 社区在 2026 年 4 月投票选出 ITom 作品集为公众创新奖得主。奖项肯定了作品集设计中的创新方式：用可探索的 3D 环境替代传统页面滚动，用手绘纹理替代精细 3D 模型，并通过自定义 GLSL 着色器系统实现可交互的上色显现效果。项目由 Tomasz Szmajda 使用 React Three Fiber 和 GSAP 从零构建。",
+      "category": "other",
+      "date": "2026-04-25",
+      "url": "https://www.cssdesignawards.com/sites/tomasz/49278/",
+      "image": "/content/917c3689008a16d7890994ba81803960973d2769-1652x2336.webp"
+    },
+    {
+      "id": "665d9a66-e483-425e-98e0-903178795066",
+      "title": "个人作品集",
+      "seoTitle": "FWA 每日最佳网站：ITom 手绘交互作品集（2026）",
+      "seoDescription": "Tomasz Szmajda（ITom）位于 itomdev.com 的手绘交互作品集，于 2026 年 4 月 25 日获得备受认可的 FWA 每日最佳网站。FWA（Favourite Website Awards）是国际知名的数字前沿设计与创意开发评选平台之一。获奖作品采用 React Three Fiber 构建可漫游 3D 走廊，结合手绘速写纹理、自定义 GLSL 上色显现效果，以及支持多种输入方式的相机系统。这次认可肯定了项目在互动网页叙事与前端工程方面的创新。",
+      "category": "sotd",
+      "date": "2026-04-25",
+      "url": "https://thefwa.com/cases/tomasz-itom-szmajda-portfolio",
+      "image": "/content/c620682e3f34e1192f78c0a331818c8cdc941bb0-1652x2336.webp"
+    },
+    {
+      "id": "637e0606-546f-4dde-9ff1-c7b762c18c04",
+      "title": "个人作品集",
+      "seoTitle": "CSSDA 公众界面奖：ITom 互动作品集（2026）",
+      "seoDescription": "ITom 位于 itomdev.com 的作品集于 2026 年 4 月通过社区投票获得 CSS Design Awards 公众界面奖。奖项表彰项目的视觉界面设计：三维几何体上的手绘速写纹理、悬停时的自定义上色显现着色器，以及温暖统一的配色，共同塑造独特的手工美感。项目由 Tomasz Szmajda 使用 React、Three.js 和 GSAP 制作。",
+      "category": "other",
+      "date": "2026-04-25",
+      "url": "https://www.cssdesignawards.com/sites/tomasz/49278/",
+      "image": "/content/5ae3c2298680c5737072e29d59c5783c9eb7d3f4-1652x2336.webp"
+    },
+    {
+      "id": "38d6fef9-4988-46d2-b47f-87765c6d4c24",
+      "title": "个人作品集",
+      "seoTitle": "CSSDA 特别嘉奖：ITom 创意开发作品集（2025）",
+      "seoDescription": "Tomasz Szmajda（ITom）位于 itomdev.com 的创意开发作品集获得 CSS Design Awards 特别嘉奖。CSSDA 是国际重要的网页设计与开发评选平台，由行业评审团从界面设计、用户体验创新和技术实现等方面评价项目。特别嘉奖表彰在所有评审标准中均体现出色质量的作品。该作品集具有互动速写视觉、流畅的 GSAP 动画，以及完全从零编码的独特房间式导航系统。",
+      "category": "other",
+      "date": "2026-04-25",
+      "url": "https://www.cssdesignawards.com/sites/tomasz/49278/",
+      "image": "/content/264e3fb124ed86d5f3db2ca6b8e6ae553fb86da5-1652x2336.webp"
+    },
+    {
+      "id": "3dc50e3a-0626-4e13-a032-41660d13e11d",
+      "title": "个人作品集",
+      "seoTitle": "Orpetron 每日最佳网站：ITom 个人作品集（2026）",
+      "seoDescription": "ITom 作品集获得 Orpetron 网页设计奖（orpetron.com）每日最佳网站。这个国际平台表彰自由设计师、创意机构和开发者的优秀数字作品。奖项肯定了作品集创新的房间式导航、速写纹理视觉和流畅互动动画。项目由创意开发者 Tomasz Szmajda 使用 React、Three.js 和 GSAP 从零开发。",
+      "category": "sotd",
+      "date": "2026-04-01",
+      "url": "https://orpetron.com/sites/tomasz-itom-szmajda-portfolio/",
+      "image": "/content/71adf1f1527f3cf11ffe3b9eaee9bf21dc943252-595x876.webp"
+    },
+    {
+      "id": "b8abd703-2823-4d6c-ba76-868deb6846fa",
+      "title": "个人作品集",
+      "seoTitle": "CSS Winner 每日最佳网站：ITom 个人作品集（2026）",
+      "seoDescription": "ITom 位于 itomdev.com 的创意开发作品集于 2026 年 3 月 25 日获选 CSS Winner 每日最佳网站。CSS Winner（csswinner.com）是国际网页设计评选平台，从设计质量、易用性和创意创新方面评价网站。作品集以自定义着色器驱动手绘速写纹理，通过互动门连接房间，并使用 GSAP 实现流畅转场。所有代码均由 Tomasz Szmajda 从零编写，不使用模板或页面搭建器。",
+      "category": "sotd",
+      "date": "2026-03-25",
+      "url": "https://www.csswinner.com/details/tomasz-itom-szmajda-portfolio/19143",
+      "image": "/content/5651ba23a87390692859130113f7503ed3c78c69-1652x2338.webp"
+    },
+    {
+      "id": "a545607a-b95a-410f-b26a-87082be95c51",
+      "title": "Young Multi",
+      "seoTitle": "Orpetron 每日最佳网站：Young Multi（2026）",
+      "seoDescription": "Tomasz Szmajda（ITom）的 Young Multi 艺人网站于 2026 年 1 月 29 日获得 Orpetron 每日最佳网站。Orpetron 网页设计奖表彰全球数字项目中出色的创意与技术实现。网站采用自定义 WebGL 图片扭曲着色器、深色氛围布局和由 GSAP 驱动的滚动转场，展现这位波兰嘻哈艺人品牌的活力。",
+      "category": "sotd",
+      "date": "2026-01-29",
+      "url": "https://orpetron.com/sites/young-multi/",
+      "image": "/content/19b206ad6cfc6adbd8457fa8381754ed3707b687-596x875.webp"
+    },
+    {
+      "id": "6dbf45eb-1f12-41f3-9f64-ab71f598b139",
+      "title": "Young Multi",
+      "seoTitle": "CSS Winner 每日最佳网站：Young Multi（2026）",
+      "seoDescription": "创意开发者 Tomasz Szmajda（ITom）的 Young Multi 艺人网站于 2026 年 1 月 24 日获得 CSS Winner 每日最佳网站。项目使用自定义 WebGL 图片扭曲着色器，让照片随鼠标交互弯折变形，带来符合这位波兰嘻哈艺人品牌的原始而充满能量的视觉体验。网站采用 React、WebGL 和 GSAP，展示创意前端代码如何把常规艺人页面转化为沉浸式互动画廊。",
+      "category": "sotd",
+      "date": "2026-01-24",
+      "url": "https://www.csswinner.com/details/young-multi-official-experience/19045",
+      "image": "/content/d2244e5db14c4dc3efa12a62e193a29e4c07d2ae-1652x2338.webp"
+    },
+    {
+      "id": "5d8f2ab8-0af1-46f3-b113-80e1d2f1199e",
+      "title": "Young Multi",
+      "seoTitle": "Design Nominees 每日最佳网站：Young Multi（2026）",
+      "seoDescription": "Tomasz Szmajda（ITom）的 Young Multi 艺人网站获得 Design Nominees（designnominees.com）每日最佳网站。这个国际平台表彰优秀网站、应用与游戏。项目采用作用于摄影图片的自定义 WebGL 扭曲着色器、深色氛围美学，以及流畅的 GSAP 滚动转场，通过互动体验捕捉这位波兰嘻哈艺人音乐中原始而充沛的能量。",
+      "category": "sotd",
+      "date": "2026-01-17",
+      "url": "https://www.designnominees.com/sites/young-multi",
+      "image": "/content/ab97e504acf57c7592cf21cd1b7fe68e50882805-1652x2336.webp"
+    }
+  ],
+  "faq": [
+    {
+      "id": "198b1f51-fefc-403c-b8cd-acc597c7964a",
+      "question": "ITom 与其他开发者有什么不同？",
+      "answer": "ITom 从零编写所有内容，不使用 WordPress、Webflow 或现成模板。他坚持“先完善基础机制”：在添加任何视觉效果前，先打磨布局、滚动行为与性能，让每个网站即使在手机上也能以每秒 60 帧流畅运行。他将获得奖项认可的创意实现与扎实的工程基础结合，交付既有出色外观、底层表现也可靠的网站。"
+    },
+    {
+      "id": "7f62a99f-063d-4d66-8a62-3da162c2bf2d",
+      "question": "ITom 使用哪些技术？",
+      "answer": "ITom 的主要工具包括 React、Next.js、JavaScript、用于动画的 GSAP（GreenSock）和 CSS。他使用 Lenis 实现平滑滚动，使用无头内容管理系统维护内容，并通过 Vercel 托管。当项目需要浏览器交互体验时，也会采用 Three.js、React Three Fiber 和 WebGL。所有内容都从零编码，不使用模板或页面搭建器。"
+    },
+    {
+      "id": "b2a17219-8c40-461e-b167-abad1f5d0d6c",
+      "question": "ITom 是谁，主要做什么？",
+      "answer": "ITom 是波兰前端开发者 Tomasz Szmajda 的创作名称。他从零制作手工打磨、富有吸引力的互动网站，专注于流畅动画、滚动叙事和清晰代码，让网站显得鲜活并吸引用户探索。作品涵盖动态作品集网站、摄像头控制的网页游戏等，并获得 FWA 每日最佳网站和 CSS Design Awards 等奖项认可。"
+    },
+    {
+      "id": "b419ccb1-dc5f-437b-ab78-5727c9eae0b8",
+      "question": "ITom 可以制作哪些类型的网站？",
+      "answer": "ITom 制作多种互动网站：包括采用流畅滚动动画和页面转场的叙事作品集、具有定制视觉效果的沉浸式艺人网站，以及兼顾精品美学和快速性能的简洁商业网站。他偏好通过动画与用户体验讲述故事的项目，而非仅静态展示内容。每个项目都由代码从零实现，不使用模板。"
+    },
+    {
+      "id": "cd82f061-9f48-4084-9fe1-3851d8b7280f",
+      "question": "67 挑战是什么，如何游玩？",
+      "answer": "67 挑战是运行在 sixsevengame.vercel.app 的浏览器速度游戏，摄像头就是控制器。玩家在 15 秒内尽可能快地完成热门“67”动作，MediaPipe 会实时追踪手腕；全过程在浏览器中完成，无需下载。游戏采用 React 19 和在 GPU 上运行的 MediaPipe WASM，提供 Firebase 全球每日排行榜、自动生成的带二维码 PDF 证书、粒子效果，以及波兰语和英语支持。它曾在大学科学节吸引超过 100 人排队游玩。"
+    },
+    {
+      "id": "d0662289-8774-4cec-95ba-88bdce6e189a",
+      "question": "ITom 接受自由职业项目吗？",
+      "answer": "接受。ITom 面向全球客户承接自由职业创意开发项目，尤其适合已有清晰构想、或提供设计稿并希望通过动画与代码将其实现的客户。他擅长交互流畅的叙事网站、艺人网站、作品集和精品商业网站。在了解完整项目范围后提供固定总价，通常在 4 至 8 周内交付。"
+    },
+    {
+      "id": "d381598b-623b-48ca-9159-004314323bfe",
+      "question": "ITom 获得过网页设计奖项吗？",
+      "answer": "获得过。ITom 的项目获得多项国际奖项，包括 FWA 每日最佳网站、GSAP 每日最佳网站、CSS Design Awards 特别嘉奖和 Awwwards 提名。他的 Young Multi 艺人网站还获得 CSSDA 每日最佳网站及 Design Nominees 每日最佳网站。这些奖项同时认可作品的创意质量与技术表现。"
+    },
+    {
+      "id": "e39ccf39-74f5-4567-af02-b525a868371d",
+      "question": "ITom 也负责设计和 3D 建模吗？",
+      "answer": "ITom 主要负责开发，并非设计师或 3D 艺术家。他不使用 Figma、Photoshop 或 Blender，而是在纸上勾勒布局想法，再直接用代码构建，边开发边设计。客户提供完整界面设计或现成 3D 模型（GLTF/GLB 文件）时，他可以精确实现并添加动画，但这些素材本身的创作不属于他的职责。"
+    }
+  ]
+}

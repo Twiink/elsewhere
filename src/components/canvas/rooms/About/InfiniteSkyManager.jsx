@@ -5,19 +5,19 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import SkyChunk, { CHUNK_LENGTH, ROOM_Z } from './SkyChunk';
 import { useScene } from '../../../../context/SceneContext';
-import '../../shaders/RevealBasicMaterial'; // Registers brush-stroke reveal for BasicMaterial
+import '../../shaders/RevealBasicMaterial'; // 注册 BasicMaterial 的笔刷显现效果。
 import { isTouchDevice } from '../../../../utils/deviceDetect';
-import { useAwards } from '../../../../hooks/useSanityData';
+import { useAwards } from '../../../../hooks/useContentData';
 
-// Reusable Vector3 to avoid allocations in event handlers
+// 复用 Vector3，避免事件处理时分配对象。
 const _tempVec3 = new THREE.Vector3();
 
 /**
- * InfiniteSkyManager Component
+ * InfiniteSkyManager 无限天空管理组件。
  * 
- * Manages dynamic generation/removal of sky chunks for infinite scroll.
- * World group moves with scroll, chunks stay at fixed positions relative to group.
- * Includes Story Milestones that loop with the content!
+ * 动态生成和移除天空分块，实现无限滚动。
+ * 世界组随滚动移动，分块相对于该组保持固定位置。
+ * 故事里程碑也随内容循环。
  */
 
 import { useAudio } from '../../../../context/AudioManager';
@@ -29,19 +29,19 @@ export const BALLOON_AUDIO_SETTINGS = {
 };
 
 /**
- * Reusable Button Component with Hover Effect + Brush-Stroke Reveal
+ * 可复用按钮，支持悬停与笔刷显现效果。
  */
 const AwardButton = ({ onClick, texture, paintedTexture, width, height, position, onHoverChange }) => {
     const isTouch = isTouchDevice();
     const meshRef = useRef();
-    const buttonRevealRef = useRef(); // RevealBasicMaterial ref for button sketch
-    const paintedRef = useRef(); // Painted button mesh visibility
-    const hideDelayRef = useRef(); // Track pending gsap.delayedCall
+    const buttonRevealRef = useRef(); // 按钮速写的 RevealBasicMaterial 引用。
+    const paintedRef = useRef(); // 彩色按钮网格的可见状态。
+    const hideDelayRef = useRef(); // 跟踪待执行的 gsap.delayedCall。
     const [hovered, setHovered] = useState(false);
 
     useFrame((state, delta) => {
         if (meshRef.current) {
-            // Smoothly lerp scale based on hover state
+            // 按悬停状态平滑插值缩放。
             const targetScale = hovered ? 1.05 : 1.0;
             const lerpFactor = 10 * delta;
 
@@ -57,7 +57,7 @@ const AwardButton = ({ onClick, texture, paintedTexture, width, height, position
         document.body.style.cursor = 'pointer';
         onHoverChange?.(true);
 
-        // Brush-stroke reveal button
+        // 笔刷显现按钮。
         if (buttonRevealRef.current) {
             gsap.to(buttonRevealRef.current, {
                 uProgress: 1.0,
@@ -79,7 +79,7 @@ const AwardButton = ({ onClick, texture, paintedTexture, width, height, position
         document.body.style.cursor = 'auto';
         onHoverChange?.(false);
 
-        // Reverse reveal
+        // 反向显现。
         if (buttonRevealRef.current) {
             gsap.to(buttonRevealRef.current, {
                 uProgress: 0.0,
@@ -97,7 +97,7 @@ const AwardButton = ({ onClick, texture, paintedTexture, width, height, position
 
     return (
         <group ref={meshRef} position={position}>
-            {/* Painted button (behind) - hidden until hover */}
+            {/* 彩色按钮位于后方，悬停前隐藏。 */}
             <mesh ref={paintedRef} position={[0, 0, -0.001]} visible={true}>
                 <planeGeometry args={[width, height]} />
                 <meshBasicMaterial color="#e0e0e0"
@@ -109,7 +109,7 @@ const AwardButton = ({ onClick, texture, paintedTexture, width, height, position
                     depthWrite={false}
                 />
             </mesh>
-            {/* Sketch button (front) with reveal */}
+            {/* 带显现效果的前方速写按钮。 */}
             <mesh
                 onClick={onClick}
                 onPointerOver={handlePointerOver}
@@ -132,51 +132,51 @@ const AwardButton = ({ onClick, texture, paintedTexture, width, height, position
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Bold.ttf"
+                font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
-                VIEW
+                查看
             </Text>
         </group>
     );
 };
 
-// Story milestones configuration
-// Each milestone appears once per "story cycle" (4 chunks = 160 units)
+// 故事里程碑配置。
+// 每个故事周期出现一次，即 4 个分块、160 单位。
 const STORY_CYCLE_LENGTH = 160;
 
-// === TWARDA LINIA ZANIKANIA DLA MILESTONES (WORLD SPACE) ===
-// Pokój About jest na Z = -25, więc -25 to drzwi pokoju
-// -27 = 2 metry za drzwiami (w głąb pokoju) - musi matchować CORRIDOR_CLIP_Z w SkyChunk
+// 世界空间中里程碑的硬裁切边界。
+// 关于我房间位于 Z=-25，门也位于此处。
+// -27 表示门后深入房间 2 米，必须与 SkyChunk 的 CORRIDOR_CLIP_Z 一致。
 const MILESTONE_CORRIDOR_CLIP_Z = -8.0;
 
 const InfiniteSkyManager = ({ scrollProgressRef }) => {
-    // PRE-CALCULATED FOR scrolProgress = 0
-    // currentChunk = floor(0/40) = 0 -> [-1, 0, 1, 2]
+    // 按 scrollProgress=0 预先计算。
+    // currentChunk=floor(0/40)=0，对应 [-1, 0, 1, 2]。
     const [activeChunks, setActiveChunks] = useState([-1, 0, 1, 2]);
-    // currentStoryCycle = floor(0/160) = 0 -> [-1, 0, 1]
+    // currentStoryCycle=floor(0/160)=0，对应 [-1, 0, 1]。
     const [activeStoryCycles, setActiveStoryCycles] = useState([-1, 0, 1]);
     const worldRef = useRef();
 
-    // Track current chunk for recycling
+    // 跟踪当前分块以循环复用。
     const getCurrentChunk = (worldZ) => {
         return Math.floor(worldZ / CHUNK_LENGTH);
     };
 
-    // Track current story cycle
+    // 跟踪当前故事周期。
     const getCurrentStoryCycle = (worldZ) => {
         return Math.floor(worldZ / STORY_CYCLE_LENGTH);
     };
 
-    // Update chunks based on world position
+    // 按世界位置更新分块。
     useFrame(() => {
         if (!worldRef.current) return;
 
         const scrollProgress = scrollProgressRef?.current || 0;
 
-        // Move world directly
+        // 直接移动世界组。
         worldRef.current.position.z = scrollProgress;
 
-        // Figure out which chunk we're in
+        // 计算当前所在分块。
         const currentChunk = getCurrentChunk(scrollProgress);
         const shouldBeActiveChunks = [
             currentChunk - 1,
@@ -192,7 +192,7 @@ const InfiniteSkyManager = ({ scrollProgressRef }) => {
             setActiveChunks(shouldBeActiveChunks);
         }
 
-        // Update story cycles
+        // 更新故事周期。
         const currentStoryCycle = getCurrentStoryCycle(scrollProgress);
         const shouldBeActiveCycles = [
             currentStoryCycle - 1,
@@ -210,7 +210,7 @@ const InfiniteSkyManager = ({ scrollProgressRef }) => {
 
     return (
         <group ref={worldRef}>
-            {/* === SKY CHUNKS WITH CLOUDS === */}
+            {/* 带云层的天空分块。 */}
             {activeChunks.map((chunkIndex) => (
                 <SkyChunk
                     key={`sky-chunk-${chunkIndex}`}
@@ -220,28 +220,28 @@ const InfiniteSkyManager = ({ scrollProgressRef }) => {
                 />
             ))}
 
-            {/* === STORY MILESTONES (loop every 160 units) === */}
+            {/* 故事里程碑，每 160 单位循环。 */}
             {activeStoryCycles.map((cycleIndex) => (
                 <group key={`story-cycle-${cycleIndex}`}>
-                    {/* === INTRO MILESTONE === */}
+                    {/* 自我介绍里程碑。 */}
                     <IntroMilestone
                         z={-(cycleIndex * STORY_CYCLE_LENGTH + 15)}
                         scrollProgressRef={scrollProgressRef}
                     />
 
-                    {/* === AWARDS MILESTONE === */}
+                    {/* 奖项里程碑。 */}
                     <AwardsMilestone
                         z={-(cycleIndex * STORY_CYCLE_LENGTH + 55)}
                         scrollProgressRef={scrollProgressRef}
                     />
 
-                    {/* === JOURNEY MILESTONE === */}
+                    {/* 经历里程碑。 */}
                     <JourneyMilestone
                         z={-(cycleIndex * STORY_CYCLE_LENGTH + 95)}
                         scrollProgressRef={scrollProgressRef}
                     />
 
-                    {/* === SKILLS MILESTONE === */}
+                    {/* 技能里程碑。 */}
 
                     <SkillsMilestone
                         z={-(cycleIndex * STORY_CYCLE_LENGTH + 135)}
@@ -254,16 +254,16 @@ const InfiniteSkyManager = ({ scrollProgressRef }) => {
 };
 
 /**
- * INTRO Milestone - Special detailed layout
- * Elements spread apart as they approach camera
+ * 自我介绍里程碑的详细布局。
+ * 元素靠近相机时向两侧散开。
  */
 const IntroMilestone = ({ z, scrollProgressRef }) => {
-    // Load avatar texture
+    // 加载人物纹理。
     const avatarTexture = useLoader(THREE.TextureLoader, '/textures/about/awatarnachmurce.webp');
     const { camera, viewport } = useThree();
     const isTouch = isTouchDevice();
 
-    // Refs for all animated elements
+    // 全部动画元素的引用。
     const groupRef = useRef();
     const titleRef = useRef();
     const brandRef = useRef();
@@ -271,55 +271,55 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
     const motto1Ref = useRef();
     const motto2Ref = useRef();
 
-    // Base positions
+    // 基础位置。
     const baseY = 2;
 
-    // Calculate aspect ratio
-    // LEGACY FIX: Use original dimensions (2816x1536) to prevent stretching
+    // 计算宽高比。
+    // 使用原始尺寸 2816×1536，避免拉伸。
     const legacyAspectRatio = 2816 / 1536; 
-    const avatarWidth = 6; // Zwiększony rozmiar awatara na chmurce
+    const avatarWidth = 6; // 增大云上人物的尺寸。
     const avatarHeight = avatarWidth / legacyAspectRatio;
 
-    // Animation: floating + spread apart when close
+    // 动画：漂浮，靠近时散开。
     useFrame((state) => {
         if (!groupRef.current) return;
 
         const time = state.clock.elapsedTime;
 
-        // === TWARDA LINIA CLIP (RĘCZNE OBLICZENIE WORLD Z) ===
-        // worldZ = pokój(-25) + scrollProgress + lokalna pozycja milestone
+        // 硬裁切线，手动计算世界 Z。
+        // 世界 Z = 房间位置 -25 + scrollProgress + 里程碑局部位置。
         const scrollProgress = scrollProgressRef?.current || 0;
         const worldZ = ROOM_Z + scrollProgress + z;
         groupRef.current.visible = worldZ < MILESTONE_CORRIDOR_CLIP_Z;
 
-        // Skip rest if not visible
+        // 不可见时跳过后续处理。
         if (!groupRef.current.visible) return;
 
-        // FIX: Use consistent distance based on scrollProgress + offset
-        // This ensures animations work IDENTICALLY regardless of chunk/camera position
-        // Base Start Z (-15) + Scroll (0) - Offset (55) = -70 (Matches "Working" Chunk 0 feel)
+        // 使用 scrollProgress 加偏移得到一致距离。
+        // 保证无论分块或相机位置如何，动画行为都相同。
+        // 基础起点 Z=-15，加滚动 0，减偏移 55，结果 -70，与第 0 分块一致。
         const distanceZ = z + scrollProgress - 55;
 
-        // Spread effect: starts at z = -25, full spread at z = -5
-        // This makes elements spread BEFORE they reach the camera
-        // === EDYTUJ TUTAJ (INTRO) ===
-        // Zwiększ różnicę między Start a End, żeby animacja była wolniejsza
-        const spreadStart = -70; // Startuje wcześniej
-        const spreadEnd = -50;   // Kończy później
+        // 散开效果从 z=-25 开始，在 z=-5 完全展开。
+        // 让元素到达相机前就散开。
+        // 在此编辑自我介绍。
+        // 增大 Start 与 End 的差值可减慢动画。
+        const spreadStart = -70; // 更早开始。
+        const spreadEnd = -50;   // 更晚结束。
         let spreadFactor = 0;
 
         if (distanceZ > spreadStart && distanceZ < spreadEnd) {
-            // Calculate spread: 0 at spreadStart, 1 at spreadEnd
+            // 计算散开进度：spreadStart 时为 0，spreadEnd 时为 1。
             spreadFactor = (distanceZ - spreadStart) / (spreadEnd - spreadStart);
             spreadFactor = Math.min(1, Math.max(0, spreadFactor));
-            // Ease out for smoother animation
+            // 缓出使动画更平滑。
             spreadFactor = spreadFactor * spreadFactor;
         } else if (distanceZ >= spreadEnd) {
             spreadFactor = 1;
         }
 
-        // Apply spread to elements (move left/right) - MORE AGGRESSIVE
-        const maxSpread = 15; // How far elements spread (increased!)
+        // 元素向左右散开，幅度更大。
+        const maxSpread = 15; // 元素散开距离，已增大。
 
         if (titleRef.current) {
             titleRef.current.position.x = -spreadFactor * maxSpread * 0.8;
@@ -328,7 +328,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
             brandRef.current.position.x = spreadFactor * maxSpread * 0.6;
         }
         if (avatarRef.current) {
-            // Avatar: floating + spread upward
+            // 人物漂浮并向上散开。
             avatarRef.current.position.y = baseY + Math.sin(time * 0.8) * 0.15 + spreadFactor * 3;
             avatarRef.current.position.x = -spreadFactor * maxSpread * 0.3;
         }
@@ -342,7 +342,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
 
     return (
         <group ref={groupRef} position={[0, 0, z]}>
-            {/* Main title - Name (spreads left) */}
+            {/* 姓名主标题，向左散开。 */}
             <Text
                 ref={titleRef}
                 position={[0, 5, 0.1]}
@@ -350,12 +350,12 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/RubikScribble-Regular.ttf"
+                font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
                 TOMASZ SZMAJDA
             </Text>
 
-            {/* Subtitle - Brand (spreads right) */}
+            {/* 品牌副标题，向右散开。 */}
             <Text
                 ref={brandRef}
                 position={[0, 4.3, 0.1]}
@@ -363,12 +363,12 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 color="#4a4a4a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Regular.ttf"
+                font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
                 (ITOM)
             </Text>
 
-            {/* Avatar on cloud - floating + spreads up-left */}
+            {/* 云上人物漂浮并向左上散开。 */}
             <mesh ref={avatarRef} position={[0, baseY, 0]}>
                 <planeGeometry args={[avatarWidth, avatarHeight]} />
                 <meshBasicMaterial color="#e0e0e0"
@@ -379,7 +379,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 />
             </mesh>
 
-            {/* Motto - Line 1 (spreads right) */}
+            {/* 座右铭第一行，向右散开。 */}
             <Text
                 ref={motto1Ref}
                 position={[0, 0, 0.1]}
@@ -387,13 +387,13 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 color="#555555"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Regular.ttf"
+                font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 fontStyle="italic"
             >
-                "Crafting digital experiences
+                “用代码创造
             </Text>
 
-            {/* Motto - Line 2 (spreads left) */}
+            {/* 座右铭第二行，向左散开。 */}
             <Text
                 ref={motto2Ref}
                 position={[0, -0.5, 0]}
@@ -401,83 +401,24 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 color="#555555"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Regular.ttf"
+                font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 fontStyle="italic"
             >
-                that push creative boundaries"
+                跨越想象的数字体验”
             </Text>
         </group>
     );
 };
 
-/**
- * MOCK DATA FOR AWARDS
- */
-const AWARDS_DATA = {
-    featured: {
-        id: 'award-featured',
-        layout: 'certificate_grid',
-        title: 'Featured Projects Collection',
-        items: [
-            { label: 'Featured - Awwwards', date: 'May 2025', image: '/textures/about/FEATURED.webp', url: 'https://awwwards.com' },
-            { label: 'Featured - CSS Design Awards', date: 'June 2025', image: '/textures/about/FEATURED.webp', url: 'https://cssdesignawards.com' },
-            { label: 'Featured - The FWA', date: 'July 2025', image: '/textures/about/FEATURED.webp', url: 'https://thefwa.com' },
-            { label: 'Featured - Behance', date: 'August 2025', image: '/textures/about/FEATURED.webp', url: 'https://behance.net' },
-        ],
-        platformConfig: {
-            label: 'HONOR',
-            color: '#1a1a1a',
-            icon: '⭐'
-        }
-    },
-    sotd: {
-        id: 'award-sotd',
-        layout: 'certificate_grid',
-        title: 'Site of the Day Awards',
-        items: [
-            { label: 'SOTD - GSAP', date: 'February 13, 2026', image: '/textures/about/SOTDAYYOUNGMULTIGSAP.webp', url: 'https://www.linkedin.com/posts/greensock_site-of-the-day-young-multi-this-immersive-activity-7427567524940017664-zU2n?utm_source=share&utm_medium=member_desktop&rcm=ACoAAE3TV6UBqXoaJXUN5-1s3ij6SQJwTRAcbCM' },
-            { label: 'SOTD - CSS Winner', date: 'January 24, 2026', image: '/textures/about/SOTDAYYOUNGMULTICSSWINNER.webp', url: 'https://www.csswinner.com/details/young-multi-official-experience/19045' },
-            { label: 'SOTD - Orpetron', date: 'January 29, 2026', image: '/textures/about/SOTDAYYOUNGMULTIORPETRON.webp', url: 'https://orpetron.com/sites/young-multi/' },
-            { label: 'SOTD - Design Nominess', date: 'February 17, 2026', image: '/textures/about/SOTDAYYOUNGMULTIDESIGNNOMINESS.webp', url: 'https://www.designnominees.com/sites/young-multi' }
-        ],
-        platformConfig: {
-            label: 'AWARD',
-            color: '#1a1a1a',
-            icon: '🏆'
-        }
-    },
-    sotm: {
-        id: 'award-sotm',
-        layout: 'certificate_grid',
-        title: 'Site of the Month Awards',
-        items: [],
-        platformConfig: {
-            label: 'AWARD',
-            color: '#1a1a1a',
-            icon: '📅'
-        }
-    },
-    other: {
-        id: 'award-other',
-        layout: 'certificate_grid',
-        title: 'Other Awards',
-        items: [],
-        platformConfig: {
-            label: 'PRESTIGE',
-            color: '#1a1a1a',
-            icon: '👑'
-        }
-    }
-};
+
+
 
 /**
- * AWARDS Milestone - Floating Cards
- * SOTY (center), SOTD, SOTM, Featured (behind)
+ * 奖项里程碑：漂浮卡片。
+ * 年度最佳居中，日奖、月奖和精选位于后方。
  */
 const AwardsMilestone = ({ z, scrollProgressRef }) => {
-    // Pobieranie danych nagród z Sanity (z fallbackiem)
-    const sanityAwards = useAwards();
-    const awardsData = sanityAwards || AWARDS_DATA;
+    const awardsData = useAwards();
 
     const { camera, viewport } = useThree();
     const isTouch = isTouchDevice();
@@ -487,7 +428,7 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
     const sotdRef = useRef();
     const sotmRef = useRef();
 
-    // Card reveal refs (driven by button hover)
+    // 卡片显现引用，由按钮悬停驱动。
     const sotdCardRevealRef = useRef();
     const sotdCardPaintedRef = useRef();
     const sotdHideDelayRef = useRef();
@@ -498,7 +439,7 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
     const sotyCardPaintedRef = useRef();
     const sotyHideDelayRef = useRef();
 
-    // Load textures
+    // 加载纹理。
     const sotyTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTY.webp');
     const sotdTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTD.webp');
     const sotmTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTM.webp');
@@ -508,7 +449,7 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
     const buttonTexture = useLoader(THREE.TextureLoader, '/textures/about/button.webp');
     const buttonPaintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/button.webp' : '/textures/about/button_painted.webp');
 
-    // Color space fix
+    // 色彩空间修正。
     sotyTexture.colorSpace = THREE.SRGBColorSpace;
     sotdTexture.colorSpace = THREE.SRGBColorSpace;
     sotmTexture.colorSpace = THREE.SRGBColorSpace;
@@ -518,20 +459,20 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
     buttonTexture.colorSpace = THREE.SRGBColorSpace;
     buttonPaintedTexture.colorSpace = THREE.SRGBColorSpace;
 
-    // Calculate aspect ratios
-    // LEGACY FIX: Use original dimensions for cards (2400x1760) and buttons (894x208)
+    // 计算宽高比。
+    // 使用原始尺寸：卡片 2400×1760，按钮 894×208。
     const cardLegacyAspect = 2400 / 1760;
     const buttonLegacyAspect = 894 / 208;
 
-    // Base height for cards
+    // 卡片基础高度。
     const cardHeight = 2.5;
 
-    // Button dimensions
+    // 按钮尺寸。
     const buttonHeight = 0.35;
     const buttonWidth = buttonHeight * buttonLegacyAspect;
     const buttonY = -cardHeight / 2 - buttonHeight / 2 + 0.5;
 
-    // Card hover handler factory
+    // 卡片悬停处理函数工厂。
     const makeCardHoverHandler = (revealRef, paintedRef, hideDelayRef) => (isHovered) => {
         if (isTouch) return;
         if (isHovered) {
@@ -615,21 +556,21 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
 
     return (
         <group ref={groupRef} position={[0, 2, z]}>
-            {/* Title */}
+            {/* 标题。 */}
             <Text
                 position={[0, 4, 0]}
                 fontSize={1.2}
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/RubikScribble-Regular.ttf"
+                font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
-                AWARDS
+                奖项
             </Text>
 
-            {/* === SOTD (behind SOTY, rendered second) === */}
+            {/* 日奖位于年度奖后方，第二个渲染。 */}
             <group ref={sotdRef} position={[0, 0.5, -0.5]}>
-                {/* Painted card (behind) - hidden until button hover */}
+                {/* 后方彩色卡片，按钮悬停前隐藏。 */}
                 <mesh ref={sotdCardPaintedRef} position={[0, 0, -0.001]} visible={true}>
                     <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -640,7 +581,7 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
                         alphaTest={0.5}
                     />
                 </mesh>
-                {/* Sketch card (front) with reveal */}
+                {/* 前方速写卡片，支持显现效果。 */}
                 <mesh>
                     <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
                     <revealBasicMaterial
@@ -651,7 +592,7 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
                         uProgress={0.0}
                     />
                 </mesh>
-                {/* BUTTON */}
+                {/* 按钮。 */}
                 <AwardButton
                     onClick={(e) => {
                         e.stopPropagation();
@@ -664,33 +605,33 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
                     position={[0, buttonY, 0.05]}
                     onHoverChange={makeCardHoverHandler(sotdCardRevealRef, sotdCardPaintedRef, sotdHideDelayRef)}
                 />
-                {/* AWARD LABEL */}
+                {/* 奖项标签。 */}
                 <Text
                     position={[0, 0.95, 0.01]}
                     fontSize={0.45}
                     color="#1a1a1a"
                     anchorX="center"
                     anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
+                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 >
-                    SOTD
+                    每日最佳
                 </Text>
-                {/* AWARD COUNT */}
+                {/* 奖项数量。 */}
                 <Text
                     position={[-0.05, 0, 0.01]}
                     fontSize={0.8}
                     color="#1a1a1a"
                     anchorX="center"
                     anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
+                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 >
                     {awardsData.sotd.items.length}
                 </Text>
             </group>
 
-            {/* === SOTM (behind SOTY, rendered third) === */}
+            {/* 月奖位于年度奖后方，第三个渲染。 */}
             <group ref={sotmRef} position={[0, 0.5, -0.2]}>
-                {/* Painted card (behind) - hidden until button hover */}
+                {/* 后方彩色卡片，按钮悬停前隐藏。 */}
                 <mesh ref={sotmCardPaintedRef} position={[0, 0, -0.001]} visible={true}>
                     <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -701,7 +642,7 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
                         alphaTest={0.5}
                     />
                 </mesh>
-                {/* Sketch card (front) with reveal */}
+                {/* 前方速写卡片，支持显现效果。 */}
                 <mesh>
                     <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
                     <revealBasicMaterial
@@ -712,7 +653,7 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
                         uProgress={0.0}
                     />
                 </mesh>
-                {/* BUTTON */}
+                {/* 按钮。 */}
                 <AwardButton
                     onClick={(e) => {
                         e.stopPropagation();
@@ -725,33 +666,33 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
                     position={[0, buttonY, 0.05]}
                     onHoverChange={makeCardHoverHandler(sotmCardRevealRef, sotmCardPaintedRef, sotmHideDelayRef)}
                 />
-                {/* AWARD LABEL */}
+                {/* 奖项标签。 */}
                 <Text
                     position={[0, 0.95, 0.01]}
                     fontSize={0.45}
                     color="#1a1a1a"
                     anchorX="center"
                     anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
+                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 >
-                    SOTM
+                    每月最佳
                 </Text>
-                {/* AWARD COUNT */}
+                {/* 奖项数量。 */}
                 <Text
                     position={[-0.05, 0, 0.01]}
                     fontSize={0.8}
                     color="#1a1a1a"
                     anchorX="center"
                     anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
+                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 >
                     {awardsData.sotm.items.length}
                 </Text>
             </group>
 
-            {/* === SOTY (front, center, rendered LAST = always on top) === */}
+            {/* 年度奖位于前方中央，最后渲染，始终在顶层。 */}
             <group ref={sotyRef} position={[0, 0.5, 0]}>
-                {/* Painted card (behind) - hidden until button hover */}
+                {/* 后方彩色卡片，按钮悬停前隐藏。 */}
                 <mesh ref={sotyCardPaintedRef} position={[0, 0, -0.001]} visible={true}>
                     <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -762,7 +703,7 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
                         alphaTest={0.5}
                     />
                 </mesh>
-                {/* Sketch card (front) with reveal */}
+                {/* 前方速写卡片，支持显现效果。 */}
                 <mesh>
                     <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
                     <revealBasicMaterial
@@ -772,7 +713,7 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
                         side={THREE.DoubleSide}
                     />
                 </mesh>
-                {/* BUTTON */}
+                {/* 按钮。 */}
                 <AwardButton
                     onClick={(e) => {
                         e.stopPropagation();
@@ -785,25 +726,25 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
                     position={[0, buttonY, 0.05]}
                     onHoverChange={makeCardHoverHandler(sotyCardRevealRef, sotyCardPaintedRef, sotyHideDelayRef)}
                 />
-                {/* AWARD LABEL */}
+                {/* 奖项标签。 */}
                 <Text
                     position={[0, 0.95, 0.01]}
                     fontSize={0.45}
                     color="#1a1a1a"
                     anchorX="center"
                     anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
+                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 >
-                    OTHER
+                    其他荣誉
                 </Text>
-                {/* AWARD COUNT */}
+                {/* 奖项数量。 */}
                 <Text
                     position={[-0.05, 0, 0.01]}
                     fontSize={0.8}
                     color="#1a1a1a"
                     anchorX="center"
                     anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
+                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 >
                     {awardsData.other.items.length}
                 </Text>
@@ -813,8 +754,8 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
 };
 
 /**
- * JOURNEY Milestone - Floating Islands
- * UO Island (left) and Freelance Island (right) floating in clouds
+ * 经历里程碑：漂浮岛屿。
+ * 左侧大学岛与右侧自由职业岛漂浮在云中。
  */
 const JourneyMilestone = ({ z, scrollProgressRef }) => {
     const { camera, viewport } = useThree();
@@ -823,27 +764,27 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
     const uoRef = useRef();
     const freelanceRef = useRef();
 
-    // Load textures
+    // 加载纹理。
     const uoTexture = useLoader(THREE.TextureLoader, '/textures/about/uowyspa.webp');
     const freelanceTexture = useLoader(THREE.TextureLoader, '/textures/about/freelancewyspa.webp');
 
-    // Texture settings
+    // 纹理设置。
     uoTexture.colorSpace = THREE.SRGBColorSpace;
     freelanceTexture.colorSpace = THREE.SRGBColorSpace;
 
-    // Calculate aspect ratios to keep images 1:1 (not stretched)
-    // LEGACY FIX: Use original dimensions (2816x1536)
+    // 计算宽高比，保持图片原比例，避免拉伸。
+    // 使用原始尺寸 2816×1536。
     const islandLegacyAspect = 2816 / 1536;
     const uoAspect = islandLegacyAspect;
     const freelanceAspect = islandLegacyAspect;
 
-    // Base height for islands - width will adjust automatically
+    // 岛屿基础高度，宽度自动调整。
     const islandHeight = 4.5;
 
     useFrame((state) => {
         if (!groupRef.current) return;
 
-        // === TWARDA LINIA CLIP (RĘCZNE OBLICZENIE WORLD Z) ===
+        // 硬裁切线，手动计算世界 Z。
         const scrollProgress = scrollProgressRef?.current || 0;
         const worldZ = ROOM_Z + scrollProgress + z;
         groupRef.current.visible = worldZ < MILESTONE_CORRIDOR_CLIP_Z;
@@ -851,12 +792,12 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
 
         const time = state.clock.elapsedTime;
 
-        // FIX: Use consistent distance based on scrollProgress + offset
+        // 使用 scrollProgress 加偏移得到一致距离。
         const distanceZ = z + scrollProgress - 55;
 
-        // Reveal effect (islands float up from below clouds)
-        // === EDYTUJ TUTAJ (JOURNEY) ===
-        const revealStart = -100; // Wcześniejszy start
+        // 显现效果：岛屿从云下升起。
+        // 在此编辑经历。
+        const revealStart = -100; // 更早开始。
         const revealEnd = -20;
         let revealFactor = 0;
 
@@ -868,10 +809,10 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
             revealFactor = 1;
         }
 
-        // Floating animation (bobbing)
-        // UO Island (Left)
+        // 上下浮动动画。
+        // 左侧大学岛。
         if (uoRef.current) {
-            // === EDYTUJ POZYCJE TUTAJ (UO) ===
+            // 在此编辑大学岛位置。
             const startY = -2;
             const endY = 1.5;
 
@@ -880,9 +821,9 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
             uoRef.current.rotation.z = Math.sin(time * 0.3) * 0.05;
         }
 
-        // Freelance Island (Right)
+        // 右侧自由职业岛。
         if (freelanceRef.current) {
-            // === EDYTUJ POZYCJE TUTAJ (Freelance) ===
+            // 在此编辑自由职业岛位置。
             const startY = -1;
             const endY = 2.5;
 
@@ -894,31 +835,31 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
 
     return (
         <group ref={groupRef} position={[0, 0, z]}>
-            {/* Title */}
+            {/* 标题。 */}
             <Text
                 position={[0, 5, 0.3]}
                 fontSize={1.2}
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/RubikScribble-Regular.ttf"
+                font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
-                JOURNEY
+                历程
             </Text>
 
-            {/* Subtitle */}
+            {/* 副标题。 */}
             <Text
                 position={[0, 4.2, 0.3]}
                 fontSize={0.35}
                 color="#555555"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Regular.ttf"
+                font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
-                My path so far...
+                一路走来的经历……
             </Text>
 
-            {/* === UO ISLAND (Left) === */}
+            {/* 左侧大学岛。 */}
             <group ref={uoRef} position={[-3.5, -1, 0]}>
                 <mesh>
                     <planeGeometry args={[islandHeight * uoAspect, islandHeight]} />
@@ -928,20 +869,20 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                         side={THREE.DoubleSide}
                     />
                 </mesh>
-                {/* NAPIS NA WYSPIE (UO) - EDYTUJ TUTAJ */}
+                {/* 在此编辑大学岛上的文字。 */}
                 <Text
-                    position={[0.1, -0.85, 0.1]} // POZYCJA (X, Y, Z)
-                    fontSize={0.4}           // WIELKOŚĆ
+                    position={[0.1, -0.85, 0.1]} // 位置（X、Y、Z）。
+                    fontSize={0.4}           // 尺寸。
                     color="#1a1a1a"
                     anchorX="center"
                     anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
+                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 >
-                    2025-NOW
+                    2025—至今
                 </Text>
             </group>
 
-            {/* === FREELANCE ISLAND (Right) === */}
+            {/* 右侧自由职业岛。 */}
             <group ref={freelanceRef} position={[3.5, -2, 0.5]}>
                 <mesh>
                     <planeGeometry args={[islandHeight * freelanceAspect, islandHeight]} />
@@ -951,16 +892,16 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                         side={THREE.DoubleSide}
                     />
                 </mesh>
-                {/* NAPIS NA WYSPIE (Freelance) - EDYTUJ TUTAJ */}
+                {/* 在此编辑自由职业岛上的文字。 */}
                 <Text
-                    position={[0, -0.65, 0.1]} // POZYCJA (X, Y, Z)
-                    fontSize={0.5}           // WIELKOŚĆ
+                    position={[0, -0.65, 0.1]} // 位置（X、Y、Z）。
+                    fontSize={0.5}           // 尺寸。
                     color="#1a1a1a"
                     anchorX="center"
                     anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
+                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 >
-                    2023-NOW
+                    2023—至今
                 </Text>
             </group>
         </group>
@@ -968,38 +909,38 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
 };
 
 /**
- * SKILLS Milestone - Floating Balloons
- * Colorful balloons floating upward, each representing a skill
+ * 技能里程碑：漂浮气球。
+ * 彩色气球向上飘，每个代表一项技能。
  */
 
-// Balloon configuration: size category, texture path, position offset
-// === EDYTUJ WYSOKOŚĆ TUTAJ (zmień wartość 'y' dla każdego balona) ===
+// 气球配置：尺寸类别、纹理路径、位置偏移。
+// 修改每个气球的 y 值可调整高度。
 const BALLOON_CONFIG = [
-    // Large balloons (main skills) - front and center
+    // 大气球代表主要技能，位于前方中央。
     { texture: '/textures/about/reactduzybalon.webp', paintedTexture: '/textures/about/reactduzybalon_painted.webp', label: 'React', size: 'large', x: -2.5, y: 2, z: 0.3, phase: 0 },
     { texture: '/textures/about/threejsduzybalon.webp', paintedTexture: '/textures/about/threejsduzybalon_painted.webp', label: 'Three.js', size: 'large', x: 2.5, y: 2.5, z: 0.2, phase: 1.5 },
     { texture: '/textures/about/GSAPduzybalon.webp', paintedTexture: '/textures/about/GSAPduzybalon_painted.webp', label: 'GSAP', size: 'large', x: 0, y: 3, z: 0.5, phase: 3 },
 
-    // Medium balloons - scattered around
+    // 中气球散布四周。
     { texture: '/textures/about/JSSREDNIBALON.webp', paintedTexture: '/textures/about/JSSREDNIBALON_painted.webp', label: 'JavaScript', size: 'medium', x: -4, y: 1, z: -0.3, phase: 0.8 },
     { texture: '/textures/about/csssrednibalon.webp', paintedTexture: '/textures/about/csssrednibalon_painted.webp', label: 'CSS', size: 'medium', x: 4, y: 1.5, z: -0.2, phase: 2.2 },
     { texture: '/textures/about/nextjssrednibalon.webp', paintedTexture: '/textures/about/nextjssrednibalon_painted.webp', label: 'Next.js', size: 'medium', x: 0, y: 0.5, z: -0.4, phase: 4 },
 
-    // Small balloons - background accents
+    // 小气球作为背景点缀。
     { texture: '/textures/about/htmlmalybalon.webp', paintedTexture: '/textures/about/htmlmalybalon_painted.webp', label: 'HTML', size: 'small', x: -5.5, y: 2.5, z: -0.8, phase: 1.2 },
     { texture: '/textures/about/gitmalybalon.webp', paintedTexture: '/textures/about/gitmalybalon_painted.webp', label: 'Git', size: 'small', x: 5.5, y: 3, z: -0.7, phase: 2.8 },
     { texture: '/textures/about/figmamalybalon.webp', paintedTexture: '/textures/about/figmamalybalon_painted.webp', label: 'Figma', size: 'small', x: -3, y: 4.5, z: -0.5, phase: 3.5 },
     { texture: '/textures/about/firebasemalybalon.webp', paintedTexture: '/textures/about/firebasemalybalon_painted.webp', label: 'Firebase', size: 'small', x: 3.5, y: 4, z: -0.6, phase: 4.5 },
 ];
 
-// Size multipliers for balloon categories
+// 各气球类别的尺寸倍率。
 const SIZE_MULTIPLIERS = {
     large: 3.0,
     medium: 2.2,
     small: 1.6,
 };
 
-// Individual balloon component
+// 单个气球组件。
 const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => {
     const { viewport } = useThree();
     const isTouch = isTouchDevice();
@@ -1013,16 +954,16 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
     const [hovered, setHovered] = useState(false);
     const [isFadingOutText, setIsFadingOutText] = useState(false);
     const popRef = useRef(0);
-    const textFadeRef = useRef(1); // 1 = fully visible, 0 = hidden
-    const respawnOffsetRef = useRef(0); // For floating back up after respawn
+    const textFadeRef = useRef(1); // 1 为完全可见，0 为隐藏。
+    const respawnOffsetRef = useRef(0); // 用于重生后向上漂浮。
     const balloonMatRef = useRef();
-    const balloonRevealRef = useRef(); // RevealBasicMaterial ref for sketch
-    const paintedMeshRef = useRef(); // Painted balloon mesh visibility
-    const paintedMatRef = useRef(); // Painted balloon material opacity control
-    const hideDelayRef = useRef(); // Track pending gsap.delayedCall
+    const balloonRevealRef = useRef(); // 速写的 RevealBasicMaterial 引用。
+    const paintedMeshRef = useRef(); // 彩色气球网格的可见状态。
+    const paintedMatRef = useRef(); // 彩色气球材质的透明度控制。
+    const hideDelayRef = useRef(); // 跟踪待执行的 gsap.delayedCall。
     const textRef = useRef();
 
-    // Audio Ref
+    // 音频引用。
     const balloonAudioRef = useRef();
     const { globalVolume, isMuted } = useAudio();
 
@@ -1035,12 +976,12 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
         }
     };
 
-    // LEGACY FIX: Use original aspect ratios from BALLOON_CONFIG or hardcoded for categories
+    // 使用 BALLOON_CONFIG 中的原始宽高比，或类别的固定比例。
     const legacyAspects = {
         'reactduzybalon.webp': 736 / 1447,
         'threejsduzybalon.webp': 1141 / 1964,
-        'GSAPduzybalon.webp': 1.0, // GSAP balloon is square
-        'default_small_medium': 631 / 1482 // Common ratio for others
+        'GSAPduzybalon.webp': 1.0, // GSAP 气球为正方形。
+        'default_small_medium': 631 / 1482 // 其他气球的通用比例。
     };
     
     const filename = config.texture.split('/').pop();
@@ -1054,13 +995,13 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
     const targetMagnet = useRef({ x: 0, y: 0 });
     const currentMagnet = useRef({ x: 0, y: 0 });
 
-    // === RESPONSYWNOŚĆ ===
-    // Na mobile (wąski viewport) balony są bliżej środka
-    const positionScale = isTouch ? 0.5 : 1; // Jak bardzo ściskamy pozycje na mobile
-    const spreadScale = isTouch ? 0.4 : 1;   // Jak bardzo zmniejszamy spread na mobile
-    const sizeScale = isTouch ? 0.85 : 1;    // Trochę mniejsze balony na mobile
+    // 响应式适配。
+    // 移动端视口较窄，气球更靠近中心。
+    const positionScale = isTouch ? 0.5 : 1; // 移动端位置压缩程度。
+    const spreadScale = isTouch ? 0.4 : 1;   // 移动端散开幅度缩减程度。
+    const sizeScale = isTouch ? 0.85 : 1;    // 移动端气球略小。
 
-    // Cursor handling
+    // 光标处理。
     useEffect(() => {
         if (hovered && !isPopping) {
             document.body.style.cursor = 'pointer';
@@ -1069,10 +1010,10 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
         }
     }, [hovered, isPopping]);
 
-    // Handle text fade out timer
+    // 文字淡出计时器。
     useEffect(() => {
         if (isPopping) {
-            // Start fading out text after 3 seconds
+            // 3 秒后开始淡出文字。
             const timer = setTimeout(() => {
                 setIsFadingOutText(true);
             }, 3000);
@@ -1080,13 +1021,13 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
         }
     }, [isPopping]);
 
-    // Hover handlers for brush-stroke reveal
+    // 笔刷显现的悬停处理。
     const handlePointerOver = (e) => {
         if (isTouch) return;
         e.stopPropagation();
         if (!isPopping) setHovered(true);
 
-        // Brush-stroke reveal: show painted balloon
+        // 笔刷显现：显示彩色气球。
         if (balloonRevealRef.current) {
             gsap.to(balloonRevealRef.current, {
                 uProgress: 1.0,
@@ -1105,7 +1046,7 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
         e.stopPropagation();
         setHovered(false);
 
-        // Reverse reveal
+        // 反向显现。
         if (balloonRevealRef.current) {
             gsap.to(balloonRevealRef.current, {
                 uProgress: 0.0,
@@ -1119,10 +1060,10 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
         });
     };
 
-    // Animation update loop
+    // 动画更新循环。
     useFrame((state, delta) => {
         if (hovered && !isPopping) {
-            targetScale.current = 1.05; // lekkie powiększenie
+            targetScale.current = 1.05; // 轻微放大。
         } else {
             targetScale.current = 1.0;
             targetMagnet.current.x = 0;
@@ -1134,10 +1075,10 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
         currentMagnet.current.y = THREE.MathUtils.lerp(currentMagnet.current.y, targetMagnet.current.y, 8 * delta);
 
         if (isPopping) {
-            // Smooth, slow pop animation
+            // 平滑、缓慢的弹出动画。
             popRef.current = THREE.MathUtils.lerp(popRef.current, 1, 2.5 * delta);
 
-            // Also hide painted mesh during pop (kill any pending reveals)
+            // 弹出时也隐藏彩色网格，并取消待执行的显现动画。
             if (hideDelayRef.current) hideDelayRef.current.kill();
             if (balloonRevealRef.current) {
                 balloonRevealRef.current.uProgress = 0;
@@ -1145,39 +1086,39 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
         }
 
         if (isFadingOutText) {
-            // Fade out the text slowly
+            // 缓慢淡出文字。
             textFadeRef.current = THREE.MathUtils.lerp(textFadeRef.current, 0, 2 * delta);
 
-            // Once fully faded, respawn the balloon from below
+            // 完全淡出后，从下方重新生成气球。
             if (textFadeRef.current < 0.05) {
                 setIsPopping(false);
                 setHovered(false);
                 setIsFadingOutText(false);
                 popRef.current = 0;
                 textFadeRef.current = 1;
-                respawnOffsetRef.current = -12; // Teleport below to float up again
+                respawnOffsetRef.current = -12; // 移至下方，再向上漂浮。
 
-                // Immediately teleport the mesh to prevent pointer events at the old location
+                // 立即移动网格，避免旧位置继续接收指针事件。
                 if (outerGroupRef.current) {
                     outerGroupRef.current.position.y -= 12;
                 }
 
-                // Immediately reset opacities to prevent flashing
+                // 立即重置透明度，防止闪烁。
                 if (balloonRevealRef.current) balloonRevealRef.current.opacity = 1;
                 if (textRef.current) textRef.current.fillOpacity = 0;
-                // Reset reveal state on respawn
+                // 重生时重置显现状态。
                 if (balloonRevealRef.current) balloonRevealRef.current.uProgress = 0;
                 if (paintedMatRef.current) paintedMatRef.current.opacity = 0;
                 if (paintedMeshRef.current) paintedMeshRef.current.visible = false;
             }
         }
 
-        // Float back up if respawning
+        // 重生时向上飘回。
         if (respawnOffsetRef.current < -0.01) {
             respawnOffsetRef.current = THREE.MathUtils.lerp(respawnOffsetRef.current, 0, 1.5 * delta);
         }
 
-        // Apply opacities if not fully respawned
+        // 尚未完全重生时应用透明度。
         if (balloonRevealRef.current && isPopping) {
             balloonRevealRef.current.opacity = 1 - popRef.current;
         }
@@ -1185,19 +1126,19 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
             paintedMatRef.current.opacity = 1 - popRef.current;
         }
         if (textRef.current && isPopping) {
-            // Combine pop-in and fade-out opacities
+            // 合并弹入与淡出的透明度。
             textRef.current.fillOpacity = popRef.current * textFadeRef.current;
             textRef.current.outlineOpacity = popRef.current * textFadeRef.current;
         }
     });
 
-    // Floating animation with unique phase — now computed inside useFrame
-    // Moved from render body to avoid re-renders
+    // 带独立相位的漂浮动画，现于 useFrame 内计算。
+    // 从渲染函数移出，避免重复渲染。
 
-    // Bazowa pozycja X (skalowana na mobile)
+    // 基础 X 位置，移动端会缩放。
     const baseX = config.x * positionScale;
 
-    // P2: Compute position/scale/rotation imperatively inside useFrame
+    // P2：在 useFrame 内直接计算并更新位置、缩放与旋转。
     useFrame(() => {
         if (!outerGroupRef.current) return;
 
@@ -1205,22 +1146,22 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
         const revealFactor = revealFactorRef.current;
         const spreadFactor = spreadFactorRef.current;
 
-        // Floating animation with unique phase
+        // 带独立相位的漂浮动画。
         const floatY = Math.sin(time * 0.6 + config.phase) * 0.3;
         const floatX = Math.sin(time * 0.4 + config.phase * 0.7) * 0.15;
         const rotation = Math.sin(time * 0.3 + config.phase) * 0.08;
 
-        // Reveal: balloons float up from below, including respawn offset
+        // 显现时气球从下方飘起，包含重生偏移。
         const startY = config.y - 8;
         const endY = config.y;
         const currentY = startY + revealFactor * (endY - startY) + floatY + respawnOffsetRef.current;
 
-        // Scale up as they reveal
+        // 显现时逐渐放大。
         let scale = revealFactor * sizeScale;
         const popScaleEffect = currentScale.current + popRef.current * 0.4;
         scale *= popScaleEffect;
 
-        // === SPREAD EFFECT (ROZSUWANIE) ===
+        // 散开效果。
         const maxSpread = 15 * spreadScale;
         let spreadX = 0;
 
@@ -1234,13 +1175,13 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
                 : -spreadFactor * maxSpread * 0.8;
         }
 
-        // Apply imperatively
+        // 直接更新对象。
         outerGroupRef.current.position.set(baseX + floatX + spreadX, currentY, config.z);
         outerGroupRef.current.rotation.z = rotation;
-        const s = Math.max(0.001, scale); // Avoid zero scale
+        const s = Math.max(0.001, scale); // 避免零缩放。
         outerGroupRef.current.scale.set(s, s, s);
 
-        // Update magnet position on inner group imperatively
+        // 直接更新内部组的磁吸位置。
         if (innerGroupRef.current) {
             innerGroupRef.current.position.set(currentMagnet.current.x, currentMagnet.current.y, 0);
         }
@@ -1252,7 +1193,7 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
             position={[baseX, config.y - 8, config.z]}
         >
             <group ref={innerGroupRef}>
-                {/* Painted balloon (behind) - hidden until hover */}
+                {/* 后方彩色气球，悬停前隐藏。 */}
                 <mesh ref={paintedMeshRef} visible={true}>
                     <planeGeometry args={[baseHeight * aspect, baseHeight]} />
                     <meshBasicMaterial color="#e0e0e0"
@@ -1266,7 +1207,7 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
                     />
                 </mesh>
 
-                {/* Sketch balloon (front) with brush-stroke reveal */}
+                {/* 前方速写气球，支持笔刷显现。 */}
                 <mesh
                     position={[0, 0, 0.001]}
                     onClick={(e) => {
@@ -1281,7 +1222,7 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
                     onPointerMove={(e) => {
                         if (hovered && !isPopping && outerGroupRef.current) {
                             outerGroupRef.current.getWorldPosition(_tempVec3);
-                            // Reduced magnetic pull from 0.5 to 0.15 for gentler effect
+                            // 磁吸强度从 0.5 降至 0.15，使效果更轻柔。
                             targetMagnet.current.x = (e.point.x - _tempVec3.x) * 0.15;
                             targetMagnet.current.y = (e.point.y - _tempVec3.y) * 0.15;
                         }
@@ -1299,7 +1240,7 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
                     />
                 </mesh>
 
-                {/* Stack Name Text that fades in then out */}
+                {/* 技术栈名称文字先淡入再淡出。 */}
                 {isPopping && textFadeRef.current > 0.01 && (
                     <Text
                         ref={textRef}
@@ -1308,7 +1249,7 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
                         color="#1a1a1a"
                         anchorX="center"
                         anchorY="middle"
-                        font="/fonts/RubikScribble-Regular.ttf"
+                        font="/fonts/LXGWWenKaiLite-Regular.ttf"
                         fillOpacity={0}
                         outlineWidth={0.02}
                         outlineColor="#fff"
@@ -1335,7 +1276,7 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
     const { camera, viewport } = useThree();
     const isTouch = isTouchDevice();
     const groupRef = useRef();
-    // P2: Use refs instead of state to avoid 60 re-renders/sec inside useFrame
+    // P2：用 ref 替代 state，避免 useFrame 中每秒触发 60 次重渲染。
     const revealFactorRef = useRef(0);
     const spreadFactorRef = useRef(0);
     const timeRef = useRef(0);
@@ -1343,7 +1284,7 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
     useFrame((state) => {
         if (!groupRef.current) return;
 
-        // === TWARDA LINIA CLIP (RĘCZNE OBLICZENIE WORLD Z) ===
+        // 硬裁切线，手动计算世界 Z。
         const scrollProgress = scrollProgressRef?.current || 0;
         const worldZ = ROOM_Z + scrollProgress + z;
         groupRef.current.visible = worldZ < MILESTONE_CORRIDOR_CLIP_Z;
@@ -1351,11 +1292,11 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
 
         timeRef.current = state.clock.elapsedTime;
 
-        // FIX: Use consistent distance based on scrollProgress + offset
+        // 使用 scrollProgress 加偏移得到一致距离。
         const distanceZ = z + scrollProgress - 55;
 
-        // Reveal effect (balloons float up)
-        // === EDYTUJ TUTAJ (SKILLS REVEAL) ===
+        // 气球上浮显现效果。
+        // 在此编辑技能显现效果。
         const revealStart = -100;
         const revealEnd = -25;
         let newRevealFactor = 0;
@@ -1363,24 +1304,24 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
         if (distanceZ > revealStart && distanceZ < revealEnd) {
             newRevealFactor = (distanceZ - revealStart) / (revealEnd - revealStart);
             newRevealFactor = Math.min(1, Math.max(0, newRevealFactor));
-            newRevealFactor = 1 - Math.pow(1 - newRevealFactor, 3); // ease out cubic
+            newRevealFactor = 1 - Math.pow(1 - newRevealFactor, 3); // 三次缓出。
         } else if (distanceZ >= revealEnd) {
             newRevealFactor = 1;
         }
 
         revealFactorRef.current = newRevealFactor;
 
-        // === SPREAD EFFECT (EDYTUJ TUTAJ SKILLS SPREAD) ===
-        // Im bliżej kamery, tym bardziej balony się rozsuwają
-        // Większy zakres = dłuższa, bardziej widoczna animacja
-        const spreadStart = -70; // Kiedy animacja SIĘ ZACZYNA (Wcześniej)
-        const spreadEnd = -40;    // Kiedy animacja jest PEŁNA (Później)
+        // 在此编辑技能气球散开效果。
+        // 越靠近相机，气球越分散。
+        // 范围越大，动画越长、越明显。
+        const spreadStart = -70; // 动画开始的位置，较早。
+        const spreadEnd = -40;    // 动画完全展开的位置，较晚。
         let newSpreadFactor = 0;
 
         if (distanceZ > spreadStart && distanceZ < spreadEnd) {
             newSpreadFactor = (distanceZ - spreadStart) / (spreadEnd - spreadStart);
             newSpreadFactor = Math.min(1, Math.max(0, newSpreadFactor));
-            newSpreadFactor = newSpreadFactor * newSpreadFactor; // ease in
+            newSpreadFactor = newSpreadFactor * newSpreadFactor; // 缓入。
         } else if (distanceZ >= spreadEnd) {
             newSpreadFactor = 1;
         }
@@ -1390,31 +1331,31 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
 
     return (
         <group ref={groupRef} position={[0, 0, z]}>
-            {/* Title */}
+            {/* 标题。 */}
             <Text
                 position={[0, 6, 0.5]}
                 fontSize={1.2}
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/RubikScribble-Regular.ttf"
+                font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
-                SKILLS
+                技能
             </Text>
 
-            {/* Subtitle */}
+            {/* 副标题。 */}
             <Text
                 position={[0, 5.2, 0.5]}
                 fontSize={0.35}
                 color="#555555"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Regular.ttf"
+                font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
-                Technologies I love working with
+                我喜欢使用的技术
             </Text>
 
-            {/* === FLOATING BALLOONS === */}
+            {/* 漂浮气球。 */}
             {BALLOON_CONFIG.map((config, index) => (
                 <SkillBalloon
                     key={index}
@@ -1429,7 +1370,7 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
 };
 
 // =========================================
-// NOTE: Use this component inside the loop!
+// 注意：在循环内部使用此组件。
 // =========================================
 
 export default InfiniteSkyManager;

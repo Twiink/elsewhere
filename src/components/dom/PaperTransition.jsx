@@ -2,18 +2,18 @@ import { useEffect, useRef, useMemo } from 'react';
 import gsap from 'gsap';
 import { useScene } from '../../context/SceneContext';
 import { useAudio } from '../../context/AudioManager';
-import '../../styles/Preloader.scss'; // Reuse preloader styles
+import '../../styles/Preloader.scss'; // 复用加载界面样式。
 
 /**
- * PaperTransition - Reusable paper tear transition for teleportation
+ * PaperTransition：用于传送的可复用撕纸过渡。
  * 
- * Listens to SceneContext teleportPhase:
- * - 'closing': Paper halves slide together (reverse of tear)
- * - 'teleporting': Paper is closed, waiting for destination load
- * - 'opening': Paper tears apart revealing new room
+ * 监听 SceneContext 的 teleportPhase：
+ * - closing：两半纸张合拢，与撕开过程相反。
+ * - teleporting：纸张已闭合，等待目标加载。
+ * - opening：纸张撕开，露出新房间。
  */
 
-// Reusable SVG Line Component (copied from Preloader)
+// 可复用 SVG 线条组件，来自 Preloader。
 const TearLineSVG = ({ svgPathData }) => (
     <svg
         className="preloader__overlay"
@@ -46,7 +46,7 @@ const PaperTransition = () => {
     const rightHalfRef = useRef(null);
     const timelineRef = useRef(null);
 
-    // Generate tear path (same logic as Preloader)
+    // 生成撕裂路径，与 Preloader 逻辑相同。
     const tearPoints = useMemo(() => {
         const points = [];
         const segments = 12;
@@ -82,31 +82,31 @@ const PaperTransition = () => {
         return `polygon(${poly.slice(0, -2)})`;
     }, [tearPoints]);
 
-    // Handle teleport phases
+    // 处理传送阶段。
     useEffect(() => {
         if (!leftHalfRef.current || !rightHalfRef.current || !containerRef.current) return;
 
-        // Kill any existing timeline
+        // 终止已有时间线。
         if (timelineRef.current) {
             timelineRef.current.kill();
         }
 
         if (teleportPhase === 'closing') {
-            // Show container
+            // 显示容器。
             gsap.set(containerRef.current, { opacity: 1, display: 'block' });
 
-            // Start with halves apart (like at end of preloader)
+            // 初始两半分开，与加载动画末尾一致。
             gsap.set(leftHalfRef.current, { xPercent: -100, rotation: -2 });
             gsap.set(rightHalfRef.current, { xPercent: 100, rotation: 2 });
 
-            // Animate halves together
+            // 动画合拢两半纸张。
             timelineRef.current = gsap.timeline({
                 onComplete: () => {
-                    startTeleportTransition(); // Move to 'teleporting' phase
+                    startTeleportTransition(); // 进入 teleporting 阶段。
                 }
             });
 
-            // Play paper sound
+            // 播放纸张音效。
             play('tear', { volume: 0.6 });
 
             timelineRef.current.to(leftHalfRef.current, {
@@ -125,16 +125,16 @@ const PaperTransition = () => {
         }
 
         if (teleportPhase === 'teleporting') {
-            // Paper is closed, TeleportRoom is loading the destination
-            // TeleportRoom will call openTeleportTransition() when room is ready
-            // No action needed here - just wait
+            // 纸张闭合，TeleportRoom 正在加载目标。
+            // 房间就绪后，TeleportRoom 调用 openTeleportTransition()。
+            // 此处只需等待。
         }
 
         if (teleportPhase === 'opening') {
-            // Tear the paper apart
+            // 撕开纸张。
             timelineRef.current = gsap.timeline({
                 onComplete: () => {
-                    finishPaperOpen(); // Just clear the phase - teleport logic already done
+                    finishPaperOpen(); // 传送逻辑已完成，只清除阶段。
                 }
             });
 
@@ -154,7 +154,7 @@ const PaperTransition = () => {
                 ease: "power3.inOut"
             }, 'tear');
 
-            // Fade out container at end
+            // 末尾淡出容器。
             timelineRef.current.to(containerRef.current, {
                 opacity: 0,
                 duration: 0.3,
@@ -171,17 +171,17 @@ const PaperTransition = () => {
         };
     }, [teleportPhase, startTeleportTransition, finishPaperOpen, play]);
 
-    // Zostawiamy komponent cały czas w DOM (bez "return null"), 
-    // żeby uniknąć laga pierwszego załadowania skomplikowanych ścieżek SVG.
+    // 始终保留组件于 DOM 中，不 return null，
+    // 避免首次加载复杂 SVG 路径时卡顿。
     // if (!teleportPhase) return null;
 
     return (
         <div
             className="preloader"
             ref={containerRef}
-            style={{ pointerEvents: 'none', display: 'none' }} // DOM starts hidden
+            style={{ pointerEvents: 'none', display: 'none' }} // DOM 初始隐藏。
         >
-            {/* LEFT HALF */}
+            {/* 左半部分。 */}
             <div
                 className="preloader__half preloader__half--left"
                 ref={leftHalfRef}
@@ -190,7 +190,7 @@ const PaperTransition = () => {
                 <TearLineSVG svgPathData={svgPathData} />
             </div>
 
-            {/* RIGHT HALF */}
+            {/* 右半部分。 */}
             <div
                 className="preloader__half preloader__half--right"
                 ref={rightHalfRef}

@@ -29,15 +29,15 @@ async function fix() {
         const newWidth = getNearestPowerOfTwo(width);
         const newHeight = getNearestPowerOfTwo(height);
 
-        console.log(`Fixing ${file}: ${width}x${height} -> ${newWidth}x${newHeight}`);
+        console.log(`正在修复 ${file}： ${width}x${height} -> ${newWidth}x${newHeight}`);
         
-        // Use resize directly
+        // 直接使用 resize。
         image.resize({ w: newWidth, h: newHeight });
         await image.write(fullPath);
-        console.log(`Success: ${file}`);
+        console.log(`成功： ${file}`);
       }
     } catch (e) {
-      console.error(`Error with ${file}: ${e.message}`);
+      console.error(`处理出错： ${file}: ${e.message}`);
     }
   }
 }
