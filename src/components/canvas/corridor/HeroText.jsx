@@ -2,20 +2,18 @@ import { useRef, useMemo, useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
+import { siteInfo } from '../../../data/content';
 
 // 本地字体；troika 需要 TTF 格式。
 const RUBIK_SCRIBBLE_URL = '/fonts/RubikScribble-Regular.ttf';
 const CABIN_SKETCH_URL = '/fonts/LXGWWenKaiLite-Regular.ttf';
 
-// 全局标记：每次页面加载只执行一次绘制动画。
-let hasPlayedDrawAnimation = false;
-
 /**
  * HeroText：使用手绘字体的标题组件。
  * 
  * 面向 Awwwards 每日最佳网站的视觉效果：
- * - ITOM 使用 Rubik Scribble，滚动时拆分为字母。
- * - “创意开发者”使用本地中文字体，滚动时同样拆分。
+ * - Twiink 使用 Rubik Scribble，滚动时拆分为字母。
+ * - 网站名称与介绍使用本地中文字体。
  * - 轻微漂浮动画。
  * - 视差拆分效果。
  * - 移动端缩小尺寸。
@@ -54,20 +52,20 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
     // 预先分配 Vector3，避免逐帧垃圾回收。
     const worldPosVec = useRef(new THREE.Vector3());
 
-    // ITOM 拆分效果的字母位置。
+    // 昵称的六个字母分别保留滚动拆分效果。
     const letters = useMemo(() => [
-        { char: 'I', baseX: -0.95, splitDir: -1.6, delay: 0 },
-        { char: 'T', baseX: -0.43, splitDir: -0.6, delay: 0 },
-        { char: 'O', baseX: 0.23, splitDir: 0.6, delay: 0 },
-        { char: 'M', baseX: 0.95, splitDir: 1.8, delay: 0 },
+        { char: 'T', baseX: -1.0, splitDir: -1.6 },
+        { char: 'w', baseX: -0.54, splitDir: -1.0 },
+        { char: 'i', baseX: -0.15, splitDir: -0.4 },
+        { char: 'i', baseX: 0.13, splitDir: 0.4 },
+        { char: 'n', baseX: 0.48, splitDir: 1.0 },
+        { char: 'k', baseX: 0.92, splitDir: 1.6 },
     ], []);
 
     // 标语拆分效果的词语。
     const taglineWords = useMemo(() => [
-        { text: '<', baseX: -0.85, splitDir: -1.5, delay: 0 },
-        { text: "创意", baseX: -0.4, splitDir: -0.8, delay: 0 },
-        { text: "开发者", baseX: 0.4, splitDir: 0.8, delay: 0 },
-        { text: '/>', baseX: 0.85, splitDir: 1.5, delay: 0 },
+        { text: "'s Space", baseX: 0, baseY: -0.35, splitDir: 0.8, fontSize: 0.26 },
+        { text: siteInfo.siteDescription, baseX: 0, baseY: -0.75, splitDir: -0.8, fontSize: 0.12 },
     ], []);
 
     // 动画循环。
@@ -97,7 +95,7 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
 
         splitAmount.current = THREE.MathUtils.lerp(splitAmount.current, targetSplit.current, 0.08);
 
-        // 对 ITOM 每个字母应用拆分。
+        // 对昵称的每个字母应用拆分。
         letterRefs.current.forEach((ref, i) => {
             if (ref) {
                 // 确保透明度为 1。
@@ -119,7 +117,7 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
 
                 const word = taglineWords[i];
                 ref.position.x = word.baseX + word.splitDir * splitAmount.current * 0.6;
-                ref.position.y = -0.45 + Math.sin(time * 0.6 + i * 0.3) * 0.008;
+                ref.position.y = word.baseY + Math.sin(time * 0.6 + i * 0.3) * 0.008;
             }
         });
 
@@ -131,13 +129,13 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
 
     return (
         <group ref={groupRef} position={position} scale={[scale, scale, 1]}>
-            {/* ITOM 字母：Rubik Scribble 字体与淡入动画。 */}
+            {/* 昵称字母：保留手绘字体与拆分动画。 */}
             {letters.map((letter, i) => (
                 <Text
-                    key={letter.char}
+                    key={`${i}-${letter.char}`}
                     ref={(el) => (letterRefs.current[i] = el)}
                     position={[letter.baseX, 0.2, 0]}
-                    fontSize={0.9}
+                    fontSize={0.74}
                     font={RUBIK_SCRIBBLE_URL}
                     color="#ffffff"
                     outlineWidth={0.012}
@@ -155,13 +153,15 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
                 <Text
                     key={word.text}
                     ref={(el) => (taglineRefs.current[i] = el)}
-                    position={[word.baseX, -0.55, 0.3]}
-                    fontSize={0.16}
+                    position={[word.baseX, word.baseY, 0.3]}
+                    fontSize={word.fontSize}
                     font={CABIN_SKETCH_URL}
                     color="#555555"
                     anchorX="center"
                     anchorY="middle"
-                    letterSpacing={0.04}
+                    maxWidth={2.5}
+                    textAlign="center"
+                    lineHeight={1.5}
                 >
                     {word.text}
                 </Text>

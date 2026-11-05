@@ -28,11 +28,11 @@ const ScreenReaderOverlay = () => {
 
             {/* 主要无障碍导航。 */}
             <nav id="sr-main-nav" className="sr-only" aria-label="作品集房间">
-                <h1>ITom：创意开发者作品集</h1>
+                <h1>Twiink's Space</h1>
                 <h2>作品集导航</h2>
 
                 {!hasEntered && (
-                    <p>欢迎来到 ITom 的 3D 互动作品集。点击门或按回车键即可进入。</p>
+                    <p>欢迎来到 Twiink's Space。做点有趣的东西，放一些舍不得关掉的脑洞。点击门或按回车键即可进入。</p>
                 )}
 
                 {hasEntered && !isInRoom && (

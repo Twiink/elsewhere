@@ -14,27 +14,31 @@ function escapeHtml(value = '') {
 }
 
 function absoluteUrl(path, siteUrl) {
-    return new URL(path, `${siteUrl}/`).href;
+    return siteUrl ? new URL(path, `${siteUrl.replace(/\/+$/, '')}/`).href : path;
+}
+
+function contentAuthor(item, personId) {
+    return item.authorName ? { '@type': 'Person', name: item.authorName } : { '@id': personId };
 }
 
 export function buildJsonLd({ site, projects, studio, awards, faq }) {
-    const personId = `${site.url}/#person`;
+    const personId = site.url ? `${site.url}/#person` : '#person';
     const graph = [
         {
             '@type': 'Person', '@id': personId,
-            name: 'Tomasz Szmajda', alternateName: ['ITom', 'ITom Dev'],
-            url: site.url, jobTitle: '创意前端开发者', description: site.aboutMe,
-            knowsAbout: ['React', 'Three.js', 'JavaScript', 'GSAP', 'Next.js', 'WebGL'],
+            name: site.nickname,
+            ...(site.url ? { url: site.url } : {}), description: site.aboutMe,
             sameAs: Object.entries(site).filter(([key, value]) => key.endsWith('Url') && value).map(([, value]) => value),
         },
         {
-            '@type': 'WebSite', '@id': `${site.url}/#website`, url: site.url,
+            '@type': 'WebSite', '@id': site.url ? `${site.url}/#website` : '#website',
+            ...(site.url ? { url: site.url } : {}),
             name: site.siteTitle, description: site.siteDescription,
             inLanguage: 'zh-CN', publisher: { '@id': personId },
         },
-        { '@type': 'ProfilePage', '@id': `${site.url}/#profilepage`, mainEntity: { '@id': personId } },
+        { '@type': 'ProfilePage', '@id': site.url ? `${site.url}/#profilepage` : '#profilepage', mainEntity: { '@id': personId } },
         {
-            '@type': 'FAQPage', '@id': `${site.url}/#faq`,
+            '@type': 'FAQPage', '@id': site.url ? `${site.url}/#faq` : '#faq',
             mainEntity: faq.map(item => ({
                 '@type': 'Question', name: item.question,
                 acceptedAnswer: { '@type': 'Answer', text: item.answer },
@@ -48,7 +52,7 @@ export function buildJsonLd({ site, projects, studio, awards, faq }) {
                     '@type': 'CreativeWork', name: item.seoTitle || item.title,
                     description: item.seoDescription || item.description,
                     url: item.url, image: absoluteUrl(item.front, site.url),
-                    creator: { '@id': personId }, inLanguage: 'zh-CN',
+                    creator: contentAuthor(item, personId), inLanguage: 'zh-CN',
                 },
             })),
         },
@@ -58,7 +62,7 @@ export function buildJsonLd({ site, projects, studio, awards, faq }) {
             description: item.seoDescription || item.description, url: item.url,
             datePublished: `${item.date}T12:00:00Z`,
             thumbnailUrl: absoluteUrl(item.frontTexture, site.url),
-            author: { '@id': personId }, inLanguage: 'zh-CN',
+            author: contentAuthor(item, personId), inLanguage: 'zh-CN',
         })),
         {
             '@type': 'ItemList', name: '奖项与荣誉', numberOfItems: awards.length,
@@ -68,7 +72,7 @@ export function buildJsonLd({ site, projects, studio, awards, faq }) {
                     '@type': 'CreativeWork', name: item.seoTitle || item.title,
                     description: item.seoDescription, url: item.url,
                     image: absoluteUrl(item.image, site.url),
-                    dateCreated: item.date, creator: { '@id': personId },
+                    dateCreated: item.date, creator: contentAuthor(item, personId),
                 },
             })),
         },
@@ -113,9 +117,14 @@ export function generateSeoHtml() {
             sections.push(`<section id="faq"><h2>常见问题</h2>${faq.map(item => `<article><h3>${escapeHtml(item.question)}</h3><p>${escapeHtml(item.answer)}</p></article>`).join('')}</section>`);
             const seoHtml = `<div id="seo-content" class="sr-only-seo">${sections.join('\n')}</div>`;
             const jsonLd = JSON.stringify(buildJsonLd(content)).replace(/</g, '\\u003c');
+            const urlTags = site.url
+                ? `<link rel="canonical" href="${escapeHtml(site.url)}/"><meta property="og:url" content="${escapeHtml(site.url)}/">`
+                : '';
             return html
-                .replace(/<link rel="canonical"[^>]*>/, `<link rel="canonical" href="${escapeHtml(site.url)}/">`)
-                .replace(/<meta property="og:url"[^>]*>/, `<meta property="og:url" content="${escapeHtml(site.url)}/">`)
+                .replace(/<meta name="author"[^>]*>/, `<meta name="author" content="${escapeHtml(site.nickname)}">`)
+                .replace(/<meta property="og:site_name"[^>]*>/, `<meta property="og:site_name" content="${escapeHtml(site.siteTitle)}">`)
+                .replace(/<meta property="og:image"[^>]*>/, `<meta property="og:image" content="${escapeHtml(absoluteUrl('/textures/twiink/avatar.png', site.url))}">`)
+                .replace(/<meta name="twitter:image"[^>]*>/, `<meta name="twitter:image" content="${escapeHtml(absoluteUrl('/textures/twiink/avatar.png', site.url))}">`)
                 .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(site.siteTitle)}</title>`)
                 .replace(/<meta name="description"[^>]*>/, `<meta name="description" content="${escapeHtml(site.siteDescription)}">`)
                 .replace(/<meta property="og:title"[^>]*>/, `<meta property="og:title" content="${escapeHtml(site.siteTitle)}">`)
@@ -123,7 +132,7 @@ export function generateSeoHtml() {
                 .replace(/<meta name="twitter:title"[^>]*>/, `<meta name="twitter:title" content="${escapeHtml(site.siteTitle)}">`)
                 .replace(/<meta name="twitter:description"[^>]*>/, `<meta name="twitter:description" content="${escapeHtml(site.siteDescription)}">`)
                 .replace(/<div id="seo-content" class="sr-only-seo">[\s\S]*?<\/div>/, seoHtml)
-                .replace('</head>', `<script type="application/ld+json">${jsonLd}</script>\n</head>`);
+                .replace('</head>', `${urlTags}<script type="application/ld+json">${jsonLd}</script>\n</head>`);
         },
         generateBundle() {
             this.emitFile({ type: 'asset', fileName: 'llms.txt', source: buildLlmsTxt(readContent()) });

@@ -75,7 +75,7 @@ const EntranceDoors = ({
     // const catTexture = useTexture('/textures/entrance/cat_sketch.webp'); // 旧版侧边猫。
     const catFrontBodyTexture = useTexture('/textures/entrance/cat_front_body.webp');
     const windowSketchTexture = useTexture('/textures/entrance/window_sketch.webp');
-    const avatarWindowTexture = useTexture('/textures/entrance/avatar_window.webp');
+    const avatarWindowTexture = useTexture('/textures/twiink/window-ink.webp');
     const treeTexture = useTexture('/textures/entrance/tree_sketch.webp');
     const mouseTexture = useTexture('/textures/entrance/mouse_hanging.webp');
     const potTexture = useTexture('/textures/entrance/pot_with_duck.webp');
@@ -298,7 +298,7 @@ const EntranceDoors = ({
             ease: 'power2.out'
         }, 0.1);
 
-        // 相机穿过门，停在更靠近人物与 ITOM 的位置。
+        // 相机穿过门，停在更靠近人物与网站标题的位置。
         tl.to(camera.position, {
             z: 11,  // 终点更靠近人物，原值为 11。
             y: 0.2, // 与 Hook 的基础 Y 位置一致。
@@ -810,10 +810,11 @@ const EntranceDoors = ({
                 position={[3.5, 0, 0.04]}
                 rotation={[0, 0, 0]}
             >
-                <planeGeometry args={[1.5, 1.5]} />
+                <planeGeometry args={[1.5 * avatarWindowTexture.image.width / avatarWindowTexture.image.height, 1.5]} />
                 <meshBasicMaterial color="#e0e0e0"
                     map={avatarWindowTexture}
                     transparent={true}
+                    alphaTest={0.1}
                 />
             </mesh>
 

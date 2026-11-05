@@ -1,0 +1,31 @@
+{
+  "project": "github.com-twiink-elsewhere",
+  "siteName": "Twiink's Space",
+  "task": "根据已提供照片制作同一人物的其他姿势",
+  "generator": "内置 image_gen",
+  "identityReference": ".openviking/media/twiink/reference-photo.jpg",
+  "styleReference": "output/imagegen/twiink-standing-color-v1.png",
+  "status": "新姿势素材预览，已生成和检查，尚未接入网页，尚未经用户确认。",
+  "assets": [
+    {
+      "name": "挥手欢迎",
+      "file": "output/imagegen/twiink-waving-color-v1.png",
+      "width": 1024,
+      "height": 1536,
+      "format": "RGBA PNG",
+      "suggestedPlacement": "入口与走廊",
+      "prompt": "Use case: identity-preserve\nAsset type: one standing, waving welcome character with transparent background for the hand-drawn paper 3D personal portfolio \"Twiink's Space\".\nInput roles: image 1 is the user's original photograph and the primary identity/clothing reference; image 2 is the existing illustrated character and the reference for the finished drawing style, facial design and color palette.\nGenerate a NEW POSE of this same recognizable woman. Preserve her soft adult facial features, long black hair, tall ornamental updo, pink flowers, delicate warm-gold hairpins with hanging bead chains, and flowing pale pink and pale sage-green traditional Chinese dress.\nPose: a relaxed full-length standing welcome pose, gently turned toward the viewer, warm small smile and friendly open eyes. Raise one hand next to her shoulder in a natural open-palmed wave with five clearly drawn fingers. Let the other hand gently gather a fold of her long sleeve near her waist. Remove the bouquet so her hands are free. Keep shoulders and arms anatomically coherent and show her whole body including the top of her hair ornaments and complete robe hem.\nStyle: exactly the same approachable softly anime-influenced hand-inked sketchbook character as image 2: charcoal-black slightly irregular contour lines, delicate sparse hatching, subtle paper-grain texture confined to the figure, large clean ivory-white interior areas and muted blush-pink/sage watercolor accents with tiny muted-gold details. Keep this visibly an adult stylized character with approximately the same body proportions as image 2.\nComposition: single centered character in a portrait 2:3 canvas, ample transparent margins around the complete figure and the raised hand. Clean readable silhouette for use as a web texture.\nBackground: actual 100% alpha transparency outside the character, including gaps around the waving hand and clothing. Interior figure areas should be opaque. No window, cloud, background paper rectangle, cast shadow, glow, extra props, text, border or watermark. Produce one standalone character, not a collage or a sprite sheet."
+    },
+    {
+      "name": "云上休息",
+      "file": "output/imagegen/twiink-cloud-color-v1.png",
+      "width": 1672,
+      "height": 941,
+      "format": "RGBA PNG",
+      "suggestedPlacement": "关于我房间",
+      "prompt": "Use case: identity-preserve\nAsset type: one wide horizontal, transparent-background character-and-cloud illustration for the \"About me\" room of the hand-drawn paper 3D personal portfolio \"Twiink's Space\".\nInput roles: image 1 is the user's original photograph, the identity and original clothing reference. Image 2 is the existing illustrated character, the exact reference for her illustrated face, distinctive hairstyle, outfit and sketchbook drawing style.\nGenerate a distinctly NEW POSE of the SAME recognizable woman, resting comfortably on one small fluffy hand-drawn cloud. Keep her gentle adult facial features, long dark hair, tall elaborate updo, pink flower decorations, tiny muted-gold hairpins with bead chains, and flowing pale pink and pale sage-green traditional Chinese robes.\nPose and composition: she sits side-saddle near the center-left of a single horizontally stretched fluffy cloud, her torso upright but relaxed, her legs tucked together naturally toward the right, the flowing robe spreading gently along the top of the cloud. Her long hair falls behind her. One hand rests naturally on her lap; the other rests lightly on the cloud next to her. Both hands are anatomically clear. She looks toward the viewer with a small calm friendly smile. Omit the bouquet to allow this resting pose.\nShow the complete top of the hair ornaments, both hands, the entire draped robe and the entire rounded cloud outline. Make a wide approximately 16:9 landscape composition with clear transparent margins on every side. The silhouette should read immediately at a small web display size.\nStyle: charcoal-black gently irregular hand-inked contours, sparse pencil hatching, a subtle hand-drawn paper grain ONLY inside the figure, restrained blush pink and sage-green watercolor washes, tiny warm-gold ornament details. Keep the same adult softly anime-influenced face and proportions as image 2. The cloud is simple off-white with black sketchbook outlines and a few sparse gray hatching marks, matching a monochrome hand-drawn 3D website.\nActual alpha transparency everywhere OUTSIDE the combined woman-and-cloud silhouette. Keep face, robes and cloud interiors opaque and light. No sky, horizon, stars, scenery, colored rectangle, paper backdrop, drop shadow, glow, extra decorative objects, text, border or watermark. Produce one finished standalone usable web illustration, not a mockup or a collage."
+    }
+  ],
+  "preservedFeatures": "花饰高发髻、长发、粉绿衣裙；沿用原人物淡彩与黑色手绘轮廓。",
+  "validation": "已查看生成结果；核验 PNG 尺寸、RGBA 透明通道、画布边界无不透明像素，以及项目副本与生成原图的 SHA-256 一致。未执行页面集成测试。"
+}

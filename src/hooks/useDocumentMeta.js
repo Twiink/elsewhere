@@ -18,23 +18,23 @@ const ROOM_META = {
     },
     about: {
         path: '/about',
-        title: "关于我：ITom 作品集",
-        description: "了解 Tomasz Szmajda（ITom）的创意前端开发经历，以及 React、Three.js 和 GSAP 交互作品。",
+        title: `关于我 | ${siteInfo.siteTitle}`,
+        description: siteInfo.aboutMe,
     },
     gallery: {
         path: '/gallery',
-        title: "画廊与项目：ITom 作品集",
-        description: "浏览 ITom 的 3D 网页项目画廊，翻转手绘卡片，探索项目介绍与技术细节。",
+        title: `画廊与项目 | ${siteInfo.siteTitle}`,
+        description: "翻转手绘卡片，逛逛项目画廊，看看有趣的想法。",
     },
     studio: {
         path: '/studio',
-        title: "工作室：ITom 作品集",
-        description: "走进 ITom 的内容工作室，在漂浮的显示器上浏览视频、文章与创作分享。",
+        title: `工作室 | ${siteInfo.siteTitle}`,
+        description: "在漂浮的显示器之间，看看文章、视频和随手记录。",
     },
     contact: {
         path: '/contact',
-        title: "联系我：ITom 作品集",
-        description: "与 Tomasz Szmajda（ITom）取得联系，在 3D 联系房间中找到社交平台入口并留下消息。",
+        title: `联系我 | ${siteInfo.siteTitle}`,
+        description: "走到海边歇一歇，在这里找到交流的入口。",
     },
 };
 

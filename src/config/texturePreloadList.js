@@ -24,7 +24,7 @@ export const ENTRANCE_TEXTURES = [
     // 角色与物体。
     '/textures/entrance/cat_front_body.webp',
     '/textures/entrance/window_sketch.webp',
-    '/textures/entrance/avatar_window.webp',
+    '/textures/twiink/window-ink.webp',
     '/textures/entrance/tree_sketch.webp',
     '/textures/entrance/mouse_hanging.webp',
     '/textures/entrance/pot_with_duck.webp',
@@ -83,7 +83,7 @@ export const CORRIDOR_TEXTURES = [
     '/textures/corridor/gorastolika.webp',
     '/textures/corridor/szafkaprzod.webp',
     '/textures/corridor/szafkaprzodgora.webp',
-    '/textures/corridor/rysuneknaobraz1.webp',
+    '/textures/twiink/avatar.png',
     '/textures/corridor/rysuneknaobrazek3.webp',
     // DoorSection 附加资源。
     '/textures/corridor/strzalka.webp',
@@ -103,17 +103,9 @@ export const IMAGE_ASSETS = [
     '/images/pin-slot.webp',
 ];
 
-// App.jsx 与人物动画的附加纹理。
+// App.jsx 与走廊欢迎人物的附加纹理。
 export const UI_TEXTURES = [
-    '/textures/corridor/avatar_anim/1.webp',
-    '/textures/corridor/avatar_anim/2.webp',
-    '/textures/corridor/avatar_anim/3.webp',
-    '/textures/corridor/avatar_anim/4.webp',
-    '/textures/corridor/avatar_anim/5.webp',
-    '/textures/corridor/avatar_anim/6.webp',
-    '/textures/corridor/avatar_anim/7.webp',
-    '/textures/corridor/avatar_anim/8.webp',
-    '/textures/corridor/avatar_anim/9.webp',
+    '/textures/twiink/waving-ink.webp',
 ];
 
 // ============================================
@@ -177,7 +169,7 @@ export const CONTACT_TEXTURES = [
 // 关于我房间纹理，通过 useLoader(TextureLoader) 加载。
 export const ABOUT_TEXTURES = [
     // 人物。
-    '/textures/about/awatarnachmurce.webp',
+    '/textures/twiink/cloud-ink.webp',
     // 奖项。
     '/textures/about/SOTY.webp',
     '/textures/about/SOTY_painted.webp',

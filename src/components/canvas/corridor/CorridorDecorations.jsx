@@ -379,8 +379,8 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
             height: 2.5 / 1.785,     // 原始比例 3200×1792。
             y: 0.3,                  // 墙面高度。
             id: 'frame-1',
-            // “rysuneknaobraz1.png”的专用设置。
-            image: '/textures/corridor/rysuneknaobraz1.webp',
+            // 与入口形象统一的 Twiink 人物头像。
+            image: '/textures/twiink/avatar.png',
             imageWidth: 1.1,
             imageHeight: 1.1,
             offsetFromWall: 0.1, // 向走廊中心移动 0.1 单位。

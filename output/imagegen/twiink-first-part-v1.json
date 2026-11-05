@@ -1,0 +1,32 @@
+{
+  "project": "github.com-twiink-elsewhere",
+  "phase": "第一部分：首页身份与人物素材",
+  "confirmedText": {
+    "nickname": "Twiink",
+    "siteName": "Twiink's Space",
+    "introduction": "做点有趣的东西，放一些舍不得关掉的脑洞。",
+    "purpose": "展示自己的项目、小实验和随手记录，让路过的人逛逛，也顺便认识一下我。"
+  },
+  "references": {
+    "photograph": ".openviking/media/twiink/reference-photo.jpg",
+    "animeIllustration": ".openviking/media/twiink/reference-anime.jpg",
+    "handling": "参考原图仅保存在 Git 忽略的本地素材目录，未加入网站公开目录。"
+  },
+  "artwork": {
+    "status": "已生成并检查的素材预览，尚未经用户确认人物风格，尚未接入网页。",
+    "generator": "内置 image_gen",
+    "color": "output/imagegen/twiink-standing-color-v1.png",
+    "monochrome": "output/imagegen/twiink-standing-ink-v1.png",
+    "canvas": {
+      "width": 1024,
+      "height": 1536,
+      "format": "RGBA PNG"
+    },
+    "style": "手绘黑色轮廓、简洁排线；淡彩版保留粉色与鼠尾草绿衣裙、花饰发髻、捧花。",
+    "validation": "已查看生成结果并检查 PNG 尺寸、RGBA 通道和轮廓外透明像素；未执行网页集成测试。"
+  },
+  "prompts": {
+    "color": "Use case: style-transfer\nAsset type: one finished full-length transparent character illustration for the hand-drawn paper-and-ink 3D personal website \"Twiink's Space\".\nInput roles: image 1 is the user's original photograph, the primary reference for the woman's facial features, traditional hairstyle, ornaments, clothing and bouquet; image 2 is the user's existing anime interpretation, a supporting reference for a friendly illustrated expression; image 3 is an existing website character and is ONLY a reference for simple hand-drawn black contour lines and white paper-like interior fills. Do not copy the man from image 3.\nPrimary request: redraw the woman in the first two images as a single charming, recognizably adult, gently anime-influenced sketchbook character that belongs in the website's simple ink-on-paper world.\nSubject invariants: long dark hair with a tall elaborate updo, pink floral hair ornaments, delicate hairpin chains, soft facial features, flowing pale pink and pale sage-green traditional Chinese robes, holding a bouquet of white and blush-pink flowers with both hands. Preserve these identifying details. Keep her calm gentle expression and slightly turned head; simplify the ornament details into readable hand-drawn shapes.\nStyle: confident charcoal-black hand-inked outlines with a little natural line variation, sparse fine pencil hatching, large clean ivory-white areas inside the character. Restrained translucent watercolor washes of dusty rose and sage green on clothing and flowers; restrained muted warm-gold touches on the hair ornaments. Hair should have a readable dark outline and a few gray hatching strokes, with plenty of open light areas rather than a dense solid-black mass. Friendly editorial storybook drawing, softly stylized proportions and a modestly larger head, consistent with an interactive sketchbook website.\nFraming: one standing full-body figure in a portrait composition, fully visible from the topmost hair ornaments to the complete bottom hem and small shoe tips. Invent only the natural lower continuation of the robe beyond the cropped photo, keeping the same design. Leave generous transparent margin all around. Keep the bouquet and its stems comfortably inside the image.\nBackground: actual alpha transparency outside the character. Interior face and robe areas remain filled and readable against the website's off-white surroundings. No surrounding scene, round window, paper rectangle, cloud, border, cast shadow, ground plane, text, labels or watermark. Produce only one coherent usable character asset, not a sheet, collage or mockup.",
+    "monochrome": "Use case: style-transfer\nAsset type: monochrome standing-character texture for a simple hand-drawn paper 3D website.\nEdit the attached full-length character illustration into its black-and-white ink drawing version. Preserve the same woman, facial expression, pose, bouquet, hairstyle, all ornaments, robe outline, full-length framing and proportions.\nKeep the contours in charcoal-black hand-drawn ink, use white opaque interior fills with very sparse light-gray pencil hatching. Replace pink, sage and gold watercolor with white and light-gray. Keep the hair readable with a light-gray fill and a few dark direction strokes, rather than a solid black block. Retain the warmth and recognizability of her face.\nCRITICAL background cleanup: the source image has an unwanted soft gray glowing halo around the silhouette. Completely remove that halo and every background/shadow pixel. Outside the exact character silhouette must be 100% alpha-transparent, including spaces between the bouquet stems. Do not paint a white or gray rectangle and do not add a drop shadow, glow, vignette or paper backdrop. The face, robe and flowers inside the silhouette should be opaque white. Output a single full-body transparent PNG, entirely visible with clear margins, with no lettering or other objects."
+  }
+}

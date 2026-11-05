@@ -8,6 +8,7 @@ import { useScene } from '../../../../context/SceneContext';
 import '../../shaders/RevealBasicMaterial'; // 注册 BasicMaterial 的笔刷显现效果。
 import { isTouchDevice } from '../../../../utils/deviceDetect';
 import { useAwards } from '../../../../hooks/useContentData';
+import { siteInfo } from '../../../../data/content';
 
 // 复用 Vector3，避免事件处理时分配对象。
 const _tempVec3 = new THREE.Vector3();
@@ -259,9 +260,7 @@ const InfiniteSkyManager = ({ scrollProgressRef }) => {
  */
 const IntroMilestone = ({ z, scrollProgressRef }) => {
     // 加载人物纹理。
-    const avatarTexture = useLoader(THREE.TextureLoader, '/textures/about/awatarnachmurce.webp');
-    const { camera, viewport } = useThree();
-    const isTouch = isTouchDevice();
+    const avatarTexture = useLoader(THREE.TextureLoader, '/textures/twiink/cloud-ink.webp');
 
     // 全部动画元素的引用。
     const groupRef = useRef();
@@ -274,11 +273,9 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
     // 基础位置。
     const baseY = 2;
 
-    // 计算宽高比。
-    // 使用原始尺寸 2816×1536，避免拉伸。
-    const legacyAspectRatio = 2816 / 1536; 
-    const avatarWidth = 6; // 增大云上人物的尺寸。
-    const avatarHeight = avatarWidth / legacyAspectRatio;
+    // 按新素材的实际宽高比显示，保留发饰与云朵轮廓。
+    const avatarWidth = 6;
+    const avatarHeight = avatarWidth * avatarTexture.image.height / avatarTexture.image.width;
 
     // 动画：漂浮，靠近时散开。
     useFrame((state) => {
@@ -352,7 +349,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 anchorY="middle"
                 font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
-                TOMASZ SZMAJDA
+                {siteInfo.nickname}
             </Text>
 
             {/* 品牌副标题，向右散开。 */}
@@ -365,7 +362,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 anchorY="middle"
                 font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
-                (ITOM)
+                {siteInfo.siteTitle}
             </Text>
 
             {/* 云上人物漂浮并向左上散开。 */}
@@ -374,6 +371,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 <meshBasicMaterial color="#e0e0e0"
                     map={avatarTexture}
                     transparent
+                    alphaTest={0.1}
                     side={THREE.DoubleSide}
                     depthWrite={false}
                 />
@@ -390,7 +388,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 fontStyle="italic"
             >
-                “用代码创造
+                做点有趣的东西，
             </Text>
 
             {/* 座右铭第二行，向左散开。 */}
@@ -404,7 +402,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 fontStyle="italic"
             >
-                跨越想象的数字体验”
+                放一些舍不得关掉的脑洞。
             </Text>
         </group>
     );

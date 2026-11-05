@@ -1,4 +1,4 @@
-# ITom 中文作品集：项目说明
+# Twiink's Space：项目说明
 
 本项目是 React 19 + React Three Fiber 的沉浸式三维作品集。入口连接无限走廊，左右门通往作品画廊、内容工作室、关于我和联系我。视觉以手绘线条、纸张和速写纹理为主，交互时可显现彩色层。
 
@@ -7,6 +7,8 @@
 - 实际内容位于 `src/data/content.json`，通过 `src/data/content.js` 整理，供 `src/hooks/useContentData.js` 和搜索输出使用。
 - `content.original.json` 是原始已发布响应的只读参考备份，不导入运行代码。
 - 内容图片保存在 `public/content/`。场景与装饰纹理保存在 `public/textures/`。
+- 第一批个人身份已接入：昵称 Twiink，网站名 Twiink's Space；介绍与网站用途来自用户确认的文案。入口、走廊和关于我使用 `public/textures/twiink/` 下的黑白人物，宽高比取纹理实际尺寸。原作者的九帧人物动画已换成 Twiink 挥手姿势与轻微摆动。
+- 个人域名与社交资料未提供，站点信息留空；项目、内容、经历、技能、奖项和联系房间仍为示例，后续分批替换。示例内容用 `authorName` 标注原作者，搜索数据不将其归为 Twiink 的作品。
 - 当前保留站点信息 1 份、画廊项目 4 个、工作室内容 11 条、证书 16 张、FAQ 8 条。
 - 内容读取同步完成，不需要网络内容查询、管理后台或数据库。
 - `seo-plugin.js` 在开发和构建时从本地内容生成中文语义正文、JSON-LD 和 `/llms.txt`。

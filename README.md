@@ -1,6 +1,10 @@
-# ITom：中文 3D 交互作品集
+# Twiink's Space
 
-这是基于 Tomasz “ITom” Szmajda 作品集的中文版本，使用 React 19、Three.js、React Three Fiber、GSAP 和 Vite。用户从入口进入无限走廊，探索作品画廊、内容工作室、关于我和联系我四个房间；`/start` 是独立的静态链接页。
+这是基于 Tomasz “ITom” Szmajda 作品集改造的 Twiink 个人空间，使用 React 19、Three.js、React Three Fiber、GSAP 和 Vite。用户从入口进入无限走廊，探索作品画廊、内容工作室、关于我和联系我四个房间；`/start` 是独立的静态链接页。
+
+已接入第一批个人资料：网站名为 **Twiink's Space**，介绍为“做点有趣的东西，放一些舍不得关掉的脑洞。”入口窗边、走廊和云上人物使用根据用户照片制作的黑白线稿，发布用纹理位于 `public/textures/twiink/`。PNG 原稿与生成说明保存在 `output/imagegen/`；照片参考仅在本地忽略目录中保存。
+
+个人经历、技能、作品、文章、奖项和联系房间仍保留示例，等待后续资料逐部分替换。示例内容中的 `authorName` 保留原作者归属。个人域名与社交链接尚未提供，`site.url` 和相关链接字段留空；未配置域名时不输出规范域名标签，设置 `site.url` 后构建即可生成。
 
 ## 本地运行
 
@@ -71,7 +75,7 @@ node --test scripts/test-content.mjs scripts/test-contact-validation.mjs scripts
 
 - `VITE_WEB3FORMS_KEY`：联系表单的 Web3Forms 配置，放在本地 `.env` 或部署平台环境变量中。表单还保留 `MessagePaper.jsx` 中的 `ALLOWED_ORIGINS` 域名限制；换域名时需要同步修改。原逻辑在 localhost 和未允许域名上不发送真实邮件。
 - `VITE_POSTHOG_KEY`、`VITE_POSTHOG_HOST`：PostHog 访问统计配置。
-- 社交链接和项目外链继续指向原作者地址，替换个人内容时请同步检查联系房间与 `/start` 页中的固定链接。
+- 联系房间和示例项目外链仍指向原作者地址，替换对应资料时需要同步修改。`/start` 已改为站内导航与 Twiink 人物插画。
 
 这些配置不影响本地 JSON 的读取，也不提供内容管理功能。凭据和私人配置不要写入 Git。
 

@@ -1,15 +1,16 @@
 {
   "site": {
-    "siteTitle": "ITom：获奖创意开发者与交互网站作品集",
-    "siteDescription": "Tomasz Szmajda（ITom）的作品集：这位获奖创意开发者通过流畅动画、故事叙述和清晰代码打造互动网站。",
-    "aboutMe": "Tomasz Szmajda，网名 ITom，是来自波兰的获奖创意开发者，擅长从零制作富有吸引力的互动网站。他目前就读于奥波莱大学计算机科学专业，专注于手工打磨的网页体验，通过流畅动画、滚动叙事和细致处理，让每个网站显得鲜活。他的核心工具包括 React、Next.js、JavaScript、GSAP（GreenSock 动画平台）和 CSS，用于实现平滑页面转场、微交互与滚动触发动画。项目需要时，也会采用 Three.js、WebGL 和自定义着色器，创造沉浸式浏览器体验；不过他最热衷的仍是结构清晰、动画精良、让人愿意探索的叙事网站。ITom 并非设计师，不使用 Figma 或 Photoshop，而是先在纸上勾勒想法，再直接通过代码边设计边实现。他也不在 Blender 中制作 3D 模型；但如果客户提供现成的 GLTF、GLB 等素材，他可以让模型在浏览器中运动、交互，并以每秒 60 帧运行。他的作品获得 FWA 每日最佳网站、GSAP 每日最佳网站、CSS Design Awards 和 Awwwards 提名等国际认可。除个人作品集外，他还开发采用 MediaPipe AI 的摄像头控制浏览器游戏“67 挑战”，以及运用自定义 DOM 虚拟化流畅处理 1000 多张图片的精品摄影工作室商业网站。ITom 面向全球客户提供自由职业创意开发服务。",
-    "url": "https://itomdev.com",
-    "githubUrl": "https://github.com/ITomPoland",
-    "instagramUrl": "https://www.instagram.com/itom.dev/",
-    "linkedinUrl": "https://www.linkedin.com/in/itomdev/",
-    "tiktokUrl": "https://www.tiktok.com/@itomdev",
-    "xUrl": "https://x.com/ITom_Dev",
-    "youtubeUrl": "https://www.youtube.com/@itomdev"
+    "nickname": "Twiink",
+    "siteTitle": "Twiink's Space",
+    "siteDescription": "做点有趣的东西，放一些舍不得关掉的脑洞。",
+    "aboutMe": "展示自己的项目、小实验和随手记录，让路过的人逛逛，也顺便认识一下我。",
+    "url": "",
+    "githubUrl": "",
+    "instagramUrl": "",
+    "linkedinUrl": "",
+    "tiktokUrl": "",
+    "xUrl": "",
+    "youtubeUrl": ""
   },
   "projects": [
     {
@@ -26,7 +27,8 @@
         "/textures/gallery/csslogo.webp",
         "/textures/gallery/jslogo.webp",
         "/textures/gallery/netlifylogo.webp"
-      ]
+      ],
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "67-game",
@@ -42,7 +44,8 @@
         "/textures/gallery/htmllogo.webp",
         "/textures/gallery/jslogo.webp",
         "/textures/gallery/firebaselogo.webp"
-      ]
+      ],
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "young",
@@ -58,7 +61,8 @@
         "/textures/gallery/htmllogo.webp",
         "/textures/gallery/tailwindlogo.webp",
         "/textures/gallery/netlifylogo.webp"
-      ]
+      ],
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "ui-components",
@@ -74,7 +78,8 @@
         "/textures/gallery/csslogo.webp",
         "/textures/gallery/jslogo.webp",
         "/textures/gallery/netlifylogo.webp"
-      ]
+      ],
+      "authorName": "Tomasz Szmajda"
     }
   ],
   "studio": [
@@ -89,7 +94,8 @@
       "url": "https://www.linkedin.com/posts/itomdev_i-kept-rebuilding-the-same-ui-animations-activity-7472981452289163264-gANX",
       "date": "2026-07-18",
       "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "88522880-608b-4cbd-ac08-e12e99eb46d0",
@@ -102,7 +108,8 @@
       "url": "https://www.tiktok.com/@itomdev",
       "date": "2026-07-18",
       "frontTexture": "/content/c8ad8f3e552d4151cb1b46618f8cad431316953f-1024x2048.webp",
-      "paintedFrontTexture": "/content/cff3658c47cc85a7ad676f540d26a8e6a0754c3c-512x1024.webp"
+      "paintedFrontTexture": "/content/cff3658c47cc85a7ad676f540d26a8e6a0754c3c-512x1024.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "5479ed60-479d-446c-b643-1681e58b4e0d",
@@ -116,7 +123,8 @@
       "date": "2026-07-18",
       "views": "999",
       "frontTexture": "/content/c8ad8f3e552d4151cb1b46618f8cad431316953f-1024x2048.webp",
-      "paintedFrontTexture": "/content/cff3658c47cc85a7ad676f540d26a8e6a0754c3c-512x1024.webp"
+      "paintedFrontTexture": "/content/cff3658c47cc85a7ad676f540d26a8e6a0754c3c-512x1024.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "1ee8bd4b-fa5d-49d5-9803-2ad3de7ec1ba",
@@ -129,7 +137,8 @@
       "url": "https://www.youtube.com/@itomdev",
       "date": "2026-07-18",
       "frontTexture": "/content/0dca95901d02de9dbba8c0c7da5fffface9957b3-2048x1024.webp",
-      "paintedFrontTexture": "/content/097f06a47d4759e495af42f03528c82873e4c623-1720x860.webp"
+      "paintedFrontTexture": "/content/097f06a47d4759e495af42f03528c82873e4c623-1720x860.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "61004a68-690e-4b1b-9a28-5c95f3c49d30",
@@ -143,7 +152,8 @@
       "date": "2026-07-12",
       "readTime": "4 分钟",
       "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "a491f10e-b9e6-489b-a4e0-a62950a696e3",
@@ -156,7 +166,8 @@
       "url": "https://www.linkedin.com/posts/itomdev_ai-creativecoding-activity-7467908125593976832-o9HE",
       "date": "2026-07-04",
       "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "371407e3-2663-4721-a212-c28b3449f9b9",
@@ -169,7 +180,8 @@
       "url": "https://www.linkedin.com/posts/itomdev_100-people-played-a-game-i-coded-using-activity-7462834233238097920-Eg-i",
       "date": "2026-06-20",
       "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "1b5dd93f-5177-40ef-a455-14cdf44d152c",
@@ -182,7 +194,8 @@
       "url": "https://tympanus.net/codrops/2026/06/11/sketching-the-impossible-a-3d-portfolio-built-without-a-single-3d-model/",
       "date": "2026-06-11",
       "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "7ef0eb6f-fe9a-45a0-b75c-8d4c6798b05e",
@@ -195,7 +208,8 @@
       "url": "https://www.linkedin.com/posts/itomdev_webdesign-gsap-frontend-activity-7455173978056224768-dyhz",
       "date": "2026-05-15",
       "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "47eeb34b-2bcb-4d58-a785-2f633603cd21",
@@ -209,7 +223,8 @@
       "date": "2026-04-13",
       "readTime": "3 分钟",
       "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "b5bc3c4d-bca0-4e2c-9988-76ece381397d",
@@ -222,7 +237,8 @@
       "url": "https://www.linkedin.com/posts/itomdev_its-finally-live-i-just-launched-my-new-activity-7441409690342825984-Kgbk",
       "date": "2026-04-01",
       "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp"
+      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
+      "authorName": "Tomasz Szmajda"
     }
   ],
   "awards": [
@@ -234,7 +250,8 @@
       "category": "other",
       "date": "2026-07-15",
       "url": "https://muz.li/picked/interactive-3d-sketch-portfolio-itom/",
-      "image": "/content/9f1863c44d5d680e95e6dcfc594d2955ac5298c1-700x930.webp"
+      "image": "/content/9f1863c44d5d680e95e6dcfc594d2955ac5298c1-700x930.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "904bf9fe-949b-4ec1-add0-6f7683ebd39a",
@@ -244,7 +261,8 @@
       "category": "sotd",
       "date": "2026-05-12",
       "url": "https://topdesignking.com/website/3621/tomasz-itom-szmajda-portfolio",
-      "image": "/content/cd3301fca22d4d589025a2bfa91fadbcee33cd00-1652x2336.webp"
+      "image": "/content/cd3301fca22d4d589025a2bfa91fadbcee33cd00-1652x2336.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "23a8d6a5-1c14-4608-a42d-2aaac80ec07e",
@@ -254,7 +272,8 @@
       "category": "sotd",
       "date": "2026-05-08",
       "url": "https://www.csslight.com/website/73073/Tomasz-ITom-Szmajda-Portfolio",
-      "image": "/content/6854d4bba74e97e4e739987227aeb9d0f56ded63-1652x2336.webp"
+      "image": "/content/6854d4bba74e97e4e739987227aeb9d0f56ded63-1652x2336.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "87598509-f4b6-4667-971f-21a429e0e749",
@@ -264,7 +283,8 @@
       "category": "sotd",
       "date": "2026-05-02",
       "url": "https://www.designnominees.com/sites/tomasz-itom-szmajda-portfoio",
-      "image": "/content/f13a8fa17a10e57963663c40665ee615c117aca8-1652x2336.webp"
+      "image": "/content/f13a8fa17a10e57963663c40665ee615c117aca8-1652x2336.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "a43fcff2-0733-427d-8387-0872fab5df55",
@@ -274,7 +294,8 @@
       "category": "sotd",
       "date": "2026-05-01",
       "url": "https://wdawards.com/web/tomasz-itom-szmajda-folio",
-      "image": "/content/e0ff92dc217fd09633b372e0de03a4a53e1e5934-1650x2336.webp"
+      "image": "/content/e0ff92dc217fd09633b372e0de03a4a53e1e5934-1650x2336.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "0de8f2a1-b861-4d30-a641-be40f8ea5b23",
@@ -284,7 +305,8 @@
       "category": "other",
       "date": "2026-04-30",
       "url": "https://www.awwwards.com/sites/tomasz-itom-szmajda-folio",
-      "image": "/content/6c7517ee36bc05c6148323332ccc95df511d33dc-2408x3194.webp"
+      "image": "/content/6c7517ee36bc05c6148323332ccc95df511d33dc-2408x3194.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "baef69f5-7eb5-4840-867a-e5633ea16adc",
@@ -294,7 +316,8 @@
       "category": "other",
       "date": "2026-04-25",
       "url": "https://www.cssdesignawards.com/sites/tomasz/49278/",
-      "image": "/content/57e43df691f1a23d5be8266550c281a387f9d3bd-1652x2336.webp"
+      "image": "/content/57e43df691f1a23d5be8266550c281a387f9d3bd-1652x2336.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "70f768e8-3bb3-4b7a-bfa5-2a5de8106b03",
@@ -304,7 +327,8 @@
       "category": "other",
       "date": "2026-04-25",
       "url": "https://www.cssdesignawards.com/sites/tomasz/49278/",
-      "image": "/content/917c3689008a16d7890994ba81803960973d2769-1652x2336.webp"
+      "image": "/content/917c3689008a16d7890994ba81803960973d2769-1652x2336.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "665d9a66-e483-425e-98e0-903178795066",
@@ -314,7 +338,8 @@
       "category": "sotd",
       "date": "2026-04-25",
       "url": "https://thefwa.com/cases/tomasz-itom-szmajda-portfolio",
-      "image": "/content/c620682e3f34e1192f78c0a331818c8cdc941bb0-1652x2336.webp"
+      "image": "/content/c620682e3f34e1192f78c0a331818c8cdc941bb0-1652x2336.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "637e0606-546f-4dde-9ff1-c7b762c18c04",
@@ -324,7 +349,8 @@
       "category": "other",
       "date": "2026-04-25",
       "url": "https://www.cssdesignawards.com/sites/tomasz/49278/",
-      "image": "/content/5ae3c2298680c5737072e29d59c5783c9eb7d3f4-1652x2336.webp"
+      "image": "/content/5ae3c2298680c5737072e29d59c5783c9eb7d3f4-1652x2336.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "38d6fef9-4988-46d2-b47f-87765c6d4c24",
@@ -334,7 +360,8 @@
       "category": "other",
       "date": "2026-04-25",
       "url": "https://www.cssdesignawards.com/sites/tomasz/49278/",
-      "image": "/content/264e3fb124ed86d5f3db2ca6b8e6ae553fb86da5-1652x2336.webp"
+      "image": "/content/264e3fb124ed86d5f3db2ca6b8e6ae553fb86da5-1652x2336.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "3dc50e3a-0626-4e13-a032-41660d13e11d",
@@ -344,7 +371,8 @@
       "category": "sotd",
       "date": "2026-04-01",
       "url": "https://orpetron.com/sites/tomasz-itom-szmajda-portfolio/",
-      "image": "/content/71adf1f1527f3cf11ffe3b9eaee9bf21dc943252-595x876.webp"
+      "image": "/content/71adf1f1527f3cf11ffe3b9eaee9bf21dc943252-595x876.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "b8abd703-2823-4d6c-ba76-868deb6846fa",
@@ -354,7 +382,8 @@
       "category": "sotd",
       "date": "2026-03-25",
       "url": "https://www.csswinner.com/details/tomasz-itom-szmajda-portfolio/19143",
-      "image": "/content/5651ba23a87390692859130113f7503ed3c78c69-1652x2338.webp"
+      "image": "/content/5651ba23a87390692859130113f7503ed3c78c69-1652x2338.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "a545607a-b95a-410f-b26a-87082be95c51",
@@ -364,7 +393,8 @@
       "category": "sotd",
       "date": "2026-01-29",
       "url": "https://orpetron.com/sites/young-multi/",
-      "image": "/content/19b206ad6cfc6adbd8457fa8381754ed3707b687-596x875.webp"
+      "image": "/content/19b206ad6cfc6adbd8457fa8381754ed3707b687-596x875.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "6dbf45eb-1f12-41f3-9f64-ab71f598b139",
@@ -374,7 +404,8 @@
       "category": "sotd",
       "date": "2026-01-24",
       "url": "https://www.csswinner.com/details/young-multi-official-experience/19045",
-      "image": "/content/d2244e5db14c4dc3efa12a62e193a29e4c07d2ae-1652x2338.webp"
+      "image": "/content/d2244e5db14c4dc3efa12a62e193a29e4c07d2ae-1652x2338.webp",
+      "authorName": "Tomasz Szmajda"
     },
     {
       "id": "5d8f2ab8-0af1-46f3-b113-80e1d2f1199e",
@@ -384,7 +415,8 @@
       "category": "sotd",
       "date": "2026-01-17",
       "url": "https://www.designnominees.com/sites/young-multi",
-      "image": "/content/ab97e504acf57c7592cf21cd1b7fe68e50882805-1652x2336.webp"
+      "image": "/content/ab97e504acf57c7592cf21cd1b7fe68e50882805-1652x2336.webp",
+      "authorName": "Tomasz Szmajda"
     }
   ],
   "faq": [

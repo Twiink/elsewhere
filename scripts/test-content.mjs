@@ -38,6 +38,12 @@ test('全部内容图片与技术图标均指向存在的本地文件', () => {
 
 test('搜索输出完整来自本地中文内容，结构化数据可解析', () => {
     const graph = buildJsonLd(content)['@graph'];
+    const person = graph.find(item => item['@type'] === 'Person');
+    assert.equal(person.name, content.site.nickname);
+    assert.equal(person.description, content.site.aboutMe);
+    assert.deepEqual(person.sameAs, []);
+    const projects = graph.find(item => item['@type'] === 'ItemList' && item.name === '精选项目');
+    assert.equal(projects.itemListElement[0].item.creator.name, content.projects[0].authorName);
     const faq = graph.find(item => item['@type'] === 'FAQPage');
     assert.equal(faq.mainEntity.length, content.faq.length);
     const llms = buildLlmsTxt(content);
@@ -50,4 +56,18 @@ test('搜索输出完整来自本地中文内容，结构化数据可解析', ()
     assert.ok(html.includes(content.projects[0].seoTitle));
     const json = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1];
     assert.deepEqual(JSON.parse(json), buildJsonLd(content));
+    assert.doesNotMatch(html, /<link rel="canonical"|<meta property="og:url"/);
+    assert.match(html, /name="author" content="Twiink"/);
+});
+
+test('未确定域名时使用相对图片地址，配置域名后可生成绝对地址', () => {
+    const localGraph = buildJsonLd(content)['@graph'];
+    assert.equal(localGraph.find(item => item['@type'] === 'Person')['@id'], '#person');
+    const localProjects = localGraph.find(item => item['@type'] === 'ItemList' && item.name === '精选项目');
+    assert.equal(localProjects.itemListElement[0].item.image, content.projects[0].front);
+    const hosted = { ...content, site: { ...content.site, url: 'https://example.com' } };
+    const hostedGraph = buildJsonLd(hosted)['@graph'];
+    assert.equal(hostedGraph.find(item => item['@type'] === 'Person')['@id'], 'https://example.com/#person');
+    const hostedProjects = hostedGraph.find(item => item['@type'] === 'ItemList' && item.name === '精选项目');
+    assert.equal(hostedProjects.itemListElement[0].item.image, `https://example.com${content.projects[0].front}`);
 });

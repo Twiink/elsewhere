@@ -1,5 +1,6 @@
 import { useMemo, memo } from 'react';
 import { Text } from '@react-three/drei';
+import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 import CorridorWalls from './CorridorWalls';
@@ -14,7 +15,7 @@ import CorridorDecorations from './CorridorDecorations';
  * CorridorSegment 走廊分段组件。
  * 
  * 无限走廊中可重复的一段。
- * 每段包含墙面、人物、ITOM 文字、门和装饰。
+ * 每段包含墙面、人物、网站标题、门和装饰。
  * 
  * 每段长度：80 单位。
  * 位置由 segmentIndex × segmentLength 决定。
@@ -36,6 +37,7 @@ const CorridorSegment = ({
     zClip = 100000, // 裁切平面，只渲染 Z < zClip 的内容。
     setCameraOverride // 接管相机控制的函数。
 }) => {
+    const isNarrow = useThree(state => state.size.width < 640);
 
     // 按分段索引计算 Z 偏移。
     // 第 0 段从 Z=10 延伸至 Z=-70。
@@ -118,11 +120,13 @@ const CorridorSegment = ({
 
             {/* 欢迎区域：位于分段起点，已向前移。 */}
             <group position={[0, 0, zOffset - 2]}>
-                {/* ITOM 文字居中，字母位置在组件内部调整。 */}
-                <HeroText position={[0, -0.1, -0.5]} />
+                {/* 人物与标题沿走廊中轴上下排列。 */}
+                <HeroText position={[0, isNarrow ? 0.75 : 0.95, -0.5]} />
 
-                {/* 人物居中。 */}
-                <Avatar position={[0, -0.61, -0.3]} />
+                <Avatar
+                    position={[0, isNarrow ? -0.9 : -0.85, -0.3]}
+                    height={isNarrow ? 1.7 : 1.8}
+                />
 
 
                 {/* 人物周围的涂鸦。 */}

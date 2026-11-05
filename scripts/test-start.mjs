@@ -77,34 +77,25 @@ function setup({ reduced = false } = {}) {
   return { links, units, document, window, media, frames, timers, notice, flush };
 }
 
-test('静态 HTML 包含全部目标，作品集入口仅出现一次', () => {
+test('个人链接页使用站内入口，作品集入口仅出现一次', () => {
   const anchors = [...html.matchAll(/<a\b([^>]+)>([\s\S]*?)<\/a>/g)];
-  assert.equal(anchors.length, 14); // 十三个目标链接及一个跳转链接。
+  assert.equal(anchors.length, 6);
   assert.equal(anchors.filter(match => /href="\/"/.test(match[1])).length, 1);
   assert.equal(anchors.filter(match => /data-pending/.test(match[1])).length, 0);
   const urls = anchors.map(match => match[1].match(/href="(https:[^"]+)"/)?.[1]).filter(Boolean);
-  assert.deepEqual(urls, [
-    'https://itom-ui-components.vercel.app',
-    'https://www.awwwards.com/ITom/',
-    'https://www.behance.net/itompoland',
-    'https://codepen.io/ITomDev',
-    'https://dribbble.com/itomdev',
-    'https://www.facebook.com/people/ITom/61586563487664/',
-    'https://github.com/ITomPoland',
-    'https://www.instagram.com/itom.dev/',
-    'https://www.linkedin.com/in/itomdev/',
-    'https://me.muz.li/itom',
-    'https://x.com/ITom_Dev',
-    'https://www.youtube.com/@itomdev',
-  ]);
+  assert.deepEqual(urls, []);
+  for (const path of ['/about', '/gallery', '/studio']) assert.ok(html.includes(`href="${path}"`));
+  assert.match(html, /<h1>Twiink's Space<\/h1>/);
   assert.match(html, /aria-label="交互作品集"/);
-  assert.match(html, /aria-label="界面手账"/);
+  assert.match(html, /aria-label="创作手记"/);
 });
 
 test('静态入口保持独立，使用本地中英文字体', () => {
   assert.equal((html.match(/<script\b/g) || []).length, 1);
   assert.match(html, /src="\/start\/script.js" defer/);
-  assert.doesNotMatch(html, /\/assets\/|\/textures\/|modulepreload/);
+  assert.doesNotMatch(html, /\/assets\/|modulepreload|<video\b/);
+  assert.match(html, /src="\/textures\/twiink\/start-bouquet.png"/);
+  assert.ok(statSync(new URL('../public/textures/twiink/start-bouquet.png', import.meta.url)).size > 0);
   assert.doesNotMatch(script, /\bimport\s|\bfetch\s*\(|XMLHttpRequest|WebSocket/);
   assert.equal((html.match(/as="font"/g) || []).length, 2);
   assert.ok(statSync(new URL('../public/start/fonts/barlow-condensed-700-latin.woff2', import.meta.url)).size < 25000);
