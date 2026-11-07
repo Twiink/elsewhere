@@ -34,27 +34,9 @@ const ROOM_META = {
     contact: {
         path: '/contact',
         title: `联系我 | ${siteInfo.siteTitle}`,
-        description: "走到海边歇一歇，在这里找到交流的入口。",
+        description: siteInfo.contact.description,
     },
 };
-
-// 将 URL 路径映射回房间 ID，用于深层链接。
-const PATH_TO_ROOM = {
-    '/': null,
-    '/about': 'about',
-    '/gallery': 'gallery',
-    '/studio': 'studio',
-    '/contact': 'contact',
-};
-
-/**
- * 返回初始 URL 对应的房间 ID。
- * 应用启动时调用一次，以决定是否自动传送。
- */
-export function getInitialRoomFromUrl() {
-    const path = window.location.pathname.replace(/\/+$/, '') || '/';
-    return PATH_TO_ROOM[path] !== undefined ? PATH_TO_ROOM[path] : null;
-}
 
 export function useDocumentMeta() {
     const { currentRoom, teleportTo, hasEntered } = useScene();

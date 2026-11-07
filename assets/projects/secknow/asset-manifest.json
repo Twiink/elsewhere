@@ -1,0 +1,316 @@
+{
+  "project": "SecKnow AI 教育平台",
+  "projectId": "secknow",
+  "status": "确认版文稿、绘本海报与原图发布副本已接入本地画廊",
+  "savedAt": "2026-11-06",
+  "assets": [
+    {
+      "id": "homepage",
+      "role": "website-screenshot",
+      "caption": "SecKnow 网站首页首屏",
+      "path": "originals/01-homepage.png",
+      "sourceAttachment": "codex-clipboard-13209746-6079-43a3-85fd-9f8079c9f078.png",
+      "mimeType": "image/png",
+      "width": 1855,
+      "height": 1025,
+      "bytes": 1026119,
+      "sha256": "d98566e0dd120ec342b0568d7df612d0721cbc1dc04969de9b60108b51ee3242",
+      "originalBytesPreserved": true,
+      "transformations": []
+    },
+    {
+      "id": "knowledge-planets",
+      "role": "website-screenshot",
+      "caption": "探索知识星球区块",
+      "path": "originals/02-knowledge-planets.png",
+      "sourceAttachment": "codex-clipboard-0347f0b7-f0f3-41df-bfdd-b91a7b0fb6ea.png",
+      "mimeType": "image/png",
+      "width": 1828,
+      "height": 964,
+      "bytes": 1493614,
+      "sha256": "3260e719f1f70959fe581e5bc966d57dfe449b8dd133a180386f65fa7733c561",
+      "originalBytesPreserved": true,
+      "transformations": []
+    },
+    {
+      "id": "venue-exterior",
+      "role": "venue-photo",
+      "caption": "带 SecKnow 标识的户外实景",
+      "path": "originals/03-venue-exterior.jpg",
+      "sourceAttachment": "codex-clipboard-6da97761-56e2-4d40-868b-f886759979ba.jpg",
+      "mimeType": "image/jpeg",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 1668916,
+      "sha256": "29456cb186c6128bc9581232086a27ad8c3c4c4dacbd372315307b9d22153704",
+      "originalBytesPreserved": true,
+      "transformations": []
+    }
+  ],
+  "websiteReference": {
+    "url": "https://www.secknow-ai.com/",
+    "title": "SecKnow",
+    "verification": {
+      "method": "http-document-request",
+      "checkedAt": "2026-11-06",
+      "httpStatus": 200
+    }
+  },
+  "generated": [
+    {
+      "id": "showcase-portrait-v1",
+      "role": "project-cover",
+      "caption": "知识星球与学习桌面竖版展示图",
+      "path": "generated/showcase-portrait-v1.png",
+      "mimeType": "image/png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 2038800,
+      "sha256": "10a54548bc6648704abc33424545166c8aed716a44572c47fba6c57ffe66f694",
+      "aiGenerated": true,
+      "generator": "image_gen",
+      "generatedAt": "2026-11-06",
+      "promptFile": "generation-prompts.md",
+      "references": [
+        "originals/01-homepage.png",
+        "originals/02-knowledge-planets.png"
+      ]
+    },
+    {
+      "id": "showcase-landscape-v1",
+      "role": "project-detail-image",
+      "caption": "官网、知识星球与学习笔记横版展示图",
+      "path": "generated/showcase-landscape-v1.png",
+      "mimeType": "image/png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2134572,
+      "sha256": "bf5a80c7391eada1f155735cd28d99901bd6f249352416cdb77b011654dfd549",
+      "aiGenerated": true,
+      "generator": "image_gen",
+      "generatedAt": "2026-11-06",
+      "promptFile": "generation-prompts.md",
+      "references": [
+        "originals/01-homepage.png",
+        "originals/02-knowledge-planets.png",
+        "generated/showcase-portrait-v1.png"
+      ]
+    },
+    {
+      "id": "showcase-portrait-v2",
+      "role": "project-cover",
+      "caption": "学生操作互动课程与 AI 语音辅导竖版展示图",
+      "path": "generated/showcase-portrait-v2.png",
+      "mimeType": "image/png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 2055266,
+      "sha256": "7bdeb72d1b489ba04397c2839d27bc70e04099f5fe015de627c00b254c7378b5",
+      "aiGenerated": true,
+      "generator": "image_gen",
+      "inputType": "text",
+      "generatedAt": "2026-11-06",
+      "promptFile": "generation-prompts-v2.md"
+    },
+    {
+      "id": "showcase-landscape-v2",
+      "role": "project-detail-image",
+      "caption": "教师准备教材与学生探究学习横版展示图",
+      "path": "generated/showcase-landscape-v2.png",
+      "mimeType": "image/png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2131663,
+      "sha256": "de806001668125d0ccd3696fe8f83dc29554d591985424327ba027ee7f434104",
+      "aiGenerated": true,
+      "generator": "image_gen",
+      "inputType": "text",
+      "generatedAt": "2026-11-06",
+      "promptFile": "generation-prompts-v2.md"
+    },
+    {
+      "id": "showcase-portrait-v3",
+      "role": "project-cover",
+      "caption": "教材生成、互动实验、随堂测验与 AI 自学助手竖版主视觉",
+      "path": "generated/showcase-portrait-v3.png",
+      "mimeType": "image/png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1779906,
+      "sha256": "3917958169ad02735723f621166768eb084377f1641108ef2d4dfbce24ed4322",
+      "aiGenerated": true,
+      "generator": "image_gen",
+      "inputType": "text",
+      "generatedAt": "2026-11-06",
+      "promptFile": "generation-prompts-v3.md"
+    },
+    {
+      "id": "showcase-landscape-v3",
+      "role": "project-detail-image",
+      "caption": "生成、实验、测验与答疑教材工作台横版主视觉",
+      "path": "generated/showcase-landscape-v3.png",
+      "mimeType": "image/png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 1677139,
+      "sha256": "5aa318a00c87125569c89e1af3325ba1d3a7c93d78510be16534cac6cfe25aaa",
+      "aiGenerated": true,
+      "generator": "image_gen",
+      "generationSteps": ["generate", "edit"],
+      "generatedAt": "2026-11-06",
+      "promptFile": "generation-prompts-v3.md"
+    },
+    {
+      "id": "showcase-portrait-v4",
+      "role": "project-cover",
+      "caption": "让知识动起来：折页教材竖版展示海报",
+      "path": "generated/showcase-portrait-v4.png",
+      "mimeType": "image/png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 2739359,
+      "sha256": "afbffb2fdf76b563a6e6eb14a5e6960cd805d02d3d240558708907c944b5315a",
+      "aiGenerated": true,
+      "generator": "image_gen",
+      "inputType": "text",
+      "generatedAt": "2026-11-06",
+      "promptFile": "generation-prompts-v4.md"
+    },
+    {
+      "id": "showcase-landscape-v4",
+      "role": "project-detail-image",
+      "caption": "让知识动起来：折页教材横版展示海报",
+      "path": "generated/showcase-landscape-v4.png",
+      "mimeType": "image/png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2859704,
+      "sha256": "e1691516bc387bb52b17b8c865dc1d7eb14cdb956b4ab9f92cbf83510ca89356",
+      "aiGenerated": true,
+      "generator": "image_gen",
+      "inputType": "text",
+      "generatedAt": "2026-11-06",
+      "promptFile": "generation-prompts-v4.md"
+    },
+    {
+      "id": "showcase-portrait-v5",
+      "role": "project-cover",
+      "caption": "让好奇心带你去探索：水彩绘本与学习星球竖版海报",
+      "path": "generated/showcase-portrait-v5.png",
+      "mimeType": "image/png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 2353634,
+      "sha256": "786d8cc80bfbb3d0f348cd91ec8e679ceacf1f44e19bceaad7e155877d6c5f0d",
+      "aiGenerated": true,
+      "generator": "image_gen",
+      "generatedAt": "2026-11-06",
+      "promptFile": "generation-prompts-v5.md",
+      "references": [
+        "originals/01-homepage.png",
+        "originals/02-knowledge-planets.png"
+      ]
+    },
+    {
+      "id": "showcase-landscape-v5",
+      "role": "project-detail-image",
+      "caption": "让好奇心带你去探索：水彩绘本与学习星球横版海报",
+      "path": "generated/showcase-landscape-v5.png",
+      "mimeType": "image/png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2231266,
+      "sha256": "55841a56938bff21fc2ae4f868252ead7aa93655c577537f3d36b23ab03e1619",
+      "aiGenerated": true,
+      "generator": "image_gen",
+      "generatedAt": "2026-11-06",
+      "promptFile": "generation-prompts-v5.md",
+      "references": [
+        "originals/01-homepage.png",
+        "originals/02-knowledge-planets.png",
+        "generated/showcase-portrait-v5.png"
+      ]
+    }
+  ],
+  "showcaseSelection": {
+    "portrait": "generated/showcase-portrait-v5.png",
+    "landscape": "generated/showcase-landscape-v5.png"
+  },
+  "published": [
+    {
+      "path": "public/content/projects/secknow/cover-color.webp",
+      "source": "generated/showcase-portrait-v5.png",
+      "mimeType": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "bytes": 231100,
+      "sha256": "d1bc27ad189c2930672219bec0d50dce627b36f22ede27e84e1063a543a0bf68",
+      "transformations": [
+        "WebP quality 94",
+        "海报按原比例缩放至 800×1200，排入 1200×1600 纸卡，顶部留白"
+      ]
+    },
+    {
+      "path": "public/content/projects/secknow/cover-sketch.webp",
+      "source": "generated/showcase-portrait-v5.png",
+      "mimeType": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "bytes": 176308,
+      "sha256": "071320691ae0c68b2291faf210a5d0b4a3e3e182e38d6f93d477c78cf50763e1",
+      "transformations": [
+        "WebP quality 94",
+        "海报按原比例缩放至 800×1200，排入 1200×1600 纸卡，顶部留白",
+        "灰度转换"
+      ]
+    },
+    {
+      "path": "public/content/projects/secknow/showcase.webp",
+      "source": "generated/showcase-landscape-v5.png",
+      "mimeType": "image/webp",
+      "width": 1672,
+      "height": 941,
+      "bytes": 300812,
+      "sha256": "1ddd8559444dfe6833e78de85e549d681e88f714cc44ca149451526317ee06ba",
+      "transformations": [
+        "WebP quality 94，保持原始尺寸与比例"
+      ]
+    },
+    {
+      "path": "public/content/projects/secknow/homepage.webp",
+      "source": "originals/01-homepage.png",
+      "mimeType": "image/webp",
+      "width": 1855,
+      "height": 1025,
+      "bytes": 147682,
+      "sha256": "2b9e36913e11671fa17986490373445bc71bd1a943a85b227f5a8984da0b0a22",
+      "transformations": [
+        "WebP quality 96，保持原始尺寸与比例"
+      ]
+    },
+    {
+      "path": "public/content/projects/secknow/knowledge-planets.webp",
+      "source": "originals/02-knowledge-planets.png",
+      "mimeType": "image/webp",
+      "width": 1828,
+      "height": 964,
+      "bytes": 184918,
+      "sha256": "b5ce180f690d54063aba8dc546a02427bf0bc489f56968362a40e20fddf87e58",
+      "transformations": [
+        "WebP quality 96，保持原始尺寸与比例"
+      ]
+    },
+    {
+      "path": "public/content/projects/secknow/venue-exterior.webp",
+      "source": "originals/03-venue-exterior.jpg",
+      "mimeType": "image/webp",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 737272,
+      "sha256": "74d8d22eb9c74f7a33caa5f2a1443e565f3a35560bc188108e1c1e2605b12265",
+      "transformations": [
+        "WebP quality 93，保持原始尺寸与比例"
+      ]
+    }
+  ]
+}

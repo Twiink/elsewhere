@@ -1,7 +1,11 @@
 import content from './content.json';
+import profile from './profile.json';
+import { withProfile } from './profile.js';
 
-// 页面与搜索信息共用本地内容，替换文案和图片时统一修改 content.json。
-export const siteInfo = content.site;
+// 关于我集中编辑 profile.json；作品、文章与站点设置继续编辑 content.json。
+export const personalProfile = profile;
+export const siteInfo = withProfile(content, profile).site;
+export const contactInfo = content.site.contact;
 export const galleryProjects = content.projects;
 export const studioContent = content.studio;
 export const awardCertificates = content.awards;

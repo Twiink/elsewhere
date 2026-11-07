@@ -1,0 +1,41 @@
+{
+  "setup": "通过 SceneContext 设置联系房间测试状态后操作真实联系方式按钮",
+  "questionsMatch": true,
+  "answersMatch": true,
+  "allCollapsedByDefault": true,
+  "desktop": {
+    "viewport": [
+      1440,
+      900
+    ],
+    "horizontalOverflow": false,
+    "bodyOverflow": false,
+    "summaryCount": 6
+  },
+  "mobile": {
+    "viewport": [
+      390,
+      844
+    ],
+    "horizontalOverflow": false,
+    "bodyOverflow": false,
+    "closeButtonVisible": true,
+    "keyboardToggle": true
+  },
+  "smallMobile": {
+    "viewport": [
+      320,
+      740
+    ],
+    "horizontalOverflow": false,
+    "bodyOverflow": false
+  },
+  "closeReturnsToContact": true,
+  "consoleErrors": [],
+  "validation": {
+    "contentTests": "23/23",
+    "productionBuild": "passed",
+    "contactComponentLint": "passed",
+    "gitDiffCheck": "passed"
+  }
+}

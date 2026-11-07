@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useMemo, useRef } from 'react';
-import { getInitialRoomFromUrl } from '../hooks/useDocumentMeta';
+import { getInitialRoomFromUrl } from '../utils/roomRoutes';
 
 const SceneContext = createContext(null);
 

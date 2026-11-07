@@ -4,7 +4,6 @@ import { Text, PositionalAudio } from '@react-three/drei';
 import * as THREE from 'three';
 import PaperAirplane from './PaperAirplane';
 import InfiniteSkyManager from './InfiniteSkyManager';
-import StoryMilestone from './StoryMilestone';
 import { useScene } from '../../../../context/SceneContext';
 import { useAchievements } from '../../../../context/AchievementsContext';
 import { useAudio } from '../../../../context/AudioManager';
@@ -21,15 +20,6 @@ export const AUDIO_SETTINGS = {
     distance: 2,
     rolloff: 0.8
 };
-
-// 故事区域：位置定义各里程碑出现的地点。
-// 用 CHUNK_LENGTH 循环故事，约每 40 单位重新开始。
-const STORY_MILESTONES = [
-    { id: 'intro', position: [0, 0, -15], type: 'intro', title: 'Twiink', subtitle: "Twiink's Space" },
-    { id: 'awards', position: [0, 0, -55], type: 'awards', title: "奖项", subtitle: "每日最佳网站与 CSS Winner 获奖作品" },
-    { id: 'journey', position: [0, 0, -95], type: 'journey', title: "历程", subtitle: "奥波莱大学 · 计算机科学" },
-    { id: 'skills', position: [0, 0, -135], type: 'skills', title: "技能", subtitle: "React · Three.js · GSAP · 创意编程" },
-];
 
 const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     const { camera } = useThree();

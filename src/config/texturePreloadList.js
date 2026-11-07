@@ -20,7 +20,7 @@ export const ENTRANCE_TEXTURES = [
     '/textures/entrance/stone-path.webp',
     '/textures/entrance/floor_paper.webp',
     '/textures/entrance/belka.webp',
-    '/textures/entrance/sign.webp',
+    '/textures/entrance/sign-creative-workshop.png',
     // 角色与物体。
     '/textures/entrance/cat_front_body.webp',
     '/textures/entrance/window_sketch.webp',
@@ -170,46 +170,13 @@ export const CONTACT_TEXTURES = [
 export const ABOUT_TEXTURES = [
     // 人物。
     '/textures/twiink/cloud-ink.webp',
-    // 奖项。
-    '/textures/about/SOTY.webp',
-    '/textures/about/SOTY_painted.webp',
-    '/textures/about/SOTD.webp',
-    '/textures/about/SOTD_painted.webp',
-    '/textures/about/SOTM.webp',
-    '/textures/about/SOTM_painted.webp',
+    // 可编辑个人资料对应的空白纸片、岛屿和气球。
+    '/textures/twiink/profile-note.svg',
+    '/textures/twiink/profile-island.svg',
+    '/textures/twiink/profile-balloon.svg',
     '/textures/about/button.webp',
     '/textures/about/button_painted.webp',
-    // 遮罩中的奖项图片。
-    '/textures/about/SOTDAYYOUNGMULTICSSWINNER.webp',
-    '/textures/about/SOTDAYYOUNGMULTIGSAP.webp',
-    '/textures/about/SOTDAYYOUNGMULTIORPETRON.webp',
-    '/textures/about/SOTDAYYOUNGMULTIDESIGNNOMINESS.webp',
-    // 经历岛屿。
-    '/textures/about/uowyspa.webp',
-    '/textures/about/freelancewyspa.webp',
-    // 大技能气球。
-    '/textures/about/reactduzybalon.webp',
-    '/textures/about/reactduzybalon_painted.webp',
-    '/textures/about/threejsduzybalon.webp',
-    '/textures/about/threejsduzybalon_painted.webp',
-    '/textures/about/GSAPduzybalon.webp',
-    '/textures/about/GSAPduzybalon_painted.webp',
-    // 中技能气球。
-    '/textures/about/JSSREDNIBALON.webp',
-    '/textures/about/JSSREDNIBALON_painted.webp',
-    '/textures/about/csssrednibalon.webp',
-    '/textures/about/csssrednibalon_painted.webp',
-    '/textures/about/nextjssrednibalon.webp',
-    '/textures/about/nextjssrednibalon_painted.webp',
-    // 小技能气球。
-    '/textures/about/htmlmalybalon.webp',
-    '/textures/about/htmlmalybalon_painted.webp',
-    '/textures/about/gitmalybalon.webp',
-    '/textures/about/gitmalybalon_painted.webp',
-    '/textures/about/figmamalybalon.webp',
-    '/textures/about/figmamalybalon_painted.webp',
-    '/textures/about/firebasemalybalon.webp',
-    '/textures/about/firebasemalybalon_painted.webp',
+    '/textures/about/island-free-creation.png',
     // 云层。
     '/textures/clouds/1131c3eb-dfae-423f-924b-ff39d8ccd6dc.webp',
     '/textures/clouds/254b8ec8-d6f7-4275-956f-7bab65b2ce2d.webp',

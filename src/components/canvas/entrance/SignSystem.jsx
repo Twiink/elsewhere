@@ -6,7 +6,7 @@ import { siteInfo } from '../../../data/content';
 
 const SignSystem = (props) => {
     const groupRef = useRef();
-    const signTexture = useTexture('/textures/entrance/sign.webp');
+    const signTexture = useTexture('/textures/entrance/sign-creative-workshop.png');
     const mountTexture = useTexture('/textures/entrance/belka.webp');
 
     // 物理参数。

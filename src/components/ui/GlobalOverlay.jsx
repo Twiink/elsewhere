@@ -65,6 +65,7 @@ const GlobalOverlay = () => {
     const content = overlayContent || cachedContent || dummyGridContent;
 
     // 传递 animateOpen 状态，控制 CSS 过渡。
+    if (content.layout === 'profile' || content.layout === 'project' || content.layout === 'contact') return null;
     return <ContentCard content={content} isOpen={animateOpen} onClose={closeOverlay} isMobile={isMobile} />;
 };
 

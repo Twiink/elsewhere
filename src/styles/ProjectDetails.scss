@@ -1,0 +1,116 @@
+// 沿用「关于我」的纸张阅读面板，现场照片保留原始比例与颜色。
+.project-details-dialog {
+    .about-profile-header { align-items: flex-start; }
+    .about-profile-header h2 { line-height: 1.35; text-wrap: balance; }
+    .about-profile-header .studio-close-btn { margin: 0; }
+}
+
+.project-detail-switcher {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+    padding: 0 2rem 0.4rem;
+
+    button {
+        min-height: 44px;
+        padding: 0.35rem 0;
+        border: 0;
+        border-bottom: 2px solid transparent;
+        background: transparent;
+        color: var(--profile-muted);
+        font: inherit;
+        cursor: pointer;
+        &:hover { color: var(--profile-ink); }
+        &[aria-pressed='true'] { color: var(--profile-ink); border-bottom-color: currentColor; font-weight: 600; }
+    }
+}
+
+.project-details-body {
+    .project-detail-tagline { margin-top: 1.5rem; color: var(--profile-muted); }
+
+    .project-detail-section { margin-top: 2.5rem; scroll-margin-top: 1.5rem; }
+
+    .project-detail-entries {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+
+        li + li { margin-top: 1.5rem; }
+        h4 { line-height: 1.5; }
+    }
+
+    .project-detail-photos {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.5rem 1rem;
+
+        figure { margin: 0; min-width: 0; }
+        figure:first-child { grid-column: 1 / -1; }
+        figure:last-child:nth-child(even) { grid-column: 1 / -1; }
+        img { display: block; width: 100%; height: auto; border: 1px solid var(--profile-rule); }
+        figcaption { margin-top: 0.55rem; font-size: 0.95rem; line-height: 1.6; color: var(--profile-muted); }
+    }
+
+    .project-detail-tools {
+        border-block: 1px dashed var(--profile-rule);
+        padding-block: 0.5rem;
+
+        summary { min-height: 44px; padding-block: 0.5rem; cursor: pointer; }
+        summary:hover { color: var(--profile-muted); }
+        .project-detail-entries { padding: 0.75rem 0; }
+    }
+
+    .project-detail-videos {
+        figure { margin: 0; }
+        video {
+            display: block;
+            width: auto;
+            max-width: 100%;
+            height: auto;
+            max-height: 60dvh;
+            margin-inline: auto;
+            border: 1px solid var(--profile-rule);
+            background: #141125;
+        }
+        figcaption { margin-top: 0.75rem; font-size: 0.95rem; line-height: 1.6; color: var(--profile-muted); }
+    }
+
+    .project-detail-reference {
+        margin-top: 0.8rem;
+        a { color: var(--profile-ink); text-underline-offset: 0.25em; }
+    }
+
+    .project-detail-entry {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 210px;
+        align-items: center;
+        gap: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px dashed var(--profile-rule);
+
+        img { display: block; width: 100%; height: auto; }
+        a:hover { outline: 1px solid var(--profile-rule); outline-offset: 4px; }
+        .project-detail-hint { color: var(--profile-muted); font-size: 0.95rem; }
+    }
+
+    .project-detail-entry-site {
+        grid-template-columns: minmax(0, 1fr);
+
+        .project-detail-site-link {
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            color: var(--profile-ink);
+            text-underline-offset: 0.3em;
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    .project-details-trigger { top: calc(max(0.8rem, env(safe-area-inset-top)) + 3.5rem); }
+    .project-details-dialog .about-profile-header h2 { font-size: 1.45rem; }
+    .project-detail-switcher { padding-inline: 1.1rem; gap: 0 1.2rem; }
+    .project-details-body .project-detail-photos { grid-template-columns: minmax(0, 1fr); }
+    .project-details-body .project-detail-entry { grid-template-columns: minmax(0, 1fr); }
+    .project-detail-entry a { width: min(252px, 100%); justify-self: center; }
+}

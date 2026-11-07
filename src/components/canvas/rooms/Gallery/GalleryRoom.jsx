@@ -49,7 +49,7 @@ const BIRD_HEIGHT = 0.35;
 const RIGHT_CROP_AMOUNT = 0.2;
 
 const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
-    const { openOverlay, isTeleporting } = useScene();
+    const { overlayContent, isTeleporting } = useScene();
     const { showTutorial, unlockAchievement, hidePopup } = useAchievements();
     const { globalVolume, isMuted } = useAudio();
     const effectiveVolume = isMuted ? 0 : AUDIO_SETTINGS.volume * globalVolume;
@@ -252,7 +252,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 techStack: techStack
             };
         });
-    }, [projectTextures, backTextureRaw, overlayTextureRaw]);
+    }, [activeProjects, projectTextures, paintedTextures, canHover, backTextureRaw, overlayTextureRaw]);
 
     // 滚动到指定项目索引的函数。
     const scrollToIndex = (index, onComplete) => {
@@ -284,6 +284,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     // 交互。
     const lastTouchX = useRef(0);
     useEffect(() => {
+        if (overlayContent) return;
         // 使用 Observer 统一滚轮、触摸与指针事件。
         const scrollObserver = Observer.create({
             target: window,
@@ -314,7 +315,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         });
 
         return () => scrollObserver.kill();
-    }, [showRoom, selectedCard, globalIsAnimating]);
+    }, [showRoom, selectedCard, globalIsAnimating, isTransitioning, overlayContent]);
 
     useFrame((state, delta) => {
         currentScroll.current = THREE.MathUtils.lerp(currentScroll.current, targetScroll.current, delta * 5);
@@ -649,6 +650,7 @@ const FlyingBird = ({ texture }) => {
 
 // 单张项目卡片子组件。
 const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, currentScroll, materials, curve, isSelected, scrollToIndex, onClick, isMobile, isTransitioning, paintProgress, roomOrigin }, ref) => {
+    const { openOverlay } = useScene();
     const cardRef = useRef();
     const paperRef = useRef(); // 可移动纸张部分的引用。
     const materialRef = useRef();
@@ -1139,7 +1141,8 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                         onClick={(e) => {
                             if (isSelected && !isTransitioning) {
                                 e.stopPropagation();
-                                window.open(project.url, '_blank');
+                                if (project.details) openOverlay({ layout: 'project', projectId: project.id });
+                                else window.open(project.url, '_blank', 'noopener,noreferrer');
                             }
                         }}
                         onPointerEnter={(e) => {
@@ -1213,11 +1216,27 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                         anchorY="middle"
                         fillOpacity={0} // 初始隐藏。
                     >
-                        技术栈
+                        {project.cardNotes ? project.cardNotesTitle || '在乐园里' : '技术栈'}
                     </Text>
 
                     {/* 横向排列标志的容器。 */}
                     <group position={[0, -0.05, 0.01]}>
+                        {project.cardNotes?.map((note, noteIndex) => (
+                            <Text
+                                key={note}
+                                position={[(noteIndex - (project.cardNotes.length - 1) / 2) * 0.3, 0, 0]}
+                                font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                                fontSize={0.05}
+                                color="#333333"
+                                maxWidth={0.25}
+                                anchorX="center"
+                                anchorY="middle"
+                                textAlign="center"
+                                lineHeight={1.5}
+                            >
+                                {note}
+                            </Text>
+                        ))}
                         {project.techStack && project.techStack.map((logoPath, idx) => {
                             // 四个方块居中排列的间距。
                             const spacing = 0.30;
@@ -1247,14 +1266,17 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                 <Text
                     ref={textRef}
                     position={[0, 0.7, 0]} // 这里只有前两个参数 X、Y 生效。
-                    fontSize={0.20}
+                    fontSize={project.cardTitle ? 0.15 : 0.20}
+                    maxWidth={project.cardTitle ? 1.3 : undefined}
+                    textAlign="center"
+                    lineHeight={1.25}
                     color="#1c1c1c"
                     font="/fonts/LXGWWenKaiLite-Regular.ttf"
                     anchorX="center"
                     anchorY="middle"
                     fillOpacity={0} // 初始隐藏。
                 >
-                    {project.title}
+                    {project.cardTitle || project.title}
                 </Text>
 
                 <PositionalAudio

@@ -77,14 +77,14 @@ function setup({ reduced = false } = {}) {
   return { links, units, document, window, media, frames, timers, notice, flush };
 }
 
-test('个人链接页使用站内入口，作品集入口仅出现一次', () => {
+test('个人链接页提供站内导航与 GitHub 入口，作品集入口仅出现一次', () => {
   const anchors = [...html.matchAll(/<a\b([^>]+)>([\s\S]*?)<\/a>/g)];
-  assert.equal(anchors.length, 6);
+  assert.equal(anchors.length, 8);
   assert.equal(anchors.filter(match => /href="\/"/.test(match[1])).length, 1);
   assert.equal(anchors.filter(match => /data-pending/.test(match[1])).length, 0);
   const urls = anchors.map(match => match[1].match(/href="(https:[^"]+)"/)?.[1]).filter(Boolean);
-  assert.deepEqual(urls, []);
-  for (const path of ['/about', '/gallery', '/studio']) assert.ok(html.includes(`href="${path}"`));
+  assert.deepEqual(urls, ['https://github.com/Twiink']);
+  for (const path of ['/about', '/gallery', '/studio', '/contact']) assert.ok(html.includes(`href="${path}"`));
   assert.match(html, /<h1>Twiink's Space<\/h1>/);
   assert.match(html, /aria-label="交互作品集"/);
   assert.match(html, /aria-label="创作手记"/);

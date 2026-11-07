@@ -1,0 +1,90 @@
+{
+  "project": "RAG 中台 RAG-Center",
+  "projectId": "rag-center",
+  "savedAt": "2026-11-06",
+  "status": "确认版文稿、海报与工作台原型已接入本地画廊",
+  "copyFile": "copy-draft.md",
+  "assets": [
+    {
+      "id": "project-poster",
+      "role": "project-poster",
+      "caption": "RAG-Center 竖版项目海报",
+      "path": "originals/01-project-poster.png",
+      "sourceAttachment": "codex-clipboard-000b4548-7e39-438d-9b6b-f89bdf00e251.png",
+      "mimeType": "image/png",
+      "width": 1086,
+      "height": 1448,
+      "bytes": 2404349,
+      "sha256": "2f08ea76e9966c00cf74fbb184f75702d321def7cef5ccc3a77c903d81597770",
+      "originalBytesPreserved": true,
+      "transformations": []
+    },
+    {
+      "id": "workbench-prototype",
+      "role": "ui-prototype",
+      "caption": "RAG-Center 工作台原型示意，图中包含示例数据",
+      "path": "originals/02-workbench-prototype.png",
+      "sourceAttachment": "codex-clipboard-b9188330-e19a-4a28-aada-ab92da904bce.png",
+      "mimeType": "image/png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1830960,
+      "sha256": "b3fc806f5efb4d05a16d9a5b033b2a727260dee1686b2c4ad87eedc1f1a83a02",
+      "originalBytesPreserved": true,
+      "transformations": []
+    }
+  ],
+  "published": [
+    {
+      "path": "public/content/projects/rag-center/cover-color.webp",
+      "source": "originals/01-project-poster.png",
+      "mimeType": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "bytes": 154714,
+      "sha256": "bdcf46995365d1bf743ff82ef2db6da34ff24ff6ce130ef572f1d4da36d461a9",
+      "transformations": [
+        "WebP quality 94",
+        "海报按原比例缩放至 900×1200，排入 1200×1600 纸卡，左侧留白 150、顶部留白 330"
+      ]
+    },
+    {
+      "path": "public/content/projects/rag-center/cover-sketch.webp",
+      "source": "originals/01-project-poster.png",
+      "mimeType": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "bytes": 131892,
+      "sha256": "167e49e82ff5728fd8fabe9634208ef0937bf5c05eac1e731e45706660bca81f",
+      "transformations": [
+        "WebP quality 94",
+        "海报按原比例缩放至 900×1200，排入 1200×1600 纸卡，左侧留白 150、顶部留白 330",
+        "灰度转换"
+      ]
+    },
+    {
+      "path": "public/content/projects/rag-center/poster.webp",
+      "source": "originals/01-project-poster.png",
+      "mimeType": "image/webp",
+      "width": 1086,
+      "height": 1448,
+      "bytes": 275156,
+      "sha256": "f4fa43e18ddfb56ae635baf4f825597d0d935b928ba4c40a0fa3f0c803338646",
+      "transformations": [
+        "WebP quality 96，保持原始尺寸与比例"
+      ]
+    },
+    {
+      "path": "public/content/projects/rag-center/workbench.webp",
+      "source": "originals/02-workbench-prototype.png",
+      "mimeType": "image/webp",
+      "width": 1586,
+      "height": 992,
+      "bytes": 154816,
+      "sha256": "024a311d75c6420f88f8491e69b1615494b1e10a4a53f8b8552360a369682ff2",
+      "transformations": [
+        "WebP quality 96，保持原始尺寸、比例与示例数据说明"
+      ]
+    }
+  ]
+}

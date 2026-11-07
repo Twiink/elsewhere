@@ -4,7 +4,7 @@
 
 已接入第一批个人资料：网站名为 **Twiink's Space**，介绍为“做点有趣的东西，放一些舍不得关掉的脑洞。”入口窗边、走廊和云上人物使用根据用户照片制作的黑白线稿，发布用纹理位于 `public/textures/twiink/`。PNG 原稿与生成说明保存在 `output/imagegen/`；照片参考仅在本地忽略目录中保存。
 
-个人经历、技能、作品、文章、奖项和联系房间仍保留示例，等待后续资料逐部分替换。示例内容中的 `authorName` 保留原作者归属。个人域名与社交链接尚未提供，`site.url` 和相关链接字段留空；未配置域名时不输出规范域名标签，设置 `site.url` 后构建即可生成。
+「关于我」已接入个人简介、技术栈、六段经历、兴趣和项目成果，统一编辑 `src/data/profile.json`。房间里的纸片、经历岛屿、技能气球和完整阅读面板共用这些资料。画廊已接入「泡芙大作战 PuffWar 乐园」「无界宇宙 Infinite Cosmos」「SecKnow AI 教育平台」「RAG 中台 RAG-Center」和「HarnessPRD 智能需求文档平台」五个个人项目，包含完整介绍、图片或开场视频，以及小程序码、官网或 GitHub 源码入口。「联系我」已接入邮箱、GitHub、微信和站内留言入口，纸页中的「随便聊聊」展示六条已确认的常见问题；工作室文章等待后续资料替换。示例内容中的 `authorName` 保留原作者归属。站点域名按用户提供的 `http://space.twiink.cn` 配置，站点与联系人信息在 `content.json` 的 `site` 中编辑。
 
 ## 本地运行
 
@@ -27,8 +27,8 @@ npm run preview
 # 代码检查
 npm run lint
 
-# 本地内容、中文校验和静态起始页的行为检查
-node --test scripts/test-content.mjs scripts/test-contact-validation.mjs scripts/test-start.mjs
+# 个人资料、本地内容、表单与静态起始页检查
+npm run check:content
 ```
 
 ## 内容维护
@@ -37,7 +37,9 @@ node --test scripts/test-content.mjs scripts/test-contact-validation.mjs scripts
 
 | 文件或目录 | 用途 |
 | --- | --- |
-| `src/data/content.json` | 实际使用的中文内容，后续替换的主要入口 |
+| `src/data/profile.json` | 关于我的可编辑资料：身份、简介、技能、工具、经历、爱好和成果 |
+| `src/data/profile.js` | 将个人资料整理为页面与搜索正文共用的数据 |
+| `src/data/content.json` | 站点设置、画廊、工作室、FAQ，以及保留供对照的示例奖项 |
 | `src/data/content.original.json` | 已发布内容的原始返回备份，保留原文和资产引用供对照，不参与运行或构建 |
 | `src/data/content.js` | 将本地内容整理为页面、奖项分组与预加载数据 |
 | `src/hooks/useContentData.js` | 各房间读取本地内容的入口 |
@@ -45,19 +47,86 @@ node --test scripts/test-content.mjs scripts/test-contact-validation.mjs scripts
 | `public/textures/` | 原有场景、门牌、纸张及装饰纹理 |
 | `public/start/` | 独立静态起始页的 HTML、CSS、脚本 |
 
-`content.json` 完整保留此次导出的 40 条记录：
+原始 40 条记录保存在 `content.original.json` 供对照；当前 `content.json` 的内容如下：
 
 | 字段 | 内容 | 数量 |
 | --- | --- | --- |
-| `site` | 站点标题、简介、个人介绍、域名及社交链接 | 1 |
-| `projects` | 画廊项目 | 4 |
+| `site` | 站点标题、一句话介绍、域名及社交链接 | 1 |
+| `projects` | 画廊项目：5 个个人项目 | 5 |
 | `studio` | 文章、视频与社交内容 | 11 |
-| `awards` | 获奖证书 | 16 |
-| `faq` | 常见问题 | 8 |
+| `awards` | 原作者示例证书，保留供对照，不作为当前个人成果展示 | 16 |
+| `faq` | 六条个人问答，展示在联系纸页并同步至搜索正文 | 6 |
 
 画廊项目的 `title`、`description`、`url`、`front`、`painted`、`techStack` 控制卡片文字、链接、正反面相关纹理及技术图标。工作室内容的 `platform`、`device`、`frontTexture` 和 `paintedFrontTexture` 控制平台标签、设备外形与屏幕纹理；`device` 使用 `monitor`、`tv` 或 `phone`。证书的 `category` 使用 `sotd`、`sotm` 或 `other`。
 
-`seoTitle` 和 `seoDescription` 用于搜索正文与结构化数据。`seo-plugin.js` 在开发和构建时读取同一份本地 JSON，并生成中文静态正文、JSON-LD 和 `/llms.txt`；首页标题、简介与规范域名也来自 `site`。FAQ 和长篇个人介绍主要呈现在搜索正文中。
+`seoTitle` 和 `seoDescription` 用于搜索正文与结构化数据。`seo-plugin.js` 在开发和构建时读取本地 JSON，并生成中文静态正文、JSON-LD 和 `/llms.txt`；首页标题、一句话介绍与规范域名来自 `site`，个人介绍和成果来自 `profile.json`。
+
+### 编辑项目介绍
+
+画廊的五张卡片依次是「泡芙大作战 PuffWar 乐园」「无界宇宙 Infinite Cosmos」「SecKnow AI 教育平台」「RAG 中台 RAG-Center」和「HarnessPRD 智能需求文档平台」。点击翻转，再点「查看项目」即可阅读完整介绍；也可以使用画廊顶部的「阅读项目介绍」，在面板内切换项目。介绍中提供项目图片或开场视频、小程序码、官网或 GitHub 源码链接，工具说明默认收起。视频由访客点击播放，切换项目或关闭介绍时停止播放。
+
+页面直接读取 `src/data/content.json` 的 `projects`，五个个人项目的 `id` 分别为 `puffwar`、`boundless-universe`、`secknow`、`rag-center` 和 `harness-prd`。保存 JSON 后开发预览会更新；线上环境需要重新构建部署。
+
+| 字段 | 用途 |
+| --- | --- |
+| `title`、`shortTitle`、`cardTitle` | 完整名称、简称和卡片上的分行标题，换行写成 `\n` |
+| `description`、`cardNotes`、`cardNotesTitle` | 纸卡背面的短介绍、游玩提示和提示栏标题 |
+| `details.tagline` | 阅读面板的一句话介绍 |
+| `details.sections` | 正文各节：`paragraphs` 一项一段，`entries` 填标题 `title` 和说明 `description`；保留 `id` 以供目录定位，`collapsible: true` 表示默认折叠 |
+| `details.photos` | 项目图片：`src` 是图片路径，`alt` 是画面描述，`caption` 是图片下的文字，`width`、`height` 填原尺寸 |
+| `details.photosLabel`、`details.photosTitle` | 图片目录的名称和图片区标题，未设置时沿用现场照片的称呼 |
+| `details.videos` | 视频：`src`、`poster` 是视频和封面路径，`title`、`caption` 描述内容，`mimeType` 填视频格式，`width`、`height` 填原尺寸，`hasAudio: false` 表示无声 |
+| `details.references` | 视频下的补充入口：`title` 填链接文字，`url` 填地址 |
+| `details.entry` | 项目入口：`title`、`description` 和可选 `hint` 填说明；小程序填 `image`、`width`、`height`，网站填 `url` 与链接文字 `label` |
+| `seoTitle`、`seoDescription` | 搜索摘要；详细正文也会同步输出到搜索 HTML 和 `/llms.txt` |
+
+发布用素材分别在 `public/content/projects/puffwar/`、`public/content/projects/boundless-universe/`、`public/content/projects/secknow/`、`public/content/projects/rag-center/` 和 `public/content/projects/harness-prd/`；附件原件、确认版文稿与来源记录保存在 `assets/projects/` 下的对应目录。页面正文以 JSON 为准，`copy-draft.md` 是确认文稿的归档。SecKnow 的竖版海报用于纸卡封面，横版海报、两张页面截图和户外照片用于阅读面板。RAG-Center 与 HarnessPRD 的竖版海报用于纸卡封面，阅读面板展示界面展示图与海报，并在底部提供 GitHub 仓库入口；发布副本转换为 WebP，原件保留。
+
+### 编辑联系方式
+
+联系房间的木桶、顶部「联系方式」纸页、无障碍导航和搜索正文共用 `src/data/content.json` 中的站点资料：
+
+| 字段 | 内容 |
+| --- | --- |
+| `site.url` | 网站地址，同时用于规范链接、分享图片绝对地址和留言域名检查 |
+| `site.githubUrl` | GitHub 个人主页 |
+| `site.contact.title`、`description`、`topics` | 联系纸页的标题、欢迎语与交流方向 |
+| `site.contact.email`、`wechatId` | 对外邮箱与微信号；微信提供复制按钮，浏览器限制复制时选中号码供手动复制 |
+| `site.contact.showMessageForm` | 是否保留海面上的站内留言入口 |
+
+直接邮件使用 `mailto:` 打开访客的邮件应用。站内留言沿用 Web3Forms：为 `site.contact.email` 对应的收件邮箱申请 Access Key，复制 `.env.example` 为本地 `.env`，填写 `VITE_WEB3FORMS_KEY`；部署环境设置同名变量并重新构建。未配置时页面会明确提示站内留言尚未开通，邮箱和微信仍可使用。
+
+本地预览不会发送真实留言，也不会显示发送成功；发布后仅在 `site.url` 对应的域名允许提交，只有服务确认接收才显示成功。验证在本地进行，不发送测试邮件。
+
+### 编辑常见问题
+
+六条问答集中在 `src/data/content.json` 的 `faq` 中：`id` 保持唯一，`question` 填问题，`answer` 填回答，段落之间用 `\n\n` 分隔。联系纸页的「随便聊聊」、静态正文、FAQ 结构化数据与 `/llms.txt` 共同读取这份内容。回答使用普通文字，新增、删除或调整顺序后，开发预览会同步更新；线上环境需要重新构建部署。
+
+### 编辑关于我
+
+1. 打开 `src/data/profile.json`，直接修改双引号内的文字并保存。
+2. 运行 `npm run dev`，进入 `/about`，点击顶部「阅读关于我」查看完整内容。房间里的「查看」「完整经历」「会做的事」「荣誉与证书」按钮也会定位到对应段落。
+3. 开发预览会在保存后更新。运行 `npm run check:content` 检查 JSON 和数据格式；线上网站需要重新运行 `npm run build`，再部署生成的 `dist/`。
+
+| 字段 | 编辑内容及页面位置 |
+| --- | --- |
+| `role`、`currentFocus` | 身份与正在做的事情；`role` 也显示在云上人物下方 |
+| `sitePurpose` | 这个空间的用途 |
+| `greeting`、`introduction` | 问候与自我介绍，每个数组元素单独显示为一段；同时更新个人搜索介绍 |
+| `keywords` | 个人关键词，同时显示在云上人物下方 |
+| `titles` | 阅读面板与房间各区域的标题 |
+| `skills` | 能力分组：`title` 为方向，`description` 为阅读面板里的自然语言说明；`technologies` 为气球与搜索使用的技术名称，画画等方向可填 `[]` |
+| `tools`、`strengths` | 工具用于生成日常协作说明；`strengths` 为额外的能力介绍，可留空 |
+| `timeline` | 重要经历，按数组顺序展示；`date` 使用 `YYYY-MM`，例如 `2023-09` |
+| `interests` | 兴趣名称和说明 |
+| `highlights`、`closing` | 「值得记一笔」的生活与项目记录及结尾文字；日期可省略，`sceneTitle` 可填写用于三维纸片的短标题 |
+| `honors` | 荣誉与证书：`title` 为名称，`description` 写赛区、等级或证书说明；日期可后补，填 `[]` 时隐藏这一段 |
+
+新增经历时，复制一个完整对象，改成唯一的 `id`，再修改日期、标题和说明。`kind` 用 `education`、`studio`、`project` 或 `internship`；经历岛屿显示第一条 `education` 的学校与日期，以及第一条 `project` 的日期。学校名称填写在 `organization` 中。不需要的经历、技能组、爱好或成果，可以删除整个对象；暂不展示某一类内容时，保留字段并把列表写成 `[]`。
+
+当前荣誉与证书先展示蓝桥杯天津赛区省级三等奖、软件创新大赛华北赛区省级三等奖、校级三等奖学金和 CET-4。年份未填写，证书图片可后续提供；生活照、古风照和自己的绘画作品也可以之后再补充。
+
+JSON 使用英文双引号和英文逗号，不支持注释或最后一项后的逗号。文字中的英文双引号需写成 `\"`，也可以直接使用中文引号。站点名称、一句话介绍、域名和社交链接继续在 `content.json` 的 `site` 中编辑。
 
 替换图片时，将文件放入 `public/content/`，再修改 JSON 中的路径。保留现有图片的宽高比可减少场景布局调整。此次本地图片沿用原页面请求的显示尺寸与质量参数，未修改图内文字和图案；原始返回中的资源标识保存在备份 JSON 中。
 
@@ -73,9 +142,9 @@ node --test scripts/test-content.mjs scripts/test-contact-validation.mjs scripts
 
 项目仍保留原有可选的邮件提交和访问统计集成：
 
-- `VITE_WEB3FORMS_KEY`：联系表单的 Web3Forms 配置，放在本地 `.env` 或部署平台环境变量中。表单还保留 `MessagePaper.jsx` 中的 `ALLOWED_ORIGINS` 域名限制；换域名时需要同步修改。原逻辑在 localhost 和未允许域名上不发送真实邮件。
+- `VITE_WEB3FORMS_KEY`：绑定收件邮箱的 Web3Forms 配置，放在本地 `.env` 或部署平台环境变量中。允许提交的域名来自 `site.url`；未配置、预览域名或发送被拦截时均明确提示，只有服务确认接收才显示成功。
 - `VITE_POSTHOG_KEY`、`VITE_POSTHOG_HOST`：PostHog 访问统计配置。
-- 联系房间和示例项目外链仍指向原作者地址，替换对应资料时需要同步修改。`/start` 已改为站内导航与 Twiink 人物插画。
+- 工作室示例保留原作者的发布链接，后续按素材替换。联系房间已使用 Twiink 的联系方式；`/start` 提供站内导航、GitHub 入口与 Twiink 人物插画。
 
 这些配置不影响本地 JSON 的读取，也不提供内容管理功能。凭据和私人配置不要写入 Git。
 

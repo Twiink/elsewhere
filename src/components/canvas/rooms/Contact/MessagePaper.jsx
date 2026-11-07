@@ -4,6 +4,8 @@ import { useFrame } from '@react-three/fiber';
 import { Text, useTexture, Html, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 import { analyzeContentAI } from '../../../../utils/contactValidation';
+import { getContactFormIssue } from '../../../../utils/contactDelivery';
+import { siteInfo } from '../../../../data/content';
 
 const PAPER_WIDTH = 1.51; // 原始比例 1197/1340。
 const PAPER_HEIGHT = 1.7;
@@ -152,14 +154,6 @@ const SmoothButton = ({ texture, onClick, position, size, text, fontPath }) => {
 // 本地开发在 .env 设置 VITE_WEB3FORMS_KEY，生产环境在 Cloudflare Pages 控制台设置。
 const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY || '';
 
-// 只允许以下域名提交表单。
-// 克隆仓库后在 localhost 运行的提交会被静默拦截。
-const ALLOWED_ORIGINS = [
-    'itomdev.com',
-    'www.itomdev.com',
-    'portfolio-itom.pages.dev',
-];
-
 // ═══════════════════════════════════════════════════════════════════════
 // 多层反垃圾留言规则。
 // 组合使用双字母分析、频率限制和时间陷阱。
@@ -277,6 +271,16 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend }) => {
         // 重置此前状态。
         setSubmitStatus(null);
 
+        const deliveryIssue = getContactFormIssue({
+            siteUrl: siteInfo.url,
+            hostname: window.location.hostname,
+            accessKey: WEB3FORMS_KEY,
+        });
+        if (deliveryIssue) {
+            setErrors({ message: deliveryIssue.message });
+            return;
+        }
+
         if (!validateForm()) {
             return;
         }
@@ -296,27 +300,14 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend }) => {
             // 0b. 时间陷阱：需停留超过 3 秒。
             const timeOnForm = Date.now() - formLoadedAt.current;
             if (timeOnForm < 3000) {
-                // 机器人常立即提交，此时静默返回成功状态。
-                setSubmitStatus('success');
-                setIsSubmitting(false);
-                return;
-            }
-
-            // 0c. 来源域名限制。
-            // 拦截克隆仓库在未授权域名发起的提交。
-            const currentHost = window.location.hostname;
-            const isAllowedOrigin = ALLOWED_ORIGINS.some(d => currentHost === d || currentHost.endsWith('.' + d));
-            if (!isAllowedOrigin) {
-                // 静默返回成功状态。
-                setSubmitStatus('success');
+                setErrors({ message: '请稍等一下再发送。' });
                 setIsSubmitting(false);
                 return;
             }
 
             // 1. 蜜罐检查，静默拦截。
             if (botcheck) {
-                // botcheck 被填入时返回成功状态，拦截机器人。
-                setSubmitStatus('success');
+                setErrors({ message: '留言暂时无法发送，请稍后再试。' });
                 setIsSubmitting(false);
                 return;
             }
@@ -360,7 +351,7 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend }) => {
                 },
                 body: JSON.stringify({
                     access_key: WEB3FORMS_KEY,
-                    from_name: "作品集联系表单",
+                    from_name: `${siteInfo.siteTitle} 站内留言`,
                     email: email,
                     subject: subject,
                     message: message
@@ -369,7 +360,7 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend }) => {
 
             const result = await response.json();
 
-            if (result.success) {
+            if (response.ok && result.success) {
                 setSubmitStatus('success');
                 recordSubmission(); // 记录提交时间，用于频率限制。
                 onSend?.({ message, email, subject });

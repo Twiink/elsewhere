@@ -1,0 +1,138 @@
+.about-profile-trigger {
+    position: fixed;
+    inset: max(1rem, env(safe-area-inset-top)) auto auto 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    min-height: 44px;
+    padding: 0.55rem 1.1rem;
+    border: 1.5px solid #333;
+    border-radius: 3px 9px 4px 7px;
+    background: #faf9f6 url('/textures/paper-texture.webp') center / cover;
+    color: #222;
+    font: 1rem '霞鹜文楷', serif;
+    cursor: pointer;
+
+    &:hover { background-color: #eae7df; }
+}
+
+.about-profile-dialog {
+    --profile-ink: #292824;
+    --profile-muted: #55534d;
+    --profile-rule: #c9c6bd;
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(880px, calc(100% - 2rem));
+    max-width: none;
+    height: min(860px, calc(100dvh - 3rem));
+    max-height: none;
+    padding: 0;
+    border: 1px solid #8a867d;
+    border-radius: 5px 11px 6px 9px;
+    background: #faf9f6;
+    color: var(--profile-ink);
+    box-shadow: 0 18px 64px rgb(0 0 0 / 22%);
+    overflow: hidden;
+    font-family: '霞鹜文楷', serif;
+
+    &::backdrop { background: rgb(29 28 25 / 46%); }
+    &::selection, ::selection { background: #ddd6c6; color: #171612; }
+    &[open] { animation: profile-paper-in 280ms cubic-bezier(0.16, 1, 0.3, 1); }
+
+    :focus-visible { outline: 2px solid var(--profile-ink); outline-offset: 4px; }
+}
+
+.about-profile-paper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: url('/textures/paper-texture.webp') center / cover;
+}
+
+.about-profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 2rem 0.75rem;
+
+    h2 { margin: 0; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 400; }
+    .studio-close-btn { width: 44px; height: 44px; opacity: 1; }
+}
+
+.about-profile-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.1rem;
+    padding: 0 2rem 0.8rem;
+    border-bottom: 1px dashed var(--profile-rule);
+
+    a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 36px;
+        color: var(--profile-muted);
+        text-underline-offset: 0.3em;
+        text-decoration-color: var(--profile-rule);
+        &:hover { color: var(--profile-ink); text-decoration-color: currentColor; }
+    }
+}
+
+.about-profile-body {
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding: 0 2rem 2.5rem;
+    font-size: 1.05rem;
+    line-height: 1.85;
+    scrollbar-color: #888276 #ece9e1;
+    scrollbar-width: thin;
+
+    .profile-section { margin: 2rem auto 0; max-width: 70ch; scroll-margin-top: 1.5rem; }
+    h3 { margin: 0 0 0.8rem; font-size: 1.4rem; line-height: 1.4; font-weight: 400; }
+    h4 { margin: 0 0 0.3rem; font-size: 1.1rem; font-weight: 600; }
+    p { margin: 0 0 0.8rem; overflow-wrap: anywhere; }
+
+    .profile-keywords {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 1rem;
+        padding: 0;
+        list-style: none;
+        color: var(--profile-muted);
+        li { border-bottom: 1px dashed var(--profile-rule); }
+    }
+
+    .profile-entries {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+
+        > li { padding: 1rem 0; border-top: 1px solid var(--profile-rule); }
+        .profile-technologies { color: var(--profile-muted); font-size: 0.95rem; }
+        time { font-variant-numeric: tabular-nums; color: var(--profile-muted); font-size: 0.95rem; }
+    }
+
+    .profile-timeline > li { display: grid; grid-template-columns: 5.5rem 1fr; gap: 1rem; }
+}
+
+.about-profile-trigger:focus-visible { outline: 2px solid #292824; outline-offset: 4px; }
+
+@keyframes profile-paper-in {
+    from { transform: translateY(14px) rotate(-0.4deg); }
+    to { transform: translateY(0) rotate(0); }
+}
+
+@media (max-width: 600px) {
+    .about-profile-trigger { top: max(0.8rem, env(safe-area-inset-top)); font-size: 0.95rem; }
+    .about-profile-dialog { width: calc(100% - 1rem); height: calc(100dvh - 2rem); }
+    .about-profile-header { padding: 1rem 1.1rem 0.5rem; }
+    .about-profile-nav { padding: 0 1.1rem 0.6rem; gap: 0 1rem; font-size: 0.9rem; }
+    .about-profile-nav a { min-height: 40px; }
+    .about-profile-body { padding: 0 1.1rem 1.5rem; font-size: 1rem; }
+    .about-profile-body .profile-timeline > li { grid-template-columns: 1fr; gap: 0.2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .about-profile-dialog[open] { animation: none; }
+}

@@ -1,10 +1,15 @@
 import { readFileSync } from 'node:fs';
+import { withProfile, getProfileSections, getSkillLabels } from './src/data/profile.js';
 
 const contentPath = new URL('./src/data/content.json', import.meta.url);
+const profilePath = new URL('./src/data/profile.json', import.meta.url);
 
 // 开发与构建均读取本地内容，编辑后无需同步远程服务。
 function readContent() {
-    return JSON.parse(readFileSync(contentPath, 'utf8'));
+    return withProfile(
+        JSON.parse(readFileSync(contentPath, 'utf8')),
+        JSON.parse(readFileSync(profilePath, 'utf8')),
+    );
 }
 
 function escapeHtml(value = '') {
@@ -21,13 +26,15 @@ function contentAuthor(item, personId) {
     return item.authorName ? { '@type': 'Person', name: item.authorName } : { '@id': personId };
 }
 
-export function buildJsonLd({ site, projects, studio, awards, faq }) {
+export function buildJsonLd({ site, projects, studio, awards, faq, profile }) {
     const personId = site.url ? `${site.url}/#person` : '#person';
     const graph = [
         {
             '@type': 'Person', '@id': personId,
             name: site.nickname,
             ...(site.url ? { url: site.url } : {}), description: site.aboutMe,
+            ...(site.contact?.email ? { email: site.contact.email } : {}),
+            ...(profile ? { knowsAbout: getSkillLabels(profile) } : {}),
             sameAs: Object.entries(site).filter(([key, value]) => key.endsWith('Url') && value).map(([, value]) => value),
         },
         {
@@ -64,7 +71,13 @@ export function buildJsonLd({ site, projects, studio, awards, faq }) {
             thumbnailUrl: absoluteUrl(item.frontTexture, site.url),
             author: contentAuthor(item, personId), inLanguage: 'zh-CN',
         })),
-        {
+        profile ? {
+            '@type': 'ItemList', name: profile.titles.highlights, numberOfItems: profile.highlights.length,
+            itemListElement: profile.highlights.map((item, index) => ({
+                '@type': 'ListItem', position: index + 1,
+                item: { '@type': 'CreativeWork', name: item.title, description: item.description, creator: { '@id': personId } },
+            })),
+        } : {
             '@type': 'ItemList', name: '奖项与荣誉', numberOfItems: awards.length,
             itemListElement: awards.map((item, index) => ({
                 '@type': 'ListItem', position: index + 1,
@@ -80,16 +93,60 @@ export function buildJsonLd({ site, projects, studio, awards, faq }) {
     return { '@context': 'https://schema.org', '@graph': graph };
 }
 
-export function buildLlmsTxt({ site, projects, studio, awards, faq }) {
-    const lines = [`# ${site.siteTitle}`, `> ${site.siteDescription}`, '', '## 个人介绍', site.aboutMe, ''];
-    for (const [title, items] of [['精选项目', projects], ['工作室内容', studio], ['奖项与荣誉', awards]]) {
+export function buildLlmsTxt({ site, projects, studio, awards, faq, profile }) {
+    const lines = [`# ${site.siteTitle}`, `> ${site.siteDescription}`, ''];
+    if (profile) {
+        for (const section of getProfileSections(profile)) {
+            lines.push(`## ${section.title}`, ...(section.paragraphs || []));
+            if (section.tags) lines.push(section.tags.join(' / '));
+            for (const entry of section.entries || []) {
+                lines.push(`- ${entry.date ? `${entry.date} · ` : ''}${entry.title}${entry.technologies ? `（${entry.technologies.join('、')}）` : ''}：${entry.description}`);
+            }
+            if (section.footer) lines.push(section.footer);
+            lines.push('');
+        }
+    } else {
+        lines.push('## 个人介绍', site.aboutMe, '');
+    }
+    const collections = [['精选项目', projects], ['工作室内容', studio]];
+    if (!profile) collections.push(['奖项与荣誉', awards]);
+    for (const [title, items] of collections) {
         lines.push(`## ${title}`);
-        for (const item of items) lines.push(`- [${item.seoTitle || item.title}](${item.url}): ${item.seoDescription || item.description || ''}`);
+        for (const item of items) {
+            lines.push(`- [${item.seoTitle || item.title}](${item.url}): ${item.seoDescription || item.description || ''}`);
+            for (const section of item.details?.sections || []) {
+                lines.push(`### ${section.title}`, ...section.paragraphs);
+                for (const entry of section.entries) lines.push(`- ${entry.title}：${entry.description}`);
+            }
+        }
         lines.push('');
+    }
+    if (site.contact) {
+        lines.push('## 联系我', site.contact.description,
+            `- 邮箱：[${site.contact.email}](mailto:${site.contact.email})`,
+            `- GitHub：${site.githubUrl}`,
+            `- 微信：${site.contact.wechatId}`, '');
     }
     lines.push('## 常见问题');
     for (const item of faq) lines.push(`- **${item.question}**`, `  ${item.answer}`);
     return `${lines.join('\n')}\n`;
+}
+
+export function buildProfileHtml(profile) {
+    return getProfileSections(profile).map(section => {
+        const paragraphs = (section.paragraphs || []).map(text => `<p>${escapeHtml(text)}</p>`).join('');
+        const tags = section.tags ? `<p>${section.tags.map(escapeHtml).join(' / ')}</p>` : '';
+        const entries = section.entries ? `<ol>${section.entries.map(entry => `<li>${entry.date ? `<time datetime="${escapeHtml(entry.date)}">${escapeHtml(entry.date)}</time>` : ''}<h4>${escapeHtml(entry.title)}</h4>${entry.technologies ? `<p>${entry.technologies.map(escapeHtml).join(' · ')}</p>` : ''}<p>${escapeHtml(entry.description)}</p></li>`).join('')}</ol>` : '';
+        return `<section id="seo-profile-${section.id}"><h3>${escapeHtml(section.title)}</h3>${paragraphs}${tags}${entries}${section.footer ? `<p>${escapeHtml(section.footer)}</p>` : ''}</section>`;
+    }).join('\n');
+}
+
+function buildProjectBody(item) {
+    return (item.details?.sections || []).map(section => {
+        const paragraphs = section.paragraphs.map(text => `<p>${escapeHtml(text)}</p>`).join('');
+        const entries = section.entries.map(entry => `<li><h5>${escapeHtml(entry.title)}</h5><p>${escapeHtml(entry.description)}</p></li>`).join('');
+        return `<section><h4>${escapeHtml(section.title)}</h4>${paragraphs}${entries ? `<ul>${entries}</ul>` : ''}</section>`;
+    }).join('');
 }
 
 // 将同一份内容输出为可访问的静态正文与搜索结构化数据。
@@ -105,14 +162,19 @@ export function generateSeoHtml() {
         },
         transformIndexHtml(html) {
             const content = readContent();
-            const { site, projects, studio, awards, faq } = content;
+            const { site, projects, studio, awards, faq, profile } = content;
             const sections = [
                 `<header><h1>${escapeHtml(site.siteTitle)}</h1><p>${escapeHtml(site.siteDescription)}</p></header>`,
-                `<section id="about"><h2>关于我</h2><p>${escapeHtml(site.aboutMe)}</p></section>`,
+                `<section id="about"><h2>关于我</h2>${profile ? buildProfileHtml(profile) : `<p>${escapeHtml(site.aboutMe)}</p>`}</section>`,
             ];
-            for (const [id, title, items] of [['projects', '精选项目', projects], ['studio', '工作室', studio], ['awards', '奖项与证书', awards]]) {
-                const entries = items.map(item => `<li><h3>${escapeHtml(item.seoTitle || item.title)}</h3><p>${escapeHtml(item.seoDescription || item.description || '')}</p><a href="${escapeHtml(item.url)}">查看详情</a></li>`).join('');
+            const collections = [['projects', '精选项目', projects], ['studio', '工作室', studio]];
+            if (!profile) collections.push(['awards', '奖项与证书', awards]);
+            for (const [id, title, items] of collections) {
+                const entries = items.map(item => `<li><h3>${escapeHtml(item.seoTitle || item.title)}</h3><p>${escapeHtml(item.details ? item.description : item.seoDescription || item.description || '')}</p>${buildProjectBody(item)}<a href="${escapeHtml(item.url)}">查看详情</a></li>`).join('');
                 sections.push(`<section id="${id}"><h2>${title}</h2><ul>${entries}</ul></section>`);
+            }
+            if (site.contact) {
+                sections.push(`<section id="contact"><h2>联系我</h2><p>${escapeHtml(site.contact.description)}</p><p><a href="mailto:${escapeHtml(site.contact.email)}">${escapeHtml(site.contact.email)}</a></p><p><a href="${escapeHtml(site.githubUrl)}">GitHub</a></p><p>微信：${escapeHtml(site.contact.wechatId)}</p></section>`);
             }
             sections.push(`<section id="faq"><h2>常见问题</h2>${faq.map(item => `<article><h3>${escapeHtml(item.question)}</h3><p>${escapeHtml(item.answer)}</p></article>`).join('')}</section>`);
             const seoHtml = `<div id="seo-content" class="sr-only-seo">${sections.join('\n')}</div>`;

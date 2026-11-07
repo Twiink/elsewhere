@@ -1,0 +1,32 @@
+{
+  "desktop": {
+    "src": "/textures/twiink/start-bouquet.png",
+    "width": 1024,
+    "height": 1536,
+    "rect": {
+      "x": 952,
+      "y": 129.109375,
+      "width": 170,
+      "height": 255,
+      "top": 129.109375,
+      "right": 1122,
+      "bottom": 384.109375,
+      "left": 952
+    }
+  },
+  "mobile": {
+    "overflow": false,
+    "img": {
+      "x": 248,
+      "y": 120.90625,
+      "width": 110,
+      "height": 165,
+      "top": 120.90625,
+      "right": 358,
+      "bottom": 285.90625,
+      "left": 248
+    }
+  },
+  "errors": [],
+  "failed": []
+}

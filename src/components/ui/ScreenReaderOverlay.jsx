@@ -1,6 +1,8 @@
 import { useScene } from '../../context/SceneContext';
-import { useGalleryProjects, useStudioContent, useAwards } from '../../hooks/useContentData';
+import { useGalleryProjects, useStudioContent } from '../../hooks/useContentData';
 import '../../styles/ScreenReaderOverlay.scss';
+import { personalProfile, contactInfo, siteInfo } from '../../data/content';
+import ProfileContent from './ProfileContent';
 
 /**
  * ScreenReaderOverlay 无障碍组件。
@@ -12,12 +14,11 @@ import '../../styles/ScreenReaderOverlay.scss';
 const ROOM_LABELS = { about: '关于我', gallery: '画廊', contact: '联系我', studio: '工作室' };
 
 const ScreenReaderOverlay = () => {
-    const { hasEntered, isInRoom, currentRoom, teleportTo, requestExit } = useScene();
+    const { hasEntered, isInRoom, currentRoom, teleportTo, requestExit, openOverlay } = useScene();
     
     // 读取本地内容，生成供搜索引擎与辅助技术使用的隐藏 HTML。
     const projects = useGalleryProjects();
     const studio = useStudioContent();
-    const awards = useAwards();
 
     return (
         <div className="sr-overlay" role="complementary" aria-label="3D 作品集无障碍导航">
@@ -79,30 +80,13 @@ const ScreenReaderOverlay = () => {
                         {currentRoom === 'about' && (
                             <div aria-label="关于我房间的内容">
                                 <h3>关于我</h3>
-                                <p>这个房间展示我的故事、奖项、重要经历，以及以互动气球呈现的技术技能。</p>
-                                
-                                {awards && (
-                                    <section>
-                                        <h4>我的奖项</h4>
-                                        <ul>
-                                            {awards.sotd && awards.sotd.items && awards.sotd.items.map((a, i) => (
-                                                <li key={i}>{a.label} - {a.date} {a.url && <a href={a.url}>查看</a>}</li>
-                                            ))}
-                                            {awards.sotm && awards.sotm.items && awards.sotm.items.map((a, i) => (
-                                                <li key={i}>{a.label} - {a.date} {a.url && <a href={a.url}>查看</a>}</li>
-                                            ))}
-                                            {awards.other && awards.other.items && awards.other.items.map((a, i) => (
-                                                <li key={i}>{a.label} - {a.date} {a.url && <a href={a.url}>查看</a>}</li>
-                                            ))}
-                                        </ul>
-                                    </section>
-                                )}
+                                <ProfileContent profile={personalProfile} idPrefix="sr-profile" />
                             </div>
                         )}
                         {currentRoom === 'gallery' && (
                             <div aria-label="画廊房间的内容">
                                 <h3>我的项目</h3>
-                                <p>浏览纸卡上的作品集项目。点击卡片可以查看介绍并访问项目网站。</p>
+                                <p>浏览纸卡上的作品集项目。点击卡片，再选择「查看项目」阅读介绍或访问项目网站。</p>
                                 
                                 {projects && projects.length > 0 && (
                                     <ul>
@@ -110,7 +94,11 @@ const ScreenReaderOverlay = () => {
                                             <li key={i}>
                                                 <h4>{p.title}</h4>
                                                 <p>{p.description}</p>
-                                                {p.url && <a href={p.url}>访问 {p.title}</a>}
+                                                {p.details ? (
+                                                    <button type="button" aria-haspopup="dialog" aria-controls="project-details-dialog" onClick={() => openOverlay({ layout: 'project', projectId: p.id })}>
+                                                        阅读 {p.title}
+                                                    </button>
+                                                ) : p.url && <a href={p.url}>访问 {p.title}</a>}
                                             </li>
                                         ))}
                                     </ul>
@@ -120,7 +108,13 @@ const ScreenReaderOverlay = () => {
                         {currentRoom === 'contact' && (
                             <div aria-label="联系我房间的内容">
                                 <h3>联系我</h3>
-                                <p>水面上的漂浮木桶是社交平台入口，点击即可访问 LinkedIn、GitHub 等个人主页。</p>
+                                <p>{contactInfo.description}</p>
+                                <p><a href={`mailto:${contactInfo.email}`}>发送邮件：{contactInfo.email}</a></p>
+                                <p><a href={siteInfo.githubUrl} target="_blank" rel="noopener noreferrer">访问 Twiink 的 GitHub（新窗口）</a></p>
+                                <p>微信号：{contactInfo.wechatId}</p>
+                                <button type="button" aria-haspopup="dialog" aria-controls="contact-details-dialog" onClick={() => openOverlay({ layout: 'contact', target: 'wechat' })}>
+                                    查看联系方式与复制微信号
+                                </button>
                             </div>
                         )}
                         {currentRoom === 'studio' && (

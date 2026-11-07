@@ -1,0 +1,89 @@
+{
+  "project": "无界宇宙 Infinite Cosmos",
+  "projectId": "boundless-universe",
+  "status": "确认版文案与选用素材已接入画廊",
+  "savedAt": "2026-11-05",
+  "assets": [
+    {
+      "id": "miniprogram-code",
+      "role": "entry-code",
+      "caption": "无界宇宙微信小程序码",
+      "path": "originals/01-miniprogram-code.jpg",
+      "sourceAttachment": "codex-clipboard-17150754-7972-47c3-b747-a9c462d2c600.jpg",
+      "mimeType": "image/jpeg",
+      "width": 430,
+      "height": 430,
+      "bytes": 79476,
+      "sha256": "e5b35d11ca4f0dadcf38facb445995438063d0d0ae70e7c101a6ac50c3be23e7",
+      "originalBytesPreserved": true,
+      "transformations": []
+    },
+    {
+      "id": "promo-video",
+      "role": "promo-video",
+      "caption": "无界宇宙竖屏宣传/开场视频",
+      "path": "originals/02-promo-video.mp4",
+      "sourceAttachment": "ff3735647d24276e2f6223739cc7863f.mp4",
+      "mimeType": "video/mp4",
+      "width": 288,
+      "height": 640,
+      "durationSeconds": 5.084,
+      "videoCodec": "H.264",
+      "hasAudio": false,
+      "bytes": 264059,
+      "sha256": "055cb5499bcc01cf00f996312a504ebe87c46ec889d623ebc4281f0da414be73",
+      "originalBytesPreserved": true,
+      "transformations": []
+    }
+  ],
+  "designReference": {
+    "url": "https://www.figma.com/design/l0pPGdqEcY8gVEbB4vgwXW/%E5%85%83%E7%95%8C%C2%B7%E5%B0%8F%E7%A8%8B%E5%BA%8F?node-id=1-150",
+    "fileKey": "l0pPGdqEcY8gVEbB4vgwXW",
+    "fileName": "元界·小程序",
+    "nodeId": "1-150",
+    "browserViewVerified": true,
+    "localFigFileExported": false
+  },
+  "videoReference": {
+    "url": "https://weixin.qq.com/sph/AHdBL0F00C",
+    "resolvedUrl": "https://channels.weixin.qq.com/finder-preview/pages/sph?id=AHdBL0F00C",
+    "platform": "微信视频号",
+    "description": "实际游玩视频入口",
+    "contentDownloaded": false,
+    "note": "仅保存用户提供的链接，未登录、未播放或下载视频内容。"
+  },
+  "published": [
+    {
+      "path": "public/content/projects/boundless-universe/cover-color.svg",
+      "bytes": 40411,
+      "sha256": "535c7e244db294cc6325dd4b3759064638ccefabac170411b3b96e05efc0e643",
+      "source": "开场视频三秒处画面与手绘 SVG 装饰，彩色版"
+    },
+    {
+      "path": "public/content/projects/boundless-universe/cover-sketch.svg",
+      "bytes": 40439,
+      "sha256": "fb707bf770b02a201003d22759156dfda8f91c27e8bb95774fd45be2201d9084",
+      "source": "开场视频三秒处画面与手绘 SVG 装饰，灰度版"
+    },
+    {
+      "path": "public/content/projects/boundless-universe/miniprogram-code.jpg",
+      "bytes": 79476,
+      "sha256": "e5b35d11ca4f0dadcf38facb445995438063d0d0ae70e7c101a6ac50c3be23e7",
+      "source": "originals/01-miniprogram-code.jpg"
+    },
+    {
+      "path": "public/content/projects/boundless-universe/promo-poster.jpg",
+      "bytes": 28772,
+      "sha256": "b40b73dbf671d422842f107104a9f96ba53655d9614f17c685f8b09cacb98112",
+      "source": "derived/promo-poster.jpg"
+    },
+    {
+      "path": "public/content/projects/boundless-universe/promo-video.mp4",
+      "bytes": 264059,
+      "sha256": "055cb5499bcc01cf00f996312a504ebe87c46ec889d623ebc4281f0da414be73",
+      "source": "originals/02-promo-video.mp4"
+    }
+  ],
+  "nextStep": "在 src/data/content.json 的 projects[id=boundless-universe] 中编辑页面文字；原始素材保留在 originals/。",
+  "updatedAt": "2026-11-06"
+}

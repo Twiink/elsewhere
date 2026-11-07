@@ -11,10 +11,13 @@ import { PerformanceProvider, usePerformance } from './context/PerformanceContex
 import { SceneProvider, useScene } from './context/SceneContext';
 import NavigationUI from './components/ui/NavigationUI';
 import GlobalOverlay from './components/ui/GlobalOverlay';
+import AboutProfile from './components/ui/AboutProfile';
+import ProjectDetails from './components/ui/ProjectDetails';
+import ContactDetails from './components/ui/ContactDetails';
 import ScreenReaderOverlay from './components/ui/ScreenReaderOverlay';
 import { useDocumentMeta } from './hooks/useDocumentMeta';
 import posthog from 'posthog-js';
-import { getContentTextures, certificateImages } from './data/content';
+import { getContentTextures } from './data/content';
 
 // 初始化 PostHog。
 if (import.meta.env.VITE_POSTHOG_KEY) {
@@ -203,6 +206,9 @@ function AppContent() {
             <>
               <NavigationUI />
               <GlobalOverlay />
+              <AboutProfile />
+              <ProjectDetails />
+              <ContactDetails />
               <PaperTransition />
               <ScreenReaderOverlay />
             </>
@@ -225,7 +231,7 @@ export default function App() {
   // App 挂载后立即预加载浏览器图片（用于标准 <img> 标签）。
   // 让这些资源在初始加载阶段便进入网络请求队列。
   useEffect(() => {
-    const filteredImages = filterTexturesByDevice([...IMAGE_ASSETS, ...certificateImages], supportsHover);
+    const filteredImages = filterTexturesByDevice(IMAGE_ASSETS, supportsHover);
     // console.log(`[Preload] 开始在浏览器预加载图片，数量： ${filteredImages.length} 个。`);
     filteredImages.forEach(path => preloadBrowserImage(path));
   }, []);

@@ -8,11 +8,15 @@
 - `content.original.json` 是原始已发布响应的只读参考备份，不导入运行代码。
 - 内容图片保存在 `public/content/`。场景与装饰纹理保存在 `public/textures/`。
 - 第一批个人身份已接入：昵称 Twiink，网站名 Twiink's Space；介绍与网站用途来自用户确认的文案。入口、走廊和关于我使用 `public/textures/twiink/` 下的黑白人物，宽高比取纹理实际尺寸。原作者的九帧人物动画已换成 Twiink 挥手姿势与轻微摆动。
-- 个人域名与社交资料未提供，站点信息留空；项目、内容、经历、技能、奖项和联系房间仍为示例，后续分批替换。示例内容用 `authorName` 标注原作者，搜索数据不将其归为 Twiink 的作品。
-- 当前保留站点信息 1 份、画廊项目 4 个、工作室内容 11 条、证书 16 张、FAQ 8 条。
+- 网站地址为用户提供的 `http://space.twiink.cn`，GitHub 主页和联系资料位于 `content.json` 的 `site`；「关于我」读取 `profile.json`；画廊已接入「泡芙大作战 PuffWar 乐园」「无界宇宙 Infinite Cosmos」「SecKnow AI 教育平台」「RAG 中台 RAG-Center」和「HarnessPRD 智能需求文档平台」五个个人项目。联系房间已接入邮箱、GitHub、微信及站内留言，六条生活化 FAQ 位于联系纸页的「随便聊聊」中；工作室后续替换。示例内容用 `authorName` 标注原作者，搜索数据不将其归为 Twiink 的作品。
+- 当前保留站点信息 1 份、画廊项目 5 个（均为个人项目）、工作室内容 11 条、示例证书 16 张和个人 FAQ 6 条；个人荣誉来自 `profile.json`。
 - 内容读取同步完成，不需要网络内容查询、管理后台或数据库。
+- 个人项目的完整文案、图片、视频与项目入口在 `content.json` 的 `projects[].details` 中编辑。`ProjectDetails.jsx` 使用原生纸张对话框阅读，技术工具默认折叠；Gallery 卡片和无障碍按钮共用该入口，也能在面板中切换项目。图片目录与标题可通过 `photosLabel`、`photosTitle` 设置；`entry.image` 展示小程序码，`entry.url` 提供外部网站入口。视频使用原生播放器，由访客点击播放；切换或关闭时卸载。对话框打开时暂停 Gallery 的滚轮与拖动，避免正文滚动带动画廊。
+- RAG-Center 的图片位于 `public/content/projects/rag-center/`，封面保留黑白与彩色两版，阅读面板展示工作台原型和竖版海报，原型中的数量为示例数据；项目入口为源码仓库。
+- HarnessPRD 的图片位于 `public/content/projects/harness-prd/`，封面保留黑白与彩色两版，阅读面板展示首页流程展示图和竖版海报，项目入口为 `https://github.com/Twiink/HarnessPRD` 源码仓库。
 - `seo-plugin.js` 在开发和构建时从本地内容生成中文语义正文、JSON-LD 和 `/llms.txt`。
-- 文字与源码说明注释使用中文，技术标识、品牌及平台名保留原名。图片内的文字仍为原素材内容。
+- FAQ 统一编辑 `content.json` 的 `faq`，由 `ContactDetails.jsx` 的原生折叠问答及搜索输出共用；`answer` 用 `\n\n` 分段，`content.original.json` 保留原始快照。
+- 文字与源码说明注释使用中文，技术标识、品牌及平台名保留原名。入口招牌改为“创意工坊”，经历浮岛改为“自由创作”，使用用户确认的透明 PNG 原图，后续再压缩；其他图片内的文字保留原素材内容。
 
 ## 关键路径
 
@@ -53,7 +57,9 @@
 
 `MessagePaper.jsx` 用隐藏的 DOM 输入框接收键盘输入，用 Drei Text 显示邮箱、主题和留言。中文换行按实际字宽处理；`src/utils/contactValidation.js` 对中文与拉丁词语分别处理，避免正常中文被误判为空内容。
 
-表单仍使用 Web3Forms；需配置 `VITE_WEB3FORMS_KEY` 和 `ALLOWED_ORIGINS`。开发域名默认不真实发送邮件。测试只验证本地逻辑，不提交真实邮件。频率限制与时间陷阱属于原有行为。
+联系方式集中于 `content.json` 的 `site.contact`，`ContactDetails.jsx` 提供纸张阅读面板、邮件与 GitHub 链接、微信复制及手动复制回退。`ContactRoom.jsx` 的五个木桶对应联系方式、GitHub、微信、邮箱、站内留言。欢迎技术交流、项目合作及实习／工作机会。
+
+表单仍使用 Web3Forms，需在受忽略的本地 `.env` 或部署环境配置绑定收件邮箱的 `VITE_WEB3FORMS_KEY`，模板见 `.env.example`。`src/utils/contactDelivery.js` 按 `site.url` 检查提交域名；未配置或处于预览域名时明确显示尚未发送。频率限制、停留时间与蜜罐检查仍保留，拦截不再假报成功；只有 HTTP 成功且服务返回 success 才通知成功并清空表单。测试不发送真实邮件。
 
 ## 开发与验证
 

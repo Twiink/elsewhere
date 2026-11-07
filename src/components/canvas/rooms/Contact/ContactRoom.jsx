@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import MessagePaper from './MessagePaper';
 import SocialBarrel from './SocialBarrel';
 import { useScene } from '../../../../context/SceneContext';
+import { contactInfo, siteInfo } from '../../../../data/content';
 import GalleryClouds from '../Gallery/GalleryClouds';
 import { useAchievements } from '../../../../context/AchievementsContext';
 import { useAudio } from '../../../../context/AudioManager';
@@ -93,7 +94,7 @@ const PHASE = {
 
 const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     const { camera } = useThree();
-    const { isTeleporting } = useScene();
+    const { isTeleporting, openOverlay } = useScene();
     const { showTutorial, unlockAchievement, hidePopup } = useAchievements();
     const { globalVolume, isMuted } = useAudio();
     const effectiveVolume = isMuted ? 0 : AUDIO_SETTINGS.volume * globalVolume;
@@ -398,13 +399,12 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             </group>
 
             {/* 🛢️ 漂浮在水中的社交木桶。 */}
-            {/* LinkedIn 社交木桶。 */}
             <SocialBarrel
                 position={isMobile ? [-1.2, 0.5, -10] : [-3, 0.5, -10]}
                 rotation={[0, 0.2, 0]}
                 texturePath="/textures/contact/beczka.webp"
-                label="LINKEDIN"
-                onClick={() => window.open('https://www.linkedin.com/in/tomasz-szmajda-259337305/', '_blank')}
+                label="联系方式"
+                onClick={() => openOverlay({ layout: 'contact' })}
                 paintOnBeforeCompile={onBeforeCompile}
                 paintUniforms={uniformsData}
             />
@@ -414,32 +414,30 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 rotation={[0, 0.3, 0]}
                 texturePath="/textures/contact/beczka.webp"
                 label="GITHUB"
-                onClick={() => window.open('https://github.com/ITomPoland', '_blank')}
+                onClick={() => window.open(siteInfo.githubUrl, '_blank', 'noopener,noreferrer')}
                 paintOnBeforeCompile={onBeforeCompile}
                 paintUniforms={uniformsData}
             />
-            {/* Facebook 社交木桶。 */}
             <SocialBarrel
                 position={isMobile ? [1.2, 0.5, -10] : [3, 0.5, -10]}
                 rotation={[0, -0.2, 0]}
                 texturePath="/textures/contact/beczka.webp"
-                label="FACEBOOK"
-                onClick={() => window.open('https://www.facebook.com/people/ITom/61586563487664/', '_blank')}
+                label="微信"
+                onClick={() => openOverlay({ layout: 'contact', target: 'wechat' })}
                 paintOnBeforeCompile={onBeforeCompile}
                 paintUniforms={uniformsData}
             />
-            {/* Instagram 社交木桶。 */}
             <SocialBarrel
                 position={isMobile ? [1.5, -0.3, -7] : [5, -0.3, -8]}
                 rotation={[0, -0.3, 0]}
                 texturePath="/textures/contact/beczka.webp"
-                label="INSTAGRAM"
-                onClick={() => window.open('https://www.instagram.com/itom.dev/', '_blank')}
+                label="邮箱"
+                onClick={() => { window.location.href = `mailto:${contactInfo.email}`; }}
                 paintOnBeforeCompile={onBeforeCompile}
                 paintUniforms={uniformsData}
             />
             {/* 邮件，触发动画。 */}
-            <SocialBarrel
+            {contactInfo.showMessageForm && <SocialBarrel
                 position={isMobile ? [0, -0.7, -6] : [0, -0.7, -7]}
                 rotation={[0, 0, 0]}
                 texturePath="/textures/contact/beczka.webp"
@@ -447,7 +445,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 onClick={handleMailSelect}
                 paintOnBeforeCompile={onBeforeCompile}
                 paintUniforms={uniformsData}
-            />
+            />}
 
 
             {/* 🏖️ 码头。 */}
@@ -501,7 +499,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             {/* 选择前是否显示信纸。
                 保留信纸，但仅在完成选择后启用。
             */}
-            <group visible={!showSelection}>
+            {contactInfo.showMessageForm && <group visible={!showSelection}>
                 <MessagePaper
                     position={[0, 0.07, 2]}
                     onSend={(data) => {
@@ -509,7 +507,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                         unlockAchievement('contact_submit');
                     }}
                 />
-            </group>
+            </group>}
 
 
         </group>

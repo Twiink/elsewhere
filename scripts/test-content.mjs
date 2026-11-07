@@ -2,23 +2,40 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, statSync } from 'node:fs';
 import { buildJsonLd, buildLlmsTxt, generateSeoHtml } from '../seo-plugin.js';
+import { withProfile } from '../src/data/profile.js';
 
-const content = JSON.parse(readFileSync(new URL('../src/data/content.json', import.meta.url)));
+const content = withProfile(
+    JSON.parse(readFileSync(new URL('../src/data/content.json', import.meta.url))),
+    JSON.parse(readFileSync(new URL('../src/data/profile.json', import.meta.url))),
+);
 const original = JSON.parse(readFileSync(new URL('../src/data/content.original.json', import.meta.url)));
 const allItems = [...content.projects, ...content.studio, ...content.awards, ...content.faq];
 
-test('本地快照保留全部已发布记录与外链', () => {
+test('原始快照保持完整，尚未替换的示例保留原始归属与外链', () => {
     assert.equal(original.length, 40);
-    for (const [key, type] of [['projects', 'galleryProject'], ['studio', 'studioItem'], ['awards', 'awardCertificate'], ['faq', 'faq']]) {
+    for (const [key, type] of [['projects', 'galleryProject'], ['studio', 'studioItem'], ['awards', 'awardCertificate']]) {
         const source = original.filter(item => item._type === type);
-        assert.equal(content[key].length, source.length, key);
-        assert.equal(new Set(content[key].map(item => item.id)).size, source.length, key);
-        assert.deepEqual(content[key].map(item => item.id).sort(), source.map(item => key === 'projects' ? item.slug.current : item._id).sort());
+        if (key === 'projects') {
+            assert.ok(content.projects.length >= source.length, key);
+        } else {
+            assert.equal(content[key].length, source.length, key);
+        }
+        assert.equal(new Set(content[key].map(item => item.id)).size, content[key].length, key);
+        const retained = key === 'projects' ? content[key].filter(item => !item.details) : content[key];
+        if (key !== 'projects') {
+            assert.deepEqual(retained.map(item => item.id).sort(), source.map(item => item._id).sort());
+        }
         if (key === 'projects' || key === 'studio') {
-            assert.deepEqual(content[key].map(item => item.url).sort(), source.map(item => item.url).sort());
+            for (const item of retained) {
+                const previous = source.find(entry => (key === 'projects' ? entry.slug.current : entry._id) === item.id);
+                assert.ok(previous, item.id);
+                assert.equal(item.url, previous.url);
+                assert.equal(item.authorName, 'Tomasz Szmajda');
+            }
         }
     }
     assert.equal(original.filter(item => item._type === 'globalInfo').length, 1);
+    assert.equal(new Set(content.faq.map(item => item.id)).size, content.faq.length);
     assert.ok(content.site.siteTitle && content.site.siteDescription && content.site.aboutMe);
     for (const item of allItems) {
         assert.ok((item.title || item.question).length > 0);
@@ -27,8 +44,7 @@ test('本地快照保留全部已发布记录与外链', () => {
 });
 
 test('全部内容图片与技术图标均指向存在的本地文件', () => {
-    const paths = new Set(allItems.flatMap(item => [item.front, item.painted, item.frontTexture, item.paintedFrontTexture, item.image, ...(item.techStack || [])]).filter(Boolean));
-    assert.equal([...paths].filter(path => path.startsWith('/content/')).length, 30);
+    const paths = new Set(allItems.flatMap(item => [item.front, item.painted, item.frontTexture, item.paintedFrontTexture, item.image, ...(item.techStack || []), ...(item.details?.photos.map(photo => photo.src) || []), ...(item.details?.videos?.flatMap(video => [video.src, video.poster]) || []), item.details?.entry.image]).filter(Boolean));
     for (const path of paths) {
         assert.match(path, /^\/(content|textures)\/[\w./-]+$/);
         assert.ok(statSync(new URL(`../public${path}`, import.meta.url)).size > 0, path);
@@ -36,32 +52,84 @@ test('全部内容图片与技术图标均指向存在的本地文件', () => {
     assert.doesNotMatch(JSON.stringify(content), /api\.sanity\.io|cdn\.sanity\.io|\/sanity-cdn/);
 });
 
+test('泡芙大作战正文结构完整，接入三张现场图和无损小程序码', () => {
+    const project = content.projects.find(item => item.id === 'puffwar');
+    assert.ok(project);
+    assert.equal(project.authorName, 'Twiink');
+    assert.equal(project.url, '/gallery');
+    assert.ok(!content.projects.some(item => item.id === 'adam-and-ewa'));
+    assert.ok(project.details.tagline.length > 0);
+    assert.equal(new Set(project.details.sections.map(section => section.id)).size, project.details.sections.length);
+    for (const section of project.details.sections) {
+        assert.ok(section.title.length > 0);
+        for (const text of [...section.paragraphs, ...section.entries.flatMap(entry => [entry.title, entry.description])]) {
+            assert.equal(typeof text, 'string');
+            assert.ok(text.length > 0);
+        }
+    }
+    assert.equal(project.details.photos.length, 3);
+    assert.equal(project.details.sections.find(section => section.id === 'tools').collapsible, true);
+    const publicCode = readFileSync(new URL(`../public${project.details.entry.image}`, import.meta.url));
+    const archivedCode = readFileSync(new URL('../assets/projects/puffwar/derived/miniprogram-code-cropped.png', import.meta.url));
+    assert.deepEqual(publicCode, archivedCode);
+    const ragCenter = content.projects.find(item => item.id === 'rag-center');
+    const harnessPrd = content.projects.find(item => item.id === 'harness-prd');
+    assert.equal(ragCenter?.details?.entry?.url, 'https://github.com/Twiink/RAG-Center');
+    assert.equal(harnessPrd?.details?.entry?.url, 'https://github.com/Twiink/HarnessPRD');
+});
+
 test('搜索输出完整来自本地中文内容，结构化数据可解析', () => {
     const graph = buildJsonLd(content)['@graph'];
     const person = graph.find(item => item['@type'] === 'Person');
     assert.equal(person.name, content.site.nickname);
     assert.equal(person.description, content.site.aboutMe);
-    assert.deepEqual(person.sameAs, []);
+    assert.deepEqual(person.sameAs, [content.site.githubUrl]);
+    assert.equal(person.email, content.site.contact.email);
     const projects = graph.find(item => item['@type'] === 'ItemList' && item.name === '精选项目');
     assert.equal(projects.itemListElement[0].item.creator.name, content.projects[0].authorName);
     const faq = graph.find(item => item['@type'] === 'FAQPage');
-    assert.equal(faq.mainEntity.length, content.faq.length);
+    assert.deepEqual(faq.mainEntity, content.faq.map(item => ({
+        '@type': 'Question', name: item.question,
+        acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })));
     const llms = buildLlmsTxt(content);
-    for (const item of allItems) assert.ok(llms.includes(item.seoTitle || item.title || item.question));
+    for (const item of [...content.projects, ...content.studio, ...content.faq]) assert.ok(llms.includes(item.seoTitle || item.title || item.question));
     const plugin = generateSeoHtml();
     const source = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
     const html = plugin.transformIndexHtml(source);
     assert.match(html, /lang="zh-CN"/);
     assert.ok(html.includes(content.faq[0].question));
+    for (const item of content.faq) {
+        const escapedQuestion = item.question.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+        const escapedAnswer = item.answer.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+        assert.ok(html.includes(escapedQuestion));
+        assert.ok(html.includes(escapedAnswer));
+        assert.ok(llms.includes(item.question));
+        assert.ok(llms.includes(item.answer));
+    }
     assert.ok(html.includes(content.projects[0].seoTitle));
+    for (const project of content.projects.filter(item => item.details)) {
+        for (const section of project.details.sections) {
+            for (const text of [...section.paragraphs, ...section.entries.map(entry => entry.description)]) {
+                assert.ok(html.includes(text), text);
+                assert.ok(llms.includes(text), text);
+            }
+        }
+    }
     const json = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1];
     assert.deepEqual(JSON.parse(json), buildJsonLd(content));
-    assert.doesNotMatch(html, /<link rel="canonical"|<meta property="og:url"/);
+    assert.ok(html.includes(`<link rel="canonical" href="${content.site.url}/">`));
+    assert.ok(html.includes(`<meta property="og:url" content="${content.site.url}/">`));
+    for (const text of [content.site.contact.email, content.site.contact.wechatId, content.site.contact.description]) {
+        assert.ok(html.includes(text));
+        assert.ok(llms.includes(text));
+    }
     assert.match(html, /name="author" content="Twiink"/);
 });
 
 test('未确定域名时使用相对图片地址，配置域名后可生成绝对地址', () => {
-    const localGraph = buildJsonLd(content)['@graph'];
+    const local = { ...content, site: { ...content.site, url: '' } };
+    const localGraph = buildJsonLd(local)['@graph'];
     assert.equal(localGraph.find(item => item['@type'] === 'Person')['@id'], '#person');
     const localProjects = localGraph.find(item => item['@type'] === 'ItemList' && item.name === '精选项目');
     assert.equal(localProjects.itemListElement[0].item.image, content.projects[0].front);

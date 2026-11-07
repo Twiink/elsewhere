@@ -1,0 +1,180 @@
+{
+  "role": "个人创作者，平时写写代码、做点小项目，最近也在琢磨 AI 和 Agent 的各种玩法。",
+  "currentFocus": "不写代码的时候，喜欢画会儿画、拍拍古风照片，或者干脆发会儿呆。遇到有意思的点子就动手试试，边做边学，慢慢把脑子里的想法做出来。",
+  "sitePurpose": "把做过的项目、突然冒出来的点子和随手记录都放在这儿。给自己留个档，也欢迎路过的人随便逛逛。",
+  "greeting": "嗨，我是 Twiink。",
+  "introduction": [
+    "写代码，也画点画，经常因为一句“要不试试？”就开始折腾新东西。",
+    "有时候是个小网页，有时候是个顺手的小工具，最近也常研究怎么让 AI 帮我干点有意思的活。我喜欢把复杂的事情一点点拆开、理顺，最开心的一刻永远是“终于跑通了”。",
+    "这里装着我的项目、日常，还有一些舍不得关掉的脑洞。",
+    "欢迎随便逛逛，碰到感兴趣的东西，随时来找我玩。"
+  ],
+  "keywords": [
+    "好奇心在线",
+    "自由创作",
+    "脑洞收集",
+    "边做边学"
+  ],
+  "titles": {
+    "profile": "一点关于我",
+    "current": "现在的我",
+    "purpose": "这个空间",
+    "skills": "会做的事",
+    "timeline": "一路走来",
+    "interests": "代码之外",
+    "highlights": "值得记一笔",
+    "honors": "荣誉与证书"
+  },
+  "skills": [
+    {
+      "id": "fullstack",
+      "title": "前后端开发",
+      "technologies": ["TypeScript", "Vue", "React", "Python", "Django", "FastAPI", "Java", "Spring Boot", "Docker"],
+      "description": "前端常用 TypeScript、Vue、React，后端主要写 Python（Django、FastAPI）和 Java（Spring Boot），平时用 Docker 打包部署。从页面交互到背后的接口逻辑，都能自己搭起来。"
+    },
+    {
+      "id": "agent",
+      "title": "AI 与 Agent 开发",
+      "technologies": ["RAG", "LangChain", "LangGraph"],
+      "description": "常折腾 RAG、LangChain、LangGraph，喜欢研究怎么把 AI 接进实际任务里。"
+    },
+    {
+      "id": "problem-solving",
+      "title": "拆需求、理逻辑",
+      "technologies": [],
+      "description": "习惯先把事情想明白，把看着头大的问题拆成几件能落地的小事，再一步步动手做。"
+    },
+    {
+      "id": "drawing",
+      "title": "画画与视觉表达",
+      "technologies": [],
+      "description": "写代码，也画画。不管是写页面还是画插画，对我来说都是把脑子里的画面做出来。"
+    }
+  ],
+  "tools": [
+    "Codex",
+    "Claude Code",
+    "Claude Desktop"
+  ],
+  "strengths": "",
+  "timeline": [
+    {
+      "id": "university",
+      "date": "2023-09",
+      "kind": "education",
+      "organization": "天津科技大学",
+      "title": "来到天津科技大学",
+      "description": "开始大学生活，也是从这时候起，慢慢摸索自己真正喜欢做什么。"
+    },
+    {
+      "id": "matrix",
+      "date": "2023-11",
+      "kind": "studio",
+      "organization": "Matrix 工作室",
+      "title": "加入 Matrix 工作室",
+      "description": "认识了一群志同道合的朋友，一起学东西、做项目，有了想法就一起动手试。"
+    },
+    {
+      "id": "knowledge-graph",
+      "date": "2024-10",
+      "kind": "project",
+      "title": "第一个项目与第一桶金",
+      "description": "做完了第一个知识图谱项目，也赚到了人生第一笔项目收入，第一次真切觉得学的东西派上了用场。"
+    },
+    {
+      "id": "boundless-universe",
+      "date": "2025-01",
+      "kind": "project",
+      "title": "第一个正式上线的小程序「无界宇宙」",
+      "description": "参与工作室和杭州公司的合作，给科技馆做了「无界宇宙」小程序，这是我参与的第一个正式投入使用的小程序。"
+    },
+    {
+      "id": "first-internship",
+      "date": "2025-09",
+      "kind": "internship",
+      "organization": "天津挺汇集团",
+      "title": "第一段实习",
+      "description": "去天津挺汇集团做前端开发，开始接触真实业务里的需求、协作和交付。"
+    },
+    {
+      "id": "second-internship",
+      "date": "2026-02",
+      "kind": "internship",
+      "title": "第二段实习与更多落地项目",
+      "description": "参与杭州良渚 5000+ 艺术园七号展馆的合作项目，开发了和线下场馆游戏设备联动的「泡芙大作战 PuffWar 乐园」小程序，同时参与开发「SecKnow AI 教育平台」，两个项目都已经正式投入使用。"
+    }
+  ],
+  "interests": [
+    {
+      "id": "ancient-style",
+      "title": "古风与拍照",
+      "description": "喜欢汉服和古风妆造，偶尔去拍套照片，换个和平时写代码完全不一样的状态。"
+    },
+    {
+      "id": "drawing",
+      "title": "手绘与插画",
+      "description": "闲下来喜欢自己画两笔，看到好看的线条、配色和画面也会顺手攒起来。"
+    },
+    {
+      "id": "exploration",
+      "title": "研究好玩的小东西",
+      "description": "看到有意思的网站交互、顺手的小工具或者新鲜的 AI 玩法，总会忍不住点进去研究半天。"
+    },
+    {
+      "id": "inspiration",
+      "title": "记点日常",
+      "description": "留几张喜欢的照片，记下突然冒出来的点子、踩过的坑，还有生活里好玩的小事。"
+    }
+  ],
+  "highlights": [
+    {
+      "id": "matrix-friends",
+      "date": "2023-11",
+      "title": "在 Matrix 工作室遇到一群聊得来的朋友",
+      "sceneTitle": "Matrix 的朋友",
+      "description": "有人一起学技术、一起讨论点子、一起把项目做出来，大学生活因此热闹了很多。"
+    },
+    {
+      "id": "first-income",
+      "date": "2024-10",
+      "title": "靠写代码赚到第一笔收入",
+      "sceneTitle": "第一笔项目收入",
+      "description": "完成知识图谱项目拿到报酬的时候，很有成就感。"
+    },
+    {
+      "id": "projects-in-use",
+      "title": "参与做的项目真正被人用起来",
+      "sceneTitle": "项目上线啦",
+      "description": "从科技馆的「无界宇宙」，到结合线下场馆设备的「泡芙大作战 PuffWar 乐园」，再到「SecKnow AI 教育平台」，看着自己写过的代码真正上线运行，是一件很踏实的事。"
+    },
+    {
+      "id": "personal-character",
+      "title": "给这个小空间留下自己的形象",
+      "sceneTitle": "自己的小形象",
+      "description": "把自己的古风照片做成动漫版和黑白线稿，放进了网站里，算是在这儿正式安了个家。"
+    }
+  ],
+  "honors": [
+    {
+      "id": "lanqiao-tianjin",
+      "title": "蓝桥杯",
+      "description": "天津赛区 · 省级三等奖"
+    },
+    {
+      "id": "software-innovation-north-china",
+      "title": "软件创新大赛",
+      "description": "华北赛区 · 省级三等奖"
+    },
+    {
+      "id": "university-scholarship",
+      "title": "校级三等奖学金",
+      "description": "天津科技大学"
+    },
+    {
+      "id": "cet4",
+      "title": "大学英语四级（CET-4）",
+      "description": "已通过大学英语四级考试"
+    }
+  ],
+  "closing": "以后不管又做完了什么新项目，还是画了张满意的画、解决了某个卡很久的问题，都继续往这里记。"
+}

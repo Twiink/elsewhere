@@ -7,8 +7,8 @@ import SkyChunk, { CHUNK_LENGTH, ROOM_Z } from './SkyChunk';
 import { useScene } from '../../../../context/SceneContext';
 import '../../shaders/RevealBasicMaterial'; // 注册 BasicMaterial 的笔刷显现效果。
 import { isTouchDevice } from '../../../../utils/deviceDetect';
-import { useAwards } from '../../../../hooks/useContentData';
-import { siteInfo } from '../../../../data/content';
+import { siteInfo, personalProfile } from '../../../../data/content';
+import { getSkillLabels, formatProfileDate } from '../../../../data/profile.js';
 
 // 复用 Vector3，避免事件处理时分配对象。
 const _tempVec3 = new THREE.Vector3();
@@ -32,7 +32,7 @@ export const BALLOON_AUDIO_SETTINGS = {
 /**
  * 可复用按钮，支持悬停与笔刷显现效果。
  */
-const AwardButton = ({ onClick, texture, paintedTexture, width, height, position, onHoverChange }) => {
+const AwardButton = ({ onClick, texture, paintedTexture, width, height, position, onHoverChange, label = '查看' }) => {
     const isTouch = isTouchDevice();
     const meshRef = useRef();
     const buttonRevealRef = useRef(); // 按钮速写的 RevealBasicMaterial 引用。
@@ -135,10 +135,31 @@ const AwardButton = ({ onClick, texture, paintedTexture, width, height, position
                 anchorY="middle"
                 font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
-                查看
+                {label}
             </Text>
         </group>
     );
+};
+
+// 所有详情按钮打开同一份个人资料，并定位到对应段落。
+const ProfileButton = ({ section, position, label = '查看', width = 2.2 }) => {
+    const { openOverlay } = useScene();
+    const isTouch = isTouchDevice();
+    const texture = useLoader(THREE.TextureLoader, '/textures/about/button.webp');
+    const paintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/button.webp' : '/textures/about/button_painted.webp');
+
+    return <AwardButton
+        texture={texture}
+        paintedTexture={paintedTexture}
+        width={width}
+        height={0.5}
+        position={position}
+        label={label}
+        onClick={event => {
+            event.stopPropagation();
+            openOverlay({ layout: 'profile', section });
+        }}
+    />;
 };
 
 // 故事里程碑配置。
@@ -230,8 +251,8 @@ const InfiniteSkyManager = ({ scrollProgressRef }) => {
                         scrollProgressRef={scrollProgressRef}
                     />
 
-                    {/* 奖项里程碑。 */}
-                    <AwardsMilestone
+                    {/* 个人成果里程碑。 */}
+                    <HighlightsMilestone
                         z={-(cycleIndex * STORY_CYCLE_LENGTH + 55)}
                         scrollProgressRef={scrollProgressRef}
                     />
@@ -380,6 +401,8 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
             {/* 座右铭第一行，向右散开。 */}
             <Text
                 ref={motto1Ref}
+                maxWidth={7}
+                textAlign="center"
                 position={[0, 0, 0.1]}
                 fontSize={0.32}
                 color="#555555"
@@ -388,21 +411,23 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 fontStyle="italic"
             >
-                做点有趣的东西，
+                {personalProfile.role}
             </Text>
 
             {/* 座右铭第二行，向左散开。 */}
             <Text
                 ref={motto2Ref}
-                position={[0, -0.5, 0]}
-                fontSize={0.32}
+                maxWidth={7}
+                textAlign="center"
+                position={[0, -0.8, 0]}
+                fontSize={0.26}
                 color="#555555"
                 anchorX="center"
                 anchorY="middle"
                 font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 fontStyle="italic"
             >
-                放一些舍不得关掉的脑洞。
+                {personalProfile.keywords.join(' · ')}
             </Text>
         </group>
     );
@@ -412,341 +437,50 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
 
 
 /**
- * 奖项里程碑：漂浮卡片。
- * 年度最佳居中，日奖、月奖和精选位于后方。
+ * 个人成果继续以漂浮纸片呈现，文字来自可编辑资料。
  */
-const AwardsMilestone = ({ z, scrollProgressRef }) => {
-    const awardsData = useAwards();
-
-    const { camera, viewport } = useThree();
-    const isTouch = isTouchDevice();
-    const { openOverlay } = useScene();
+const HighlightsMilestone = ({ z, scrollProgressRef }) => {
     const groupRef = useRef();
-    const sotyRef = useRef();
-    const sotdRef = useRef();
-    const sotmRef = useRef();
+    const noteRefs = useRef([]);
+    const noteTexture = useLoader(THREE.TextureLoader, '/textures/twiink/profile-note.svg');
 
-    // 卡片显现引用，由按钮悬停驱动。
-    const sotdCardRevealRef = useRef();
-    const sotdCardPaintedRef = useRef();
-    const sotdHideDelayRef = useRef();
-    const sotmCardRevealRef = useRef();
-    const sotmCardPaintedRef = useRef();
-    const sotmHideDelayRef = useRef();
-    const sotyCardRevealRef = useRef();
-    const sotyCardPaintedRef = useRef();
-    const sotyHideDelayRef = useRef();
-
-    // 加载纹理。
-    const sotyTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTY.webp');
-    const sotdTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTD.webp');
-    const sotmTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTM.webp');
-    const sotyPaintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/SOTY.webp' : '/textures/about/SOTY_painted.webp');
-    const sotdPaintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/SOTD.webp' : '/textures/about/SOTD_painted.webp');
-    const sotmPaintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/SOTM.webp' : '/textures/about/SOTM_painted.webp');
-    const buttonTexture = useLoader(THREE.TextureLoader, '/textures/about/button.webp');
-    const buttonPaintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/button.webp' : '/textures/about/button_painted.webp');
-
-    // 色彩空间修正。
-    sotyTexture.colorSpace = THREE.SRGBColorSpace;
-    sotdTexture.colorSpace = THREE.SRGBColorSpace;
-    sotmTexture.colorSpace = THREE.SRGBColorSpace;
-    sotyPaintedTexture.colorSpace = THREE.SRGBColorSpace;
-    sotdPaintedTexture.colorSpace = THREE.SRGBColorSpace;
-    sotmPaintedTexture.colorSpace = THREE.SRGBColorSpace;
-    buttonTexture.colorSpace = THREE.SRGBColorSpace;
-    buttonPaintedTexture.colorSpace = THREE.SRGBColorSpace;
-
-    // 计算宽高比。
-    // 使用原始尺寸：卡片 2400×1760，按钮 894×208。
-    const cardLegacyAspect = 2400 / 1760;
-    const buttonLegacyAspect = 894 / 208;
-
-    // 卡片基础高度。
-    const cardHeight = 2.5;
-
-    // 按钮尺寸。
-    const buttonHeight = 0.35;
-    const buttonWidth = buttonHeight * buttonLegacyAspect;
-    const buttonY = -cardHeight / 2 - buttonHeight / 2 + 0.5;
-
-    // 卡片悬停处理函数工厂。
-    const makeCardHoverHandler = (revealRef, paintedRef, hideDelayRef) => (isHovered) => {
-        if (isTouch) return;
-        if (isHovered) {
-            if (revealRef.current) {
-                gsap.to(revealRef.current, {
-                    uProgress: 1.0,
-                    duration: 0.8,
-                    ease: 'power2.out',
-                    overwrite: true
-                });
-            }
-            if (hideDelayRef.current) hideDelayRef.current.kill();
-            if (paintedRef.current) {
-                paintedRef.current.visible = true;
-                if (paintedRef.current.material) paintedRef.current.material.opacity = 1;
-            }
-        } else {
-            if (revealRef.current) {
-                gsap.to(revealRef.current, {
-                    uProgress: 0.0,
-                    duration: 0.5,
-                    ease: 'power2.out',
-                    overwrite: true
-                });
-            }
-            hideDelayRef.current = gsap.delayedCall(0.55, () => {
-                if (paintedRef.current && paintedRef.current.material) {
-                    paintedRef.current.material.opacity = 0;
-                }
-            });
-        }
-    };
-
-    useFrame((state) => {
+    useFrame(state => {
         if (!groupRef.current) return;
-
         const scrollProgress = scrollProgressRef?.current || 0;
-        const worldZ = ROOM_Z + scrollProgress + z;
-        groupRef.current.visible = worldZ < MILESTONE_CORRIDOR_CLIP_Z;
+        groupRef.current.visible = ROOM_Z + scrollProgress + z < MILESTONE_CORRIDOR_CLIP_Z;
         if (!groupRef.current.visible) return;
-
-        const distanceZ = z + scrollProgress - 55;
-
-        const revealStart = -120;
-        const revealEnd = -50;
-        let revealFactor = 0;
-
-        if (distanceZ > revealStart && distanceZ < revealEnd) {
-            revealFactor = (distanceZ - revealStart) / (revealEnd - revealStart);
-            revealFactor = Math.min(1, Math.max(0, revealFactor));
-            revealFactor = revealFactor * revealFactor;
-        } else if (distanceZ >= revealEnd) {
-            revealFactor = 1;
-        }
-
-        const sotyStart = -80;
-        const sotyEnd = -20;
-        let sotyFactor = 0;
-
-        if (distanceZ > sotyStart && distanceZ < sotyEnd) {
-            sotyFactor = (distanceZ - sotyStart) / (sotyEnd - sotyStart);
-            sotyFactor = Math.min(1, Math.max(0, sotyFactor));
-            sotyFactor = 1 - Math.pow(1 - sotyFactor, 2);
-        } else if (distanceZ >= sotyEnd) {
-            sotyFactor = 1;
-        }
-
-        const spreadX = 5;
-
-        if (sotdRef.current) {
-            sotdRef.current.position.x = -revealFactor * spreadX;
-        }
-        if (sotmRef.current) {
-            sotmRef.current.position.x = revealFactor * spreadX;
-        }
-
-        if (sotyRef.current) {
-            sotyRef.current.position.y = 0.5 + sotyFactor * 2.5;
-        }
+        const reveal = THREE.MathUtils.clamp((z + scrollProgress + 65) / 70, 0, 1);
+        noteRefs.current.forEach((note, index) => {
+            if (!note) return;
+            note.position.x = ((index % 3) - 1) * 4.4 * (0.85 + reveal * 0.15);
+            note.position.y = 1.5 - Math.floor(index / 3) * 3 + Math.sin(state.clock.elapsedTime * 0.5 + index) * 0.15;
+            note.rotation.z = Math.sin(state.clock.elapsedTime * 0.3 + index) * 0.025;
+        });
     });
 
     return (
         <group ref={groupRef} position={[0, 2, z]}>
-            {/* 标题。 */}
-            <Text
-                position={[0, 4, 0]}
-                fontSize={1.2}
-                color="#1a1a1a"
-                anchorX="center"
-                anchorY="middle"
-                font="/fonts/LXGWWenKaiLite-Regular.ttf"
-            >
-                奖项
+            <Text position={[0, 4, 0]} fontSize={1} color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/LXGWWenKaiLite-Regular.ttf">
+                {personalProfile.titles.highlights}
             </Text>
-
-            {/* 日奖位于年度奖后方，第二个渲染。 */}
-            <group ref={sotdRef} position={[0, 0.5, -0.5]}>
-                {/* 后方彩色卡片，按钮悬停前隐藏。 */}
-                <mesh ref={sotdCardPaintedRef} position={[0, 0, -0.001]} visible={true}>
-                    <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
-                    <meshBasicMaterial color="#e0e0e0"
-                        map={sotdPaintedTexture}
-                        transparent
-                        opacity={0}
-                        side={THREE.DoubleSide}
-                        alphaTest={0.5}
-                    />
-                </mesh>
-                {/* 前方速写卡片，支持显现效果。 */}
-                <mesh>
-                    <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
-                    <revealBasicMaterial
-                        ref={sotdCardRevealRef}
-                        map={sotdTexture}
-                        transparent
-                        side={THREE.DoubleSide}
-                        uProgress={0.0}
-                    />
-                </mesh>
-                {/* 按钮。 */}
-                <AwardButton
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        openOverlay(awardsData.sotd);
-                    }}
-                    texture={buttonTexture}
-                    paintedTexture={buttonPaintedTexture}
-                    width={buttonWidth}
-                    height={buttonHeight}
-                    position={[0, buttonY, 0.05]}
-                    onHoverChange={makeCardHoverHandler(sotdCardRevealRef, sotdCardPaintedRef, sotdHideDelayRef)}
-                />
-                {/* 奖项标签。 */}
-                <Text
-                    position={[0, 0.95, 0.01]}
-                    fontSize={0.45}
-                    color="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
-                >
-                    每日最佳
-                </Text>
-                {/* 奖项数量。 */}
-                <Text
-                    position={[-0.05, 0, 0.01]}
-                    fontSize={0.8}
-                    color="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
-                >
-                    {awardsData.sotd.items.length}
-                </Text>
-            </group>
-
-            {/* 月奖位于年度奖后方，第三个渲染。 */}
-            <group ref={sotmRef} position={[0, 0.5, -0.2]}>
-                {/* 后方彩色卡片，按钮悬停前隐藏。 */}
-                <mesh ref={sotmCardPaintedRef} position={[0, 0, -0.001]} visible={true}>
-                    <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
-                    <meshBasicMaterial color="#e0e0e0"
-                        map={sotmPaintedTexture}
-                        transparent
-                        opacity={0}
-                        side={THREE.DoubleSide}
-                        alphaTest={0.5}
-                    />
-                </mesh>
-                {/* 前方速写卡片，支持显现效果。 */}
-                <mesh>
-                    <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
-                    <revealBasicMaterial
-                        ref={sotmCardRevealRef}
-                        map={sotmTexture}
-                        transparent
-                        side={THREE.DoubleSide}
-                        uProgress={0.0}
-                    />
-                </mesh>
-                {/* 按钮。 */}
-                <AwardButton
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        openOverlay(awardsData.sotm);
-                    }}
-                    texture={buttonTexture}
-                    paintedTexture={buttonPaintedTexture}
-                    width={buttonWidth}
-                    height={buttonHeight}
-                    position={[0, buttonY, 0.05]}
-                    onHoverChange={makeCardHoverHandler(sotmCardRevealRef, sotmCardPaintedRef, sotmHideDelayRef)}
-                />
-                {/* 奖项标签。 */}
-                <Text
-                    position={[0, 0.95, 0.01]}
-                    fontSize={0.45}
-                    color="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
-                >
-                    每月最佳
-                </Text>
-                {/* 奖项数量。 */}
-                <Text
-                    position={[-0.05, 0, 0.01]}
-                    fontSize={0.8}
-                    color="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
-                >
-                    {awardsData.sotm.items.length}
-                </Text>
-            </group>
-
-            {/* 年度奖位于前方中央，最后渲染，始终在顶层。 */}
-            <group ref={sotyRef} position={[0, 0.5, 0]}>
-                {/* 后方彩色卡片，按钮悬停前隐藏。 */}
-                <mesh ref={sotyCardPaintedRef} position={[0, 0, -0.001]} visible={true}>
-                    <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
-                    <meshBasicMaterial color="#e0e0e0"
-                        map={sotyPaintedTexture}
-                        transparent
-                        opacity={0}
-                        side={THREE.DoubleSide}
-                        alphaTest={0.5}
-                    />
-                </mesh>
-                {/* 前方速写卡片，支持显现效果。 */}
-                <mesh>
-                    <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
-                    <revealBasicMaterial
-                        ref={sotyCardRevealRef}
-                        map={sotyTexture}
-                        transparent
-                        side={THREE.DoubleSide}
-                    />
-                </mesh>
-                {/* 按钮。 */}
-                <AwardButton
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        openOverlay(awardsData.other);
-                    }}
-                    texture={buttonTexture}
-                    paintedTexture={buttonPaintedTexture}
-                    width={buttonWidth}
-                    height={buttonHeight}
-                    position={[0, buttonY, 0.05]}
-                    onHoverChange={makeCardHoverHandler(sotyCardRevealRef, sotyCardPaintedRef, sotyHideDelayRef)}
-                />
-                {/* 奖项标签。 */}
-                <Text
-                    position={[0, 0.95, 0.01]}
-                    fontSize={0.45}
-                    color="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
-                >
-                    其他荣誉
-                </Text>
-                {/* 奖项数量。 */}
-                <Text
-                    position={[-0.05, 0, 0.01]}
-                    fontSize={0.8}
-                    color="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
-                >
-                    {awardsData.other.items.length}
-                </Text>
-            </group>
+            {personalProfile.honors?.length > 0 && (
+                <ProfileButton section="honors" position={[0, 3.1, 0.05]} label={personalProfile.titles.honors} />
+            )}
+            {personalProfile.highlights.map((item, index) => (
+                <group key={item.id} ref={node => { noteRefs.current[index] = node; }} position={[((index % 3) - 1) * 4.4, 1.5, 0]}>
+                    <mesh>
+                        <planeGeometry args={[3.6, 2.52]} />
+                        <meshBasicMaterial map={noteTexture} transparent side={THREE.DoubleSide} />
+                    </mesh>
+                    <Text position={[0, 0.5, 0.03]} fontSize={0.32} maxWidth={2.8} textAlign="center" color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/LXGWWenKaiLite-Regular.ttf">
+                        {item.sceneTitle || item.title}
+                    </Text>
+                    <Text position={[0, 0, 0.03]} fontSize={0.24} color="#555555" anchorX="center" anchorY="middle" font="/fonts/LXGWWenKaiLite-Regular.ttf">
+                        {formatProfileDate(item.date)}
+                    </Text>
+                    <ProfileButton section="highlights" position={[0, -0.65, 0.05]} />
+                </group>
+            ))}
         </group>
     );
 };
@@ -762,9 +496,12 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
     const uoRef = useRef();
     const freelanceRef = useRef();
 
+    const education = personalProfile.timeline.find(item => item.kind === 'education');
+    const firstProject = personalProfile.timeline.find(item => item.kind === 'project');
+
     // 加载纹理。
-    const uoTexture = useLoader(THREE.TextureLoader, '/textures/about/uowyspa.webp');
-    const freelanceTexture = useLoader(THREE.TextureLoader, '/textures/about/freelancewyspa.webp');
+    const uoTexture = useLoader(THREE.TextureLoader, '/textures/twiink/profile-island.svg');
+    const freelanceTexture = useLoader(THREE.TextureLoader, '/textures/about/island-free-creation.png');
 
     // 纹理设置。
     uoTexture.colorSpace = THREE.SRGBColorSpace;
@@ -773,7 +510,7 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
     // 计算宽高比，保持图片原比例，避免拉伸。
     // 使用原始尺寸 2816×1536。
     const islandLegacyAspect = 2816 / 1536;
-    const uoAspect = islandLegacyAspect;
+    const uoAspect = 800 / 500;
     const freelanceAspect = islandLegacyAspect;
 
     // 岛屿基础高度，宽度自动调整。
@@ -842,7 +579,7 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                 anchorY="middle"
                 font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
-                历程
+                {personalProfile.titles.timeline}
             </Text>
 
             {/* 副标题。 */}
@@ -854,8 +591,10 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                 anchorY="middle"
                 font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
-                一路走来的经历……
+                {personalProfile.timeline.map(item => item.date.slice(0, 4)).filter((year, index, years) => years.indexOf(year) === index).join(' · ')}
             </Text>
+
+            <ProfileButton section="timeline" position={[0, 3.4, 0.3]} label="完整经历" />
 
             {/* 左侧大学岛。 */}
             <group ref={uoRef} position={[-3.5, -1, 0]}>
@@ -867,7 +606,10 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                         side={THREE.DoubleSide}
                     />
                 </mesh>
-                {/* 在此编辑大学岛上的文字。 */}
+                <Text position={[0, 0.95, 0.1]} fontSize={0.42} maxWidth={3.6} textAlign="center" color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/LXGWWenKaiLite-Regular.ttf">
+                    {education?.organization || education?.title || personalProfile.titles.timeline}
+                </Text>
+                {/* 日期与完整经历使用同一条数据。 */}
                 <Text
                     position={[0.1, -0.85, 0.1]} // 位置（X、Y、Z）。
                     fontSize={0.4}           // 尺寸。
@@ -876,7 +618,7 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                     anchorY="middle"
                     font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 >
-                    2025—至今
+                    {formatProfileDate(education?.date)}
                 </Text>
             </group>
 
@@ -899,7 +641,7 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                     anchorY="middle"
                     font="/fonts/LXGWWenKaiLite-Regular.ttf"
                 >
-                    2023—至今
+                    {formatProfileDate(firstProject?.date)}
                 </Text>
             </group>
         </group>
@@ -913,23 +655,23 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
 
 // 气球配置：尺寸类别、纹理路径、位置偏移。
 // 修改每个气球的 y 值可调整高度。
-const BALLOON_CONFIG = [
-    // 大气球代表主要技能，位于前方中央。
-    { texture: '/textures/about/reactduzybalon.webp', paintedTexture: '/textures/about/reactduzybalon_painted.webp', label: 'React', size: 'large', x: -2.5, y: 2, z: 0.3, phase: 0 },
-    { texture: '/textures/about/threejsduzybalon.webp', paintedTexture: '/textures/about/threejsduzybalon_painted.webp', label: 'Three.js', size: 'large', x: 2.5, y: 2.5, z: 0.2, phase: 1.5 },
-    { texture: '/textures/about/GSAPduzybalon.webp', paintedTexture: '/textures/about/GSAPduzybalon_painted.webp', label: 'GSAP', size: 'large', x: 0, y: 3, z: 0.5, phase: 3 },
-
-    // 中气球散布四周。
-    { texture: '/textures/about/JSSREDNIBALON.webp', paintedTexture: '/textures/about/JSSREDNIBALON_painted.webp', label: 'JavaScript', size: 'medium', x: -4, y: 1, z: -0.3, phase: 0.8 },
-    { texture: '/textures/about/csssrednibalon.webp', paintedTexture: '/textures/about/csssrednibalon_painted.webp', label: 'CSS', size: 'medium', x: 4, y: 1.5, z: -0.2, phase: 2.2 },
-    { texture: '/textures/about/nextjssrednibalon.webp', paintedTexture: '/textures/about/nextjssrednibalon_painted.webp', label: 'Next.js', size: 'medium', x: 0, y: 0.5, z: -0.4, phase: 4 },
-
-    // 小气球作为背景点缀。
-    { texture: '/textures/about/htmlmalybalon.webp', paintedTexture: '/textures/about/htmlmalybalon_painted.webp', label: 'HTML', size: 'small', x: -5.5, y: 2.5, z: -0.8, phase: 1.2 },
-    { texture: '/textures/about/gitmalybalon.webp', paintedTexture: '/textures/about/gitmalybalon_painted.webp', label: 'Git', size: 'small', x: 5.5, y: 3, z: -0.7, phase: 2.8 },
-    { texture: '/textures/about/figmamalybalon.webp', paintedTexture: '/textures/about/figmamalybalon_painted.webp', label: 'Figma', size: 'small', x: -3, y: 4.5, z: -0.5, phase: 3.5 },
-    { texture: '/textures/about/firebasemalybalon.webp', paintedTexture: '/textures/about/firebasemalybalon_painted.webp', label: 'Firebase', size: 'small', x: 3.5, y: 4, z: -0.6, phase: 4.5 },
+const BALLOON_POSITIONS = [
+    [-2.5, 2, 0.3], [2.5, 2.5, 0.2], [0, 3, 0.5],
+    [-4, 1, -0.3], [4, 1.5, -0.2], [0, 0.5, -0.4],
+    [-5.5, 2.5, -0.8], [5.5, 3, -0.7], [-3, 4.5, -0.5],
+    [3.5, 4, -0.6], [-1.3, 4.5, -1], [1.5, 4.8, -1.2],
 ];
+const BALLOON_CONFIG = getSkillLabels(personalProfile).map((label, index) => {
+    const [x, y, z] = BALLOON_POSITIONS[index % BALLOON_POSITIONS.length];
+    return {
+        label,
+        texture: '/textures/twiink/profile-balloon.svg',
+        paintedTexture: '/textures/twiink/profile-balloon.svg',
+        size: index < 3 ? 'large' : index < 6 ? 'medium' : 'small',
+        x, y, z: z - Math.floor(index / BALLOON_POSITIONS.length) * 2,
+        phase: index * 0.8,
+    };
+});
 
 // 各气球类别的尺寸倍率。
 const SIZE_MULTIPLIERS = {
@@ -975,15 +717,7 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
     };
 
     // 使用 BALLOON_CONFIG 中的原始宽高比，或类别的固定比例。
-    const legacyAspects = {
-        'reactduzybalon.webp': 736 / 1447,
-        'threejsduzybalon.webp': 1141 / 1964,
-        'GSAPduzybalon.webp': 1.0, // GSAP 气球为正方形。
-        'default_small_medium': 631 / 1482 // 其他气球的通用比例。
-    };
-    
-    const filename = config.texture.split('/').pop();
-    const aspect = legacyAspects[filename] || legacyAspects['default_small_medium'];
+    const aspect = texture.image.width / texture.image.height;
     const baseHeight = SIZE_MULTIPLIERS[config.size];
 
     const outerGroupRef = useRef();
@@ -1238,6 +972,12 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
                     />
                 </mesh>
 
+                {!isPopping && (
+                    <Text position={[0, baseHeight * 0.2, 0.02]} fontSize={baseHeight * 0.08} maxWidth={baseHeight * 0.42} textAlign="center" color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/LXGWWenKaiLite-Regular.ttf">
+                        {config.label}
+                    </Text>
+                )}
+
                 {/* 技术栈名称文字先淡入再淡出。 */}
                 {isPopping && textFadeRef.current > 0.01 && (
                     <Text
@@ -1338,7 +1078,7 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
                 anchorY="middle"
                 font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
-                技能
+                {personalProfile.titles.skills}
             </Text>
 
             {/* 副标题。 */}
@@ -1350,13 +1090,15 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
                 anchorY="middle"
                 font="/fonts/LXGWWenKaiLite-Regular.ttf"
             >
-                我喜欢使用的技术
+                {personalProfile.skills.map(group => group.title).join(' · ')}
             </Text>
 
+            <ProfileButton section="skills" position={[0, -1.4, 0.5]} label={personalProfile.titles.skills} />
+
             {/* 漂浮气球。 */}
-            {BALLOON_CONFIG.map((config, index) => (
+            {BALLOON_CONFIG.map(config => (
                 <SkillBalloon
-                    key={index}
+                    key={config.label}
                     config={config}
                     revealFactorRef={revealFactorRef}
                     spreadFactorRef={spreadFactorRef}

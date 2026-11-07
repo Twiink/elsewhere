@@ -1,0 +1,92 @@
+{
+  "project": "HarnessPRD 智能需求文档平台",
+  "projectId": "harness-prd",
+  "interfaceName": "ReqFlow",
+  "savedAt": "2026-11-06",
+  "status": "确认版文稿、海报与首页展示图已接入本地画廊",
+  "copyFile": "copy-draft.md",
+  "githubUrl": "https://github.com/Twiink/HarnessPRD",
+  "assets": [
+    {
+      "id": "project-poster",
+      "role": "project-poster",
+      "caption": "ReqFlow 竖版项目海报",
+      "path": "originals/01-project-poster.png",
+      "sourceAttachment": "codex-clipboard-2b7ca889-04d4-4fe6-a744-583d8e2b1c55.png",
+      "mimeType": "image/png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 2361439,
+      "sha256": "466d2223252fff9f9fb2ee411d749f7262f279df4ae9652994b0464af82df517",
+      "originalBytesPreserved": true,
+      "transformations": []
+    },
+    {
+      "id": "homepage-showcase",
+      "role": "homepage-showcase",
+      "caption": "ReqFlow 首页展示图，包含三种方案起点和文档生成流程",
+      "path": "originals/02-homepage-showcase.png",
+      "sourceAttachment": "codex-clipboard-15bfdb0e-c1a6-4725-b046-9c05afc49797.png",
+      "mimeType": "image/png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 1816306,
+      "sha256": "f11a07e3efe7d49cc28d22a58930ca40242e8e0c098257a6e253e8512fd4faf7",
+      "originalBytesPreserved": true,
+      "transformations": []
+    }
+  ],
+  "published": [
+    {
+      "path": "public/content/projects/harness-prd/cover-color.webp",
+      "source": "originals/01-project-poster.png",
+      "mimeType": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "bytes": 159470,
+      "sha256": "0fcf9c3069061d153feaef1a03f0883724848d03f88df4e13bc2c031af3818e0",
+      "transformations": [
+        "WebP quality 94",
+        "海报按原比例缩放至 800×1200，排入 1200×1600 纸卡，左侧留白 200、顶部留白 330"
+      ]
+    },
+    {
+      "path": "public/content/projects/harness-prd/cover-sketch.webp",
+      "source": "originals/01-project-poster.png",
+      "mimeType": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "bytes": 118306,
+      "sha256": "28a91ff55c85efc79cb4408126d4633d1d2b827984231db24d4038b41aec767a",
+      "transformations": [
+        "WebP quality 94",
+        "海报按原比例缩放至 800×1200，排入 1200×1600 纸卡，左侧留白 200、顶部留白 330",
+        "灰度转换"
+      ]
+    },
+    {
+      "path": "public/content/projects/harness-prd/poster.webp",
+      "source": "originals/01-project-poster.png",
+      "mimeType": "image/webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 316060,
+      "sha256": "f069f628e87d6e6e3c70876d4baaf9ac74b383f945da922f5ecebfd568521231",
+      "transformations": [
+        "WebP quality 96，保持原始尺寸与比例"
+      ]
+    },
+    {
+      "path": "public/content/projects/harness-prd/homepage.webp",
+      "source": "originals/02-homepage-showcase.png",
+      "mimeType": "image/webp",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 187852,
+      "sha256": "f63b7b129d702750cf428f8507a85f08f924344e7adc4fd0179a46e58989e722",
+      "transformations": [
+        "WebP quality 96，保持原始尺寸与比例"
+      ]
+    }
+  ]
+}

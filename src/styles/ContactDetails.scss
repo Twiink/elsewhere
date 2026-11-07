@@ -1,0 +1,57 @@
+.about-profile-dialog.contact-details-dialog {
+    width: min(700px, calc(100% - 2rem));
+    height: fit-content;
+    max-height: calc(100dvh - 3rem);
+
+    .about-profile-header { align-items: flex-start; }
+    .about-profile-header h2 { line-height: 1.4; }
+    .studio-close-btn { margin: 0; flex-shrink: 0; }
+}
+
+.contact-details-body {
+    max-height: calc(100dvh - 10rem);
+
+    a { color: var(--profile-ink); text-underline-offset: 0.3em; overflow-wrap: anywhere; }
+    .profile-keywords { margin-block: 1rem 1.5rem; }
+    .contact-message-note { color: var(--profile-muted); margin-top: 1.5rem; }
+}
+
+.contact-addresses {
+    margin: 0;
+
+    > div { display: grid; grid-template-columns: 5rem minmax(0, 1fr); gap: 0.5rem 1rem; padding-block: 1rem; border-top: 1px solid var(--profile-rule); }
+    dt { padding-top: 0.35rem; }
+    dd { margin: 0; min-width: 0; }
+    dd > a { display: inline-flex; align-items: center; min-height: 44px; }
+}
+
+.contact-wechat {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+
+    input { flex: 1 1 12rem; width: 100%; min-width: 0; padding: 0.45rem 0.6rem; border: 1px solid var(--profile-rule); border-radius: 3px; background: transparent; color: var(--profile-ink); font: inherit; }
+    button { min-height: 44px; padding: 0.4rem 0.7rem; border: 1px solid var(--profile-ink); border-radius: 3px 6px 4px 5px; background: transparent; color: var(--profile-ink); font: inherit; cursor: pointer; }
+    button:hover { background: #e5e0d5; }
+}
+
+.contact-details-body .contact-copy-status { min-height: 1.6em; margin: 0.4rem 0 0; color: var(--profile-muted); font-size: 0.9rem; }
+
+.contact-faq {
+    margin-top: 2.5rem;
+
+    details { border-top: 1px solid var(--profile-rule); }
+    details:last-child { border-bottom: 1px solid var(--profile-rule); }
+    summary { min-height: 44px; padding-block: 0.65rem; cursor: pointer; }
+    summary:hover { color: var(--profile-muted); }
+    p { margin-bottom: 0.9rem; }
+    details[open] { padding-bottom: 0.5rem; }
+}
+
+@media (max-width: 600px) {
+    .contact-details-trigger { top: calc(max(0.8rem, env(safe-area-inset-top)) + 3.5rem); }
+    .about-profile-dialog.contact-details-dialog { width: calc(100% - 1rem); max-height: calc(100dvh - 2rem); }
+    .contact-details-body { max-height: calc(100dvh - 8rem); }
+    .contact-addresses > div { grid-template-columns: minmax(0, 1fr); gap: 0.2rem; }
+    .contact-addresses dt { padding: 0; font-weight: 600; }
+}
