@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# 临时生成文件与一次性脚本
+/output/
+/tmp/
+
 # dotenv 环境变量文件
 .env
 .env.*

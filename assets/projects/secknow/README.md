@@ -42,4 +42,4 @@
 - `homepage.webp`、`knowledge-planets.webp`：用户提供的两张页面截图。
 - `venue-exterior.webp`：用户提供的户外实景。
 
-发布副本使用 WebP，原始图片和海报继续保留。图片转码与封面排版记录在 `asset-manifest.json`；检查结果见项目 `output/verification/secknow-gallery/`。本次为本地接入，未提交 Git、未部署。
+发布副本使用 WebP，原始图片和海报继续保留。图片转码与封面排版记录在 `asset-manifest.json`；检查结果摘要见 `sources.md`。本次为本地接入，未提交 Git、未部署。

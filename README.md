@@ -2,7 +2,7 @@
 
 这是基于 Tomasz “ITom” Szmajda 作品集改造的 Twiink 个人空间，使用 React 19、Three.js、React Three Fiber、GSAP 和 Vite。用户从入口进入无限走廊，探索作品画廊、内容工作室、关于我和联系我四个房间；`/start` 是独立的静态链接页。
 
-已接入第一批个人资料：网站名为 **Twiink's Space**，介绍为“做点有趣的东西，放一些舍不得关掉的脑洞。”入口窗边、走廊和云上人物使用根据用户照片制作的黑白线稿，发布用纹理位于 `public/textures/twiink/`。PNG 原稿与生成说明保存在 `output/imagegen/`；照片参考仅在本地忽略目录中保存。
+已接入第一批个人资料：网站名为 **Twiink's Space**，介绍为“做点有趣的东西，放一些舍不得关掉的脑洞。”入口窗边、走廊和云上人物使用根据用户照片制作的黑白线稿，发布用纹理位于 `public/textures/twiink/`。照片参考仅在本地忽略目录中保存。
 
 「关于我」已接入个人简介、技术栈、六段经历、兴趣和项目成果，统一编辑 `src/data/profile.json`。房间里的纸片、经历岛屿、技能气球和完整阅读面板共用这些资料。画廊已接入「泡芙大作战 PuffWar 乐园」「无界宇宙 Infinite Cosmos」「SecKnow AI 教育平台」「RAG 中台 RAG-Center」和「HarnessPRD 智能需求文档平台」五个个人项目，包含完整介绍、图片或开场视频，以及小程序码、官网或 GitHub 源码入口。「联系我」已接入邮箱、GitHub、微信和站内留言入口，纸页中的「随便聊聊」展示六条已确认的常见问题；工作室文章等待后续资料替换。示例内容中的 `authorName` 保留原作者归属。站点域名按用户提供的 `http://space.twiink.cn` 配置，站点与联系人信息在 `content.json` 的 `site` 中编辑。
 
@@ -153,7 +153,9 @@ JSON 使用英文双引号和英文逗号，不支持注释或最后一项后的
 
 走廊的两幅竖版照片位于 `public/content/corridor/`：右侧 `frame-3` 展示花束与牵手照，左侧 `frame-4` 展示红灯笼前的古风合照。原图与处理记录保存在 `assets/corridor/`。图片按原始比例展示，桌面端点击查看时会自动适配视口高度；路径和画框尺寸在 `src/components/canvas/corridor/CorridorDecorations.jsx` 的 `frames` 中编辑，新增图片时同步 `src/config/texturePreloadList.js`。
 
-分享封面使用 `public/content/social/twiink-share-cover-v1.jpg`，为已确认的淡彩古风横版图片，尺寸 1200×630。主站的 Open Graph 与 Twitter 分享信息由 `site.shareImage` 和 `seo-plugin.js` 输出；独立链接页 `/start` 的同类标签位于 `public/start/index.html`。更换图片路径、尺寸或说明时，同步这两处配置。原始生成图和完整提示词保存在 `output/imagegen/twiink-share-cover-v1.png` 及同名 JSON。
+网站图标使用浅绿纸飞机与金色星星，保留奶油色纸底和完整构图。主站与 `/start` 的浏览器图标分别使用 `public/textures/twiink/site-icon-airplane-v1-32.png`、`site-icon-airplane-v1-64.png`，手机主屏幕图标使用同目录的 `site-icon-airplane-v1-180.png`；走廊 `frame-1` 与纹理预加载使用 `site-icon-airplane-v1-512.png`。更换时同步两处 HTML、走廊画框与预加载清单。
+
+分享封面使用 `public/content/social/twiink-share-cover-v1.jpg`，为已确认的淡彩古风横版图片，尺寸 1200×630。主站的 Open Graph 与 Twitter 分享信息由 `site.shareImage` 和 `seo-plugin.js` 输出；独立链接页 `/start` 的同类标签位于 `public/start/index.html`。更换图片路径、尺寸或说明时，同步这两处配置。
 
 这些配置不影响本地 JSON 的读取，也不提供内容管理功能。凭据和私人配置不要写入 Git。
 

@@ -83,7 +83,7 @@ export const CORRIDOR_TEXTURES = [
     '/textures/corridor/gorastolika.webp',
     '/textures/corridor/szafkaprzod.webp',
     '/textures/corridor/szafkaprzodgora.webp',
-    '/textures/twiink/avatar.png',
+    '/textures/twiink/site-icon-airplane-v1-512.png',
     '/textures/corridor/rysuneknaobrazek3.webp',
     '/content/corridor/bouquet-hands.webp',
     '/content/corridor/hanfu-photo.webp',

@@ -26,8 +26,7 @@
     "productionBuild": "passed",
     "targetedEslint": "passed",
     "impeccableDetect": "no findings",
-    "browser": "PDF 返回 HTTP 200 和 application/pdf；实际下载文件名与字节正确；复制成功与拒绝后的选中回退通过；手机无横向溢出，页面无运行错误或资源 404。",
-    "report": "output/verification/resume-studio-channels/report.json"
+    "browser": "PDF 返回 HTTP 200 和 application/pdf；实际下载文件名与字节正确；复制成功与拒绝后的选中回退通过；手机无横向溢出，页面无运行错误或资源 404。"
   },
   "delivery": {
     "localIntegration": "complete",

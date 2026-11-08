@@ -53,7 +53,7 @@
 - 纸卡封面选用 `showcaseSelection.portrait`；阅读面板选用 `showcaseSelection.landscape`、首页截图、知识星球截图和带 SecKnow 标识的户外照片。图片标题和说明区分海报、界面与实景。
 - 发布副本位于 `public/content/projects/secknow/`，使用 WebP。封面将 1024 × 1536 竖版海报等比例放入 1200 × 1600 纸卡，并为上方卡片标题留白；阅读区图片保留原始尺寸和比例。转换方式与发布文件校验和写入素材清单。
 - 阅读面板可切换三个个人项目，SecKnow 入口为官网链接；两个小程序项目继续使用各自的小程序码。
-- 本次为本地页面接入，未提交 Git、未部署，未调用教材生成、支付或其他业务服务。验证结果记录在 `output/verification/secknow-gallery/`。
+- 本次为本地页面接入，未提交 Git、未部署，未调用教材生成、支付或其他业务服务。
 
 ### 页面接入验证
 
