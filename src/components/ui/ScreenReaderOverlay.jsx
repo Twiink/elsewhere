@@ -1,7 +1,7 @@
 import { useScene } from '../../context/SceneContext';
 import { useGalleryProjects, useStudioContent } from '../../hooks/useContentData';
 import '../../styles/ScreenReaderOverlay.scss';
-import { personalProfile, contactInfo, siteInfo } from '../../data/content';
+import { personalProfile, contactInfo, siteInfo, studioChannels, resumeInfo } from '../../data/content';
 import ProfileContent from './ProfileContent';
 
 /**
@@ -81,6 +81,7 @@ const ScreenReaderOverlay = () => {
                             <div aria-label="关于我房间的内容">
                                 <h3>关于我</h3>
                                 <ProfileContent profile={personalProfile} idPrefix="sr-profile" />
+                                {resumeInfo?.url && <a href={resumeInfo.url} download={resumeInfo.downloadName}>下载简历 PDF</a>}
                             </div>
                         )}
                         {currentRoom === 'gallery' && (
@@ -109,6 +110,7 @@ const ScreenReaderOverlay = () => {
                             <div aria-label="联系我房间的内容">
                                 <h3>联系我</h3>
                                 <p>{contactInfo.description}</p>
+                                {resumeInfo?.url && <p><a href={resumeInfo.url} download={resumeInfo.downloadName}>下载简历 PDF</a></p>}
                                 <p><a href={`mailto:${contactInfo.email}`}>发送邮件：{contactInfo.email}</a></p>
                                 <p><a href={siteInfo.githubUrl} target="_blank" rel="noopener noreferrer">访问 Twiink 的 GitHub（新窗口）</a></p>
                                 <p>微信号：{contactInfo.wechatId}</p>
@@ -120,15 +122,20 @@ const ScreenReaderOverlay = () => {
                         {currentRoom === 'studio' && (
                             <div aria-label="工作室房间的内容">
                                 <h3>工作室</h3>
-                                <p>通过旋转显示器探索我的内容，点击屏幕即可查看详细介绍。</p>
+                                {studioChannels && <p><a href={studioChannels.csdnUrl} target="_blank" rel="noopener noreferrer">访问 Matrix 工作室的 CSDN（新窗口）</a>，微信视频号：{studioChannels.videoAccount}。</p>}
+                                <p>出门走走、一起玩游戏，还有给网站画人物的过程。点击屏幕，或选择下面的一篇，翻翻这些生活与创作记录。</p>
 
                                 {studio && studio.length > 0 && (
                                     <ul>
                                         {studio.map((s, i) => (
                                             <li key={i}>
-                                                <h4>{s.title} ({s.platform})</h4>
+                                                <h4>{s.title}</h4>
                                                 <p>{s.description}</p>
-                                                {s.url && <a href={s.url}>查看内容</a>}
+                                                {s.layout === 'studio' ? (
+                                                    <button type="button" aria-haspopup="dialog" aria-controls="studio-notes-dialog" onClick={() => openOverlay({ layout: 'studio', noteId: s.id })}>
+                                                        阅读 {s.title}
+                                                    </button>
+                                                ) : s.url && <a href={s.url}>查看内容</a>}
                                             </li>
                                         ))}
                                     </ul>

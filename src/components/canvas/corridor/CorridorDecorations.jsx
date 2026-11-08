@@ -209,8 +209,12 @@ const InspectableFrame = ({ frame, wallX, frameTexture, framePaintedTexture, CAB
 
             tempRot.multiply(tempQuat);
 
-            // 略微放大图片以展示细节。
-            tempScale.set(1.2, 1.2, 1.2);
+            // 竖版照片按可见范围缩放，完整保留画面。
+            const visibleHeight = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * distance;
+            const scale = frame.fitToView
+                ? Math.min(1.2, visibleHeight * 0.86 / frame.height, visibleHeight * viewport.aspect * 0.86 / frame.width)
+                : 1.2;
+            tempScale.setScalar(scale);
         } else {
             // 返回墙面位置。
             tempPos.copy(originalPos);
@@ -400,28 +404,28 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
         {
             z: zOffset - 40,         // 工作室与关于我之间，相对 Z 为 -34 至 -46。
             side: 'right',
-            width: 2.5,
-            height: 2.5 / 1.785,
+            width: 1.95,
+            height: 2.6,
             y: 0.25,
             id: 'frame-3',
-            signature: "这里还是空白！\n想展示你的作品吗？\n联系我吧！",
-            signatureX: 0,
-            signatureY: 0,
-            signatureSize: 0.12,
-            signatureColor: '#333333'
+            image: '/content/corridor/bouquet-hands.webp',
+            imageWidth: 1.65,
+            imageHeight: 2.2,
+            offsetFromWall: 0.1,
+            fitToView: true,
         },
         {
             z: zOffset - 55,         // 关于我与联系我之间，相对 Z 为 -50 至 -60。
             side: 'left',
-            width: 2.5,
-            height: 2.5 / 1.785,
+            width: 1.85,
+            height: 2.6,
             y: 0.35,
             id: 'frame-4',
-            signature: "这里还是空白！\n想展示你的作品吗？\n联系我吧！",
-            signatureX: 0,
-            signatureY: 0,
-            signatureSize: 0.12,
-            signatureColor: '#333333'
+            image: '/content/corridor/hanfu-photo.webp',
+            imageWidth: 2.2 * 2 / 3,
+            imageHeight: 2.2,
+            offsetFromWall: 0.1,
+            fitToView: true,
         },
     ], [zOffset]);
 

@@ -17,12 +17,12 @@ test('原始快照保持完整，尚未替换的示例保留原始归属与外�
         const source = original.filter(item => item._type === type);
         if (key === 'projects') {
             assert.ok(content.projects.length >= source.length, key);
-        } else {
+        } else if (key === 'awards') {
             assert.equal(content[key].length, source.length, key);
         }
         assert.equal(new Set(content[key].map(item => item.id)).size, content[key].length, key);
-        const retained = key === 'projects' ? content[key].filter(item => !item.details) : content[key];
-        if (key !== 'projects') {
+        const retained = key === 'projects' ? content[key].filter(item => !item.details) : key === 'studio' ? content[key].filter(item => item.layout !== 'studio') : content[key];
+        if (key === 'awards') {
             assert.deepEqual(retained.map(item => item.id).sort(), source.map(item => item._id).sort());
         }
         if (key === 'projects' || key === 'studio') {
@@ -43,13 +43,16 @@ test('原始快照保持完整，尚未替换的示例保留原始归属与外�
     }
 });
 
-test('全部内容图片与技术图标均指向存在的本地文件', () => {
-    const paths = new Set(allItems.flatMap(item => [item.front, item.painted, item.frontTexture, item.paintedFrontTexture, item.image, ...(item.techStack || []), ...(item.details?.photos.map(photo => photo.src) || []), ...(item.details?.videos?.flatMap(video => [video.src, video.poster]) || []), item.details?.entry.image]).filter(Boolean));
+test('全部内容图片、技术图标与简历均指向有效的本地文件', () => {
+    const paths = new Set(allItems.flatMap(item => [item.front, item.painted, item.frontTexture, item.paintedFrontTexture, item.image, ...(item.techStack || []), ...(item.photos || []).map(photo => photo.src), ...(item.details?.photos.map(photo => photo.src) || []), ...(item.details?.videos?.flatMap(video => [video.src, video.poster]) || []), item.details?.entry.image]).filter(Boolean));
+    paths.add(content.site.shareImage.path);
     for (const path of paths) {
         assert.match(path, /^\/(content|textures)\/[\w./-]+$/);
         assert.ok(statSync(new URL(`../public${path}`, import.meta.url)).size > 0, path);
     }
     assert.doesNotMatch(JSON.stringify(content), /api\.sanity\.io|cdn\.sanity\.io|\/sanity-cdn/);
+    const resume = readFileSync(new URL(`../public${content.site.resume.url}`, import.meta.url));
+    assert.equal(resume.subarray(0, 5).toString(), '%PDF-');
 });
 
 test('泡芙大作战正文结构完整，接入三张现场图和无损小程序码', () => {
@@ -97,6 +100,15 @@ test('搜索输出完整来自本地中文内容，结构化数据可解析', ()
     const plugin = generateSeoHtml();
     const source = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
     const html = plugin.transformIndexHtml(source);
+    const shareImageUrl = new URL(content.site.shareImage.path, `${content.site.url}/`).href;
+    assert.ok(html.includes(`<meta property="og:image" content="${shareImageUrl}">`));
+    assert.ok(html.includes(`<meta name="twitter:image" content="${shareImageUrl}">`));
+    assert.match(html, /<meta name="twitter:card" content="summary_large_image">/);
+    for (const text of [content.site.resume.url, content.site.studioChannels.videoAccount]) {
+        assert.ok(html.includes(text));
+        assert.ok(llms.includes(text));
+    }
+    assert.ok(html.includes('https://blog.csdn.net/matrix_studio?type=blog'));
     assert.match(html, /lang="zh-CN"/);
     assert.ok(html.includes(content.faq[0].question));
     for (const item of content.faq) {
@@ -108,6 +120,17 @@ test('搜索输出完整来自本地中文内容，结构化数据可解析', ()
         assert.ok(llms.includes(item.answer));
     }
     assert.ok(html.includes(content.projects[0].seoTitle));
+    for (const note of content.studio.filter(item => item.layout === 'studio')) {
+        const article = graph.find(item => item['@type'] === 'Article' && item.url === note.url);
+        assert.equal(article.author.name, 'Twiink');
+        assert.equal(article.articleBody, note.paragraphs.join('\n\n'));
+        if (!note.date) assert.ok(!('datePublished' in article));
+        for (const text of note.paragraphs) {
+            assert.ok(html.includes(text), text);
+            assert.ok(llms.includes(text), text);
+        }
+        for (const photo of note.photos) assert.ok(html.includes(photo.src));
+    }
     for (const project of content.projects.filter(item => item.details)) {
         for (const section of project.details.sections) {
             for (const text of [...section.paragraphs, ...section.entries.map(entry => entry.description)]) {

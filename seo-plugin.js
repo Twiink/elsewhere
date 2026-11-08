@@ -67,7 +67,8 @@ export function buildJsonLd({ site, projects, studio, awards, faq, profile }) {
             '@type': item.platform === 'youtube' ? 'VideoObject' : 'Article',
             name: item.seoTitle || item.title, headline: item.seoTitle || item.title,
             description: item.seoDescription || item.description, url: item.url,
-            datePublished: `${item.date}T12:00:00Z`,
+            ...(item.date ? { datePublished: `${item.date}T12:00:00Z` } : {}),
+            ...(item.paragraphs ? { articleBody: item.paragraphs.join('\n\n') } : {}),
             thumbnailUrl: absoluteUrl(item.frontTexture, site.url),
             author: contentAuthor(item, personId), inLanguage: 'zh-CN',
         })),
@@ -114,6 +115,10 @@ export function buildLlmsTxt({ site, projects, studio, awards, faq, profile }) {
         lines.push(`## ${title}`);
         for (const item of items) {
             lines.push(`- [${item.seoTitle || item.title}](${item.url}): ${item.seoDescription || item.description || ''}`);
+            lines.push(...(item.paragraphs || []));
+            for (const photo of item.photos || []) {
+                if (photo.label) lines.push(`- ${photo.label}：${photo.caption || photo.alt}`);
+            }
             for (const section of item.details?.sections || []) {
                 lines.push(`### ${section.title}`, ...section.paragraphs);
                 for (const entry of section.entries) lines.push(`- ${entry.title}：${entry.description}`);
@@ -126,6 +131,12 @@ export function buildLlmsTxt({ site, projects, studio, awards, faq, profile }) {
             `- 邮箱：[${site.contact.email}](mailto:${site.contact.email})`,
             `- GitHub：${site.githubUrl}`,
             `- 微信：${site.contact.wechatId}`, '');
+    }
+    if (site.resume?.url) lines.push('## 简历', `- [查看或下载简历 PDF](${site.resume.url})`, '');
+    if (site.studioChannels) {
+        lines.push(`## ${site.studioChannels.title}`, site.studioChannels.description,
+            `- [工作室 CSDN](${site.studioChannels.csdnUrl})`,
+            `- 微信视频号：${site.studioChannels.videoAccount}`, '');
     }
     lines.push('## 常见问题');
     for (const item of faq) lines.push(`- **${item.question}**`, `  ${item.answer}`);
@@ -149,6 +160,13 @@ function buildProjectBody(item) {
     }).join('');
 }
 
+function buildStudioBody(item) {
+    if (!item.paragraphs) return '';
+    const paragraphs = item.paragraphs.map(text => `<p>${escapeHtml(text)}</p>`).join('');
+    const photos = (item.photos || []).map(photo => `<figure><img src="${escapeHtml(photo.src)}" alt="${escapeHtml(photo.alt)}" width="${photo.width}" height="${photo.height}" loading="lazy">${photo.label ? `<figcaption>${escapeHtml(photo.label)}${photo.caption ? `：${escapeHtml(photo.caption)}` : ''}</figcaption>` : ''}</figure>`).join('');
+    return `${paragraphs}${photos}`;
+}
+
 // 将同一份内容输出为可访问的静态正文与搜索结构化数据。
 export function generateSeoHtml() {
     return {
@@ -163,6 +181,7 @@ export function generateSeoHtml() {
         transformIndexHtml(html) {
             const content = readContent();
             const { site, projects, studio, awards, faq, profile } = content;
+            const shareImage = site.shareImage;
             const sections = [
                 `<header><h1>${escapeHtml(site.siteTitle)}</h1><p>${escapeHtml(site.siteDescription)}</p></header>`,
                 `<section id="about"><h2>关于我</h2>${profile ? buildProfileHtml(profile) : `<p>${escapeHtml(site.aboutMe)}</p>`}</section>`,
@@ -170,11 +189,18 @@ export function generateSeoHtml() {
             const collections = [['projects', '精选项目', projects], ['studio', '工作室', studio]];
             if (!profile) collections.push(['awards', '奖项与证书', awards]);
             for (const [id, title, items] of collections) {
-                const entries = items.map(item => `<li><h3>${escapeHtml(item.seoTitle || item.title)}</h3><p>${escapeHtml(item.details ? item.description : item.seoDescription || item.description || '')}</p>${buildProjectBody(item)}<a href="${escapeHtml(item.url)}">查看详情</a></li>`).join('');
+                const entries = items.map(item => `<li><h3>${escapeHtml(item.seoTitle || item.title)}</h3><p>${escapeHtml(item.details ? item.description : item.seoDescription || item.description || '')}</p>${buildProjectBody(item)}${buildStudioBody(item)}<a href="${escapeHtml(item.url)}">查看详情</a></li>`).join('');
                 sections.push(`<section id="${id}"><h2>${title}</h2><ul>${entries}</ul></section>`);
             }
             if (site.contact) {
                 sections.push(`<section id="contact"><h2>联系我</h2><p>${escapeHtml(site.contact.description)}</p><p><a href="mailto:${escapeHtml(site.contact.email)}">${escapeHtml(site.contact.email)}</a></p><p><a href="${escapeHtml(site.githubUrl)}">GitHub</a></p><p>微信：${escapeHtml(site.contact.wechatId)}</p></section>`);
+            }
+            if (site.resume?.url) {
+                sections.push(`<section id="resume"><h2>${escapeHtml(site.resume.title)}</h2><p>${escapeHtml(site.resume.description)}</p><a href="${escapeHtml(site.resume.url)}" target="_blank" rel="noopener noreferrer">在线查看简历 PDF（新窗口）</a> <a href="${escapeHtml(site.resume.url)}" download="${escapeHtml(site.resume.downloadName)}">下载简历 PDF</a></section>`);
+            }
+            if (site.studioChannels) {
+                const channels = site.studioChannels;
+                sections.push(`<section id="studio-channels"><h2>${escapeHtml(channels.title)}</h2><p>${escapeHtml(channels.description)}</p><a href="${escapeHtml(channels.csdnUrl)}" target="_blank" rel="noopener noreferrer">工作室 CSDN（新窗口）</a><p>微信视频号：${escapeHtml(channels.videoAccount)}</p></section>`);
             }
             sections.push(`<section id="faq"><h2>常见问题</h2>${faq.map(item => `<article><h3>${escapeHtml(item.question)}</h3><p>${escapeHtml(item.answer)}</p></article>`).join('')}</section>`);
             const seoHtml = `<div id="seo-content" class="sr-only-seo">${sections.join('\n')}</div>`;
@@ -185,8 +211,13 @@ export function generateSeoHtml() {
             return html
                 .replace(/<meta name="author"[^>]*>/, `<meta name="author" content="${escapeHtml(site.nickname)}">`)
                 .replace(/<meta property="og:site_name"[^>]*>/, `<meta property="og:site_name" content="${escapeHtml(site.siteTitle)}">`)
-                .replace(/<meta property="og:image"[^>]*>/, `<meta property="og:image" content="${escapeHtml(absoluteUrl('/textures/twiink/avatar.png', site.url))}">`)
-                .replace(/<meta name="twitter:image"[^>]*>/, `<meta name="twitter:image" content="${escapeHtml(absoluteUrl('/textures/twiink/avatar.png', site.url))}">`)
+                .replace(/<meta property="og:image"[^>]*>/, `<meta property="og:image" content="${escapeHtml(absoluteUrl(shareImage.path, site.url))}">`)
+                .replace(/<meta property="og:image:width"[^>]*>/, `<meta property="og:image:width" content="${shareImage.width}">`)
+                .replace(/<meta property="og:image:height"[^>]*>/, `<meta property="og:image:height" content="${shareImage.height}">`)
+                .replace(/<meta property="og:image:type"[^>]*>/, `<meta property="og:image:type" content="${escapeHtml(shareImage.mimeType)}">`)
+                .replace(/<meta property="og:image:alt"[^>]*>/, `<meta property="og:image:alt" content="${escapeHtml(shareImage.alt)}">`)
+                .replace(/<meta name="twitter:image"[^>]*>/, `<meta name="twitter:image" content="${escapeHtml(absoluteUrl(shareImage.path, site.url))}">`)
+                .replace(/<meta name="twitter:image:alt"[^>]*>/, `<meta name="twitter:image:alt" content="${escapeHtml(shareImage.alt)}">`)
                 .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(site.siteTitle)}</title>`)
                 .replace(/<meta name="description"[^>]*>/, `<meta name="description" content="${escapeHtml(site.siteDescription)}">`)
                 .replace(/<meta property="og:title"[^>]*>/, `<meta property="og:title" content="${escapeHtml(site.siteTitle)}">`)

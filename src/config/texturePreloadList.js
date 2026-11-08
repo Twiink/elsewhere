@@ -85,6 +85,8 @@ export const CORRIDOR_TEXTURES = [
     '/textures/corridor/szafkaprzodgora.webp',
     '/textures/twiink/avatar.png',
     '/textures/corridor/rysuneknaobrazek3.webp',
+    '/content/corridor/bouquet-hands.webp',
+    '/content/corridor/hanfu-photo.webp',
     // DoorSection 附加资源。
     '/textures/corridor/strzalka.webp',
     '/textures/corridor/doors/door_back.webp',

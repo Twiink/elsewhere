@@ -77,9 +77,11 @@ function setup({ reduced = false } = {}) {
   return { links, units, document, window, media, frames, timers, notice, flush };
 }
 
-test('个人链接页提供站内导航与 GitHub 入口，作品集入口仅出现一次', () => {
+test('个人链接页提供站内导航、GitHub 与简历下载，作品集入口仅出现一次', () => {
   const anchors = [...html.matchAll(/<a\b([^>]+)>([\s\S]*?)<\/a>/g)];
-  assert.equal(anchors.length, 8);
+  assert.equal(anchors.length, 9);
+  const { resume } = JSON.parse(readFileSync(new URL('../src/data/content.json', import.meta.url))).site;
+  assert.ok(anchors.some(match => match[1].includes(`href="${resume.url}"`) && match[1].includes(`download="${resume.downloadName}"`)));
   assert.equal(anchors.filter(match => /href="\/"/.test(match[1])).length, 1);
   assert.equal(anchors.filter(match => /data-pending/.test(match[1])).length, 0);
   const urls = anchors.map(match => match[1].match(/href="(https:[^"]+)"/)?.[1]).filter(Boolean);
@@ -91,6 +93,11 @@ test('个人链接页提供站内导航与 GitHub 入口，作品集入口仅出
 });
 
 test('静态入口保持独立，使用本地中英文字体', () => {
+  const { site } = JSON.parse(readFileSync(new URL('../src/data/content.json', import.meta.url)));
+  const shareImageUrl = new URL(site.shareImage.path, `${site.url}/`).href;
+  assert.equal(html.match(/property="og:image" content="([^"]+)"/)?.[1], shareImageUrl);
+  assert.equal(html.match(/name="twitter:image" content="([^"]+)"/)?.[1], shareImageUrl);
+  assert.match(html, /<meta name="twitter:card" content="summary_large_image">/);
   assert.equal((html.match(/<script\b/g) || []).length, 1);
   assert.match(html, /src="\/start\/script.js" defer/);
   assert.doesNotMatch(html, /\/assets\/|modulepreload|<video\b/);

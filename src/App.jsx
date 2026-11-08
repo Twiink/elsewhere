@@ -13,6 +13,7 @@ import NavigationUI from './components/ui/NavigationUI';
 import GlobalOverlay from './components/ui/GlobalOverlay';
 import AboutProfile from './components/ui/AboutProfile';
 import ProjectDetails from './components/ui/ProjectDetails';
+import StudioNotes from './components/ui/StudioNotes';
 import ContactDetails from './components/ui/ContactDetails';
 import ScreenReaderOverlay from './components/ui/ScreenReaderOverlay';
 import { useDocumentMeta } from './hooks/useDocumentMeta';
@@ -208,6 +209,7 @@ function AppContent() {
               <GlobalOverlay />
               <AboutProfile />
               <ProjectDetails />
+              <StudioNotes />
               <ContactDetails />
               <PaperTransition />
               <ScreenReaderOverlay />

@@ -25,6 +25,14 @@
     dd > a { display: inline-flex; align-items: center; min-height: 44px; }
 }
 
+.contact-resume {
+    margin-bottom: 1.5rem;
+
+    .contact-resume-actions { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; }
+    .contact-resume-actions a { display: inline-flex; align-items: center; min-height: 44px; padding: 0.4rem 0.7rem; border: 1px solid var(--profile-rule); border-radius: 3px 6px 4px 5px; }
+    .contact-resume-actions a:hover { background: #e5e0d5; }
+}
+
 .contact-wechat {
     display: flex;
     flex-wrap: wrap;

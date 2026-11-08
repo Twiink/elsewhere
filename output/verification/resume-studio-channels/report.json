@@ -1,0 +1,12 @@
+{
+  "errors": [],
+  "broken": [],
+  "checks": [
+    "start: actual download uses configured filename and exact PDF bytes",
+    "PDF URL: HTTP 200, application/pdf, source bytes preserved",
+    "contact: resume view/download and studio CSDN/account; real clipboard copy",
+    "mobile contact: no horizontal overflow; denied copy selects full account and gives manual copy guidance",
+    "studio: shared channels appear below records and fit mobile viewport",
+    "about: resume PDF is available from personal introduction navigation"
+  ]
+}

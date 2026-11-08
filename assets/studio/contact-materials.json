@@ -1,0 +1,42 @@
+{
+  "project": "github.com-twiink-elsewhere",
+  "updatedAt": "2026-11-08",
+  "studioChannels": {
+    "owner": "Matrix 工作室",
+    "csdnUrl": "https://blog.csdn.net/matrix_studio?type=blog",
+    "wechatVideoAccount": "MatrixStudio996"
+  },
+  "resume": {
+    "source": "/home/xyz/obsidianlibrary/求职/01-简历/郑越-Agent全栈开发-261104.pdf",
+    "publicFile": "public/files/twiink-resume.pdf",
+    "downloadName": "Twiink-简历.pdf",
+    "pages": 2,
+    "bytes": 648689,
+    "sha256": "f2f6201daaa672be17be11366476485679654d9e34e4ba46ab45aa45879f6b3d",
+    "originalBytesPreserved": true
+  },
+  "implementation": [
+    "src/data/content.json 的 site.resume 与 site.studioChannels 是可编辑配置。",
+    "关于我提供 PDF 查看链接，联系我提供在线查看与下载，public/start/index.html 提供直接下载。",
+    "StudioChannels.jsx 在工作室阅读面板和联系方式中展示集体账号；复制失败时聚焦并选中完整视频号供手动复制。",
+    "工作室账号独立于个人 GitHub，SEO 与无障碍正文均已同步。"
+  ],
+  "verification": {
+    "contentChecksPassed": 23,
+    "productionBuild": "passed",
+    "targetedEslint": "passed",
+    "impeccableDetect": "no findings",
+    "browser": "PDF 返回 HTTP 200 和 application/pdf；实际下载文件名与字节正确；复制成功与拒绝后的选中回退通过；手机无横向溢出，页面无运行错误或资源 404。",
+    "report": "output/verification/resume-studio-channels/report.json"
+  },
+  "delivery": {
+    "localIntegration": "complete",
+    "gitCommitted": false,
+    "deployed": false
+  },
+  "memorySync": {
+    "status": "submitted_for_extraction",
+    "submittedAt": "2026-11-08",
+    "result": "OpenViking 已受理补交的更新结论，等待服务端抽取。"
+  }
+}

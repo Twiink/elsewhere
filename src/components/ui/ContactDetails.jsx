@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useScene } from '../../context/SceneContext';
-import { contactInfo, siteInfo, frequentlyAskedQuestions } from '../../data/content';
+import { contactInfo, siteInfo, resumeInfo, frequentlyAskedQuestions } from '../../data/content';
+import StudioChannels from './StudioChannels';
 import '../../styles/AboutProfile.scss';
 import '../../styles/ContactDetails.scss';
 
@@ -74,6 +75,16 @@ export default function ContactDetails() {
                         <ul className="profile-keywords" aria-label="欢迎这些联系">
                             {contactInfo.topics.map(topic => <li key={topic}>{topic}</li>)}
                         </ul>
+                        {resumeInfo?.url && (
+                            <section className="contact-resume" aria-labelledby="contact-resume-title">
+                                <h3 id="contact-resume-title">{resumeInfo.title}</h3>
+                                <p>{resumeInfo.description}</p>
+                                <div className="contact-resume-actions">
+                                    <a href={resumeInfo.url} target="_blank" rel="noopener noreferrer">在线查看 PDF（新窗口）</a>
+                                    <a href={resumeInfo.url} download={resumeInfo.downloadName}>下载简历 PDF</a>
+                                </div>
+                            </section>
+                        )}
                         <dl className="contact-addresses">
                             <div>
                                 <dt>邮箱</dt>
@@ -99,6 +110,7 @@ export default function ContactDetails() {
                                 ? '也可以点击海面上的「写留言」，给我留一封信。'
                                 : '站内留言入口已保留，暂时请通过邮箱或微信联系我。'}</p>
                         )}
+                        <StudioChannels />
                         <section className="contact-faq" aria-labelledby="contact-faq-title">
                             <h3 id="contact-faq-title">随便聊聊</h3>
                             {frequentlyAskedQuestions.map(item => (

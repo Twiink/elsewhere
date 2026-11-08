@@ -29,7 +29,7 @@ const ROOM_META = {
     studio: {
         path: '/studio',
         title: `工作室 | ${siteInfo.siteTitle}`,
-        description: "在漂浮的显示器之间，看看文章、视频和随手记录。",
+        description: "在漂浮的显示器之间，翻翻出门走走、一起玩游戏和画人物的小记录。",
     },
     contact: {
         path: '/contact',

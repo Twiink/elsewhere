@@ -1,0 +1,33 @@
+{
+  "collection": "character-making",
+  "status": "integrated",
+  "assets": [
+    {
+      "label": "古风照片",
+      "source": ".openviking/media/twiink/reference-photo.jpg",
+      "path": "public/content/studio/character-making/01-photo.jpg",
+      "width": 1280,
+      "height": 1920,
+      "bytes": 181492,
+      "sha256": "2f2b193cd2f5f1d31653bf66be129b7b9d7ecbef857d0438501a66e3396cdb87"
+    },
+    {
+      "label": "动漫形象",
+      "source": ".openviking/media/twiink/reference-anime.jpg",
+      "path": "public/content/studio/character-making/02-anime.jpg",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 209629,
+      "sha256": "5e11c0d43a4c759e02c9691db27920fc7ada87b2049017815fc7c2f66e941e9d"
+    },
+    {
+      "label": "黑白线稿",
+      "source": "public/textures/twiink/start-bouquet.png",
+      "path": "public/textures/twiink/start-bouquet.png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1394646,
+      "sha256": "5f7e9defd94cde48f7c1a96c5294e01323af59edc1b628d11082ef141a1ac5c4"
+    }
+  ]
+}

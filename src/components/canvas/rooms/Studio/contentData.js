@@ -1,5 +1,17 @@
 // 工作室各内容平台的颜色、图标与设备外形。
 export const PLATFORM_CONFIG = {
+    life: {
+        color: '#5b6959',
+        accentColor: '#465342',
+        label: '生活存档',
+        shape: 'monitor',
+    },
+    making: {
+        color: '#806653',
+        accentColor: '#63503f',
+        label: '人物形象制作记录',
+        shape: 'monitor',
+    },
     youtube: {
         color: '#FF0000',
         accentColor: '#cc0000',

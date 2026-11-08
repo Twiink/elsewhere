@@ -144,7 +144,16 @@ JSON 使用英文双引号和英文逗号，不支持注释或最后一项后的
 
 - `VITE_WEB3FORMS_KEY`：绑定收件邮箱的 Web3Forms 配置，放在本地 `.env` 或部署平台环境变量中。允许提交的域名来自 `site.url`；未配置、预览域名或发送被拦截时均明确提示，只有服务确认接收才显示成功。
 - `VITE_POSTHOG_KEY`、`VITE_POSTHOG_HOST`：PostHog 访问统计配置。
-- 工作室示例保留原作者的发布链接，后续按素材替换。联系房间已使用 Twiink 的联系方式；`/start` 提供站内导航、GitHub 入口与 Twiink 人物插画。
+- 工作室已换成四篇生活存档与一篇人物形象制作记录。编辑 `src/data/content.json` 的 `studio` 数组即可修改标题、`paragraphs` 正文和 `photos` 图片；每张图的 `alt` 是图片说明，人物制作过程另有 `label` 和 `caption`。没有提供日期的记录不填写 `date`。点击场景中的屏幕或「翻翻生活与创作」可在站内阅读，也可使用 `/studio?note=记录的id` 直接打开对应记录。
+- 生活照片的原图与素材清单保存在 `assets/studio/life-notes/`，页面图片位于 `public/content/studio/`，人物黑白线稿沿用 `public/textures/twiink/start-bouquet.png`。联系房间已使用 Twiink 的联系方式；`/start` 提供站内导航、GitHub 入口与 Twiink 人物插画。
+
+工作室的 CSDN 与微信视频号在 `src/data/content.json` 的 `site.studioChannels` 中编辑，展示在工作室阅读面板底部和联系方式中。视频号支持复制；浏览器不允许自动复制时，会选中账号，方便手动复制。这两项属于 Matrix 工作室。
+
+简历 PDF 保存在 `public/files/twiink-resume.pdf`，入口位于「关于我」「联系我」与独立链接页 `/start`。「联系我」同时支持新窗口查看和下载。后续直接替换这一个 PDF 即可更新简历；说明、路径和下载文件名在 `site.resume` 中编辑。若更改文件路径或下载文件名，也要同步 `/start/index.html` 中的静态下载链接。
+
+走廊的两幅竖版照片位于 `public/content/corridor/`：右侧 `frame-3` 展示花束与牵手照，左侧 `frame-4` 展示红灯笼前的古风合照。原图与处理记录保存在 `assets/corridor/`。图片按原始比例展示，桌面端点击查看时会自动适配视口高度；路径和画框尺寸在 `src/components/canvas/corridor/CorridorDecorations.jsx` 的 `frames` 中编辑，新增图片时同步 `src/config/texturePreloadList.js`。
+
+分享封面使用 `public/content/social/twiink-share-cover-v1.jpg`，为已确认的淡彩古风横版图片，尺寸 1200×630。主站的 Open Graph 与 Twitter 分享信息由 `site.shareImage` 和 `seo-plugin.js` 输出；独立链接页 `/start` 的同类标签位于 `public/start/index.html`。更换图片路径、尺寸或说明时，同步这两处配置。原始生成图和完整提示词保存在 `output/imagegen/twiink-share-cover-v1.png` 及同名 JSON。
 
 这些配置不影响本地 JSON 的读取，也不提供内容管理功能。凭据和私人配置不要写入 Git。
 

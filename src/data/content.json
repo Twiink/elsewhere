@@ -10,6 +10,25 @@
     "tiktokUrl": "",
     "xUrl": "",
     "youtubeUrl": "",
+    "shareImage": {
+      "path": "/content/social/twiink-share-cover-v1.jpg",
+      "width": 1200,
+      "height": 630,
+      "mimeType": "image/jpeg",
+      "alt": "Twiink's Space：奶白纸底上的淡彩古风捧花人物，配网站名与一句话介绍。"
+    },
+    "resume": {
+      "title": "我的简历",
+      "description": "想更快了解我做过什么，可以先看看这份简历。",
+      "url": "/files/twiink-resume.pdf",
+      "downloadName": "Twiink-简历.pdf"
+    },
+    "studioChannels": {
+      "title": "Matrix 工作室",
+      "description": "也欢迎来工作室串个门。",
+      "csdnUrl": "https://blog.csdn.net/matrix_studio?type=blog",
+      "videoAccount": "MatrixStudio996"
+    },
     "contact": {
       "title": "有空，来聊聊",
       "description": "欢迎技术交流、项目合作，也欢迎聊聊实习和工作机会。",
@@ -733,161 +752,157 @@
   ],
   "studio": [
     {
-      "id": "8d7c3ac8-13d1-4b54-8eee-0278d5ed964c",
-      "title": "ITom 手绘笔记本：交互组件集发布",
-      "description": "ITom 手绘笔记本正式发布，精选采用 React 和 GSAP 实现的手绘动态交互组件。",
-      "seoTitle": "ITom 手绘交互组件集发布：LinkedIn 与 X 分享",
-      "seoDescription": "Tomasz Szmajda（ITom）发布 ITom 手绘笔记本，一个采用 React 和 GSAP 制作的定制手绘动态交互组件集。帖子介绍：在多个项目中反复重建相似界面动画，促成了这个具有标志性速写美学、可复用的开放组件库。内容分享于 LinkedIn 和 X（Twitter）。",
-      "platform": "linkedin",
+      "id": "donglingshan-sunrise",
+      "title": "为了云海，说走就走",
+      "shortTitle": "东灵山",
+      "description": "中午看到有人说东灵山有云海，立马买票，晚上就到了山脚下。",
+      "seoTitle": "为了云海，说走就走｜Twiink 的生活存档",
+      "seoDescription": "中午看到有人说东灵山有云海，立马买票，晚上就到了山脚下。 在山上挨冻挨到早上，总算等到了日出。出发的时候有多痛快，等日出的时候就有多冷。这张合照，给这趟说走就走的旅行留个纪念。",
+      "layout": "studio",
+      "platform": "life",
       "device": "monitor",
-      "url": "https://www.linkedin.com/posts/itomdev_i-kept-rebuilding-the-same-ui-animations-activity-7472981452289163264-gANX",
-      "date": "2026-07-18",
-      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
-      "authorName": "Tomasz Szmajda"
+      "url": "/studio?note=donglingshan-sunrise",
+      "frontTexture": "/content/studio/covers/donglingshan-sunrise-ink.webp",
+      "paintedFrontTexture": "/content/studio/covers/donglingshan-sunrise-color.webp",
+      "authorName": "Twiink",
+      "paragraphs": [
+        "中午看到有人说东灵山有云海，立马买票，晚上就到了山脚下。",
+        "在山上挨冻挨到早上，总算等到了日出。出发的时候有多痛快，等日出的时候就有多冷。这张合照，给这趟说走就走的旅行留个纪念。"
+      ],
+      "photos": [
+        {
+          "src": "/content/studio/life-notes/01-donglingshan-sunrise.jpg",
+          "alt": "东灵山日出时的双人合照，远处是山脊和初升的太阳",
+          "width": 1706,
+          "height": 1279
+        }
+      ]
     },
     {
-      "id": "88522880-608b-4cbd-ac08-e12e99eb46d0",
-      "title": "我的 TikTok",
-      "description": "ITom 的 TikTok 频道，分享创意网页开发、优秀网站案例与代码实验短视频。",
-      "seoTitle": "ITom 的 TikTok：创意编程与网页灵感",
-      "seoDescription": "在 TikTok 关注 Tomasz Szmajda（ITom）的 @itomdev，观看短视频：展示互联网上出色的网站、创意编程实验及交互前端开发幕后。为网页设计爱好者带来节奏明快、直观有趣的内容。",
-      "platform": "tiktok",
+      "id": "huashan-finish",
+      "title": "华山的结算画面",
+      "shortTitle": "华山",
+      "description": "爬完华山，走下来之后，在牌坊前拍了这张照。给这趟爬山留个凭证：华山，通关！",
+      "seoTitle": "华山的结算画面｜Twiink 的生活存档",
+      "seoDescription": "爬完华山，走下来之后，在牌坊前拍了这张照。给这趟爬山留个凭证：华山，通关！",
+      "layout": "studio",
+      "platform": "life",
       "device": "phone",
-      "url": "https://www.tiktok.com/@itomdev",
-      "date": "2026-07-18",
-      "frontTexture": "/content/c8ad8f3e552d4151cb1b46618f8cad431316953f-1024x2048.webp",
-      "paintedFrontTexture": "/content/cff3658c47cc85a7ad676f540d26a8e6a0754c3c-512x1024.webp",
-      "authorName": "Tomasz Szmajda"
+      "url": "/studio?note=huashan-finish",
+      "frontTexture": "/content/studio/covers/huashan-finish-ink.webp",
+      "paintedFrontTexture": "/content/studio/covers/huashan-finish-color.webp",
+      "authorName": "Twiink",
+      "paragraphs": [
+        "爬完华山，走下来之后，在牌坊前拍了这张照。给这趟爬山留个凭证：华山，通关！"
+      ],
+      "photos": [
+        {
+          "src": "/content/studio/life-notes/02-huashan-finish.jpg",
+          "alt": "爬完华山下山后，在山脚牌坊前拍摄的留念照",
+          "width": 1279,
+          "height": 1706
+        }
+      ]
     },
     {
-      "id": "5479ed60-479d-446c-b643-1681e58b4e0d",
-      "title": "我的 Instagram",
-      "description": "在 Instagram 关注 ITom，了解创意网页项目幕后、网站灵感和短视频内容。",
-      "seoTitle": "ITom 的 Instagram：创意开发幕后",
-      "seoDescription": "在 Instagram 关注 Tomasz Szmajda（ITom）的 @itom.dev，观看创意开发短视频、网页设计灵感短片、获奖项目的幕后片段与艺术实验。ITom 会分享启发自己创意前端开发工作的网站和互动体验。",
-      "platform": "instagram",
-      "device": "phone",
-      "url": "https://www.instagram.com/itom.dev/",
-      "date": "2026-07-18",
-      "views": "999",
-      "frontTexture": "/content/c8ad8f3e552d4151cb1b46618f8cad431316953f-1024x2048.webp",
-      "paintedFrontTexture": "/content/cff3658c47cc85a7ad676f540d26a8e6a0754c3c-512x1024.webp",
-      "authorName": "Tomasz Szmajda"
-    },
-    {
-      "id": "1ee8bd4b-fa5d-49d5-9803-2ad3de7ec1ba",
-      "title": "我的 YouTube",
-      "description": "ITom 的 YouTube 频道，分享创意网页开发长视频、完整项目讲解和编程实录。",
-      "seoTitle": "ITom 的 YouTube 频道：创意网页开发视频",
-      "seoDescription": "Tomasz Szmajda 的 ITom YouTube 频道提供较长篇幅的创意网页开发内容，包括完整项目讲解、长时间编程实录、网站案例合集，以及用 React、GSAP、Three.js 和自定义着色器制作互动网站的幕后过程。订阅频道，获取深入的创意前端内容。",
-      "platform": "youtube",
-      "device": "tv",
-      "url": "https://www.youtube.com/@itomdev",
-      "date": "2026-07-18",
-      "frontTexture": "/content/0dca95901d02de9dbba8c0c7da5fffface9957b3-2048x1024.webp",
-      "paintedFrontTexture": "/content/097f06a47d4759e495af42f03528c82873e4c623-1720x860.webp",
-      "authorName": "Tomasz Szmajda"
-    },
-    {
-      "id": "61004a68-690e-4b1b-9a28-5c95f3c49d30",
-      "title": "斯切尔采居民成为世界顶尖网站创作者",
-      "description": "波兰地方新闻报道 Tomasz Szmajda 获得国际网页设计奖项，题为《斯切尔采奥波莱居民成为世界顶尖网站创作者》。",
-      "seoTitle": "波兰媒体报道：ITom 获誉世界顶尖网站创作者",
-      "seoDescription": "波兰地方媒体 Strzelce360.pl 报道了来自斯切尔采奥波莱的计算机科学专业学生 Tomasz Szmajda，如何以世界顶尖网站创作者之一的身份获得国际认可。文章重点介绍他在 itomdev.com 的手绘交互作品集获得 FWA 每日最佳网站，以及受到主要行业媒体关注的经历。这是一位创意开发者从家乡走向全球舞台的故事。",
-      "platform": "blog",
+      "id": "via-ferrata",
+      "title": "飞拉达结束，合个影",
+      "shortTitle": "飞拉达",
+      "description": "和周周玩完飞拉达，拿着证书拍张照。一个用证书挡脸，一个负责举手机，背后就是山崖。",
+      "seoTitle": "飞拉达结束，合个影｜Twiink 的生活存档",
+      "seoDescription": "和周周玩完飞拉达，拿着证书拍张照。一个用证书挡脸，一个负责举手机，背后就是山崖。 挑战完成，合照也存好了。",
+      "layout": "studio",
+      "platform": "life",
       "device": "monitor",
-      "url": "https://www.strzelce360.pl/artykul/11843,strzelczanin-najlepszym-tworca-stron-internetowych-na-swiecie",
-      "date": "2026-07-12",
-      "readTime": "4 分钟",
-      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
-      "authorName": "Tomasz Szmajda"
+      "url": "/studio?note=via-ferrata",
+      "frontTexture": "/content/studio/covers/via-ferrata-ink.webp",
+      "paintedFrontTexture": "/content/studio/covers/via-ferrata-color.webp",
+      "authorName": "Twiink",
+      "paragraphs": [
+        "和周周玩完飞拉达，拿着证书拍张照。一个用证书挡脸，一个负责举手机，背后就是山崖。",
+        "挑战完成，合照也存好了。"
+      ],
+      "photos": [
+        {
+          "src": "/content/studio/life-notes/03-via-ferrata.jpg",
+          "alt": "和周周体验飞拉达后，拿着证书在山崖边合影",
+          "width": 1706,
+          "height": 1279
+        }
+      ]
     },
     {
-      "id": "a491f10e-b9e6-489b-a4e0-a62950a696e3",
-      "title": "Google 反重力 2.0：AI 互动实验",
-      "description": "重新演绎经典 Google 反重力彩蛋，结合 AI 交互的创意编程实验。",
-      "seoTitle": "Google 反重力 2.0：ITom 的 AI 创意实验",
-      "seoDescription": "Tomasz Szmajda（ITom）的创意编程实验，以现代 AI 交互与创意前端技术重新演绎经典 Google 反重力彩蛋。这个有趣的业余项目展示了创意开发者如何探索传统作品集以外的实验性网页概念。内容分享于 LinkedIn 和 X（Twitter）。",
-      "platform": "linkedin",
+      "id": "it-takes-two",
+      "title": "两个手柄的通关合照",
+      "shortTitle": "双人成行",
+      "description": "和周周把《双人成行》打通关了。屏幕里放着片尾字幕，屏幕外把两个手柄举起来，也拍一张结算照。",
+      "seoTitle": "两个手柄的通关合照｜Twiink 的生活存档",
+      "seoDescription": "和周周把《双人成行》打通关了。屏幕里放着片尾字幕，屏幕外把两个手柄举起来，也拍一张结算照。 这一局存档，下次玩什么，回头再慢慢挑。",
+      "layout": "studio",
+      "platform": "life",
       "device": "monitor",
-      "url": "https://www.linkedin.com/posts/itomdev_ai-creativecoding-activity-7467908125593976832-o9HE",
-      "date": "2026-07-04",
-      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
-      "authorName": "Tomasz Szmajda"
+      "url": "/studio?note=it-takes-two",
+      "frontTexture": "/content/studio/covers/it-takes-two-ink.webp",
+      "paintedFrontTexture": "/content/studio/covers/it-takes-two-color.webp",
+      "authorName": "Twiink",
+      "paragraphs": [
+        "和周周把《双人成行》打通关了。屏幕里放着片尾字幕，屏幕外把两个手柄举起来，也拍一张结算照。",
+        "这一局存档，下次玩什么，回头再慢慢挑。"
+      ],
+      "photos": [
+        {
+          "src": "/content/studio/life-notes/04-it-takes-two.jpg",
+          "alt": "和周周通关《双人成行》后，在片尾字幕前举起两个手柄留念",
+          "width": 1706,
+          "height": 1279
+        }
+      ]
     },
     {
-      "id": "371407e3-2663-4721-a212-c28b3449f9b9",
-      "title": "67 挑战：超过 100 人现场体验",
-      "description": "记录 67 挑战在大学科学节首次亮相：孩子们排队挑战，成年人惊讶于游戏竟然可以直接在浏览器里运行。",
-      "seoTitle": "67 挑战科学节首秀：ITom 在 LinkedIn 与 X 的分享",
-      "seoDescription": "Tomasz Szmajda（ITom）分享摄像头控制的浏览器游戏“67 挑战”在奥波莱大学科学节首次亮相的经历。超过 100 名参与者排队游玩，在 Chrome 中完成热门“67”动作，由 MediaPipe 实时追踪。孩子们不断冲击更快成绩，家长也被拉来参与，成年人反复惊叹：“这只是一个网站？”项目采用 React 19、运行于 GPU 的 MediaPipe WASM、Firebase 排行榜和自动生成的 PDF 证书。",
-      "platform": "linkedin",
+      "id": "character-making",
+      "title": "给网站安排一个小小的自己",
+      "shortTitle": "人物制作",
+      "description": "从一张古风照片开始，变成动漫形象，再变成网站里的黑白线稿。",
+      "seoTitle": "给网站安排一个小小的自己｜人物形象制作记录",
+      "seoDescription": "从古风照片、动漫形象到黑白线稿，记下 Twiink 网站人物形象的制作过程。",
+      "layout": "studio",
+      "platform": "making",
       "device": "monitor",
-      "url": "https://www.linkedin.com/posts/itomdev_100-people-played-a-game-i-coded-using-activity-7462834233238097920-Eg-i",
-      "date": "2026-06-20",
-      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
-      "authorName": "Tomasz Szmajda"
-    },
-    {
-      "id": "1b5dd93f-5177-40ef-a455-14cdf44d152c",
-      "title": "勾勒不可能：Codrops 专题",
-      "description": "Codrops 深度文章：介绍如何仅用平面几何、手绘贴图和自定义 GLSL 着色器，搭建一个没有独立 3D 模型的作品集。",
-      "seoTitle": "Codrops 专题：不使用独立 3D 模型的 ITom 作品集",
-      "seoDescription": "Tomasz Szmajda（ITom）在 Codrops（tympanus.net）发表专题文章《勾勒不可能：不使用任何独立 3D 模型的三维作品集》。文章深入解析：完全不懂 Blender，如何反而促成一个获奖互动走廊的诞生。整个项目在 React Three Fiber 中仅用平面几何、手绘铅笔贴图和自定义 GLSL 着色器上色显现效果搭建。文章发表于全球最受尊重的创意前端开发媒体之一。",
-      "platform": "codrops",
-      "device": "monitor",
-      "url": "https://tympanus.net/codrops/2026/06/11/sketching-the-impossible-a-3d-portfolio-built-without-a-single-3d-model/",
-      "date": "2026-06-11",
-      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
-      "authorName": "Tomasz Szmajda"
-    },
-    {
-      "id": "7ef0eb6f-fe9a-45a0-b75c-8d4c6798b05e",
-      "title": "Adam & Ewa 网站发布",
-      "description": "精品摄影网站 Adam & Ewa 正式发布，展示流畅的 GSAP 动画、散落式画廊和可容纳 1000 张照片的虚拟化方案。",
-      "seoTitle": "Adam & Ewa 网站发布：ITom 在 LinkedIn 与 X 的分享",
-      "seoDescription": "Tomasz Szmajda（ITom）发布精品婚礼摄影网站 Adam & Ewa 的上线公告。帖子展示定制 React 实现、GSAP ScrollTrigger 动画、FLIP 技术灯箱转场，以及能够以每秒 60 帧处理多达 1000 张高清照片的自定义 DOM 虚拟化系统。内容分享于 LinkedIn 和 X（Twitter）。",
-      "platform": "linkedin",
-      "device": "monitor",
-      "url": "https://www.linkedin.com/posts/itomdev_webdesign-gsap-frontend-activity-7455173978056224768-dyhz",
-      "date": "2026-05-15",
-      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
-      "authorName": "Tomasz Szmajda"
-    },
-    {
-      "id": "47eeb34b-2bcb-4d58-a785-2f633603cd21",
-      "title": "WebGPU 展示：纸张撕裂与手绘走廊",
-      "description": "ITom 作品集入选 WebGPU.com，专题题为《一张撕开的纸、一条手绘走廊，以及自己完成上色的速写》。",
-      "seoTitle": "WebGPU.com 展示：ITom 纸张撕裂作品集（2026）",
-      "seoDescription": "ITom 作品集入选领先的 WebGL 与 WebGPU 社区展示平台 WebGPU.com。文章题为《一张撕开的纸、一条手绘走廊，以及自己完成上色的速写》，介绍项目的独特方式：纸张撕开后，访客进入手绘走廊，走近铅笔速写画框时，画框会自动上色。相关技术标签包括 WebGL、Three.js、GLSL、GSAP、React Three Fiber 和卡通着色。",
-      "platform": "blog",
-      "device": "monitor",
-      "url": "https://www.webgpu.com/showcase/itom-portfolio-paper-tear-corridor/",
-      "date": "2026-04-13",
-      "readTime": "3 分钟",
-      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
-      "authorName": "Tomasz Szmajda"
-    },
-    {
-      "id": "b5bc3c4d-bca0-4e2c-9988-76ece381397d",
-      "title": "个人作品集正式上线",
-      "description": "ITom 作品集上线公告，分享于 LinkedIn 和 X。",
-      "seoTitle": "ITom 个人作品集上线公告",
-      "seoDescription": "Tomasz Szmajda（ITom）最初在 LinkedIn 和 X（Twitter）发布的上线公告，分享位于 itomdev.com 的手绘交互作品集。帖子介绍可漫游的 3D 走廊、手绘贴图与自定义着色器效果；该项目随后获得 FWA 每日最佳网站、Awwwards 荣誉认可和 CSSDA 特别嘉奖。",
-      "platform": "linkedin",
-      "device": "monitor",
-      "url": "https://www.linkedin.com/posts/itomdev_its-finally-live-i-just-launched-my-new-activity-7441409690342825984-Kgbk",
-      "date": "2026-04-01",
-      "frontTexture": "/content/f891ca7523f021027cc7b109e81ba3ecc5f5a1b0-1024x512.webp",
-      "paintedFrontTexture": "/content/85434a6feba56b393f5872e16c815e2fce83066d-2048x1024.webp",
-      "authorName": "Tomasz Szmajda"
+      "url": "/studio?note=character-making",
+      "frontTexture": "/content/studio/covers/character-making-ink.webp",
+      "paintedFrontTexture": "/content/studio/covers/character-making-color.webp",
+      "authorName": "Twiink",
+      "process": true,
+      "paragraphs": [
+        "想给这个小空间安排一个自己的形象，就从一张古风照片开始。花花的发饰、捧在手里的花，还有那身衣裙，都想一起留下来。",
+        "先变成动漫形象，再换成黑白线稿。画里的自己慢慢和网站的手绘风格凑到了一起，现在就留在这里，替我跟来串门的人打个招呼。"
+      ],
+      "photos": [
+        {
+          "src": "/content/studio/character-making/01-photo.jpg",
+          "alt": "人物形象的原始古风照片，花饰发髻、粉绿衣裙，手里捧着花束",
+          "label": "古风照片",
+          "caption": "最开始是这张照片，发饰、衣裙和手里的花，都是后面画人物时保留下来的小细节。",
+          "width": 1280,
+          "height": 1920
+        },
+        {
+          "src": "/content/studio/character-making/02-anime.jpg",
+          "alt": "以古风照片为参考的动漫形象，保留花饰、长发、衣裙和捧花",
+          "label": "动漫形象",
+          "caption": "把照片里的自己变成动漫形象，还是熟悉的花饰和捧花，只是换了一种画法。",
+          "width": 1024,
+          "height": 1536
+        },
+        {
+          "src": "/textures/twiink/start-bouquet.png",
+          "alt": "网站使用的全身黑白人物线稿，保留古风发饰、捧花与衣裙",
+          "label": "黑白线稿",
+          "caption": "再把颜色收起来，留下黑白线条，放进网站的手绘小世界里。",
+          "width": 1024,
+          "height": 1536
+        }
+      ]
     }
   ],
   "awards": [

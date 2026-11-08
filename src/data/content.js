@@ -6,6 +6,8 @@ import { withProfile } from './profile.js';
 export const personalProfile = profile;
 export const siteInfo = withProfile(content, profile).site;
 export const contactInfo = content.site.contact;
+export const resumeInfo = content.site.resume;
+export const studioChannels = content.site.studioChannels;
 export const galleryProjects = content.projects;
 export const studioContent = content.studio;
 export const awardCertificates = content.awards;
