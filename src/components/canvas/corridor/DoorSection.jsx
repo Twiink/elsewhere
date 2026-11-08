@@ -42,7 +42,7 @@ const DOOR_ALIGN_X = 1.2;
 // 门纹理映射：标签对应纹理文件。
 const DOOR_TEXTURES = {
     "作品画廊": '/textures/corridor/doors/drzwiprojekty.webp',
-    "内容工作室": '/textures/corridor/doors/drzwisocial.webp',
+    "生活手记": '/textures/corridor/doors/life-notes-ink-v1.webp',
     "关于我": '/textures/corridor/doors/drzwiabout.webp',
     "联系我": '/textures/corridor/doors/drzwikontakt.webp',
 };
@@ -50,7 +50,7 @@ const DOOR_TEXTURES = {
 // 悬停时用笔刷显现的彩色版本。
 const DOOR_PAINTED_TEXTURES = {
     "作品画廊": '/textures/corridor/doors/drzwiprojekty_painted.webp',
-    "内容工作室": '/textures/corridor/doors/drzwisocial_painted.webp',
+    "生活手记": '/textures/corridor/doors/life-notes-color-v1.webp',
     "关于我": '/textures/corridor/doors/drzwiabout_painted.webp',
     "联系我": '/textures/corridor/doors/drzwikontakt_painted.webp',
 };
@@ -124,7 +124,7 @@ const DoorSection = ({
 
         // 兼容旧代码的回退。
         if (label === "作品画廊") return 'gallery';
-        if (label === "内容工作室") return 'studio';
+        if (label === "生活手记") return 'studio';
         if (label === "关于我") return 'about';
         if (label === "联系我") return 'contact';
         return null;
@@ -251,7 +251,7 @@ const DoorSection = ({
     }, [baseboardTexture]);
 
     // 门尺寸按原始纹理宽高比计算，约为 0.376。
-    const doorRatio = label === "内容工作室" ? 0.388 : 0.376;
+    const doorRatio = label === "生活手记" ? 0.388 : 0.376;
     const doorHeight = 2.5;
     const doorWidth = doorHeight * doorRatio * 1.12;
 
@@ -1093,7 +1093,7 @@ const DoorSection = ({
                                 </Text>
                             </group>
                         )}
-                        {label === "内容工作室" && (
+                        {label === "生活手记" && (
                             <group position={[0, 0, 0.01]}>
                                 <Text
                                     font="/fonts/LXGWWenKaiLite-Regular.ttf"
@@ -1103,7 +1103,7 @@ const DoorSection = ({
                                     anchorY="bottom"
                                     position={[0, -0.02, 0]}
                                 >
-                                    我的
+                                    生活
                                 </Text>
                                 <Text
                                     font="/fonts/LXGWWenKaiLite-Regular.ttf"
@@ -1113,7 +1113,7 @@ const DoorSection = ({
                                     anchorY="top"
                                     position={[0, +0.03, 0]}
                                 >
-                                    工作室
+                                    手记
                                 </Text>
                             </group>
                         )}
@@ -1182,7 +1182,7 @@ const DoorSection = ({
                         <mesh
                             ref={doorPaintedRef}
                             position={[doorMeshX, -0.2, -0.001]}
-                            scale={[(side === 'right' && label !== "内容工作室") ? -1 : 1, 1, 1]}
+                            scale={[(side === 'right' && label !== "生活手记") ? -1 : 1, 1, 1]}
                         >
                             <planeGeometry args={[doorWidth, doorHeight]} />
                             <meshBasicMaterial color="#e0e0e0"
@@ -1196,7 +1196,7 @@ const DoorSection = ({
                         {/* 前方速写叠加层通过笔刷丢弃露出底层彩色图。 */}
                         <mesh
                             position={[doorMeshX, -0.2, 0]}
-                            scale={[(side === 'right' && label !== "内容工作室") ? -1 : 1, 1, 1]}
+                            scale={[(side === 'right' && label !== "生活手记") ? -1 : 1, 1, 1]}
                         >
                             <planeGeometry args={[doorWidth, doorHeight]} />
                             <revealMaterial color="#e0e0e0"

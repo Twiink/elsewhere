@@ -1,6 +1,6 @@
 # Twiink's Space：项目说明
 
-本项目是 React 19 + React Three Fiber 的沉浸式三维作品集。入口连接无限走廊，左右门通往作品画廊、内容工作室、关于我和联系我。视觉以手绘线条、纸张和速写纹理为主，交互时可显现彩色层。
+本项目是 React 19 + React Three Fiber 的沉浸式三维作品集。入口连接无限走廊，左右门通往作品画廊、生活手记、关于我和联系我。视觉以手绘线条、纸张和速写纹理为主，交互时可显现彩色层。
 
 ## 当前内容架构
 
@@ -8,8 +8,10 @@
 - `content.original.json` 是原始已发布响应的只读参考备份，不导入运行代码。
 - 内容图片保存在 `public/content/`。场景与装饰纹理保存在 `public/textures/`。
 - 第一批个人身份已接入：昵称 Twiink，网站名 Twiink's Space；介绍与网站用途来自用户确认的文案。入口、走廊和关于我使用 `public/textures/twiink/` 下的黑白人物，宽高比取纹理实际尺寸。原作者的九帧人物动画已换成 Twiink 挥手姿势与轻微摆动。
-- 网站地址为用户提供的 `http://space.twiink.cn`，GitHub 主页和联系资料位于 `content.json` 的 `site`；「关于我」读取 `profile.json`；画廊已接入「泡芙大作战 PuffWar 乐园」「无界宇宙 Infinite Cosmos」「SecKnow AI 教育平台」「RAG 中台 RAG-Center」和「HarnessPRD 智能需求文档平台」五个个人项目。联系房间已接入邮箱、GitHub、微信及站内留言，六条生活化 FAQ 位于联系纸页的「随便聊聊」中；工作室后续替换。示例内容用 `authorName` 标注原作者，搜索数据不将其归为 Twiink 的作品。
-- 当前保留站点信息 1 份、画廊项目 5 个（均为个人项目）、工作室内容 11 条、示例证书 16 张和个人 FAQ 6 条；个人荣誉来自 `profile.json`。
+- 入口双门的技术贴纸与 `profile.json` 中的12项技术一致：左侧 TypeScript、Vue、React、Python、Django、FastAPI，右侧 Java、Spring Boot、Docker、RAG、LangChain、LangGraph。发布贴图为 `public/textures/doors/twiink-entry-{left,right}-{ink,color}-v1.webp`，提示词与素材清单位于 `assets/entrance/door-textures.json`；入口组件和预加载清单共用黑白版，桌面端悬停使用彩色版。
+- 网站地址为用户提供的 `http://space.twiink.cn`，GitHub 主页和联系资料位于 `content.json` 的 `site`；「关于我」读取 `profile.json`；画廊已接入「泡芙大作战 PuffWar 乐园」「无界宇宙 Infinite Cosmos」「SecKnow AI 教育平台」「RAG 中台 RAG-Center」和「HarnessPRD 智能需求文档平台」五个个人项目。联系房间已接入邮箱、GitHub、微信及站内留言，六条生活化 FAQ 位于联系纸页的「随便聊聊」中；生活手记收录四篇生活存档与一篇人物形象制作记录。示例内容用 `authorName` 标注原作者，搜索数据不将其归为 Twiink 的作品。
+- 当前保留站点信息 1 份、画廊项目 5 个（均为个人项目）、生活手记 5 篇、示例证书 16 张和个人 FAQ 6 条；个人荣誉来自 `profile.json`。
+- 生活手记沿用 `/studio` 路径和 `studio` 数据标识。门贴图使用 `life-notes-ink-v1.webp` 与 `life-notes-color-v1.webp`，对应相机、山间日出和手柄；分类为 `life`、`making`。Matrix 工作室的 CSDN、视频号集中在联系面板展示。
 - 内容读取同步完成，不需要网络内容查询、管理后台或数据库。
 - 个人项目的完整文案、图片、视频与项目入口在 `content.json` 的 `projects[].details` 中编辑。`ProjectDetails.jsx` 使用原生纸张对话框阅读，技术工具默认折叠；Gallery 卡片和无障碍按钮共用该入口，也能在面板中切换项目。图片目录与标题可通过 `photosLabel`、`photosTitle` 设置；`entry.image` 展示小程序码，`entry.url` 提供外部网站入口。视频使用原生播放器，由访客点击播放；切换或关闭时卸载。对话框打开时暂停 Gallery 的滚轮与拖动，避免正文滚动带动画廊。
 - RAG-Center 的图片位于 `public/content/projects/rag-center/`，封面保留黑白与彩色两版，阅读面板展示工作台原型和竖版海报，原型中的数量为示例数据；项目入口为源码仓库。

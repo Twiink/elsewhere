@@ -109,7 +109,7 @@ export function buildLlmsTxt({ site, projects, studio, awards, faq, profile }) {
     } else {
         lines.push('## 个人介绍', site.aboutMe, '');
     }
-    const collections = [['精选项目', projects], ['工作室内容', studio]];
+    const collections = [['精选项目', projects], ['生活手记', studio]];
     if (!profile) collections.push(['奖项与荣誉', awards]);
     for (const [title, items] of collections) {
         lines.push(`## ${title}`);
@@ -186,7 +186,7 @@ export function generateSeoHtml() {
                 `<header><h1>${escapeHtml(site.siteTitle)}</h1><p>${escapeHtml(site.siteDescription)}</p></header>`,
                 `<section id="about"><h2>关于我</h2>${profile ? buildProfileHtml(profile) : `<p>${escapeHtml(site.aboutMe)}</p>`}</section>`,
             ];
-            const collections = [['projects', '精选项目', projects], ['studio', '工作室', studio]];
+            const collections = [['projects', '精选项目', projects], ['studio', '生活手记', studio]];
             if (!profile) collections.push(['awards', '奖项与证书', awards]);
             for (const [id, title, items] of collections) {
                 const entries = items.map(item => `<li><h3>${escapeHtml(item.seoTitle || item.title)}</h3><p>${escapeHtml(item.details ? item.description : item.seoDescription || item.description || '')}</p>${buildProjectBody(item)}${buildStudioBody(item)}<a href="${escapeHtml(item.url)}">查看详情</a></li>`).join('');
@@ -196,11 +196,11 @@ export function generateSeoHtml() {
                 sections.push(`<section id="contact"><h2>联系我</h2><p>${escapeHtml(site.contact.description)}</p><p><a href="mailto:${escapeHtml(site.contact.email)}">${escapeHtml(site.contact.email)}</a></p><p><a href="${escapeHtml(site.githubUrl)}">GitHub</a></p><p>微信：${escapeHtml(site.contact.wechatId)}</p></section>`);
             }
             if (site.resume?.url) {
-                sections.push(`<section id="resume"><h2>${escapeHtml(site.resume.title)}</h2><p>${escapeHtml(site.resume.description)}</p><a href="${escapeHtml(site.resume.url)}" target="_blank" rel="noopener noreferrer">在线查看简历 PDF（新窗口）</a> <a href="${escapeHtml(site.resume.url)}" download="${escapeHtml(site.resume.downloadName)}">下载简历 PDF</a></section>`);
+                sections.push(`<section id="resume"><h2>${escapeHtml(site.resume.title)}</h2><p>${escapeHtml(site.resume.description)}</p><a href="${escapeHtml(site.resume.url)}" target="_blank" rel="noopener noreferrer">在线查看简历 PDF</a> <a href="${escapeHtml(site.resume.url)}" download="${escapeHtml(site.resume.downloadName)}">下载简历 PDF</a></section>`);
             }
             if (site.studioChannels) {
                 const channels = site.studioChannels;
-                sections.push(`<section id="studio-channels"><h2>${escapeHtml(channels.title)}</h2><p>${escapeHtml(channels.description)}</p><a href="${escapeHtml(channels.csdnUrl)}" target="_blank" rel="noopener noreferrer">工作室 CSDN（新窗口）</a><p>微信视频号：${escapeHtml(channels.videoAccount)}</p></section>`);
+                sections.push(`<section id="studio-channels"><h2>${escapeHtml(channels.title)}</h2><p>${escapeHtml(channels.description)}</p><a href="${escapeHtml(channels.csdnUrl)}" target="_blank" rel="noopener noreferrer">工作室 CSDN</a><p>微信视频号：${escapeHtml(channels.videoAccount)}</p></section>`);
             }
             sections.push(`<section id="faq"><h2>常见问题</h2>${faq.map(item => `<article><h3>${escapeHtml(item.question)}</h3><p>${escapeHtml(item.answer)}</p></article>`).join('')}</section>`);
             const seoHtml = `<div id="seo-content" class="sr-only-seo">${sections.join('\n')}</div>`;

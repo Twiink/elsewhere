@@ -6,7 +6,7 @@ import * as THREE from 'three';
 // ============================================
 // 配置。
 // ============================================
-const PARTICLE_COUNT = 60;
+const PARTICLE_COUNT = 36;
 const MIN_RADIUS = 4;
 const MAX_RADIUS = 12;
 const VERTICAL_SPREAD = 25;
@@ -17,40 +17,15 @@ const LOOP_BOTTOM = -15;
 const LOOP_TOP = 15;
 const LOOP_HEIGHT = LOOP_TOP - LOOP_BOTTOM;
 
-// 符号定义及其视觉权重。
+// 手记里的生活片段，作为淡淡的手写背景。
 const SYMBOLS = [
-    // 代码括号，较大。
-    { text: '{/}', size: 0.8, weight: 2 },
-    { text: '</>', size: 0.8, weight: 2 },
-    { text: '{ }', size: 0.7, weight: 1 },
-    { text: '{ • }', size: 0.7, weight: 1 },
-
-    // 运算符与标点，中等。
-    { text: ';', size: 0.5, weight: 3 },
-    { text: '::', size: 0.4, weight: 2 },
-    { text: '=>', size: 0.5, weight: 2 },
-    { text: '//', size: 0.5, weight: 2 },
-    { text: '&&', size: 0.4, weight: 1 },
-
-    // 零散的二进制数字，较小。
-    { text: '0', size: 0.3, weight: 4 },
-    { text: '1', size: 0.3, weight: 4 },
-    { text: '01', size: 0.35, weight: 3 },
-    { text: '0101', size: 0.4, weight: 2 },
-    { text: '00', size: 0.35, weight: 2 },
-
-    // 箭头与其他符号。
-    { text: '↑', size: 0.4, weight: 2 },
-    { text: '→', size: 0.4, weight: 1 },
-    { text: '←', size: 0.4, weight: 1 },
-    { text: '×', size: 0.3, weight: 2 },
-    { text: '•', size: 0.25, weight: 3 },
-    { text: '○', size: 0.3, weight: 2 },
-
-    // 像素风图案。
-    { text: '▪▪\n▪', size: 0.25, weight: 2 },
-    { text: '▪ ▪\n ▪', size: 0.25, weight: 1 },
-    { text: '▪▪▪', size: 0.2, weight: 2 },
+    { text: '出门走走', size: 0.35, weight: 2 },
+    { text: '日出', size: 0.45, weight: 3 },
+    { text: '合照', size: 0.4, weight: 3 },
+    { text: '再玩一局', size: 0.35, weight: 2 },
+    { text: '已存档', size: 0.4, weight: 3 },
+    { text: '随手画', size: 0.4, weight: 2 },
+    { text: '小发现', size: 0.35, weight: 2 },
 ];
 
 // 按权重随机选择。

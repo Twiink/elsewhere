@@ -1,10 +1,10 @@
 # Twiink's Space
 
-这是基于 Tomasz “ITom” Szmajda 作品集改造的 Twiink 个人空间，使用 React 19、Three.js、React Three Fiber、GSAP 和 Vite。用户从入口进入无限走廊，探索作品画廊、内容工作室、关于我和联系我四个房间；`/start` 是独立的静态链接页。
+这是基于 Tomasz “ITom” Szmajda 作品集改造的 Twiink 个人空间，使用 React 19、Three.js、React Three Fiber、GSAP 和 Vite。用户从入口进入无限走廊，探索作品画廊、生活手记、关于我和联系我四个房间；`/start` 是独立的静态链接页。
 
 已接入第一批个人资料：网站名为 **Twiink's Space**，介绍为“做点有趣的东西，放一些舍不得关掉的脑洞。”入口窗边、走廊和云上人物使用根据用户照片制作的黑白线稿，发布用纹理位于 `public/textures/twiink/`。照片参考仅在本地忽略目录中保存。
 
-「关于我」已接入个人简介、技术栈、六段经历、兴趣和项目成果，统一编辑 `src/data/profile.json`。房间里的纸片、经历岛屿、技能气球和完整阅读面板共用这些资料。画廊已接入「泡芙大作战 PuffWar 乐园」「无界宇宙 Infinite Cosmos」「SecKnow AI 教育平台」「RAG 中台 RAG-Center」和「HarnessPRD 智能需求文档平台」五个个人项目，包含完整介绍、图片或开场视频，以及小程序码、官网或 GitHub 源码入口。「联系我」已接入邮箱、GitHub、微信和站内留言入口，纸页中的「随便聊聊」展示六条已确认的常见问题；工作室文章等待后续资料替换。示例内容中的 `authorName` 保留原作者归属。站点域名按用户提供的 `http://space.twiink.cn` 配置，站点与联系人信息在 `content.json` 的 `site` 中编辑。
+「关于我」已接入个人简介、技术栈、六段经历、兴趣和项目成果，统一编辑 `src/data/profile.json`。房间里的纸片、经历岛屿、技能气球和完整阅读面板共用这些资料。画廊已接入「泡芙大作战 PuffWar 乐园」「无界宇宙 Infinite Cosmos」「SecKnow AI 教育平台」「RAG 中台 RAG-Center」和「HarnessPRD 智能需求文档平台」五个个人项目，包含完整介绍、图片或开场视频，以及小程序码、官网或 GitHub 源码入口。「联系我」已接入邮箱、GitHub、微信和站内留言入口，纸页中的「随便聊聊」展示六条已确认的常见问题；生活手记收录四篇生活存档与一篇人物形象制作记录。示例内容中的 `authorName` 保留原作者归属。站点域名按用户提供的 `http://space.twiink.cn` 配置，站点与联系人信息在 `content.json` 的 `site` 中编辑。
 
 ## 本地运行
 
@@ -39,7 +39,7 @@ npm run check:content
 | --- | --- |
 | `src/data/profile.json` | 关于我的可编辑资料：身份、简介、技能、工具、经历、爱好和成果 |
 | `src/data/profile.js` | 将个人资料整理为页面与搜索正文共用的数据 |
-| `src/data/content.json` | 站点设置、画廊、工作室、FAQ，以及保留供对照的示例奖项 |
+| `src/data/content.json` | 站点设置、画廊、生活手记、FAQ，以及保留供对照的示例奖项 |
 | `src/data/content.original.json` | 已发布内容的原始返回备份，保留原文和资产引用供对照，不参与运行或构建 |
 | `src/data/content.js` | 将本地内容整理为页面、奖项分组与预加载数据 |
 | `src/hooks/useContentData.js` | 各房间读取本地内容的入口 |
@@ -53,11 +53,11 @@ npm run check:content
 | --- | --- | --- |
 | `site` | 站点标题、一句话介绍、域名及社交链接 | 1 |
 | `projects` | 画廊项目：5 个个人项目 | 5 |
-| `studio` | 文章、视频与社交内容 | 11 |
+| `studio` | 四篇生活存档与一篇人物形象制作记录 | 5 |
 | `awards` | 原作者示例证书，保留供对照，不作为当前个人成果展示 | 16 |
 | `faq` | 六条个人问答，展示在联系纸页并同步至搜索正文 | 6 |
 
-画廊项目的 `title`、`description`、`url`、`front`、`painted`、`techStack` 控制卡片文字、链接、正反面相关纹理及技术图标。工作室内容的 `platform`、`device`、`frontTexture` 和 `paintedFrontTexture` 控制平台标签、设备外形与屏幕纹理；`device` 使用 `monitor`、`tv` 或 `phone`。证书的 `category` 使用 `sotd`、`sotm` 或 `other`。
+画廊项目的 `title`、`description`、`url`、`front`、`painted`、`techStack` 控制卡片文字、链接、正反面相关纹理及技术图标。生活手记的 `platform`、`device`、`frontTexture` 和 `paintedFrontTexture` 控制分类标签、设备外形与屏幕纹理；`platform` 使用 `life` 或 `making`，`device` 使用 `monitor`、`tv` 或 `phone`。证书的 `category` 使用 `sotd`、`sotm` 或 `other`。
 
 `seoTitle` 和 `seoDescription` 用于搜索正文与结构化数据。`seo-plugin.js` 在开发和构建时读取本地 JSON，并生成中文静态正文、JSON-LD 和 `/llms.txt`；首页标题、一句话介绍与规范域名来自 `site`，个人介绍和成果来自 `profile.json`。
 
@@ -144,16 +144,20 @@ JSON 使用英文双引号和英文逗号，不支持注释或最后一项后的
 
 - `VITE_WEB3FORMS_KEY`：绑定收件邮箱的 Web3Forms 配置，放在本地 `.env` 或部署平台环境变量中。允许提交的域名来自 `site.url`；未配置、预览域名或发送被拦截时均明确提示，只有服务确认接收才显示成功。
 - `VITE_POSTHOG_KEY`、`VITE_POSTHOG_HOST`：PostHog 访问统计配置。
-- 工作室已换成四篇生活存档与一篇人物形象制作记录。编辑 `src/data/content.json` 的 `studio` 数组即可修改标题、`paragraphs` 正文和 `photos` 图片；每张图的 `alt` 是图片说明，人物制作过程另有 `label` 和 `caption`。没有提供日期的记录不填写 `date`。点击场景中的屏幕或「翻翻生活与创作」可在站内阅读，也可使用 `/studio?note=记录的id` 直接打开对应记录。
+- 生活手记收录四篇生活存档与一篇人物形象制作记录。编辑 `src/data/content.json` 的 `studio` 数组即可修改标题、`paragraphs` 正文和 `photos` 图片；每张图的 `alt` 是图片说明，人物制作过程另有 `label` 和 `caption`。没有提供日期的记录不填写 `date`。点击场景中的屏幕或「翻翻生活手记」可在站内阅读，也可使用 `/studio?note=记录的id` 直接打开对应记录。
 - 生活照片的原图与素材清单保存在 `assets/studio/life-notes/`，页面图片位于 `public/content/studio/`，人物黑白线稿沿用 `public/textures/twiink/start-bouquet.png`。联系房间已使用 Twiink 的联系方式；`/start` 提供站内导航、GitHub 入口与 Twiink 人物插画。
 
-工作室的 CSDN 与微信视频号在 `src/data/content.json` 的 `site.studioChannels` 中编辑，展示在工作室阅读面板底部和联系方式中。视频号支持复制；浏览器不允许自动复制时，会选中账号，方便手动复制。这两项属于 Matrix 工作室。
+Matrix 工作室的 CSDN 与微信视频号在 `src/data/content.json` 的 `site.studioChannels` 中编辑，集中展示在联系方式中。视频号支持复制；浏览器不允许自动复制时，会选中账号，方便手动复制。
+
+生活手记的门牌、地图和页面标题统一显示「生活手记」。门贴图位于 `public/textures/corridor/doors/life-notes-ink-v1.webp` 与 `life-notes-color-v1.webp`，图案为相机、山间日出和手柄；生成提示词与处理说明保存在 `assets/studio/door-textures.json`。阅读面板展示个人记录，房间背景使用日出、合照、存档等手写词。
 
 简历 PDF 保存在 `public/files/twiink-resume.pdf`，入口位于「关于我」「联系我」与独立链接页 `/start`。「联系我」同时支持新窗口查看和下载。后续直接替换这一个 PDF 即可更新简历；说明、路径和下载文件名在 `site.resume` 中编辑。若更改文件路径或下载文件名，也要同步 `/start/index.html` 中的静态下载链接。
 
 走廊的两幅竖版照片位于 `public/content/corridor/`：右侧 `frame-3` 展示花束与牵手照，左侧 `frame-4` 展示红灯笼前的古风合照。原图与处理记录保存在 `assets/corridor/`。图片按原始比例展示，桌面端点击查看时会自动适配视口高度；路径和画框尺寸在 `src/components/canvas/corridor/CorridorDecorations.jsx` 的 `frames` 中编辑，新增图片时同步 `src/config/texturePreloadList.js`。
 
 网站图标使用浅绿纸飞机与金色星星，保留奶油色纸底和完整构图。主站与 `/start` 的浏览器图标分别使用 `public/textures/twiink/site-icon-airplane-v1-32.png`、`site-icon-airplane-v1-64.png`，手机主屏幕图标使用同目录的 `site-icon-airplane-v1-180.png`；走廊 `frame-1` 与纹理预加载使用 `site-icon-airplane-v1-512.png`。更换时同步两处 HTML、走廊画框与预加载清单。
+
+入口双门的技术贴纸与 `profile.json` 一致：左门展示 TypeScript、Vue、React、Python、Django、FastAPI，右门展示 Java、Spring Boot、Docker、RAG、LangChain、LangGraph。贴图位于 `public/textures/doors/twiink-entry-{left,right}-{ink,color}-v1.webp`，各有黑白和彩色版本；生成提示词、技术清单与文件校验信息保存在 `assets/entrance/door-textures.json`。后续修改门上的技术名称时需重新制作贴图，并同步 `EntranceDoors.jsx` 与 `texturePreloadList.js` 中的路径。
 
 分享封面使用 `public/content/social/twiink-share-cover-v1.jpg`，为已确认的淡彩古风横版图片，尺寸 1200×630。主站的 Open Graph 与 Twitter 分享信息由 `site.shareImage` 和 `seo-plugin.js` 输出；独立链接页 `/start` 的同类标签位于 `public/start/index.html`。更换图片路径、尺寸或说明时，同步这两处配置。
 

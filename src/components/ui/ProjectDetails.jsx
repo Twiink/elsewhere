@@ -157,7 +157,7 @@ export default function ProjectDetails() {
                                             </div>
                                             {project.details.references?.map(reference => (
                                                 <p key={reference.url} className="project-detail-reference">
-                                                    <a href={reference.url} target="_blank" rel="noopener noreferrer">{reference.title}（新窗口）</a>
+                                                    <a href={reference.url} target="_blank" rel="noopener noreferrer">{reference.title}</a>
                                                 </p>
                                             ))}
                                         </section>
@@ -171,7 +171,7 @@ export default function ProjectDetails() {
                                     {entry.hint && <p className="project-detail-hint">{entry.hint}</p>}
                                     {entry.url && (
                                         <a className="project-detail-site-link" href={entry.url} target="_blank" rel="noopener noreferrer">
-                                            {entry.label || '访问项目网站'}（新窗口）
+                                            {entry.label || '访问项目网站'}
                                         </a>
                                     )}
                                 </div>

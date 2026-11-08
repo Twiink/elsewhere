@@ -1,7 +1,7 @@
 import { useScene } from '../../context/SceneContext';
 import { useGalleryProjects, useStudioContent } from '../../hooks/useContentData';
 import '../../styles/ScreenReaderOverlay.scss';
-import { personalProfile, contactInfo, siteInfo, studioChannels, resumeInfo } from '../../data/content';
+import { personalProfile, contactInfo, siteInfo, resumeInfo } from '../../data/content';
 import ProfileContent from './ProfileContent';
 
 /**
@@ -11,7 +11,7 @@ import ProfileContent from './ProfileContent';
  * 包含与门、房间等 3D 交互元素对应的按钮和链接。
  * 通过 sr-only 视觉隐藏，但辅助技术仍可访问。
  */
-const ROOM_LABELS = { about: '关于我', gallery: '画廊', contact: '联系我', studio: '工作室' };
+const ROOM_LABELS = { about: '关于我', gallery: '画廊', contact: '联系我', studio: '生活手记' };
 
 const ScreenReaderOverlay = () => {
     const { hasEntered, isInRoom, currentRoom, teleportTo, requestExit, openOverlay } = useScene();
@@ -57,7 +57,7 @@ const ScreenReaderOverlay = () => {
                             </li>
                             <li>
                                 <button onClick={() => teleportTo('studio')} type="button">
-                                    工作室：内容与创作
+                                    生活手记：旅行、游戏与随手记录
                                 </button>
                             </li>
                         </ul>
@@ -70,7 +70,7 @@ const ScreenReaderOverlay = () => {
                             你现在位于 {currentRoom === 'about' ? "关于我" :
                                 currentRoom === 'gallery' ? "画廊" :
                                     currentRoom === 'contact' ? "联系我" :
-                                        currentRoom === 'studio' ? "工作室" : currentRoom} 房间。
+                                        currentRoom === 'studio' ? "生活手记" : currentRoom} 房间。
                         </p>
                         <button onClick={requestExit} type="button">
                             返回走廊
@@ -112,7 +112,7 @@ const ScreenReaderOverlay = () => {
                                 <p>{contactInfo.description}</p>
                                 {resumeInfo?.url && <p><a href={resumeInfo.url} download={resumeInfo.downloadName}>下载简历 PDF</a></p>}
                                 <p><a href={`mailto:${contactInfo.email}`}>发送邮件：{contactInfo.email}</a></p>
-                                <p><a href={siteInfo.githubUrl} target="_blank" rel="noopener noreferrer">访问 Twiink 的 GitHub（新窗口）</a></p>
+                                <p><a href={siteInfo.githubUrl} target="_blank" rel="noopener noreferrer">访问 Twiink 的 GitHub</a></p>
                                 <p>微信号：{contactInfo.wechatId}</p>
                                 <button type="button" aria-haspopup="dialog" aria-controls="contact-details-dialog" onClick={() => openOverlay({ layout: 'contact', target: 'wechat' })}>
                                     查看联系方式与复制微信号
@@ -120,9 +120,8 @@ const ScreenReaderOverlay = () => {
                             </div>
                         )}
                         {currentRoom === 'studio' && (
-                            <div aria-label="工作室房间的内容">
-                                <h3>工作室</h3>
-                                {studioChannels && <p><a href={studioChannels.csdnUrl} target="_blank" rel="noopener noreferrer">访问 Matrix 工作室的 CSDN（新窗口）</a>，微信视频号：{studioChannels.videoAccount}。</p>}
+                            <div aria-label="生活手记房间的内容">
+                                <h3>生活手记</h3>
                                 <p>出门走走、一起玩游戏，还有给网站画人物的过程。点击屏幕，或选择下面的一篇，翻翻这些生活与创作记录。</p>
 
                                 {studio && studio.length > 0 && (
@@ -156,7 +155,7 @@ const ScreenReaderOverlay = () => {
                                 <li><button onClick={() => teleportTo('contact')} type="button">前往联系我</button></li>
                             )}
                             {currentRoom !== 'studio' && (
-                                <li><button onClick={() => teleportTo('studio')} type="button">前往工作室</button></li>
+                                <li><button onClick={() => teleportTo('studio')} type="button">前往生活手记</button></li>
                             )}
                         </ul>
                     </>

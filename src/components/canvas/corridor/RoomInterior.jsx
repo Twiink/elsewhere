@@ -21,7 +21,7 @@ const ROOM_CONFIG = {
 
 const SUBTITLES = {
     "作品画廊": "探索我的创意项目",
-    "内容工作室": "了解创作幕后",
+    "生活手记": "翻翻生活里的小片段",
     "开发日志": "我的开发历程",
     "联系我": "欢迎与我联系"
 };
@@ -124,7 +124,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
 
     // 通用房间没有独立组件负责就绪通知，需在此触发 onReady。
     useEffect(() => {
-        if (showRoom && !["作品画廊", "内容工作室", "关于我", "联系我"].includes(label)) {
+        if (showRoom && !["作品画廊", "生活手记", "关于我", "联系我"].includes(label)) {
             onReady?.();
         }
     }, [showRoom, label, onReady]);
@@ -199,8 +199,8 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                                 <GalleryRoom showRoom={showRoom} onReady={onReady} isExiting={isExiting} />
                             </Suspense>
                         </group>
-                    ) : label === "内容工作室" ? (
-                        // 工作室房间。
+                    ) : label === "生活手记" ? (
+                        // 生活手记房间。
                         <group position={[0, -0.5, -corridorDepth]}>
                             <Suspense fallback={null}>
                                 <StudioRoom showRoom={showRoom} onReady={onReady} isExiting={isExiting} />

@@ -67,7 +67,7 @@ export default function AboutProfile() {
                                 {item.id === 'intro' ? '自我介绍' : item.title}
                             </a>
                         ))}
-                        {resumeInfo?.url && <a href={resumeInfo.url} target="_blank" rel="noopener noreferrer">简历 PDF（新窗口）</a>}
+                        {resumeInfo?.url && <a href={resumeInfo.url} target="_blank" rel="noopener noreferrer">简历 PDF</a>}
                     </nav>
                     <div ref={bodyRef} className="about-profile-body" tabIndex={0} aria-label="个人介绍正文">
                         <ProfileContent profile={personalProfile} />

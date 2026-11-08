@@ -60,7 +60,7 @@ const CorridorSegment = ({
                 roomId: 'studio',
                 relativeZ: -32,
                 side: 'right',
-                label: "内容工作室",
+                label: "生活手记",
                 icon: '▶',
                 color: '#e6f5ef'
             },

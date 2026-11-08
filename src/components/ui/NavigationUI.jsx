@@ -14,7 +14,7 @@ const ROOMS = [
     { id: 'about', label: "关于我", x: 43, y: 38 },      // 左侧纸飞机。
     { id: 'gallery', label: "画廊", x: 43, y: 72 },  // 左下城市建筑。
     { id: 'contact', label: "联系我", x: 57, y: 25 },  // 右上码头。
-    { id: 'studio', label: "工作室", x: 57, y: 55 },    // 右侧显示器堆。
+    { id: 'studio', label: "生活手记", x: 57, y: 55 },    // 右侧照片屏幕。
 ];
 
 // 图钉起始位置，位于塔底部的虚线圆。
@@ -378,14 +378,14 @@ const NavigationUI = () => {
                                 onFocus={() => setHoveredRoom('studio')}
                                 onBlur={() => setHoveredRoom(null)}
                                 onClick={() => handleRoomClick('studio')}
-                                aria-label="前往工作室房间"
+                                aria-label="前往生活手记房间"
                             />
 
                             {/* 常驻地图文字标签。 */}
                             <div className="map-room-label about">关于我</div>
                             <div className="map-room-label gallery">我的<br />画廊</div>
                             <div className="map-room-label contact">联系我</div>
-                            <div className="map-room-label studio">我的<br />工作室</div>
+                            <div className="map-room-label studio">生活<br />手记</div>
 
                             {/* 四个图钉槽位。 */}
                             {ROOMS.map((room) => (

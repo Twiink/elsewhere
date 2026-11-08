@@ -55,12 +55,12 @@ const EntranceDoors = ({
     const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
     const frameTexture = useTexture('/textures/doors/frame_sketch.webp');
-    const doorLeftTexture = useTexture('/textures/doors/door_left_sketch.webp');
-    const doorRightTexture = useTexture('/textures/doors/door_right_sketch.webp');
+    const doorLeftTexture = useTexture('/textures/doors/twiink-entry-left-ink-v1.webp');
+    const doorRightTexture = useTexture('/textures/doors/twiink-entry-right-ink-v1.webp');
 
     // 移动端优化：手机不加载彩色纹理与把手。
-    const doorRightPaintedTexture = useTexture(isMobileDevice ? dummyTex : '/textures/doors/door_right_painted.webp');
-    const doorLeftPaintedTexture = useTexture(isMobileDevice ? dummyTex : '/textures/doors/door_left_painted.webp');
+    const doorRightPaintedTexture = useTexture(isMobileDevice ? dummyTex : '/textures/doors/twiink-entry-right-color-v1.webp');
+    const doorLeftPaintedTexture = useTexture(isMobileDevice ? dummyTex : '/textures/doors/twiink-entry-left-color-v1.webp');
     const handleLeftTexture = useTexture('/textures/doors/handle_left_sketch.webp');
     const handleLeftPaintedTexture = useTexture(isMobileDevice ? dummyTex : '/textures/doors/handle_left_painted.webp');
     const handleRightTexture = useTexture('/textures/doors/handle_right_sketch.webp');

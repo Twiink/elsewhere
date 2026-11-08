@@ -1,0 +1,79 @@
+{
+  "purpose": "Twiink's Space 入口双门技术栈",
+  "generator": "built-in image_gen",
+  "generatedAt": "2026-11-08",
+  "profileSource": "src/data/profile.json",
+  "doors": [
+    {
+      "side": "left",
+      "technologies": [
+        "TypeScript",
+        "Vue",
+        "React",
+        "Python",
+        "Django",
+        "FastAPI"
+      ],
+      "references": [
+        "public/textures/doors/door_left_sketch.webp",
+        "public/textures/doors/door_right_sketch.webp"
+      ],
+      "prompt": "Create one production-ready flat illustrated door-leaf texture for an existing interactive 3D portfolio. Match the original target's very tall portrait proportions, width:height = 332:848 (approximately 1:2.55). A complete single leaf fills the image edge to edge. Preserve exactly the original panel boundaries, pencil door contours, rail positions and keyhole plate position, so this can replace the target as a UV texture. No external frame, scene, floor, perspective, white margin or extra handle. Use thin, gently imperfect dark graphite outlines, pale warm cream wood with very subtle tan colored-pencil grain, and clear softly colored technology stickers. Think handmade sketchbook and colored pencil, not glossy badges or photorealism. Labels must be large enough to read, correctly spelled and separated from decorative line work. Stickers have organic handmade outlines and can overlap the recessed panel edges slightly, as in the reference. Use spacious placement with visible wood between marks; avoid a rigid grid or a dense sticker collage. Render the exact labels requested, each once, and no other words. This is one door leaf only, not a pair or a contact sheet.\n\nEDIT TARGET is image 1: the LEFT leaf. Image 2 is reference only for the shared sketch style. Preserve the LEFT leaf's keyhole plate on its far RIGHT edge at approximately mid height. Keep the long upper recessed panel and shorter lower recessed panel in their original places. Completely replace the existing sticker artwork with exactly these six technologies.\n\nUpper tall panel: a prominent soft-blue TypeScript badge with a large TS and the clearly written label \"TypeScript\"; underneath, a recognizable green double-V Vue symbol with the label \"Vue\", and a cyan React atom sketch with the label \"React\". Lower short panel: a friendly blue-and-yellow two-snake Python symbol with the label \"Python\", plus two smaller but legible handwritten stickers labeled \"Django\" (dark green, small dj motif) and \"FastAPI\" (teal circle with simple lightning/arrow motif). Arrange the three lower labels so they all fit comfortably, for example Python above Django and FastAPI. The colors are restrained yet recognizable, with generous cream wood visible around all six marks.\n\nExact technology label spellings: TypeScript, Vue, React, Python, Django, FastAPI. No HTML, HTML5, JavaScript/JS, Node.js, CSS, CSS3, social-platform symbols, random code glyphs, extra technologies or invented text. Keep the edges and all six technology marks complete inside this leaf."
+    },
+    {
+      "side": "right",
+      "technologies": [
+        "Java",
+        "Spring Boot",
+        "Docker",
+        "RAG",
+        "LangChain",
+        "LangGraph"
+      ],
+      "references": [
+        "public/textures/doors/door_right_sketch.webp",
+        "public/textures/doors/door_left_sketch.webp"
+      ],
+      "prompt": "Create one production-ready flat illustrated door-leaf texture for an existing interactive 3D portfolio. Match the original target's very tall portrait proportions, width:height = 332:848 (approximately 1:2.55). A complete single leaf fills the image edge to edge. Preserve exactly the original panel boundaries, pencil door contours, rail positions and keyhole plate position, so this can replace the target as a UV texture. No external frame, scene, floor, perspective, white margin or extra handle. Use thin, gently imperfect dark graphite outlines, pale warm cream wood with very subtle tan colored-pencil grain, and clear softly colored technology stickers. Think handmade sketchbook and colored pencil, not glossy badges or photorealism. Labels must be large enough to read, correctly spelled and separated from decorative line work. Stickers have organic handmade outlines and can overlap the recessed panel edges slightly, as in the reference. Use spacious placement with visible wood between marks; avoid a rigid grid or a dense sticker collage. Render the exact labels requested, each once, and no other words. This is one door leaf only, not a pair or a contact sheet.\n\nEDIT TARGET is image 1: the RIGHT leaf. Image 2 is reference only for the shared sketch style. Preserve the RIGHT leaf's keyhole plate on its far LEFT edge at approximately mid height. Keep the long upper recessed panel and shorter lower recessed panel in their original places. Completely replace the existing sticker artwork with exactly these six technologies.\n\nUpper tall panel: a small warm red/orange coffee cup and steam sketch clearly labeled \"Java\"; a sage-green leaf / power-button motif clearly labeled \"Spring Boot\"; and a friendly light-blue whale carrying three small shipping boxes clearly labeled \"Docker\". Lower short panel: a small cream document-and-magnifying-glass sticker labeled \"RAG\", plus two smaller but legible stickers, one with simple linked chain loops clearly labeled \"LangChain\", and one with three connected graph nodes clearly labeled \"LangGraph\". These last three are simple explanatory illustrations paired with the exact names, not claimed official brand logos. Arrange RAG above LangChain and LangGraph so the three lower labels fit comfortably. Keep generous wood visible and each symbol visually distinct.\n\nExact technology label spellings: Java, Spring Boot, Docker, RAG, LangChain, LangGraph. No React, Node.js, CSS/CSS3, JSX, social-platform symbols, random code glyphs, extra technologies or invented text. Keep the edges and all six technology marks complete inside this leaf."
+    }
+  ],
+  "publishedImages": [
+    {
+      "side": "left",
+      "variant": "ink",
+      "path": "public/textures/doors/twiink-entry-left-ink-v1.webp",
+      "width": 512,
+      "height": 1308,
+      "bytes": 131664,
+      "sha256": "5fb4cba64640730f174d8e5fa6e20880e191f163e1e191d8909588059cbc01a4"
+    },
+    {
+      "side": "left",
+      "variant": "color",
+      "path": "public/textures/doors/twiink-entry-left-color-v1.webp",
+      "width": 512,
+      "height": 1308,
+      "bytes": 269750,
+      "sha256": "bc0adf4f23e4e537d1770171aad988ec39f6fa949682d5614cf2f972fa5bd269"
+    },
+    {
+      "side": "right",
+      "variant": "ink",
+      "path": "public/textures/doors/twiink-entry-right-ink-v1.webp",
+      "width": 512,
+      "height": 1308,
+      "bytes": 111644,
+      "sha256": "e74d0090027f0b740da134a1f25e43fd457abe34e2378188611c9d779b0c6a02"
+    },
+    {
+      "side": "right",
+      "variant": "color",
+      "path": "public/textures/doors/twiink-entry-right-color-v1.webp",
+      "width": 512,
+      "height": 1308,
+      "bytes": 276664,
+      "sha256": "59364ba775a94a0ea9584b3de284001cff88783c77d599f74a9b284462b104d2"
+    }
+  ],
+  "processing": "保留完整门板与锁孔位置；统一导出为512×1308 WebP。彩色版保留彩铅木纹，黑白版进行灰度与对比度调整（gain 2，offset -120），供现有涂色与开门交互使用。"
+}

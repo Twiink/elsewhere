@@ -24,7 +24,7 @@ export default function StudioChannels() {
         <section className="studio-channels" aria-labelledby={`${id}-title`}>
             <h3 id={`${id}-title`}>{studioChannels.title}</h3>
             <p>{studioChannels.description}</p>
-            <a href={studioChannels.csdnUrl} target="_blank" rel="noopener noreferrer">逛逛工作室的 CSDN（新窗口）</a>
+            <a href={studioChannels.csdnUrl} target="_blank" rel="noopener noreferrer">逛逛工作室的 CSDN</a>
             <label htmlFor={`${id}-account`}>微信视频号</label>
             <div className="studio-channel-account">
                 <input id={`${id}-account`} ref={accountRef} value={studioChannels.videoAccount} readOnly spellCheck={false} />

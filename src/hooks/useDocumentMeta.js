@@ -28,8 +28,8 @@ const ROOM_META = {
     },
     studio: {
         path: '/studio',
-        title: `工作室 | ${siteInfo.siteTitle}`,
-        description: "在漂浮的显示器之间，翻翻出门走走、一起玩游戏和画人物的小记录。",
+        title: `生活手记 | ${siteInfo.siteTitle}`,
+        description: "爬过的山、一起通关的游戏，还有随手画下的小片段，都记在这里。",
     },
     contact: {
         path: '/contact',

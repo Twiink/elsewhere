@@ -80,7 +80,7 @@ export default function ContactDetails() {
                                 <h3 id="contact-resume-title">{resumeInfo.title}</h3>
                                 <p>{resumeInfo.description}</p>
                                 <div className="contact-resume-actions">
-                                    <a href={resumeInfo.url} target="_blank" rel="noopener noreferrer">在线查看 PDF（新窗口）</a>
+                                    <a href={resumeInfo.url} target="_blank" rel="noopener noreferrer">在线查看 PDF</a>
                                     <a href={resumeInfo.url} download={resumeInfo.downloadName}>下载简历 PDF</a>
                                 </div>
                             </section>
@@ -92,7 +92,7 @@ export default function ContactDetails() {
                             </div>
                             <div>
                                 <dt>GitHub</dt>
-                                <dd><a href={siteInfo.githubUrl} target="_blank" rel="noopener noreferrer">{siteInfo.githubUrl.replace(/^https?:\/\//, '')}（新窗口）</a></dd>
+                                <dd><a href={siteInfo.githubUrl} target="_blank" rel="noopener noreferrer">{siteInfo.githubUrl.replace(/^https?:\/\//, '')}</a></dd>
                             </div>
                             <div>
                                 <dt><label htmlFor="contact-wechat">微信</label></dt>

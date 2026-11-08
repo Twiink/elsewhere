@@ -89,7 +89,7 @@ test('个人链接页提供站内导航、GitHub 与简历下载，作品集入�
   for (const path of ['/about', '/gallery', '/studio', '/contact']) assert.ok(html.includes(`href="${path}"`));
   assert.match(html, /<h1>Twiink's Space<\/h1>/);
   assert.match(html, /aria-label="交互作品集"/);
-  assert.match(html, /aria-label="创作手记"/);
+  assert.match(html, /aria-label="生活手记"/);
 });
 
 test('静态入口保持独立，使用本地中英文字体', () => {
