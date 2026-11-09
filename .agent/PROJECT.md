@@ -6,6 +6,7 @@
 
 - 实际内容位于 `src/data/content.json`，通过 `src/data/content.js` 整理，供 `src/hooks/useContentData.js` 和搜索输出使用。
 - `content.original.json` 是原始已发布响应的只读参考备份，不导入运行代码。
+- Git 跟踪发布素材、源码与回归测试所需数据；`assets/` 制作归档仅保存在本地并被忽略，下文对应路径需从本地档案另行取回。`public/` 下的备份目录、临时文件、试验图和图片生成元数据同样不跟踪。内容测试通过发布图片的固定 SHA-256 检查小程序码完整性。
 - 运行时图片与场景纹理使用 `https://media.secknow-ai.com/space/` 下的完整 HTTPS 地址，包括「想做的事」的旅行插画与旋转卡片封面；`public/content/`、`public/textures/` 保留素材归档。照片与贴图使用 PNG/JPEG 地址，腾讯云按浏览器能力返回 AVIF/WebP；心愿封面保留 SVG，走廊古风合照单独使用 `space/content/corridor/hanfu-photo.jpg`。高分辨率源图通过 `imageMogr2/thumbnail/宽x高` 保持原有展示尺寸。
 - 第一批个人身份已接入：昵称 Twiink，网站名 Twiink's Space；介绍与网站用途来自用户确认的文案。入口、走廊和关于我使用 `public/textures/twiink/` 下的黑白人物，宽高比取纹理实际尺寸。原作者的九帧人物动画已换成 Twiink 挥手姿势与轻微摆动。
 - 入口双门的技术贴纸与 `profile.json` 中的12项技术一致：左侧 TypeScript、Vue、React、Python、Django、FastAPI，右侧 Java、Spring Boot、Docker、RAG、LangChain、LangGraph。发布贴图为 `public/textures/doors/twiink-entry-{left,right}-{ink,color}-v1.webp`，提示词与素材清单位于 `assets/entrance/door-textures.json`；入口组件和预加载清单共用黑白版，桌面端悬停使用彩色版。

@@ -12,9 +12,44 @@ dist
 dist-ssr
 *.local
 
+# 工具缓存、测试报告与覆盖率
+.cache/
+.vite/
+.codegraph/
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+blob-report/
+.eslintcache
+*.tsbuildinfo
+
 # 临时生成文件与一次性脚本
 /output/
 /tmp/
+*.tmp
+*.temp
+*.bak
+*.orig
+*~
+
+# 本地素材制作归档：原件、草稿、来源记录和生成历史
+/assets/
+
+# 发布目录中的备份、试验图与生成元数据
+/public/**/backups/
+/public/textures/**/*_ORIGINAL.*
+/public/textures/**/*_backup.*
+/public/textures/**/*_test.*
+/public/textures/entrance/pot_with_duck1.webp
+/public/**/*.webp.json
+/public/**/*.png.json
+/public/**/*.jpg.json
+/public/**/*.jpeg.json
+
+# 未使用的脚手架示例图
+/public/vite.svg
+/src/assets/react.svg
 
 # dotenv 环境变量文件
 .env
@@ -26,6 +61,8 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
+Desktop.ini
 *.suo
 *.ntvs*
 *.njsproj

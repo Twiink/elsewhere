@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync, statSync } from 'node:fs';
 import { buildJsonLd, buildLlmsTxt, generateSeoHtml } from '../seo-plugin.js';
 import { withProfile } from '../src/data/profile.js';
@@ -86,8 +87,8 @@ test('泡芙大作战正文结构完整，接入三张现场图和无损小程�
     assert.equal(project.details.sections.find(section => section.id === 'tools').collapsible, true);
     assert.equal(new URL(project.details.entry.image).pathname, '/space/content/projects/puffwar/miniprogram-code.png');
     const publicCode = readFileSync(new URL('../public/content/projects/puffwar/miniprogram-code.png', import.meta.url));
-    const archivedCode = readFileSync(new URL('../assets/projects/puffwar/derived/miniprogram-code-cropped.png', import.meta.url));
-    assert.deepEqual(publicCode, archivedCode);
+    // 固定已确认小程序码的字节校验和，避免测试依赖本地制作归档。
+    assert.equal(createHash('sha256').update(publicCode).digest('hex'), '0d53d2cdee68da4746b6f0c966064be10803a12085718d707bc7a6c095c9729c');
     const ragCenter = content.projects.find(item => item.id === 'rag-center');
     const harnessPrd = content.projects.find(item => item.id === 'harness-prd');
     assert.equal(ragCenter?.details?.entry?.url, 'https://github.com/Twiink/RAG-Center');
