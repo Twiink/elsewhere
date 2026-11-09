@@ -1,7 +1,6 @@
-import { useState, Suspense, useEffect, useCallback, useLayoutEffect, lazy } from 'react';
-import { Canvas, useThree, useFrame, useLoader } from '@react-three/fiber';
-import { Preload, useTexture, Text, PerformanceMonitor } from '@react-three/drei';
-import * as THREE from 'three';
+import { useState, Suspense, useEffect, useCallback, lazy } from 'react';
+import { Canvas, useLoader } from '@react-three/fiber';
+import { Preload, useTexture, PerformanceMonitor } from '@react-three/drei';
 
 import Preloader from './components/dom/Preloader';
 import PaperTransition from './components/dom/PaperTransition';
@@ -99,38 +98,21 @@ const GlobalAudioEnabler = () => {
   return null;
 };
 
-// 使用走廊墙面纹理的静态场景背景。
-const PaperSceneBackground = () => {
-  const { scene } = useThree();
-  const texture = useTexture('https://media.secknow-ai.com/space/textures/paper-texture.png');
-
-  useEffect(() => {
-    texture.colorSpace = THREE.SRGBColorSpace;
-    scene.background = texture;
-
-    return () => {
-      scene.background = null;
-    };
-  }, [scene, texture]);
-
-  return null;
-};
-
 // 桥接组件，用于在 SceneProvider 内调用 Hook。
 // 处理动态元标签和深层链接自动传送。
 function DocumentMetaBridge() {
   useDocumentMeta();
 
-  const { initialRoom, deeplinkHandled, hasEntered, teleportTo, markEntered } = useScene();
+  const { initialRoom, deeplinkHandled: deeplinkHandledRef, hasEntered, teleportTo } = useScene();
 
   // 深层链接：直接访问 /gallery 等路径时，场景加载后自动传送。
   useEffect(() => {
-    if (initialRoom && hasEntered && !deeplinkHandled.current) {
-      deeplinkHandled.current = true;
+    if (initialRoom && hasEntered && !deeplinkHandledRef.current) {
+      deeplinkHandledRef.current = true;
       // 稍作延迟，让走廊先完成渲染。
       setTimeout(() => teleportTo(initialRoom), 300);
     }
-  }, [initialRoom, hasEntered, teleportTo, deeplinkHandled]);
+  }, [initialRoom, hasEntered, teleportTo, deeplinkHandledRef]);
 
   return null;
 }
@@ -188,12 +170,8 @@ function AppContent() {
                 onFallback={() => downgradeTier()}
               />
 
-              {/* 帧率与性能监视器。 */}
-              {/* <Perf position="top-left" minimal={false} /> */}
-
               <Suspense fallback={null}>
                 <Experience
-                  isLoaded={isLoaded}
                   onSceneReady={handleSceneReady}
                   performanceTier={tier}
                 />
@@ -234,7 +212,6 @@ export default function App() {
   // 让这些资源在初始加载阶段便进入网络请求队列。
   useEffect(() => {
     const filteredImages = filterTexturesByDevice(IMAGE_ASSETS, supportsHover);
-    // console.log(`[Preload] 开始在浏览器预加载图片，数量： ${filteredImages.length} 个。`);
     filteredImages.forEach(path => preloadBrowserImage(path));
   }, []);
 

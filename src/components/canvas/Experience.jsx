@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useCallback } from 'react';
+import { useThree } from '@react-three/fiber';
 
 import InfiniteCorridorManager from './corridor/InfiniteCorridorManager';
 import EntranceDoors from './entrance/EntranceDoors';
@@ -25,9 +25,9 @@ const ENTRANCE_DOORS_Z = 22;
  * 2. 点击门后开门，相机穿过入口。
  * 3. 门后是带有 ITOM 标识的无限走廊。
  */
-const Experience = ({ isLoaded, onSceneReady, performanceTier }) => {
+const Experience = ({ onSceneReady, performanceTier }) => {
     // 使用 SceneContext 管理房间状态。
-    const { hasEntered, markEntered, enterRoom, isTeleporting, isInRoom, pendingDoorClick } = useScene();
+    const { hasEntered, markEntered, enterRoom, isTeleporting, isInRoom } = useScene();
 
     const { camera } = useThree();
 
@@ -42,12 +42,6 @@ const Experience = ({ isLoaded, onSceneReady, performanceTier }) => {
         parallaxEnabled: hasEntered && !isTeleporting && !isInRoom
     });
 
-    // 注意：相机接管现由 DoorSection.jsx 直接管理。
-    // 此处原先调用 setCameraOverride 的 useEffect 已移除，
-    // 它会与 DoorSection 的直接控制冲突，导致相机跳动。
-    // scrollEnabled 和 parallaxEnabled 已负责在房间内禁用滚动。
-
-
     // 处理入口动画完成事件。
     const handleEntranceComplete = useCallback(() => {
         markEntered();
@@ -56,7 +50,6 @@ const Experience = ({ isLoaded, onSceneReady, performanceTier }) => {
     // 处理从走廊进入房间的事件。
     const handleDoorEnter = useCallback((doorId) => {
         enterRoom(doorId);
-        // console.log('正在进入：', doorId);
     }, [enterRoom]);
 
     // 优化：低性能档采用更简单的光照。
@@ -69,17 +62,6 @@ const Experience = ({ isLoaded, onSceneReady, performanceTier }) => {
                 随后卸载自身并触发 onSceneReady，确保走廊分段
                 与房间着色器都在用户开始交互前完成预编译。 */}
             <RoomWarmup onWarmupComplete={onSceneReady} isLowTier={isLowTier} />
-
-            {/* 全局光照 */}
-            {/* <ambientLight intensity={isLowTier ? 2.5 : 2.2} /> */}
-            {/* <directionalLight
-                position={[5, 10, 5]}
-                intensity={0.8}
-                color="#acacac"
-                castShadow={!isLowTier}
-                shadow-mapSize={[1024, 1024]}
-            /> */}
-            {/* <directionalLight position={[-5, 8, -10]} intensity={0.4} color="#ffffff" /> */}
 
             {/* 空走廊：为入口阶段提供环境。 */}
             {!hasEntered && (
