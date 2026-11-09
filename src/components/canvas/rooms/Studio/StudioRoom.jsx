@@ -10,6 +10,7 @@ import FloatingCodeParticles from './FloatingCodeParticles';
 import { PositionalAudio } from '@react-three/drei';
 import { useAudio } from '../../../../context/AudioManager';
 import { useStudioContent } from '../../../../hooks/useContentData';
+import { studioWishCard } from '../../../../data/content';
 import '../../shaders/RevealMaterial';
 import { isTouchDevice } from '../../../../utils/deviceDetect';
 import { usePaintMaterial } from '../Gallery/usePaintMaterial';
@@ -107,7 +108,8 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     const { globalVolume, isMuted } = useAudio();
     const effectiveVolume = isMuted ? 0 : AUDIO_SETTINGS.volume * globalVolume;
 
-    const activeContent = useStudioContent();
+    const studioNotes = useStudioContent();
+    const activeContent = useMemo(() => [...studioNotes, studioWishCard], [studioNotes]);
 
     const audioRef = useRef();
     useEffect(() => {
@@ -620,9 +622,9 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
 
     // 确定正面纹理地址，使用自定义值或默认值。
     const frontTextureUrl = item.frontTexture || (
-        isBlogMonitor ? '/textures/studio/monitor_front.webp' :
-            isTvMonitor ? '/textures/studio/tv_front.webp' :
-                '/textures/studio/phone_front.webp'
+        isBlogMonitor ? 'https://media.secknow-ai.com/space/textures/studio/monitor_front.png' :
+            isTvMonitor ? 'https://media.secknow-ai.com/space/textures/studio/tv_front.png' :
+                'https://media.secknow-ai.com/space/textures/studio/phone_front.png'
     );
 
     // 触摸设备使用的动态占位纹理。
@@ -631,9 +633,9 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
 
     // 确定彩色正面纹理地址。
     const paintedFrontTextureUrl = isTouch ? dummyTex : (item.paintedFrontTexture || (
-        isBlogMonitor ? '/textures/studio/monitor_front_painted.webp' :
-            isTvMonitor ? '/textures/studio/tv_front_painted.webp' :
-                '/textures/studio/phone_front_painted.webp'
+        isBlogMonitor ? 'https://media.secknow-ai.com/space/textures/studio/monitor_front_painted.png' :
+            isTvMonitor ? 'https://media.secknow-ai.com/space/textures/studio/tv_front_painted.png' :
+                'https://media.secknow-ai.com/space/textures/studio/phone_front_painted.png'
     ));
 
     // 加载动态正面纹理。
@@ -641,32 +643,32 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
     const frontPaintedTex = useLoader(TextureLoader, paintedFrontTextureUrl);
 
     // 加载博客显示器的外壳与彩色纹理。
-    const monitorBack = useLoader(TextureLoader, '/textures/studio/monitor_back.webp');
-    const monitorTop = useLoader(TextureLoader, '/textures/studio/monitor_top.webp');
-    const monitorBottom = useLoader(TextureLoader, '/textures/studio/monitor_bottom.webp');
-    const monitorLeft = useLoader(TextureLoader, '/textures/studio/monitor_left.webp');
-    const monitorRight = useLoader(TextureLoader, '/textures/studio/monitor_right.webp');
-    const monitorBackPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/monitor_back_painted.webp');
-    const monitorTopPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/monitor_top_painted.webp');
-    const monitorBottomPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/monitor_bottom_painted.webp');
-    const monitorLeftPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/monitor_left_painted.webp');
-    const monitorRightPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/monitor_right_painted.webp');
+    const monitorBack = useLoader(TextureLoader, 'https://media.secknow-ai.com/space/textures/studio/monitor_back.png');
+    const monitorTop = useLoader(TextureLoader, 'https://media.secknow-ai.com/space/textures/studio/monitor_top.png');
+    const monitorBottom = useLoader(TextureLoader, 'https://media.secknow-ai.com/space/textures/studio/monitor_bottom.png');
+    const monitorLeft = useLoader(TextureLoader, 'https://media.secknow-ai.com/space/textures/studio/monitor_left.png');
+    const monitorRight = useLoader(TextureLoader, 'https://media.secknow-ai.com/space/textures/studio/monitor_right.png');
+    const monitorBackPainted = useLoader(TextureLoader, isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/studio/monitor_back_painted.png');
+    const monitorTopPainted = useLoader(TextureLoader, isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/studio/monitor_top_painted.png');
+    const monitorBottomPainted = useLoader(TextureLoader, isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/studio/monitor_bottom_painted.png');
+    const monitorLeftPainted = useLoader(TextureLoader, isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/studio/monitor_left_painted.png');
+    const monitorRightPainted = useLoader(TextureLoader, isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/studio/monitor_right_painted.png');
 
     // 加载 YouTube 电视的外壳与彩色纹理。
-    const tvBack = useLoader(TextureLoader, '/textures/studio/tv_back.webp');
-    const tvTop = useLoader(TextureLoader, '/textures/studio/tv_top.webp');
-    const tvBottom = useLoader(TextureLoader, '/textures/studio/tv_bottom.webp');
-    const tvSide = useLoader(TextureLoader, '/textures/studio/tv_side.webp');
-    const tvBackPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/tv_back_painted.webp');
-    const tvTopPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/tv_top_painted.webp');
-    const tvBottomPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/tv_bottom_painted.webp');
-    const tvSidePainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/tv_side_painted.webp');
+    const tvBack = useLoader(TextureLoader, 'https://media.secknow-ai.com/space/textures/studio/tv_back.png');
+    const tvTop = useLoader(TextureLoader, 'https://media.secknow-ai.com/space/textures/studio/tv_top.png');
+    const tvBottom = useLoader(TextureLoader, 'https://media.secknow-ai.com/space/textures/studio/tv_bottom.png');
+    const tvSide = useLoader(TextureLoader, 'https://media.secknow-ai.com/space/textures/studio/tv_side.png');
+    const tvBackPainted = useLoader(TextureLoader, isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/studio/tv_back_painted.png');
+    const tvTopPainted = useLoader(TextureLoader, isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/studio/tv_top_painted.png');
+    const tvBottomPainted = useLoader(TextureLoader, isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/studio/tv_bottom_painted.png');
+    const tvSidePainted = useLoader(TextureLoader, isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/studio/tv_side_painted.png');
 
     // 加载 TikTok 手机的外壳与彩色纹理。
-    const phoneBack = useLoader(TextureLoader, '/textures/studio/phone_back.webp');
-    const phoneSide = useLoader(TextureLoader, '/textures/studio/phone_side.webp');
-    const phoneBackPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/phone_back_painted.webp');
-    const phoneSidePainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/phone_side_painted.webp');
+    const phoneBack = useLoader(TextureLoader, 'https://media.secknow-ai.com/space/textures/studio/phone_back.png');
+    const phoneSide = useLoader(TextureLoader, 'https://media.secknow-ai.com/space/textures/studio/phone_side.png');
+    const phoneBackPainted = useLoader(TextureLoader, isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/studio/phone_back_painted.png');
+    const phoneSidePainted = useLoader(TextureLoader, isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/studio/phone_side_painted.png');
 
     // 构建当前设备类型的纹理配置。
     // 每项为 { sketch, painted }；painted 为 null 时，该面没有显现效果。

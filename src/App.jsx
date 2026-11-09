@@ -102,7 +102,7 @@ const GlobalAudioEnabler = () => {
 // 使用走廊墙面纹理的静态场景背景。
 const PaperSceneBackground = () => {
   const { scene } = useThree();
-  const texture = useTexture('/textures/paper-texture.webp');
+  const texture = useTexture('https://media.secknow-ai.com/space/textures/paper-texture.png');
 
   useEffect(() => {
     texture.colorSpace = THREE.SRGBColorSpace;

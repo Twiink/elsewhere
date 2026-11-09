@@ -10,7 +10,7 @@ import * as THREE from 'three';
  */
 const PaperBackground = () => {
     // 加载纸张纹理。
-    const paperTexture = useTexture('/textures/paper-texture.webp');
+    const paperTexture = useTexture('https://media.secknow-ai.com/space/textures/paper-texture.png');
 
     useMemo(() => {
         paperTexture.wrapS = paperTexture.wrapT = THREE.RepeatWrapping;

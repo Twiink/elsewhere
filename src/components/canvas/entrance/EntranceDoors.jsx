@@ -54,34 +54,34 @@ const EntranceDoors = ({
     const isMobileDevice = typeof window !== 'undefined' && (isTouchDevice() || window.innerWidth < 1000);
     const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
-    const frameTexture = useTexture('/textures/doors/frame_sketch.webp');
-    const doorLeftTexture = useTexture('/textures/doors/twiink-entry-left-ink-v1.webp');
-    const doorRightTexture = useTexture('/textures/doors/twiink-entry-right-ink-v1.webp');
+    const frameTexture = useTexture('https://media.secknow-ai.com/space/textures/doors/frame_sketch.png');
+    const doorLeftTexture = useTexture('https://media.secknow-ai.com/space/textures/doors/twiink-entry-left-ink-v1.png?imageMogr2/thumbnail/512x1308');
+    const doorRightTexture = useTexture('https://media.secknow-ai.com/space/textures/doors/twiink-entry-right-ink-v1.png?imageMogr2/thumbnail/512x1308');
 
     // 移动端优化：手机不加载彩色纹理与把手。
-    const doorRightPaintedTexture = useTexture(isMobileDevice ? dummyTex : '/textures/doors/twiink-entry-right-color-v1.webp');
-    const doorLeftPaintedTexture = useTexture(isMobileDevice ? dummyTex : '/textures/doors/twiink-entry-left-color-v1.webp');
-    const handleLeftTexture = useTexture('/textures/doors/handle_left_sketch.webp');
-    const handleLeftPaintedTexture = useTexture(isMobileDevice ? dummyTex : '/textures/doors/handle_left_painted.webp');
-    const handleRightTexture = useTexture('/textures/doors/handle_right_sketch.webp');
-    const handleRightPaintedTexture = useTexture(isMobileDevice ? dummyTex : '/textures/doors/handle_right_painted.webp');
+    const doorRightPaintedTexture = useTexture(isMobileDevice ? dummyTex : 'https://media.secknow-ai.com/space/textures/doors/twiink-entry-right-color-v1.png?imageMogr2/thumbnail/512x1308');
+    const doorLeftPaintedTexture = useTexture(isMobileDevice ? dummyTex : 'https://media.secknow-ai.com/space/textures/doors/twiink-entry-left-color-v1.png?imageMogr2/thumbnail/512x1308');
+    const handleLeftTexture = useTexture('https://media.secknow-ai.com/space/textures/doors/handle_left_sketch.png');
+    const handleLeftPaintedTexture = useTexture(isMobileDevice ? dummyTex : 'https://media.secknow-ai.com/space/textures/doors/handle_left_painted.png');
+    const handleRightTexture = useTexture('https://media.secknow-ai.com/space/textures/doors/handle_right_sketch.png');
+    const handleRightPaintedTexture = useTexture(isMobileDevice ? dummyTex : 'https://media.secknow-ai.com/space/textures/doors/handle_right_painted.png');
 
     // 移动端动态纹理。
-    const doorBackTexture = useTexture(isMobileDevice ? '/textures/doors/door_back.webp' : '/textures/doors/door_back_left_sketch.webp');
-    const edgeTexture = useTexture(isMobileDevice ? '/textures/doors/pien_sketch.webp' : '/textures/doors/pien.webp');
+    const doorBackTexture = useTexture(isMobileDevice ? 'https://media.secknow-ai.com/space/textures/doors/door_back.png' : 'https://media.secknow-ai.com/space/textures/doors/door_back_left_sketch.png');
+    const edgeTexture = useTexture(isMobileDevice ? 'https://media.secknow-ai.com/space/textures/doors/pien_sketch.png' : 'https://media.secknow-ai.com/space/textures/doors/pien.png');
 
-    const bricksTexture = useTexture('/textures/entrance/wall_bricks_2.webp');
-    const stonePathTexture = useTexture('/textures/entrance/stone-path.webp');
-    // const catTexture = useTexture('/textures/entrance/cat_sketch.webp'); // 旧版侧边猫。
-    const catFrontBodyTexture = useTexture('/textures/entrance/cat_front_body.webp');
-    const windowSketchTexture = useTexture('/textures/entrance/window_sketch.webp');
-    const avatarWindowTexture = useTexture('/textures/twiink/window-ink.webp');
-    const treeTexture = useTexture('/textures/entrance/tree_sketch.webp');
-    const mouseTexture = useTexture('/textures/entrance/mouse_hanging.webp');
-    const potTexture = useTexture('/textures/entrance/pot_with_duck.webp');
-    const bugTexture = useTexture('/textures/entrance/bug_sketch.webp');
-    const inkSplashTexture = useTexture('/images/ink-splash.webp');
-    const speechBubbleTexture = useTexture('/textures/entrance/speech_bubble.webp');
+    const bricksTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/wall_bricks_2.png');
+    const stonePathTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/stone-path.png?imageMogr2/thumbnail/389x779');
+    // const catTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/cat_sketch.png?imageMogr2/thumbnail/512x1024'); // 旧版侧边猫。
+    const catFrontBodyTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/cat_front_body.png');
+    const windowSketchTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/window_sketch.png?imageMogr2/thumbnail/1024x1024');
+    const avatarWindowTexture = useTexture('https://media.secknow-ai.com/space/textures/twiink/window-ink.png');
+    const treeTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/tree_sketch.png');
+    const mouseTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/mouse_hanging.png');
+    const potTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/pot_with_duck.png?imageMogr2/thumbnail/2048x1024');
+    const bugTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/bug_sketch.png');
+    const inkSplashTexture = useTexture('https://media.secknow-ai.com/space/images/ink-splash.png');
+    const speechBubbleTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/speech_bubble.png');
 
     // 猫的引用。
     const leftPupilRef = useRef();

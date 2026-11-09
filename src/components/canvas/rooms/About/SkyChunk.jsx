@@ -22,14 +22,14 @@ const ROOM_Z = -25;
 
 // 可用云纹理。
 const CLOUD_TEXTURES = [
-    '/textures/clouds/1131c3eb-dfae-423f-924b-ff39d8ccd6dc.webp',
-    '/textures/clouds/254b8ec8-d6f7-4275-956f-7bab65b2ce2d.webp',
-    '/textures/clouds/2cc88dd1-483c-466d-b07e-f8308c61ccbe.webp',
-    '/textures/clouds/5606fcc0-3252-447d-a58a-7bcbac73229a.webp',
-    '/textures/clouds/7882dc72-3d01-41fb-ac0e-d07b0184ebc1.webp',
-    '/textures/clouds/9b2ca72f-7bd0-473b-ba6e-dd9e0eb79d35.webp',
-    '/textures/clouds/c83293c6-d90c-4a32-8d9d-5ac9af7e2296.webp',
-    '/textures/clouds/f6e358bc-d27c-41dd-95f4-6787a835c41e.webp',
+    'https://media.secknow-ai.com/space/textures/clouds/1131c3eb-dfae-423f-924b-ff39d8ccd6dc.png',
+    'https://media.secknow-ai.com/space/textures/clouds/254b8ec8-d6f7-4275-956f-7bab65b2ce2d.png',
+    'https://media.secknow-ai.com/space/textures/clouds/2cc88dd1-483c-466d-b07e-f8308c61ccbe.png?imageMogr2/thumbnail/512x128',
+    'https://media.secknow-ai.com/space/textures/clouds/5606fcc0-3252-447d-a58a-7bcbac73229a.png?imageMogr2/thumbnail/512x256',
+    'https://media.secknow-ai.com/space/textures/clouds/7882dc72-3d01-41fb-ac0e-d07b0184ebc1.png?imageMogr2/thumbnail/256x256',
+    'https://media.secknow-ai.com/space/textures/clouds/9b2ca72f-7bd0-473b-ba6e-dd9e0eb79d35.png',
+    'https://media.secknow-ai.com/space/textures/clouds/c83293c6-d90c-4a32-8d9d-5ac9af7e2296.png?imageMogr2/thumbnail/512x128',
+    'https://media.secknow-ai.com/space/textures/clouds/f6e358bc-d27c-41dd-95f4-6787a835c41e.png',
 ];
 
 const SkyChunk = ({ chunkIndex = 0, seed = 0, scrollProgressRef }) => {
@@ -106,17 +106,17 @@ const Cloud = ({
 
     // 使用原始宽高比，防止二次幂尺寸转换后拉伸。
     const legacyCloudAspects = {
-        '1131c3eb-dfae-423f-924b-ff39d8ccd6dc.webp': 1.894,
-        '254b8ec8-d6f7-4275-956f-7bab65b2ce2d.webp': 2.459,
-        '2cc88dd1-483c-466d-b07e-f8308c61ccbe.webp': 3.577,
-        '5606fcc0-3252-447d-a58a-7bcbac73229a.webp': 1.794,
-        '7882dc72-3d01-41fb-ac0e-d07b0184ebc1.webp': 1.997,
-        '9b2ca72f-7bd0-473b-ba6e-dd9e0eb79d35.webp': 1.905,
-        'c83293c6-d90c-4a32-8d9d-5ac9af7e2296.webp': 3,
-        'f6e358bc-d27c-41dd-95f4-6787a835c41e.webp': 1.875
+        '1131c3eb-dfae-423f-924b-ff39d8ccd6dc.png': 1.894,
+        '254b8ec8-d6f7-4275-956f-7bab65b2ce2d.png': 2.459,
+        '2cc88dd1-483c-466d-b07e-f8308c61ccbe.png': 3.577,
+        '5606fcc0-3252-447d-a58a-7bcbac73229a.png': 1.794,
+        '7882dc72-3d01-41fb-ac0e-d07b0184ebc1.png': 1.997,
+        '9b2ca72f-7bd0-473b-ba6e-dd9e0eb79d35.png': 1.905,
+        'c83293c6-d90c-4a32-8d9d-5ac9af7e2296.png': 3,
+        'f6e358bc-d27c-41dd-95f4-6787a835c41e.png': 1.875
     };
 
-    const cloudFile = CLOUD_TEXTURES[textureIndex].split('/').pop();
+    const cloudFile = new URL(CLOUD_TEXTURES[textureIndex]).pathname.split('/').pop();
     const aspectRatio = legacyCloudAspects[cloudFile] || 1.8; // 默认使用通用比例。
     const width = 3 * scale;
     const height = width / aspectRatio;

@@ -26,7 +26,7 @@ function contentAuthor(item, personId) {
     return item.authorName ? { '@type': 'Person', name: item.authorName } : { '@id': personId };
 }
 
-export function buildJsonLd({ site, projects, studio, awards, faq, profile }) {
+export function buildJsonLd({ site, projects, studio, wishes = [], awards, faq, profile }) {
     const personId = site.url ? `${site.url}/#person` : '#person';
     const graph = [
         {
@@ -72,6 +72,14 @@ export function buildJsonLd({ site, projects, studio, awards, faq, profile }) {
             thumbnailUrl: absoluteUrl(item.frontTexture, site.url),
             author: contentAuthor(item, personId), inLanguage: 'zh-CN',
         })),
+        ...(wishes.length ? [{
+            '@type': 'ItemList', name: '想做的事', numberOfItems: wishes.length,
+            url: '/studio?view=wishes',
+            itemListElement: wishes.map((wish, index) => ({
+                '@type': 'ListItem', position: index + 1, name: wish.title,
+                ...(wish.description ? { description: wish.description } : {}),
+            })),
+        }] : []),
         profile ? {
             '@type': 'ItemList', name: profile.titles.highlights, numberOfItems: profile.highlights.length,
             itemListElement: profile.highlights.map((item, index) => ({
@@ -94,7 +102,7 @@ export function buildJsonLd({ site, projects, studio, awards, faq, profile }) {
     return { '@context': 'https://schema.org', '@graph': graph };
 }
 
-export function buildLlmsTxt({ site, projects, studio, awards, faq, profile }) {
+export function buildLlmsTxt({ site, projects, studio, wishes = [], awards, faq, profile }) {
     const lines = [`# ${site.siteTitle}`, `> ${site.siteDescription}`, ''];
     if (profile) {
         for (const section of getProfileSections(profile)) {
@@ -123,6 +131,9 @@ export function buildLlmsTxt({ site, projects, studio, awards, faq, profile }) {
                 lines.push(`### ${section.title}`, ...section.paragraphs);
                 for (const entry of section.entries) lines.push(`- ${entry.title}：${entry.description}`);
             }
+        }
+        if (title === '生活手记' && wishes.length) {
+            lines.push('### 想做的事', ...wishes.map(wish => `- [${wish.title}](/studio?view=wishes) · ${wish.status}${wish.description ? `：${wish.description}` : ''}`));
         }
         lines.push('');
     }
@@ -180,7 +191,7 @@ export function generateSeoHtml() {
         },
         transformIndexHtml(html) {
             const content = readContent();
-            const { site, projects, studio, awards, faq, profile } = content;
+            const { site, projects, studio, wishes = [], awards, faq, profile } = content;
             const shareImage = site.shareImage;
             const sections = [
                 `<header><h1>${escapeHtml(site.siteTitle)}</h1><p>${escapeHtml(site.siteDescription)}</p></header>`,
@@ -190,13 +201,16 @@ export function generateSeoHtml() {
             if (!profile) collections.push(['awards', '奖项与证书', awards]);
             for (const [id, title, items] of collections) {
                 const entries = items.map(item => `<li><h3>${escapeHtml(item.seoTitle || item.title)}</h3><p>${escapeHtml(item.details ? item.description : item.seoDescription || item.description || '')}</p>${buildProjectBody(item)}${buildStudioBody(item)}<a href="${escapeHtml(item.url)}">查看详情</a></li>`).join('');
-                sections.push(`<section id="${id}"><h2>${title}</h2><ul>${entries}</ul></section>`);
+                const wishSection = id === 'studio' && wishes.length
+                    ? `<section id="wishes"><h3>想做的事</h3><ul>${wishes.map(wish => `<li><h4>${escapeHtml(wish.title)}</h4>${wish.description ? `<p>${escapeHtml(wish.description)}</p>` : ''}<p>${escapeHtml(wish.status)}</p></li>`).join('')}</ul><a href="/studio?view=wishes">查看想做的事</a></section>`
+                    : '';
+                sections.push(`<section id="${id}"><h2>${title}</h2><ul>${entries}</ul>${wishSection}</section>`);
             }
             if (site.contact) {
                 sections.push(`<section id="contact"><h2>联系我</h2><p>${escapeHtml(site.contact.description)}</p><p><a href="mailto:${escapeHtml(site.contact.email)}">${escapeHtml(site.contact.email)}</a></p><p><a href="${escapeHtml(site.githubUrl)}">GitHub</a></p><p>微信：${escapeHtml(site.contact.wechatId)}</p></section>`);
             }
             if (site.resume?.url) {
-                sections.push(`<section id="resume"><h2>${escapeHtml(site.resume.title)}</h2><p>${escapeHtml(site.resume.description)}</p><a href="${escapeHtml(site.resume.url)}" target="_blank" rel="noopener noreferrer">在线查看简历 PDF</a> <a href="${escapeHtml(site.resume.url)}" download="${escapeHtml(site.resume.downloadName)}">下载简历 PDF</a></section>`);
+                sections.push(`<section id="resume"><h2>${escapeHtml(site.resume.title)}</h2><p>${escapeHtml(site.resume.description)}</p><a href="${escapeHtml(site.resume.url)}" target="_blank" rel="noopener noreferrer">在线查看简历 PDF</a> <a href="${escapeHtml(site.resume.url)}" download="${escapeHtml(site.resume.downloadName)}" data-resume-download>下载简历 PDF</a></section>`);
             }
             if (site.studioChannels) {
                 const channels = site.studioChannels;

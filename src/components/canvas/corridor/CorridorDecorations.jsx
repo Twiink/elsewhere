@@ -331,20 +331,20 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
     // =============================================
     // 装饰纹理。
     // =============================================
-    const frameTexture = useTexture('/textures/corridor/ramkanazdjecieduza.webp');
-    const framePaintedTexture = useTexture('/textures/corridor/ramkanazdjecieduza_painted.webp');
-    const standingFrameTexture = useTexture('/textures/corridor/ramkanazdjeciemala.webp');
-    const treeTexture = useTexture('/textures/corridor/drzewkowdoniczce.webp');
-    const grateTexture = useTexture('/textures/corridor/kratkawentylacyjna.webp');
-    const flowerTexture = useTexture('/textures/corridor/kwiatekwdoniczce.webp');
+    const frameTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/ramkanazdjecieduza.png?imageMogr2/thumbnail/2048x1024');
+    const framePaintedTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/ramkanazdjecieduza_painted.png?imageMogr2/thumbnail/2048x1024');
+    const standingFrameTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/ramkanazdjeciemala.png?imageMogr2/thumbnail/512x1024');
+    const treeTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/drzewkowdoniczce.png?imageMogr2/thumbnail/1024x2048');
+    const grateTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/kratkawentylacyjna.png?imageMogr2/thumbnail/2048x1024');
+    const flowerTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/kwiatekwdoniczce.png?imageMogr2/thumbnail/128x256');
 
     // 顶灯：光源点。
     // 灯具纹理。
-    const lampGrilleTexture = useTexture('/textures/corridor/kratanalampy.webp');
+    const lampGrilleTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/kratanalampy.png?imageMogr2/thumbnail/1515x757');
     // lampGrilleTexture.wrapS = lampGrilleTexture.wrapT = THREE.RepeatWrapping; 
     // lampGrilleTexture.repeat.set(1, 1);
 
-    const lampSideTexture = useTexture('/textures/corridor/bokilampy.webp');
+    const lampSideTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/bokilampy.png?imageMogr2/thumbnail/1024x64');
     lampSideTexture.wrapS = lampSideTexture.wrapT = THREE.RepeatWrapping;
     // 调整长边 UV。
     lampSideTexture.repeat.set(1, 1);
@@ -384,7 +384,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
             y: 0.3,                  // 墙面高度。
             id: 'frame-1',
             // 纸飞机与星星，沿用网站图标。
-            image: '/textures/twiink/site-icon-airplane-v1-512.png',
+            image: 'https://media.secknow-ai.com/space/textures/twiink/site-icon-airplane-v1-512.png?imageMogr2/thumbnail/512x512',
             imageWidth: 0.95,
             imageHeight: 0.95,
             offsetFromWall: 0.1, // 向走廊中心移动 0.1 单位。
@@ -396,7 +396,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
             height: 2.5 / 1.785,
             y: 0.2,
             id: 'frame-2',
-            image: '/textures/corridor/rysuneknaobrazek3.webp',
+            image: 'https://media.secknow-ai.com/space/textures/corridor/rysuneknaobrazek3.png?imageMogr2/thumbnail/716x358',
             imageWidth: 1.7,
             imageHeight: 1,
             offsetFromWall: 0.1
@@ -408,7 +408,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
             height: 2.6,
             y: 0.25,
             id: 'frame-3',
-            image: '/content/corridor/bouquet-hands.webp',
+            image: 'https://media.secknow-ai.com/space/content/corridor/bouquet-hands.png?imageMogr2/thumbnail/1536x2048',
             imageWidth: 1.65,
             imageHeight: 2.2,
             offsetFromWall: 0.1,
@@ -421,7 +421,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
             height: 2.6,
             y: 0.35,
             id: 'frame-4',
-            image: '/content/corridor/hanfu-photo.webp',
+            image: 'https://media.secknow-ai.com/space/content/corridor/hanfu-photo.jpg?imageMogr2/thumbnail/1365x2048',
             imageWidth: 2.2 * 2 / 3,
             imageHeight: 2.2,
             offsetFromWall: 0.1,
@@ -432,12 +432,12 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
     // =============================================
     // 桌子。
     // =============================================
-    const woodTexture = useTexture('/textures/corridor/texturadrewnadonozekbiurka.webp');
-    const tableTopTexture = useTexture('/textures/corridor/gorastolika.webp');
+    const woodTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/texturadrewnadonozekbiurka.png?imageMogr2/thumbnail/2048x128');
+    const tableTopTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/gorastolika.png?imageMogr2/thumbnail/2048x512');
 
     // 柜子纹理。
-    const cabinetFrontTexture = useTexture('/textures/corridor/szafkaprzod.webp');
-    const cabinetRestTexture = useTexture('/textures/corridor/szafkaprzodgora.webp');
+    const cabinetFrontTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/szafkaprzod.png?imageMogr2/thumbnail/1024x1024');
+    const cabinetRestTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/szafkaprzodgora.png?imageMogr2/thumbnail/512x1024');
 
     // 克隆桌腿纹理后旋转，使横向纹理变为竖向。
     const legTexture = useMemo(() => {

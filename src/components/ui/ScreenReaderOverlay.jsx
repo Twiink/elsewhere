@@ -1,7 +1,7 @@
 import { useScene } from '../../context/SceneContext';
 import { useGalleryProjects, useStudioContent } from '../../hooks/useContentData';
 import '../../styles/ScreenReaderOverlay.scss';
-import { personalProfile, contactInfo, siteInfo, resumeInfo } from '../../data/content';
+import { personalProfile, contactInfo, siteInfo, resumeInfo, studioWishes } from '../../data/content';
 import ProfileContent from './ProfileContent';
 
 /**
@@ -81,7 +81,7 @@ const ScreenReaderOverlay = () => {
                             <div aria-label="关于我房间的内容">
                                 <h3>关于我</h3>
                                 <ProfileContent profile={personalProfile} idPrefix="sr-profile" />
-                                {resumeInfo?.url && <a href={resumeInfo.url} download={resumeInfo.downloadName}>下载简历 PDF</a>}
+                                {resumeInfo?.url && <a href={resumeInfo.url} download={resumeInfo.downloadName} data-resume-download>下载简历 PDF</a>}
                             </div>
                         )}
                         {currentRoom === 'gallery' && (
@@ -110,7 +110,7 @@ const ScreenReaderOverlay = () => {
                             <div aria-label="联系我房间的内容">
                                 <h3>联系我</h3>
                                 <p>{contactInfo.description}</p>
-                                {resumeInfo?.url && <p><a href={resumeInfo.url} download={resumeInfo.downloadName}>下载简历 PDF</a></p>}
+                                {resumeInfo?.url && <p><a href={resumeInfo.url} download={resumeInfo.downloadName} data-resume-download>下载简历 PDF</a></p>}
                                 <p><a href={`mailto:${contactInfo.email}`}>发送邮件：{contactInfo.email}</a></p>
                                 <p><a href={siteInfo.githubUrl} target="_blank" rel="noopener noreferrer">访问 Twiink 的 GitHub</a></p>
                                 <p>微信号：{contactInfo.wechatId}</p>
@@ -123,6 +123,18 @@ const ScreenReaderOverlay = () => {
                             <div aria-label="生活手记房间的内容">
                                 <h3>生活手记</h3>
                                 <p>出门走走、一起玩游戏，还有给网站画人物的过程。点击屏幕，或选择下面的一篇，翻翻这些生活与创作记录。</p>
+                                <section aria-label="想做的事">
+                                    <h4>想做的事</h4>
+                                    <button type="button" aria-haspopup="dialog" aria-controls="studio-notes-dialog" onClick={() => openOverlay({ layout: 'studio', view: 'wishes' })}>在生活手记中查看想做的事</button>
+                                    <ul>
+                                        {studioWishes.map(wish => (
+                                            <li key={wish.id}>
+                                                <p>{wish.title} · {wish.status}</p>
+                                                {wish.description && <p>{wish.description}</p>}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </section>
 
                                 {studio && studio.length > 0 && (
                                     <ul>

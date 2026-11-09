@@ -13,7 +13,7 @@ const Tunnel = ({ parallax = { x: 0, y: 0 } }) => {
     const meshRef = useRef();
 
     // 加载纸张纹理。
-    const paperTexture = useTexture('/textures/paper-texture.webp');
+    const paperTexture = useTexture('https://media.secknow-ai.com/space/textures/paper-texture.png');
 
     // 配置纹理平铺。
     useMemo(() => {

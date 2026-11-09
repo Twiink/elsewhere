@@ -81,11 +81,11 @@ test('个人链接页提供站内导航、GitHub 与简历下载，作品集入�
   const anchors = [...html.matchAll(/<a\b([^>]+)>([\s\S]*?)<\/a>/g)];
   assert.equal(anchors.length, 9);
   const { resume } = JSON.parse(readFileSync(new URL('../src/data/content.json', import.meta.url))).site;
-  assert.ok(anchors.some(match => match[1].includes(`href="${resume.url}"`) && match[1].includes(`download="${resume.downloadName}"`)));
+  assert.ok(anchors.some(match => match[1].includes(`href="${resume.url}"`) && match[1].includes(`download="${resume.downloadName}"`) && match[1].includes('data-resume-download')));
   assert.equal(anchors.filter(match => /href="\/"/.test(match[1])).length, 1);
   assert.equal(anchors.filter(match => /data-pending/.test(match[1])).length, 0);
   const urls = anchors.map(match => match[1].match(/href="(https:[^"]+)"/)?.[1]).filter(Boolean);
-  assert.deepEqual(urls, ['https://github.com/Twiink']);
+  assert.deepEqual(urls, [resume.url, 'https://github.com/Twiink']);
   for (const path of ['/about', '/gallery', '/studio', '/contact']) assert.ok(html.includes(`href="${path}"`));
   assert.match(html, /<h1>Twiink's Space<\/h1>/);
   assert.match(html, /aria-label="交互作品集"/);
@@ -98,11 +98,11 @@ test('静态入口保持独立，使用本地中英文字体', () => {
   assert.equal(html.match(/property="og:image" content="([^"]+)"/)?.[1], shareImageUrl);
   assert.equal(html.match(/name="twitter:image" content="([^"]+)"/)?.[1], shareImageUrl);
   assert.match(html, /<meta name="twitter:card" content="summary_large_image">/);
-  assert.equal((html.match(/<script\b/g) || []).length, 1);
+  assert.equal((html.match(/<script\b/g) || []).length, 2);
   assert.match(html, /src="\/start\/script.js" defer/);
+  assert.match(html, /src="\/scripts\/resume-download.js" defer/);
   assert.doesNotMatch(html, /\/assets\/|modulepreload|<video\b/);
-  assert.match(html, /src="\/textures\/twiink\/start-bouquet.png"/);
-  assert.ok(statSync(new URL('../public/textures/twiink/start-bouquet.png', import.meta.url)).size > 0);
+  assert.match(html, /src="https:\/\/media\.secknow-ai\.com\/space\/textures\/twiink\/start-bouquet\.png(?:\?[^\"]*)?"/);
   assert.doesNotMatch(script, /\bimport\s|\bfetch\s*\(|XMLHttpRequest|WebSocket/);
   assert.equal((html.match(/as="font"/g) || []).length, 2);
   assert.ok(statSync(new URL('../public/start/fonts/barlow-condensed-700-latin.woff2', import.meta.url)).size < 25000);

@@ -82,21 +82,21 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
     // 地面设置。
     // =============================================
     // 地面片段纹理：手绘木板。
-    const floorTexture = useTexture('/textures/corridor/kawalekpodlogi.webp');
+    const floorTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/kawalekpodlogi.png?imageMogr2/thumbnail/1024x1024');
     floorTexture.wrapS = floorTexture.wrapT = THREE.ClampToEdgeWrapping;
 
     // 踢脚线纹理。
     // 图片尺寸：1582×94 像素，宽高比 16.83:1。
-    const baseboardTexture = useTexture('/textures/corridor/texturadoprogow.webp');
+    const baseboardTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png');
     baseboardTexture.wrapS = baseboardTexture.wrapT = THREE.RepeatWrapping;
     baseboardTexture.colorSpace = THREE.SRGBColorSpace;
 
     // 加载墙面纹理。
-    const wallTexture = useTexture('/textures/corridor/wall_texture.webp');
+    const wallTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512');
     wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
 
     // 加载天花板纹理。
-    const ceilingTexture = useTexture('/textures/corridor/ceiling_texture.webp');
+    const ceilingTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/ceiling_texture.png?imageMogr2/thumbnail/1024x512');
     ceilingTexture.wrapS = ceilingTexture.wrapT = THREE.RepeatWrapping;
 
     // 按裁切条件计算有效几何体。

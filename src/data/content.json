@@ -11,17 +11,17 @@
     "xUrl": "",
     "youtubeUrl": "",
     "shareImage": {
-      "path": "/content/social/twiink-share-cover-v1.jpg",
+      "path": "https://media.secknow-ai.com/space/content/social/twiink-share-cover-v1.png?imageMogr2/thumbnail/1200x630",
       "width": 1200,
       "height": 630,
-      "mimeType": "image/jpeg",
+      "mimeType": "image/png",
       "alt": "Twiink's Space：奶白纸底上的淡彩古风捧花人物，配网站名与一句话介绍。"
     },
     "resume": {
       "title": "我的简历",
       "description": "想更快了解我做过什么，可以先看看这份简历。",
-      "url": "/files/twiink-resume.pdf",
-      "downloadName": "Twiink-简历.pdf"
+      "url": "https://media.secknow-ai.com/space/Resume.pdf",
+      "downloadName": "郑越-13990529155-Agent全栈开发.pdf"
     },
     "studioChannels": {
       "title": "Matrix 工作室",
@@ -48,8 +48,8 @@
       "seoTitle": "泡芙大作战 PuffWar 乐园：把逛乐园变成一场闯关游戏",
       "seoDescription": "平时去线下乐园，大多就是到处逛逛、玩玩项目。做「泡芙大作战 PuffWar 乐园」的时候，我们想让逛乐园这件事更像在打一场真人的闯关游戏。\n\n进场戴上手环、用小程序绑好之后，就可以照着地图去找任务做了。在场馆里的游戏设备上刷手环打卡、闯关，手机里就会跟着攒积分、点亮图鉴和徽章，还能看看自己和所在阵营排在第几名。攒够了积分，可以直接在小程序商城里挑礼物，再去现场柜台把实物领走。\n\n里面还有一个我很喜欢的小玩法：走到场馆的大屏幕前扫个码，手机屏幕就会变成一个游戏手柄。拖一拖摇杆，就能直接操控大屏里的角色到处跑，还能顺手发个表情和文字上去，大家一起在屏幕前闹腾，气氛一下就热闹起来了。",
       "url": "/gallery",
-      "front": "/content/projects/puffwar/cover-sketch.svg",
-      "painted": "/content/projects/puffwar/cover-color.svg",
+      "front": "https://media.secknow-ai.com/space/content/projects/puffwar/cover-sketch.png?imageMogr2/thumbnail/1200x1600",
+      "painted": "https://media.secknow-ai.com/space/content/projects/puffwar/cover-color.png?imageMogr2/thumbnail/1200x1600",
       "techStack": [],
       "cardNotes": [
         "手环闯关",
@@ -150,21 +150,21 @@
         ],
         "photos": [
           {
-            "src": "/content/projects/puffwar/ball-pit.jpg",
+            "src": "https://media.secknow-ai.com/space/content/projects/puffwar/ball-pit.png",
             "alt": "乐园里的海洋球区，抬头还能看到悬挂的气球与球形屏幕。",
             "caption": "乐园里的海洋球区，抬头还能看到悬挂的气球与球形屏幕。",
             "width": 1220,
             "height": 918
           },
           {
-            "src": "/content/projects/puffwar/play-area-collage.jpg",
+            "src": "https://media.secknow-ai.com/space/content/projects/puffwar/play-area-collage.png",
             "alt": "在场馆里玩一玩：网绳游乐区和墙上的互动装置。",
             "caption": "在场馆里玩一玩：网绳游乐区和墙上的互动装置。",
             "width": 1220,
             "height": 922
           },
           {
-            "src": "/content/projects/puffwar/interactive-session.jpg",
+            "src": "https://media.secknow-ai.com/space/content/projects/puffwar/interactive-session.png",
             "alt": "大家围坐在大屏前，听讲解、参与现场互动。",
             "caption": "大家围坐在大屏前，听讲解、参与现场互动。",
             "width": 1220,
@@ -173,7 +173,7 @@
         ],
         "entry": {
           "title": "去小程序里逛逛",
-          "image": "/content/projects/puffwar/miniprogram-code.png",
+          "image": "https://media.secknow-ai.com/space/content/projects/puffwar/miniprogram-code.png",
           "width": 336,
           "height": 336,
           "description": "用微信扫一扫，或搜索「泡芙大作战 PuffWar 乐园」，就能打开小程序。",
@@ -190,8 +190,8 @@
       "seoTitle": "无界宇宙 Infinite Cosmos：带着小宇航员逛科技馆",
       "seoDescription": "去科技馆逛展的时候，很多小朋友和观众走马观花看一圈就出来了。「无界宇宙」想做的事情很简单：让大家进馆之后多一个自己的宇航员小分身，边逛展、边做任务，像在完成一场小小的太空探险。这也是我参与的第一个正式投入使用的小程序。\n\n进馆戴上手环、在手机里绑好之后，就能领到自己的小宇航员。一边在展馆里打卡做任务、攒积分，一边慢慢收集新装备和勋章——头盔、衣服、身边跟着的小玩偶，还有身上的小特效都能自己挑着搭。每次拿到新东西，回手机里给小人换一身装扮，逛展就多了一点收集的乐趣。\n\n走到馆里的互动大屏前，还可以掏出手机扫个码，把手机变成游戏手柄。穿过一段小小的太空隧道动画，刚才自己亲手打扮好的那个小宇航员就会降落到大屏幕上。手指拖一拖摇杆，大屏里的角色就跟着到处走，还能顺手发几句文字和表情上去凑热闹。\n\n逛完离场前，可以在小程序里看看今天一共攒了多少分、能去现场哪里换小奖品，也能把自己的宇航员造型和点亮的勋章生成一张纪念海报，存下来或者发给朋友看。",
       "url": "/gallery",
-      "front": "/content/projects/boundless-universe/cover-sketch.svg",
-      "painted": "/content/projects/boundless-universe/cover-color.svg",
+      "front": "https://media.secknow-ai.com/space/content/projects/boundless-universe/cover-sketch.png?imageMogr2/thumbnail/1200x1600",
+      "painted": "https://media.secknow-ai.com/space/content/projects/boundless-universe/cover-color.png?imageMogr2/thumbnail/1200x1600",
       "techStack": [],
       "cardNotesTitle": "在科技馆里",
       "cardNotes": [
@@ -297,7 +297,7 @@
           {
             "title": "无界宇宙开场动画（无声）",
             "src": "/content/projects/boundless-universe/promo-video.mp4",
-            "poster": "/content/projects/boundless-universe/promo-poster.jpg",
+            "poster": "https://media.secknow-ai.com/space/content/projects/boundless-universe/promo-poster.png",
             "width": 288,
             "height": 640,
             "mimeType": "video/mp4",
@@ -313,7 +313,7 @@
         ],
         "entry": {
           "title": "带上自己的小宇航员出发",
-          "image": "/content/projects/boundless-universe/miniprogram-code.jpg",
+          "image": "https://media.secknow-ai.com/space/content/projects/boundless-universe/miniprogram-code.png",
           "width": 430,
           "height": 430,
           "description": "用微信扫一扫，或在微信里搜索「无界宇宙」，打开小程序看看。",
@@ -330,8 +330,8 @@
       "seoTitle": "SecKnow AI 教育平台：让好奇心带你去探索",
       "seoDescription": "SecKnow 把图文、视频、互动实验、AI 答疑和趣味测验放进一节节课程里，让孩子边看、边动手试、边提问。老师可以在后台生成、预览和修改教材与教案。Twiink 参与了前后端、教材准备、课程学习、语音辅导、课程开通与后台管理。",
       "url": "https://www.secknow-ai.com/",
-      "front": "/content/projects/secknow/cover-sketch.webp",
-      "painted": "/content/projects/secknow/cover-color.webp",
+      "front": "https://media.secknow-ai.com/space/content/projects/secknow/cover-sketch.png",
+      "painted": "https://media.secknow-ai.com/space/content/projects/secknow/cover-color.png",
       "techStack": [],
       "cardNotesTitle": "边看边探索",
       "cardNotes": [
@@ -437,28 +437,28 @@
         "photosTitle": "绘本里的小星球，和实际的页面",
         "photos": [
           {
-            "src": "/content/projects/secknow/showcase.webp",
+            "src": "https://media.secknow-ai.com/space/content/projects/secknow/showcase.png",
             "alt": "SecKnow 水彩绘本海报，四颗学习星球分别表现教材生成、互动实验、智能答疑和趣味测验",
             "caption": "SecKnow 的绘本海报，四颗小星球装着教材、实验、问答和测验。",
             "width": 1672,
             "height": 941
           },
           {
-            "src": "/content/projects/secknow/homepage.webp",
+            "src": "https://media.secknow-ai.com/space/content/projects/secknow/homepage.png",
             "alt": "SecKnow 网站首页，奶油色背景上排列着水彩星球和开始学习入口",
             "caption": "从首页出发，找一个感兴趣的话题看看。",
             "width": 1855,
             "height": 1025
           },
           {
-            "src": "/content/projects/secknow/knowledge-planets.webp",
+            "src": "https://media.secknow-ai.com/space/content/projects/secknow/knowledge-planets.png",
             "alt": "SecKnow 探索知识星球页面，各个学科和主题围绕星轨排列",
             "caption": "数学、科学、心理健康……每颗小星球里都有可以继续探索的内容。",
             "width": 1828,
             "height": 964
           },
           {
-            "src": "/content/projects/secknow/venue-exterior.webp",
+            "src": "https://media.secknow-ai.com/space/content/projects/secknow/venue-exterior.png",
             "alt": "草地、树木与建筑前，围栏上悬挂着蓝色 SecKnow 标识",
             "caption": "屏幕外的一角：草地、树木，还有 SecKnow 的标识。",
             "width": 1920,
@@ -482,8 +482,8 @@
       "seoTitle": "RAG 中台 RAG-Center：帮你翻资料，也把出处找出来",
       "seoDescription": "平时不管是做项目还是大家一起干活，电脑和网盘里总会攒下一大堆 PDF、Word 和笔记。明明记得“这件事之前哪份文件里写过”，真着急用的时候，光靠搜一两个词还是得把好几个文档挨个点开，来回翻上半天；要是直接丢给 AI 问，有时候又怕它顺嘴胡编，不敢直接信。\n\n做「RAG 中台（RAG-Center）」的时候，我想做的其实就是个“帮人翻资料、还会把原文翻开指给你看”的小管家。平时把零散的文档传上去分门别类放好，想查什么的时候，直接像平时说话一样问就行——哪怕你随口问的是“出差住酒店能报多少”，而文件里写的是“差旅住宿标准”，记不清原话也没关系，它照样能顺着意思和字眼把那几段翻出来。\n\n要是碰到那种一句两句说不清、得翻好几份文件才能凑齐答案的问题，还可以切到“深度研究”。它会像个耐心的搭档一样，先把大问题拆成几件要先搞明白的小事，去资料库里分头翻一圈；发现哪块还缺材料，再顺着线索去补查一轮，最后把整理好的回答连着出处小标号一起摆到你面前。哪句话出自哪份文件、哪一节，点一下就能跳回原文核对；要是资料库里压根没写这件事，它也会老老实实告诉你还没找到依据，绝不硬编。",
       "url": "/gallery",
-      "front": "/content/projects/rag-center/cover-sketch.webp",
-      "painted": "/content/projects/rag-center/cover-color.webp",
+      "front": "https://media.secknow-ai.com/space/content/projects/rag-center/cover-sketch.png",
+      "painted": "https://media.secknow-ai.com/space/content/projects/rag-center/cover-color.png",
       "techStack": [],
       "cardNotesTitle": "查资料的时候",
       "cardNotes": [
@@ -588,14 +588,14 @@
         "photosTitle": "项目海报与工作台原型",
         "photos": [
           {
-            "src": "/content/projects/rag-center/workbench.webp",
+            "src": "https://media.secknow-ai.com/space/content/projects/rag-center/workbench.png",
             "alt": "RAG-Center 工作台原型，展示知识库、文档上传、查资料与深度研究入口，含示例数据。",
             "caption": "工作台原型：上传文档、整理知识库，再试着问一个问题。画面为原型演示，包含示例数据。",
             "width": 1586,
             "height": 992
           },
           {
-            "src": "/content/projects/rag-center/poster.webp",
+            "src": "https://media.secknow-ai.com/space/content/projects/rag-center/poster.png",
             "alt": "RAG-Center 绿色与米白色项目海报，文档穿过绿色方框后带上来源标号。",
             "caption": "项目海报：把散落的资料连起来，找答案时也留好出处。",
             "width": 1086,
@@ -620,8 +620,8 @@
       "seoTitle": "HarnessPRD 智能需求文档平台：把半成品点子聊透，理成能直接开工的清单",
       "seoDescription": "平时突然冒出个新点子，跟朋友或者搭档说“咱们做个……吧”，嘴上聊起来热火朝天，觉得三天就能做完；可真坐到电脑前准备动手，或者想让 AI 帮着写代码的时候，脑子一下就卡壳了——总共要有几个页面？按钮点完去哪儿？万一填错了或者中途反悔怎么处理？要是前期全靠一句“你懂我意思吧”，做到一半准得推倒重来。\n\n做「HarnessPRD 智能需求文档平台」（界面里叫 ReqFlow）的时候，我想做的其实就是个“陪你把想法聊明白、再理成开工资料”的小帮手。刚开始哪怕只有一个模糊念头也没关系，先把大概想法填进去，AI 就会像个爱操心的搭档一样，顺着你的话追问那些容易漏掉的细节。聊完之后，它会把刚补齐的内容整理出来摆在你面前，让你先过目确认“对，我就是这个意思”，再往下动笔。\n\n等最核心的“到底要做什么”拍板定下来了，它就会顺着这份底子，帮你理出三样可以直接拿去干活的东西：一份讲清楚功能和页面的产品说明书（PRD）、一份前后端对表用的数据接口清单，还有一份专门喂给 AI 编程工具的写代码任务单。如果手头本来就已经写好了一半文档，也不用从头走流程，直接塞进去就能接着往下写；全部收拾停当之后打包带走，就能踏踏实实开工了。",
       "url": "/gallery",
-      "front": "/content/projects/harness-prd/cover-sketch.webp",
-      "painted": "/content/projects/harness-prd/cover-color.webp",
+      "front": "https://media.secknow-ai.com/space/content/projects/harness-prd/cover-sketch.png",
+      "painted": "https://media.secknow-ai.com/space/content/projects/harness-prd/cover-color.png",
       "techStack": [],
       "cardNotesTitle": "准备开工前",
       "cardNotes": [
@@ -726,14 +726,14 @@
         "photosTitle": "首页流程与项目海报",
         "photos": [
           {
-            "src": "/content/projects/harness-prd/homepage.webp",
+            "src": "https://media.secknow-ai.com/space/content/projects/harness-prd/homepage.png",
             "alt": "HarnessPRD（ReqFlow）首页展示图，包含从零整理需求、已有 PRD、已有 PRD 和接口文档三种起点。",
             "caption": "挑一个顺手的起点：可以从一句话想法开始聊，也能把写了一半的文档导进来接着往下做。",
             "width": 1536,
             "height": 1024
           },
           {
-            "src": "/content/projects/harness-prd/poster.webp",
+            "src": "https://media.secknow-ai.com/space/content/projects/harness-prd/poster.png",
             "alt": "HarnessPRD（ReqFlow）竖版海报，展示从需求录入、AI 澄清到 PRD、接口文档和开发提示词的完整流程。",
             "caption": "项目海报：先把核心需求敲定下来，再顺着整理出产品说明书、接口清单和写代码任务单。",
             "width": 1024,
@@ -762,8 +762,8 @@
       "platform": "life",
       "device": "monitor",
       "url": "/studio?note=donglingshan-sunrise",
-      "frontTexture": "/content/studio/covers/donglingshan-sunrise-ink.webp",
-      "paintedFrontTexture": "/content/studio/covers/donglingshan-sunrise-color.webp",
+      "frontTexture": "https://media.secknow-ai.com/space/content/studio/covers/donglingshan-sunrise-ink.png",
+      "paintedFrontTexture": "https://media.secknow-ai.com/space/content/studio/covers/donglingshan-sunrise-color.png",
       "authorName": "Twiink",
       "paragraphs": [
         "中午看到有人说东灵山有云海，立马买票，晚上就到了山脚下。",
@@ -771,7 +771,7 @@
       ],
       "photos": [
         {
-          "src": "/content/studio/life-notes/01-donglingshan-sunrise.jpg",
+          "src": "https://media.secknow-ai.com/space/content/studio/life-notes/01-donglingshan-sunrise.png",
           "alt": "东灵山日出时的双人合照，远处是山脊和初升的太阳",
           "width": 1706,
           "height": 1279
@@ -789,15 +789,15 @@
       "platform": "life",
       "device": "phone",
       "url": "/studio?note=huashan-finish",
-      "frontTexture": "/content/studio/covers/huashan-finish-ink.webp",
-      "paintedFrontTexture": "/content/studio/covers/huashan-finish-color.webp",
+      "frontTexture": "https://media.secknow-ai.com/space/content/studio/covers/huashan-finish-ink.png",
+      "paintedFrontTexture": "https://media.secknow-ai.com/space/content/studio/covers/huashan-finish-color.png",
       "authorName": "Twiink",
       "paragraphs": [
         "爬完华山，走下来之后，在牌坊前拍了这张照。给这趟爬山留个凭证：华山，通关！"
       ],
       "photos": [
         {
-          "src": "/content/studio/life-notes/02-huashan-finish.jpg",
+          "src": "https://media.secknow-ai.com/space/content/studio/life-notes/02-huashan-finish.png",
           "alt": "爬完华山下山后，在山脚牌坊前拍摄的留念照",
           "width": 1279,
           "height": 1706
@@ -815,8 +815,8 @@
       "platform": "life",
       "device": "monitor",
       "url": "/studio?note=via-ferrata",
-      "frontTexture": "/content/studio/covers/via-ferrata-ink.webp",
-      "paintedFrontTexture": "/content/studio/covers/via-ferrata-color.webp",
+      "frontTexture": "https://media.secknow-ai.com/space/content/studio/covers/via-ferrata-ink.png",
+      "paintedFrontTexture": "https://media.secknow-ai.com/space/content/studio/covers/via-ferrata-color.png",
       "authorName": "Twiink",
       "paragraphs": [
         "和周周玩完飞拉达，拿着证书拍张照。一个用证书挡脸，一个负责举手机，背后就是山崖。",
@@ -824,7 +824,7 @@
       ],
       "photos": [
         {
-          "src": "/content/studio/life-notes/03-via-ferrata.jpg",
+          "src": "https://media.secknow-ai.com/space/content/studio/life-notes/03-via-ferrata.png",
           "alt": "和周周体验飞拉达后，拿着证书在山崖边合影",
           "width": 1706,
           "height": 1279
@@ -842,8 +842,8 @@
       "platform": "life",
       "device": "monitor",
       "url": "/studio?note=it-takes-two",
-      "frontTexture": "/content/studio/covers/it-takes-two-ink.webp",
-      "paintedFrontTexture": "/content/studio/covers/it-takes-two-color.webp",
+      "frontTexture": "https://media.secknow-ai.com/space/content/studio/covers/it-takes-two-ink.png",
+      "paintedFrontTexture": "https://media.secknow-ai.com/space/content/studio/covers/it-takes-two-color.png",
       "authorName": "Twiink",
       "paragraphs": [
         "和周周把《双人成行》打通关了。屏幕里放着片尾字幕，屏幕外把两个手柄举起来，也拍一张结算照。",
@@ -851,7 +851,7 @@
       ],
       "photos": [
         {
-          "src": "/content/studio/life-notes/04-it-takes-two.jpg",
+          "src": "https://media.secknow-ai.com/space/content/studio/life-notes/04-it-takes-two.png",
           "alt": "和周周通关《双人成行》后，在片尾字幕前举起两个手柄留念",
           "width": 1706,
           "height": 1279
@@ -869,8 +869,8 @@
       "platform": "making",
       "device": "monitor",
       "url": "/studio?note=character-making",
-      "frontTexture": "/content/studio/covers/character-making-ink.webp",
-      "paintedFrontTexture": "/content/studio/covers/character-making-color.webp",
+      "frontTexture": "https://media.secknow-ai.com/space/content/studio/covers/character-making-ink.png",
+      "paintedFrontTexture": "https://media.secknow-ai.com/space/content/studio/covers/character-making-color.png",
       "authorName": "Twiink",
       "process": true,
       "paragraphs": [
@@ -879,7 +879,7 @@
       ],
       "photos": [
         {
-          "src": "/content/studio/character-making/01-photo.jpg",
+          "src": "https://media.secknow-ai.com/space/content/studio/character-making/01-photo.png",
           "alt": "人物形象的原始古风照片，花饰发髻、粉绿衣裙，手里捧着花束",
           "label": "古风照片",
           "caption": "最开始是这张照片，发饰、衣裙和手里的花，都是后面画人物时保留下来的小细节。",
@@ -887,7 +887,7 @@
           "height": 1920
         },
         {
-          "src": "/content/studio/character-making/02-anime.jpg",
+          "src": "https://media.secknow-ai.com/space/content/studio/character-making/02-anime.png",
           "alt": "以古风照片为参考的动漫形象，保留花饰、长发、衣裙和捧花",
           "label": "动漫形象",
           "caption": "把照片里的自己变成动漫形象，还是熟悉的花饰和捧花，只是换了一种画法。",
@@ -895,7 +895,7 @@
           "height": 1536
         },
         {
-          "src": "/textures/twiink/start-bouquet.png",
+          "src": "https://media.secknow-ai.com/space/textures/twiink/start-bouquet.png",
           "alt": "网站使用的全身黑白人物线稿，保留古风发饰、捧花与衣裙",
           "label": "黑白线稿",
           "caption": "再把颜色收起来，留下黑白线条，放进网站的手绘小世界里。",
@@ -903,6 +903,41 @@
           "height": 1536
         }
       ]
+    }
+  ],
+  "studioWishCard": {
+    "id": "wish-journal",
+    "layout": "studio",
+    "view": "wishes",
+    "title": "想做的事",
+    "description": "下一次，和周周一起。",
+    "platform": "life",
+    "device": "monitor",
+    "frontTexture": "https://media.secknow-ai.com/space/content/studio/wish-journal/cover-ink.svg",
+    "paintedFrontTexture": "https://media.secknow-ai.com/space/content/studio/wish-journal/cover-color.svg"
+  },
+  "wishes": [
+    {
+      "id": "changbaishan",
+      "title": "和周周去一次长白山",
+      "description": "希望可以看见天池。",
+      "image": "https://media.secknow-ai.com/space/content/studio/wish-journal/changbaishan.png",
+      "imageAlt": "长白山天池的淡彩手绘想象，两位同行者在湖边远望雪山",
+      "status": "想做的"
+    },
+    {
+      "id": "snow-mountain",
+      "title": "和周周去爬一次雪山",
+      "image": "https://media.secknow-ai.com/space/content/studio/wish-journal/snow-mountain.png",
+      "imageAlt": "两位同行者沿着小路走向雪山的淡彩旅行插画",
+      "status": "想做的"
+    },
+    {
+      "id": "skiing",
+      "title": "和周周一起去滑雪",
+      "image": "https://media.secknow-ai.com/space/content/studio/wish-journal/skiing.png",
+      "imageAlt": "两位同行者在雪坡上一起滑雪的淡彩旅行插画",
+      "status": "想做的"
     }
   ],
   "awards": [
@@ -914,7 +949,7 @@
       "category": "other",
       "date": "2026-07-15",
       "url": "https://muz.li/picked/interactive-3d-sketch-portfolio-itom/",
-      "image": "/content/9f1863c44d5d680e95e6dcfc594d2955ac5298c1-700x930.webp",
+      "image": "https://media.secknow-ai.com/space/content/9f1863c44d5d680e95e6dcfc594d2955ac5298c1-700x930.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -925,7 +960,7 @@
       "category": "sotd",
       "date": "2026-05-12",
       "url": "https://topdesignking.com/website/3621/tomasz-itom-szmajda-portfolio",
-      "image": "/content/cd3301fca22d4d589025a2bfa91fadbcee33cd00-1652x2336.webp",
+      "image": "https://media.secknow-ai.com/space/content/cd3301fca22d4d589025a2bfa91fadbcee33cd00-1652x2336.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -936,7 +971,7 @@
       "category": "sotd",
       "date": "2026-05-08",
       "url": "https://www.csslight.com/website/73073/Tomasz-ITom-Szmajda-Portfolio",
-      "image": "/content/6854d4bba74e97e4e739987227aeb9d0f56ded63-1652x2336.webp",
+      "image": "https://media.secknow-ai.com/space/content/6854d4bba74e97e4e739987227aeb9d0f56ded63-1652x2336.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -947,7 +982,7 @@
       "category": "sotd",
       "date": "2026-05-02",
       "url": "https://www.designnominees.com/sites/tomasz-itom-szmajda-portfoio",
-      "image": "/content/f13a8fa17a10e57963663c40665ee615c117aca8-1652x2336.webp",
+      "image": "https://media.secknow-ai.com/space/content/f13a8fa17a10e57963663c40665ee615c117aca8-1652x2336.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -958,7 +993,7 @@
       "category": "sotd",
       "date": "2026-05-01",
       "url": "https://wdawards.com/web/tomasz-itom-szmajda-folio",
-      "image": "/content/e0ff92dc217fd09633b372e0de03a4a53e1e5934-1650x2336.webp",
+      "image": "https://media.secknow-ai.com/space/content/e0ff92dc217fd09633b372e0de03a4a53e1e5934-1650x2336.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -969,7 +1004,7 @@
       "category": "other",
       "date": "2026-04-30",
       "url": "https://www.awwwards.com/sites/tomasz-itom-szmajda-folio",
-      "image": "/content/6c7517ee36bc05c6148323332ccc95df511d33dc-2408x3194.webp",
+      "image": "https://media.secknow-ai.com/space/content/6c7517ee36bc05c6148323332ccc95df511d33dc-2408x3194.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -980,7 +1015,7 @@
       "category": "other",
       "date": "2026-04-25",
       "url": "https://www.cssdesignawards.com/sites/tomasz/49278/",
-      "image": "/content/57e43df691f1a23d5be8266550c281a387f9d3bd-1652x2336.webp",
+      "image": "https://media.secknow-ai.com/space/content/57e43df691f1a23d5be8266550c281a387f9d3bd-1652x2336.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -991,7 +1026,7 @@
       "category": "other",
       "date": "2026-04-25",
       "url": "https://www.cssdesignawards.com/sites/tomasz/49278/",
-      "image": "/content/917c3689008a16d7890994ba81803960973d2769-1652x2336.webp",
+      "image": "https://media.secknow-ai.com/space/content/917c3689008a16d7890994ba81803960973d2769-1652x2336.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -1002,7 +1037,7 @@
       "category": "sotd",
       "date": "2026-04-25",
       "url": "https://thefwa.com/cases/tomasz-itom-szmajda-portfolio",
-      "image": "/content/c620682e3f34e1192f78c0a331818c8cdc941bb0-1652x2336.webp",
+      "image": "https://media.secknow-ai.com/space/content/c620682e3f34e1192f78c0a331818c8cdc941bb0-1652x2336.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -1013,7 +1048,7 @@
       "category": "other",
       "date": "2026-04-25",
       "url": "https://www.cssdesignawards.com/sites/tomasz/49278/",
-      "image": "/content/5ae3c2298680c5737072e29d59c5783c9eb7d3f4-1652x2336.webp",
+      "image": "https://media.secknow-ai.com/space/content/5ae3c2298680c5737072e29d59c5783c9eb7d3f4-1652x2336.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -1024,7 +1059,7 @@
       "category": "other",
       "date": "2026-04-25",
       "url": "https://www.cssdesignawards.com/sites/tomasz/49278/",
-      "image": "/content/264e3fb124ed86d5f3db2ca6b8e6ae553fb86da5-1652x2336.webp",
+      "image": "https://media.secknow-ai.com/space/content/264e3fb124ed86d5f3db2ca6b8e6ae553fb86da5-1652x2336.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -1035,7 +1070,7 @@
       "category": "sotd",
       "date": "2026-04-01",
       "url": "https://orpetron.com/sites/tomasz-itom-szmajda-portfolio/",
-      "image": "/content/71adf1f1527f3cf11ffe3b9eaee9bf21dc943252-595x876.webp",
+      "image": "https://media.secknow-ai.com/space/content/71adf1f1527f3cf11ffe3b9eaee9bf21dc943252-595x876.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -1046,7 +1081,7 @@
       "category": "sotd",
       "date": "2026-03-25",
       "url": "https://www.csswinner.com/details/tomasz-itom-szmajda-portfolio/19143",
-      "image": "/content/5651ba23a87390692859130113f7503ed3c78c69-1652x2338.webp",
+      "image": "https://media.secknow-ai.com/space/content/5651ba23a87390692859130113f7503ed3c78c69-1652x2338.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -1057,7 +1092,7 @@
       "category": "sotd",
       "date": "2026-01-29",
       "url": "https://orpetron.com/sites/young-multi/",
-      "image": "/content/19b206ad6cfc6adbd8457fa8381754ed3707b687-596x875.webp",
+      "image": "https://media.secknow-ai.com/space/content/19b206ad6cfc6adbd8457fa8381754ed3707b687-596x875.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -1068,7 +1103,7 @@
       "category": "sotd",
       "date": "2026-01-24",
       "url": "https://www.csswinner.com/details/young-multi-official-experience/19045",
-      "image": "/content/d2244e5db14c4dc3efa12a62e193a29e4c07d2ae-1652x2338.webp",
+      "image": "https://media.secknow-ai.com/space/content/d2244e5db14c4dc3efa12a62e193a29e4c07d2ae-1652x2338.png",
       "authorName": "Tomasz Szmajda"
     },
     {
@@ -1079,7 +1114,7 @@
       "category": "sotd",
       "date": "2026-01-17",
       "url": "https://www.designnominees.com/sites/young-multi",
-      "image": "/content/ab97e504acf57c7592cf21cd1b7fe68e50882805-1652x2336.webp",
+      "image": "https://media.secknow-ai.com/space/content/ab97e504acf57c7592cf21cd1b7fe68e50882805-1652x2336.png",
       "authorName": "Tomasz Szmajda"
     }
   ],

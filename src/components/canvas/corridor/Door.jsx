@@ -32,12 +32,12 @@ const Door = ({
 }) => {
     // 预加载纹理。
     // 必须无条件调用纹理加载 Hook，保证 React Hook 顺序一致。
-    const textureMap = useTexture(`/textures/corridor/doors/drzwi${type}.webp`);
+    const textureMap = useTexture(`https://media.secknow-ai.com/space/textures/corridor/doors/drzwi${type}.png`);
     const isTouch = isTouchDevice();
     const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-    const paintedColorMap = useTexture(isTouch ? dummyTex : `/textures/corridor/doors/drzwi${type}_painted.webp`);
+    const paintedColorMap = useTexture(isTouch ? dummyTex : `https://media.secknow-ai.com/space/textures/corridor/doors/drzwi${type}_painted.png`);
     // 门框。
-    const frameMap = useTexture(`/textures/corridor/doors/ramkasingledoors.webp`);
+    const frameMap = useTexture(`https://media.secknow-ai.com/space/textures/corridor/doors/ramkasingledoors.png?imageMogr2/thumbnail/512x1024`);
 
     const doorRef = useRef();
     const frameRef = useRef();

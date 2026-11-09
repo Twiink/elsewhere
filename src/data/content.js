@@ -10,6 +10,8 @@ export const resumeInfo = content.site.resume;
 export const studioChannels = content.site.studioChannels;
 export const galleryProjects = content.projects;
 export const studioContent = content.studio;
+export const studioWishCard = content.studioWishCard;
+export const studioWishes = content.wishes;
 export const awardCertificates = content.awards;
 export const frequentlyAskedQuestions = content.faq;
 
@@ -41,7 +43,7 @@ export const awardGroups = Object.fromEntries(awardCategories.map(({ key, title,
 export function getContentTextures(includePainted) {
     return [...new Set([
         ...galleryProjects.flatMap(item => [item.front, includePainted && item.painted]),
-        ...studioContent.flatMap(item => [item.frontTexture, includePainted && item.paintedFrontTexture]),
+        ...[...studioContent, studioWishCard].flatMap(item => [item.frontTexture, includePainted && item.paintedFrontTexture]),
     ].filter(Boolean))];
 }
 

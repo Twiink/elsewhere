@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "kind": "future-travel-illustrations",
+  "generator": "image_gen built-in",
+  "purpose": "生活手记「想做的事」旅行手账插画",
+  "items": [
+    {
+      "id": "changbaishan",
+      "image": "public/content/studio/wish-journal/changbaishan.png",
+      "prompt": "Use case: illustration-story. Asset: a square illustrated travel keepsake for a handmade Chinese personal website's future-wishes scrapbook. Hand-drawn graphite contours with soft translucent watercolor and colored-pencil details on warm ivory paper. Quiet beautiful winter colors: dusty glacier blue, sage green, warm sand, tiny muted apricot accents. Detailed and charming, airy and tactile, like an artist's travel sketchbook. Two very small adult friends seen from behind, one in a sage coat and one in a muted apricot coat; no identifiable faces. Full scene filling the square, generous breathing space around the figures. No words, letters, numbers, captions, frames, UI, logos, watermarks or photographic realism. This is an illustration imagining a future trip.\nPrimary scene: the brilliant blue Tianchi crater lake at Changbai Mountain, surrounded by a majestic ring of pale snowy volcanic ridges beneath thin clouds. The two tiny friends stand together at a simple viewpoint in the lower foreground looking across the lake. Make the lake the visual focal point; delicate snow, sky and water textures."
+    },
+    {
+      "id": "snow-mountain",
+      "image": "public/content/studio/wish-journal/snow-mountain.png",
+      "prompt": "Use case: illustration-story. Asset: a square illustrated travel keepsake for a handmade Chinese personal website's future-wishes scrapbook. Hand-drawn graphite contours with soft translucent watercolor and colored-pencil details on warm ivory paper. Quiet beautiful winter colors: dusty glacier blue, sage green, warm sand, tiny muted apricot accents. Detailed and charming, airy and tactile, like an artist's travel sketchbook. Two very small adult friends seen from behind, one in a sage coat and one in a muted apricot coat; no identifiable faces. Full scene filling the square, generous breathing space around the figures. No words, letters, numbers, captions, frames, UI, logos, watermarks or photographic realism. This is an illustration imagining a future trip.\nPrimary scene: two tiny friends in beanies with small backpacks and trekking poles walking together toward a beautiful snow-covered mountain peak. A winding pale trail in the lower foreground leads into the snowy ridges; a little warm morning sunlight on the summit, wisps of cloud, rich pencil hatching in the rocks. A hopeful hiking memory imagined in advance."
+    },
+    {
+      "id": "skiing",
+      "image": "public/content/studio/wish-journal/skiing.png",
+      "prompt": "Use case: illustration-story. Asset: a square illustrated travel keepsake for a handmade Chinese personal website's future-wishes scrapbook. Hand-drawn graphite contours with soft translucent watercolor and colored-pencil details on warm ivory paper. Quiet beautiful winter colors: dusty glacier blue, sage green, warm sand, tiny muted apricot accents. Detailed and charming, airy and tactile, like an artist's travel sketchbook. Two very small adult friends seen from behind, one in a sage coat and one in a muted apricot coat; no identifiable faces. Full scene filling the square, generous breathing space around the figures. No words, letters, numbers, captions, frames, UI, logos, watermarks or photographic realism. This is an illustration imagining a future trip.\nPrimary scene: the two tiny friends wearing helmets on skis with poles, gliding side by side down a gentle snowy alpine slope. A few snow-laden pine trees frame the lower sides; rounded blue mountains and an open pale sky in the distance. Natural playful movement, light curved ski tracks, tiny warm coat colors against powder snow."
+    }
+  ]
+}

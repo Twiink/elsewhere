@@ -6,8 +6,8 @@ import { siteInfo } from '../../../data/content';
 
 const SignSystem = (props) => {
     const groupRef = useRef();
-    const signTexture = useTexture('/textures/entrance/sign-creative-workshop.png');
-    const mountTexture = useTexture('/textures/entrance/belka.webp');
+    const signTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/sign-creative-workshop.png');
+    const mountTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/belka.png');
 
     // 物理参数。
     const timeOffset = useMemo(() => Math.random() * 100, []);

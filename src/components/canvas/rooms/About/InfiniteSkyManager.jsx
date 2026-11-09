@@ -145,8 +145,8 @@ const AwardButton = ({ onClick, texture, paintedTexture, width, height, position
 const ProfileButton = ({ section, position, label = '查看', width = 2.2 }) => {
     const { openOverlay } = useScene();
     const isTouch = isTouchDevice();
-    const texture = useLoader(THREE.TextureLoader, '/textures/about/button.webp');
-    const paintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/button.webp' : '/textures/about/button_painted.webp');
+    const texture = useLoader(THREE.TextureLoader, 'https://media.secknow-ai.com/space/textures/about/button.png?imageMogr2/thumbnail/512x128');
+    const paintedTexture = useLoader(THREE.TextureLoader, isTouch ? 'https://media.secknow-ai.com/space/textures/about/button.png?imageMogr2/thumbnail/512x128' : 'https://media.secknow-ai.com/space/textures/about/button_painted.png?imageMogr2/thumbnail/512x128');
 
     return <AwardButton
         texture={texture}
@@ -281,7 +281,7 @@ const InfiniteSkyManager = ({ scrollProgressRef }) => {
  */
 const IntroMilestone = ({ z, scrollProgressRef }) => {
     // 加载人物纹理。
-    const avatarTexture = useLoader(THREE.TextureLoader, '/textures/twiink/cloud-ink.webp');
+    const avatarTexture = useLoader(THREE.TextureLoader, 'https://media.secknow-ai.com/space/textures/twiink/cloud-ink.png');
 
     // 全部动画元素的引用。
     const groupRef = useRef();
@@ -442,7 +442,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
 const HighlightsMilestone = ({ z, scrollProgressRef }) => {
     const groupRef = useRef();
     const noteRefs = useRef([]);
-    const noteTexture = useLoader(THREE.TextureLoader, '/textures/twiink/profile-note.svg');
+    const noteTexture = useLoader(THREE.TextureLoader, 'https://media.secknow-ai.com/space/textures/twiink/profile-note.png?imageMogr2/thumbnail/800x560');
 
     useFrame(state => {
         if (!groupRef.current) return;
@@ -500,8 +500,8 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
     const firstProject = personalProfile.timeline.find(item => item.kind === 'project');
 
     // 加载纹理。
-    const uoTexture = useLoader(THREE.TextureLoader, '/textures/twiink/profile-island.svg');
-    const freelanceTexture = useLoader(THREE.TextureLoader, '/textures/about/island-free-creation.png');
+    const uoTexture = useLoader(THREE.TextureLoader, 'https://media.secknow-ai.com/space/textures/twiink/profile-island.png?imageMogr2/thumbnail/800x500');
+    const freelanceTexture = useLoader(THREE.TextureLoader, 'https://media.secknow-ai.com/space/textures/about/island-free-creation.png');
 
     // 纹理设置。
     uoTexture.colorSpace = THREE.SRGBColorSpace;
@@ -665,8 +665,8 @@ const BALLOON_CONFIG = getSkillLabels(personalProfile).map((label, index) => {
     const [x, y, z] = BALLOON_POSITIONS[index % BALLOON_POSITIONS.length];
     return {
         label,
-        texture: '/textures/twiink/profile-balloon.svg',
-        paintedTexture: '/textures/twiink/profile-balloon.svg',
+        texture: 'https://media.secknow-ai.com/space/textures/twiink/profile-balloon.png?imageMogr2/thumbnail/520x980',
+        paintedTexture: 'https://media.secknow-ai.com/space/textures/twiink/profile-balloon.png?imageMogr2/thumbnail/520x980',
         size: index < 3 ? 'large' : index < 6 ? 'medium' : 'small',
         x, y, z: z - Math.floor(index / BALLOON_POSITIONS.length) * 2,
         phase: index * 0.8,

@@ -41,19 +41,19 @@ const SegmentDoors = ({
 
     // 加载纹理。
     // 注意：用户在 corridor/doors/ 中指定了具体文件名。
-    const frameTexture = useTexture('/textures/corridor/doors/frame_sketch.webp');
-    const doorLeftTexture = useTexture('/textures/corridor/doors/doorrleft.webp');
-    const doorRightTexture = useTexture('/textures/corridor/doors/dorright.webp');
-    const handleLeftTexture = useTexture('/textures/corridor/doors/handle_left_sketch.webp');
-    const handleRightTexture = useTexture('/textures/corridor/doors/handle_right_sketch.webp');
-    const doorBackTexture = useTexture('/textures/corridor/doors/door_back.webp');
-    const edgeTexture = useTexture('/textures/corridor/doors/pien.webp');
-    const wallTexture = useTexture('/textures/corridor/wall_texture.webp');
+    const frameTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/frame_sketch.png?imageMogr2/thumbnail/512x512');
+    const doorLeftTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/doorrleft.png?imageMogr2/thumbnail/256x512');
+    const doorRightTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/dorright.png?imageMogr2/thumbnail/256x512');
+    const handleLeftTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/handle_left_sketch.png?imageMogr2/thumbnail/256x512');
+    const handleRightTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/handle_right_sketch.png?imageMogr2/thumbnail/256x512');
+    const doorBackTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/door_back.png?imageMogr2/thumbnail/256x512');
+    const edgeTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/pien.png?imageMogr2/thumbnail/32x256');
+    const wallTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512');
 
     wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
 
     // 踢脚线纹理，1582×94 像素。
-    const baseboardTexSrc = useTexture('/textures/corridor/texturadoprogow.webp');
+    const baseboardTexSrc = useTexture('https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png');
     const NATURAL_TILE_W = (1582 / 94) * 0.15; // 每次自然平铺约 2.524 单位。
 
     // 来自 EntranceDoors 的尺寸。
@@ -149,9 +149,9 @@ const SegmentDoors = ({
     });
 
     // 墙面装饰。
-    const whileTrueTexture = useTexture('/textures/corridor/decorations/while_true_loop.webp');
-    const coffeeTexture = useTexture('/textures/corridor/decorations/coffee_debug.webp');
-    const ideaTexture = useTexture('/textures/corridor/decorations/idea_process.webp');
+    const whileTrueTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/decorations/while_true_loop.png?imageMogr2/thumbnail/1249x624');
+    const coffeeTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/decorations/coffee_debug.png?imageMogr2/thumbnail/1761x880');
+    const ideaTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/decorations/idea_process.png?imageMogr2/thumbnail/604x1208');
 
     return (
         <group position={[position[0], 0, position[2]]}>

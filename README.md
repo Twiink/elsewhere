@@ -33,19 +33,20 @@ npm run check:content
 
 ## 内容维护
 
-网站直接读取仓库内的 JSON 与图片，不需要内容管理后台、后台账号、SQLite 或其他数据库。修改内容后，开发服务会更新页面；发布环境需重新构建部署。
+网站从仓库内的 JSON 读取文字，图片与场景贴图统一从 `https://media.secknow-ai.com/space/` 加载，包括「想做的事」的三幅旅行插画与两张旋转卡片封面。本地 `public/content/` 与 `public/textures/` 保留素材归档。修改内容后，开发服务会更新页面；发布环境需重新构建部署。
 
 | 文件或目录 | 用途 |
 | --- | --- |
 | `src/data/profile.json` | 关于我的可编辑资料：身份、简介、技能、工具、经历、爱好和成果 |
 | `src/data/profile.js` | 将个人资料整理为页面与搜索正文共用的数据 |
-| `src/data/content.json` | 站点设置、画廊、生活手记、FAQ，以及保留供对照的示例奖项 |
+| `src/data/content.json` | 站点设置、画廊、生活手记、想做的事、FAQ，以及保留供对照的示例奖项 |
 | `src/data/content.original.json` | 已发布内容的原始返回备份，保留原文和资产引用供对照，不参与运行或构建 |
 | `src/data/content.js` | 将本地内容整理为页面、奖项分组与预加载数据 |
 | `src/hooks/useContentData.js` | 各房间读取本地内容的入口 |
-| `public/content/` | 本地保存的内容图片，JSON 中以 `/content/文件名.webp` 引用 |
-| `public/textures/` | 原有场景、门牌、纸张及装饰纹理 |
+| `public/content/` | 内容图片与视频的本地归档；页面图片使用对象存储地址 |
+| `public/textures/` | 场景、门牌、纸张及装饰纹理的本地归档 |
 | `public/start/` | 独立静态起始页的 HTML、CSS、脚本 |
+| `public/scripts/resume-download.js` | 主站与独立链接页共用的简历下载处理 |
 
 原始 40 条记录保存在 `content.original.json` 供对照；当前 `content.json` 的内容如下：
 
@@ -54,6 +55,8 @@ npm run check:content
 | `site` | 站点标题、一句话介绍、域名及社交链接 | 1 |
 | `projects` | 画廊项目：5 个个人项目 | 5 |
 | `studio` | 四篇生活存档与一篇人物形象制作记录 | 5 |
+| `studioWishCard` | 旋转显示器塔中的「想做的事」卡片入口与封面 | 1 |
+| `wishes` | 想做的事：长白山、雪山与滑雪 | 3 |
 | `awards` | 原作者示例证书，保留供对照，不作为当前个人成果展示 | 16 |
 | `faq` | 六条个人问答，展示在联系纸页并同步至搜索正文 | 6 |
 
@@ -128,7 +131,9 @@ npm run check:content
 
 JSON 使用英文双引号和英文逗号，不支持注释或最后一项后的逗号。文字中的英文双引号需写成 `\"`，也可以直接使用中文引号。站点名称、一句话介绍、域名和社交链接继续在 `content.json` 的 `site` 中编辑。
 
-替换图片时，将文件放入 `public/content/`，再修改 JSON 中的路径。保留现有图片的宽高比可减少场景布局调整。此次本地图片沿用原页面请求的显示尺寸与质量参数，未修改图内文字和图案；原始返回中的资源标识保存在备份 JSON 中。
+替换图片时，先上传到对象存储的 `space/` 目录，再将完整 HTTPS 地址写入 JSON 或对应组件。保留原有目录层级与宽高比，SVG 封面保留 `.svg` 后缀；PNG/JPEG 地址可由腾讯云按浏览器能力自动返回 AVIF/WebP，不要直接把地址后缀改成 `.webp`。走廊古风合照使用 `https://media.secknow-ai.com/space/content/corridor/hanfu-photo.jpg`，避免超出在线处理的原图体积限制。
+
+高分辨率源图通过 `?imageMogr2/thumbnail/宽x高` 请求原有展示尺寸，控制下载体积和三维纹理占用。图片预加载、CSS 背景、分享图与 `/start` 的地址同步使用对象存储。覆盖同一路径的图片后，需刷新对应 CDN 缓存。字体、音效和视频继续使用本地静态文件，简历从对象存储读取。
 
 入口文字、导航、教程、成就、联系表单、各房间固定标题以及源码说明注释均已中文化；ITom、作者姓名、技术和平台名称保留原名。固定交互文案仍位于对应的 `src/components/` 与 `src/context/` 组件中，`/start` 的文案位于其 HTML 中。原图和图中嵌入的文字留待后续替换。
 
@@ -145,13 +150,15 @@ JSON 使用英文双引号和英文逗号，不支持注释或最后一项后的
 - `VITE_WEB3FORMS_KEY`：绑定收件邮箱的 Web3Forms 配置，放在本地 `.env` 或部署平台环境变量中。允许提交的域名来自 `site.url`；未配置、预览域名或发送被拦截时均明确提示，只有服务确认接收才显示成功。
 - `VITE_POSTHOG_KEY`、`VITE_POSTHOG_HOST`：PostHog 访问统计配置。
 - 生活手记收录四篇生活存档与一篇人物形象制作记录。编辑 `src/data/content.json` 的 `studio` 数组即可修改标题、`paragraphs` 正文和 `photos` 图片；每张图的 `alt` 是图片说明，人物制作过程另有 `label` 和 `caption`。没有提供日期的记录不填写 `date`。点击场景中的屏幕或「翻翻生活手记」可在站内阅读，也可使用 `/studio?note=记录的id` 直接打开对应记录。
+- 点击房间顶部「翻翻生活手记」，在阅读面板的导航中选择「想做的事」，即可翻到旅行心愿手账；它与东灵山、华山、飞拉达、双人成行和人物制作共用面板，可直接来回切换。长白山插画放在主画面，雪山与滑雪插画错落排列，配以纸张、照片边框和手写愿望；点击插画可查看大图。手机按纵向手账排版，正文可滚动。愿望编辑 `content.json` 的 `wishes` 数组：`id` 唯一、`title` 为一句话愿望、`description` 可选，`image` 与 `imageAlt` 配置插画及其说明，`status` 保存状态并供辅助技术读取。`/studio?view=wishes` 从入口开门后自动打开面板中的心愿手账。三幅淡彩画是对未来旅行的想象，PNG 位于 `public/content/studio/wish-journal/`，生成提示词保存在 `assets/studio/wish-journal/illustrations.json`，当前三条均为「想做的」。
+- 旋转显示器塔同时展示「想做的事」卡片，点击后打开同一页手账。卡片配置在 `content.json` 的 `studioWishCard`，封面默认为黑白版，支持悬停的设备显现彩色版；预加载沿用这一设备规则。三幅插画和两张 SVG 封面统一使用对象存储的 `space/content/studio/wish-journal/` 目录。`node scripts/build-studio-wish-covers.mjs` 将配置中的地址映射到本地素材归档，生成原生 SVG 封面，文字使用文楷字形路径。阅读页沿用生活手记的纸白底色与文字颜色。
 - 生活照片的原图与素材清单保存在 `assets/studio/life-notes/`，页面图片位于 `public/content/studio/`，人物黑白线稿沿用 `public/textures/twiink/start-bouquet.png`。联系房间已使用 Twiink 的联系方式；`/start` 提供站内导航、GitHub 入口与 Twiink 人物插画。
 
 Matrix 工作室的 CSDN 与微信视频号在 `src/data/content.json` 的 `site.studioChannels` 中编辑，集中展示在联系方式中。视频号支持复制；浏览器不允许自动复制时，会选中账号，方便手动复制。
 
 生活手记的门牌、地图和页面标题统一显示「生活手记」。门贴图位于 `public/textures/corridor/doors/life-notes-ink-v1.webp` 与 `life-notes-color-v1.webp`，图案为相机、山间日出和手柄；生成提示词与处理说明保存在 `assets/studio/door-textures.json`。阅读面板展示个人记录，房间背景使用日出、合照、存档等手写词。
 
-简历 PDF 保存在 `public/files/twiink-resume.pdf`，入口位于「关于我」「联系我」与独立链接页 `/start`。「联系我」同时支持新窗口查看和下载。后续直接替换这一个 PDF 即可更新简历；说明、路径和下载文件名在 `site.resume` 中编辑。若更改文件路径或下载文件名，也要同步 `/start/index.html` 中的静态下载链接。
+简历 PDF 使用对象存储地址 `https://media.secknow-ai.com/space/Resume.pdf`，入口位于「关于我」「联系我」与独立链接页 `/start`。「联系我」同时支持新窗口查看和下载。下载文件名为 `郑越-13990529155-Agent全栈开发.pdf`；`public/scripts/resume-download.js` 将 PDF 获取为 Blob 后保存，保证跨域下载时的中文文件名。说明、地址和下载文件名在 `site.resume` 中编辑；若更改地址或文件名，也要同步 `/start/index.html` 中的静态链接。两个页面均加载这份共享下载脚本。
 
 走廊的两幅竖版照片位于 `public/content/corridor/`：右侧 `frame-3` 展示花束与牵手照，左侧 `frame-4` 展示红灯笼前的古风合照。原图与处理记录保存在 `assets/corridor/`。图片按原始比例展示，桌面端点击查看时会自动适配视口高度；路径和画框尺寸在 `src/components/canvas/corridor/CorridorDecorations.jsx` 的 `frames` 中编辑，新增图片时同步 `src/config/texturePreloadList.js`。
 

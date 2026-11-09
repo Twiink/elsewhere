@@ -41,18 +41,18 @@ const DOOR_ALIGN_X = 1.2;
 
 // 门纹理映射：标签对应纹理文件。
 const DOOR_TEXTURES = {
-    "作品画廊": '/textures/corridor/doors/drzwiprojekty.webp',
-    "生活手记": '/textures/corridor/doors/life-notes-ink-v1.webp',
-    "关于我": '/textures/corridor/doors/drzwiabout.webp',
-    "联系我": '/textures/corridor/doors/drzwikontakt.webp',
+    "作品画廊": 'https://media.secknow-ai.com/space/textures/corridor/doors/drzwiprojekty.png?imageMogr2/thumbnail/512x1024',
+    "生活手记": 'https://media.secknow-ai.com/space/textures/corridor/doors/life-notes-ink-v1.png',
+    "关于我": 'https://media.secknow-ai.com/space/textures/corridor/doors/drzwiabout.png?imageMogr2/thumbnail/512x1024',
+    "联系我": 'https://media.secknow-ai.com/space/textures/corridor/doors/drzwikontakt.png?imageMogr2/thumbnail/512x1024',
 };
 
 // 悬停时用笔刷显现的彩色版本。
 const DOOR_PAINTED_TEXTURES = {
-    "作品画廊": '/textures/corridor/doors/drzwiprojekty_painted.webp',
-    "生活手记": '/textures/corridor/doors/life-notes-color-v1.webp',
-    "关于我": '/textures/corridor/doors/drzwiabout_painted.webp',
-    "联系我": '/textures/corridor/doors/drzwikontakt_painted.webp',
+    "作品画廊": 'https://media.secknow-ai.com/space/textures/corridor/doors/drzwiprojekty_painted.png?imageMogr2/thumbnail/880x1761',
+    "生活手记": 'https://media.secknow-ai.com/space/textures/corridor/doors/life-notes-color-v1.png',
+    "关于我": 'https://media.secknow-ai.com/space/textures/corridor/doors/drzwiabout_painted.png?imageMogr2/thumbnail/1024x2048',
+    "联系我": 'https://media.secknow-ai.com/space/textures/corridor/doors/drzwikontakt_painted.png?imageMogr2/thumbnail/880x1761',
 };
 
 
@@ -189,7 +189,7 @@ const DoorSection = ({
     const currentTilt = useRef(0);
 
     // 加载墙面纹理。
-    const originalWallTexture = useTexture('/textures/corridor/wall_texture.webp');
+    const originalWallTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512');
 
     // 克隆纹理，独立设置重复次数，修正缩放问题。
     const wallTexture = useMemo(() => {
@@ -216,14 +216,14 @@ const DoorSection = ({
 
     const doorPaintedTexturePath = DOOR_PAINTED_TEXTURES[label] || DOOR_PAINTED_TEXTURES["作品画廊"];
     const doorPaintedTexture = useTexture(isTouch ? dummyTex : doorPaintedTexturePath);
-    const frameTexture = useTexture('/textures/corridor/doors/ramkasingledoors.webp');
-    const handleTexture = useTexture('/textures/corridor/doors/klamkadodrzwi.webp');
-    const handlePaintedTexture = useTexture(isTouch ? dummyTex : '/textures/corridor/doors/klamkadodrzwi_painted.webp');
-    const doorBackTexture = useTexture('/textures/corridor/doors/backsingledoors.webp');
-    const arrowTexture = useTexture('/textures/corridor/strzalka.webp');
+    const frameTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/ramkasingledoors.png?imageMogr2/thumbnail/512x1024');
+    const handleTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/klamkadodrzwi.png?imageMogr2/thumbnail/512x1024');
+    const handlePaintedTexture = useTexture(isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/corridor/doors/klamkadodrzwi_painted.png?imageMogr2/thumbnail/512x1024');
+    const doorBackTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/backsingledoors.png?imageMogr2/thumbnail/512x1024');
+    const arrowTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/strzalka.png?imageMogr2/thumbnail/128x64');
 
     // 门区域的踢脚线纹理：1582×94 像素，比例 16.83:1。
-    const baseboardTexture = useTexture('/textures/corridor/texturadoprogow.webp');
+    const baseboardTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png');
     baseboardTexture.wrapS = baseboardTexture.wrapT = THREE.RepeatWrapping;
     baseboardTexture.colorSpace = THREE.SRGBColorSpace;
 
@@ -937,7 +937,7 @@ const DoorSection = ({
     const handlePivotX = side === 'left' ? doorWidth * 0.25 : -doorWidth * 0.25;
 
     // 标牌纹理映射，现统一使用空白标牌纹理。
-    const signTextureUrl = '/textures/corridor/pustatabliczka.webp';
+    const signTextureUrl = 'https://media.secknow-ai.com/space/textures/corridor/pustatabliczka.png?imageMogr2/thumbnail/2048x1024';
     const signLegacyRatio = 1.792; // 2752x1536
     const signHeight = 0.55;
     const signWidth = signHeight * signLegacyRatio;

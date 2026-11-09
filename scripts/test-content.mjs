@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, statSync } from 'node:fs';
 import { buildJsonLd, buildLlmsTxt, generateSeoHtml } from '../seo-plugin.js';
 import { withProfile } from '../src/data/profile.js';
+import { PRELOAD_ALL, PRELOAD_LOADER, filterTexturesByDevice } from '../src/config/texturePreloadList.js';
 
 const content = withProfile(
     JSON.parse(readFileSync(new URL('../src/data/content.json', import.meta.url))),
@@ -43,16 +44,27 @@ test('原始快照保持完整，尚未替换的示例保留原始归属与外�
     }
 });
 
-test('全部内容图片、技术图标与简历均指向有效的本地文件', () => {
-    const paths = new Set(allItems.flatMap(item => [item.front, item.painted, item.frontTexture, item.paintedFrontTexture, item.image, ...(item.techStack || []), ...(item.photos || []).map(photo => photo.src), ...(item.details?.photos.map(photo => photo.src) || []), ...(item.details?.videos?.flatMap(video => [video.src, video.poster]) || []), item.details?.entry.image]).filter(Boolean));
+test('内容图片、贴图和简历使用对象存储，视频保留有效文件', () => {
+    const imageItems = [...allItems, ...content.wishes, content.studioWishCard];
+    const paths = new Set(imageItems.flatMap(item => [item.front, item.painted, item.frontTexture, item.paintedFrontTexture, item.image, ...(item.techStack || []), ...(item.photos || []).map(photo => photo.src), ...(item.details?.photos.map(photo => photo.src) || []), ...(item.details?.videos?.flatMap(video => [video.src, video.poster]) || []), item.details?.entry.image]).filter(Boolean));
     paths.add(content.site.shareImage.path);
-    for (const path of paths) {
-        assert.match(path, /^\/(content|textures)\/[\w./-]+$/);
-        assert.ok(statSync(new URL(`../public${path}`, import.meta.url)).size > 0, path);
+    for (const path of [...paths, ...PRELOAD_ALL, ...PRELOAD_LOADER]) {
+        if (path.endsWith('.mp4')) {
+            assert.ok(statSync(new URL(`../public${path}`, import.meta.url)).size > 0, path);
+            continue;
+        }
+        const url = new URL(path);
+        assert.equal(url.origin, 'https://media.secknow-ai.com');
+        assert.match(url.pathname, /^\/space\/(content|textures|images)\/[\w./-]+\.(png|jpg|svg)$/);
+        assert.ok(!url.pathname.endsWith('/hanfu-photo.png'));
     }
+    assert.ok(filterTexturesByDevice(PRELOAD_ALL, true).some(path => path.includes('_painted.png')));
+    assert.ok(filterTexturesByDevice(PRELOAD_ALL, false).every(path => !path.includes('_painted.png')));
     assert.doesNotMatch(JSON.stringify(content), /api\.sanity\.io|cdn\.sanity\.io|\/sanity-cdn/);
-    const resume = readFileSync(new URL(`../public${content.site.resume.url}`, import.meta.url));
-    assert.equal(resume.subarray(0, 5).toString(), '%PDF-');
+    const resume = new URL(content.site.resume.url);
+    assert.equal(resume.origin, 'https://media.secknow-ai.com');
+    assert.equal(resume.pathname, '/space/Resume.pdf');
+    assert.match(content.site.resume.downloadName, /\.pdf$/);
 });
 
 test('泡芙大作战正文结构完整，接入三张现场图和无损小程序码', () => {
@@ -72,7 +84,8 @@ test('泡芙大作战正文结构完整，接入三张现场图和无损小程�
     }
     assert.equal(project.details.photos.length, 3);
     assert.equal(project.details.sections.find(section => section.id === 'tools').collapsible, true);
-    const publicCode = readFileSync(new URL(`../public${project.details.entry.image}`, import.meta.url));
+    assert.equal(new URL(project.details.entry.image).pathname, '/space/content/projects/puffwar/miniprogram-code.png');
+    const publicCode = readFileSync(new URL('../public/content/projects/puffwar/miniprogram-code.png', import.meta.url));
     const archivedCode = readFileSync(new URL('../assets/projects/puffwar/derived/miniprogram-code-cropped.png', import.meta.url));
     assert.deepEqual(publicCode, archivedCode);
     const ragCenter = content.projects.find(item => item.id === 'rag-center');
@@ -150,7 +163,7 @@ test('搜索输出完整来自本地中文内容，结构化数据可解析', ()
     assert.match(html, /name="author" content="Twiink"/);
 });
 
-test('未确定域名时使用相对图片地址，配置域名后可生成绝对地址', () => {
+test('站点域名配置不改变对象存储图片地址', () => {
     const local = { ...content, site: { ...content.site, url: '' } };
     const localGraph = buildJsonLd(local)['@graph'];
     assert.equal(localGraph.find(item => item['@type'] === 'Person')['@id'], '#person');
@@ -160,5 +173,5 @@ test('未确定域名时使用相对图片地址，配置域名后可生成绝�
     const hostedGraph = buildJsonLd(hosted)['@graph'];
     assert.equal(hostedGraph.find(item => item['@type'] === 'Person')['@id'], 'https://example.com/#person');
     const hostedProjects = hostedGraph.find(item => item['@type'] === 'ItemList' && item.name === '精选项目');
-    assert.equal(hostedProjects.itemListElement[0].item.image, `https://example.com${content.projects[0].front}`);
+    assert.equal(hostedProjects.itemListElement[0].item.image, content.projects[0].front);
 });

@@ -81,7 +81,7 @@ export default function ContactDetails() {
                                 <p>{resumeInfo.description}</p>
                                 <div className="contact-resume-actions">
                                     <a href={resumeInfo.url} target="_blank" rel="noopener noreferrer">在线查看 PDF</a>
-                                    <a href={resumeInfo.url} download={resumeInfo.downloadName}>下载简历 PDF</a>
+                                    <a href={resumeInfo.url} download={resumeInfo.downloadName} data-resume-download>下载简历 PDF</a>
                                 </div>
                             </section>
                         )}

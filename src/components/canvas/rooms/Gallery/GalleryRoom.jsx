@@ -189,8 +189,8 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     const paintedTextures = useTexture(paintedUrls);
 
     // 按条件加载通用背面纹理与按钮纹理。
-    const backTextureRaw = useTexture(canHover ? '/textures/gallery/tylkartki_painted.webp' : '/textures/gallery/tylkartki.webp');
-    const overlayTextureRaw = useTexture(canHover ? '/textures/gallery/przyciskdotylukartki_painted.webp' : '/textures/gallery/przyciskdotylukartki.webp');
+    const backTextureRaw = useTexture(canHover ? 'https://media.secknow-ai.com/space/textures/gallery/tylkartki_painted.png' : 'https://media.secknow-ai.com/space/textures/gallery/tylkartki.png');
+    const overlayTextureRaw = useTexture(canHover ? 'https://media.secknow-ai.com/space/textures/gallery/przyciskdotylukartki_painted.png' : 'https://media.secknow-ai.com/space/textures/gallery/przyciskdotylukartki.png');
 
     // 预加载技术栈标志，避免首次翻面卡顿。
     // 采用相同条件：桌面端彩色，触摸设备普通图。
@@ -201,9 +201,9 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             'tailwindlogo', 'wordpresslogo'
         ];
         return names.map(name => {
-            if (!canHover) return `/textures/gallery/${name}.webp`;
-            if (name === 'csslogo') return `/textures/gallery/css3logo_painted.webp`;
-            return `/textures/gallery/${name}_painted.webp`;
+            if (!canHover) return `https://media.secknow-ai.com/space/textures/gallery/${name}.png`;
+            if (name === 'csslogo') return `https://media.secknow-ai.com/space/textures/gallery/css3logo_painted.png`;
+            return `https://media.secknow-ai.com/space/textures/gallery/${name}_painted.png`;
         });
     }, [canHover]);
     
@@ -237,9 +237,9 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             // 将技术栈标志映射至对应的彩色或普通版本。
             const techStack = projectData.techStack.map(path => {
                 if (!canHover) return path; // 保留普通版本。
-                const name = path.split('/').pop().replace('.webp', '');
-                if (name === 'csslogo') return '/textures/gallery/css3logo_painted.webp';
-                return `/textures/gallery/${name}_painted.webp`;
+                const name = new URL(path).pathname.split('/').pop().replace('.png', '');
+                if (name === 'csslogo') return 'https://media.secknow-ai.com/space/textures/gallery/css3logo_painted.png';
+                return `https://media.secknow-ai.com/space/textures/gallery/${name}_painted.png`;
             });
 
             return {
@@ -322,12 +322,12 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     });
 
     // 几何体与材质。
-    const floorTexture = useTexture('/textures/gallery/floor.webp');
-    const railingTexture = useTexture('/textures/gallery/railing.webp');
-    const housesTexture = useTexture('/textures/gallery/domki.webp');
-    const cityTexture = useTexture('/textures/gallery/miastotlo.webp');
-    const birdTexture = useTexture('/textures/gallery/bird_gray.webp');
-    const clothespinTexture = useTexture('/textures/gallery/klamerka.webp');
+    const floorTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/floor.png');
+    const railingTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/railing.png');
+    const housesTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/domki.png');
+    const cityTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/miastotlo.png');
+    const birdTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/bird_gray.png');
+    const clothespinTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/klamerka.png');
 
     useEffect(() => {
         if (floorTexture) {
@@ -361,7 +361,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         const thresholdMat = new THREE.MeshBasicMaterial({
             color: '#e0e0e0',
             map: (() => {
-                const t = new THREE.TextureLoader().load('/textures/corridor/texturadoprogow.webp');
+                const t = new THREE.TextureLoader().load('https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png');
                 t.colorSpace = THREE.SRGBColorSpace;
                 t.wrapS = t.wrapT = THREE.RepeatWrapping;
                 t.repeat.set(15 / 2.524, 1);

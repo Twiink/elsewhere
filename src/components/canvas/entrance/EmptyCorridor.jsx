@@ -16,7 +16,7 @@ const EmptyCorridor = ({ camera }) => {
     const [segmentBase, setSegmentBase] = useState(0);
 
     // 加载地面纹理。
-    const floorTexture = useTexture('/textures/entrance/floor_paper.webp');
+    const floorTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/floor_paper.png?imageMogr2/thumbnail/1024x512');
     floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
     floorTexture.repeat.set(6.6, 20); // 根据 2816×1536 的比例与新宽度调整重复次数。
 

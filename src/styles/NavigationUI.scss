@@ -42,7 +42,7 @@
         // 纸张纹理上叠加白色，使其更明亮。
         background:
             linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45)),
-            url('/textures/paper-texture.webp') center center;
+            url('https://media.secknow-ai.com/space/textures/paper-texture.png') center center;
         background-size: cover;
         z-index: -1;
         // 仅背景应用撕边 clip-path。
@@ -211,7 +211,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: url('/textures/paper-texture.webp') center center;
+            background: url('https://media.secknow-ai.com/space/textures/paper-texture.png') center center;
             background-size: cover;
             transform: rotate(90deg);
             z-index: -1;
@@ -481,7 +481,7 @@
             left: -20%;
             width: 140%;
             height: 140%;
-            background: url('/textures/paper-texture.webp') center center;
+            background: url('https://media.secknow-ai.com/space/textures/paper-texture.png') center center;
             background-size: cover;
             z-index: -1;
             pointer-events: none;
