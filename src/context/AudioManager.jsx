@@ -1,16 +1,5 @@
-import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
-
-const AudioContext = createContext({
-    isMuted: false,
-    toggleMute: () => { },
-    play: () => { },
-    enableAudio: () => { },
-    audioEnabled: false,
-    globalVolume: 0.5,
-    setGlobalVolume: () => { },
-});
-
-export const useAudio = () => useContext(AudioContext);
+import { AudioContext } from './contexts';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export const AudioProvider = ({ children }) => {
     // 持久保存静音偏好。
@@ -76,15 +65,18 @@ export const AudioProvider = ({ children }) => {
     }, [audioEnabled]);
 
     const play = useCallback((soundName, { loop = false, volume = 1.0 } = {}) => {
+        if (!audioEnabled) return { stop() {} };
         // 文件缺失时平稳降级。
         const soundPaths = {
+            'tear': '/sounds/papersound.mp3',
             'szumwiatru': '/sounds/szumwiatru.mp3', // 关于我房间的风声。
             'szummiasta': '/sounds/szummiasta.mp3', // 画廊房间的城市声。
             'uchyleniedrzwi': '/sounds/uchyleniedrzwi.mp3', // 悬停时的吱呀声。
             'otwarciedrzwi': '/sounds/otwarciedrzwi.mp3',   // 主门和侧门的开门声。
             'zamknieciedrzwi': '/sounds/zamknieciedrzwi.mp3' // 关门声。
         };
-        const path = soundPaths[soundName] || `/sounds/${soundName}.mp3`;
+        const path = soundPaths[soundName];
+        if (!path) return { stop() {} };
 
         // 模拟模式或文件缺失时可能出错。
         // 让浏览器处理 404，避免 JavaScript 崩溃。
@@ -130,13 +122,13 @@ export const AudioProvider = ({ children }) => {
                 audio.currentTime = 0;
                 delete activeSounds.current[soundName];
             },
-            fade: (duration = 1000) => {
+            fade: () => {
                 // 当前只停止。
                 audio.pause();
                 delete activeSounds.current[soundName];
             }
         };
-    }, [isMuted, globalVolume]);
+    }, [isMuted, globalVolume, audioEnabled]);
 
     return (
         <AudioContext.Provider value={{

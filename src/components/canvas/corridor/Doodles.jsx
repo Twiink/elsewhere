@@ -1,8 +1,10 @@
-import { useRef, useState, useEffect } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { usePerformance } from '../../../context/contexts';
+import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
+import { useRef } from 'react';
+
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
-import { usePerformance } from '../../../context/PerformanceContext';
+
 
 /**
  * Doodles：手绘速写装饰组件。
@@ -122,18 +124,8 @@ const SketchElement = ({
     initialRotation = 0
 }) => {
     const ref = useRef();
-    const [dimensions, setDimensions] = useState({ width: 1, height: 1 });
-
-    // 根据纹理计算尺寸。
-    useEffect(() => {
-        if (texture.image) {
-            const aspectRatio = texture.image.width / texture.image.height;
-            setDimensions({
-                width: scale * aspectRatio,
-                height: scale
-            });
-        }
-    }, [texture, scale]);
+    const aspectRatio = texture.image ? texture.image.width / texture.image.height : 1;
+    const dimensions = { width: scale * aspectRatio, height: scale };
 
     useFrame((state) => {
         if (!ref.current) return;

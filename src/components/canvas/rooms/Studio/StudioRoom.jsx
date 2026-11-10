@@ -1,14 +1,15 @@
+import { useScene, useAchievements, useAudio } from '../../../../context/contexts';
 import { useRef, useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useFrame, useThree, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { PLATFORM_CONFIG } from './contentData';
-import { useScene } from '../../../../context/SceneContext';
-import { useAchievements } from '../../../../context/AchievementsContext';
+
+
 import { TextureLoader } from 'three';
 import FloatingCodeParticles from './FloatingCodeParticles';
 import { PositionalAudio } from '@react-three/drei';
-import { useAudio } from '../../../../context/AudioManager';
+
 import { useStudioContent } from '../../../../hooks/useContentData';
 import { studioWishCard } from '../../../../data/content';
 import '../../shaders/RevealMaterial';
@@ -32,7 +33,7 @@ const STUDIO_PAINT_CONFIG = {
 // ⚙️ 音频设置：在此调整。
 // 修改这些值可调整显示器环境声的音量和可听范围。
 // ============================================
-export const AUDIO_SETTINGS = {
+const AUDIO_SETTINGS = {
     volume: 1,
     distance: 2,
     rolloff: 1.0
@@ -51,6 +52,16 @@ const TOWER_HEIGHT = 12; // 塔的总可见高度。
 const VERTICAL_SPACING = 2.5; // 显示器环之间的间距。
 const TOWER_Y_START = -5; // 塔的初始 Y 偏移，负值更低，用于控制上下位置。
 const TOWER_Z_START = -10; // 初始 Z 位置，负值更远，用于控制距离。
+
+function shuffleContent(content, seed) {
+    const result = [...content];
+    for (let i = result.length - 1; i > 0; i--) {
+        seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+        const j = Math.floor((seed / 4294967296) * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+}
 
 const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     const groupRef = useRef();
@@ -125,9 +136,8 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     }, [isExiting, isTeleporting, hidePopup]);
 
     // 自上而下的上色过渡。
-    const { onBeforeCompile: paintOnBeforeCompile, animatePaint, resetPaint, uniformsData: paintUniforms, updateRoomOrigin } = usePaintMaterial(STUDIO_PAINT_CONFIG);
+    const { onBeforeCompile: paintOnBeforeCompile, animatePaint, resetPaint, setPaintProgress, uniformsData: paintUniforms, updateRoomOrigin } = usePaintMaterial(STUDIO_PAINT_CONFIG);
 
-    const [isTransitioning, setIsTransitioning] = useState(false);
 
     const wasTeleportedRef = useRef(false);
     useEffect(() => {
@@ -137,20 +147,16 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     useEffect(() => {
         if (showRoom && !isWarmup) {
             if (wasTeleportedRef.current || isTeleporting) {
-                paintUniforms.uPaintProgress.value = 1.0;
-                setIsTransitioning(false);
+                setPaintProgress(1);
             } else {
-                setIsTransitioning(true);
                 resetPaint();
-                animatePaint(0.2, 2.5);
-                setTimeout(() => {
-                    setIsTransitioning(false);
-                }, 2700);
+                const animation = animatePaint(0.2, 2.5);
+                return () => animation.kill();
             }
         } else {
-            paintUniforms.uPaintProgress.value = 1.0;
+            setPaintProgress(1);
         }
-    }, [showRoom, isWarmup, isTeleporting]);
+    }, [showRoom, isWarmup, isTeleporting, animatePaint, resetPaint, setPaintProgress]);
 
     const latestContent = useMemo(() => {
         if (!activeContent || activeContent.length === 0) return null;
@@ -193,13 +199,14 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         const items = [];
 
         // 使用固定种子打乱内容，保持顺序稳定。
-        let shuffledContent = [...activeContent].sort(() => 0.5 - Math.random());
+        let seed = 42;
+        let shuffledContent = shuffleContent(activeContent, seed++);
         
         // 塔至少高 12 环，即 48 个项目，
         // 让循环传送边界远离相机视野。
         if (shuffledContent.length > 0) {
             while (shuffledContent.length < 48) {
-                shuffledContent = [...shuffledContent, ...[...activeContent].sort(() => 0.5 - Math.random())];
+                shuffledContent = [...shuffledContent, ...shuffleContent(activeContent, seed++)];
             }
         }
 
@@ -266,8 +273,6 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             }
         }
 
-        // 初始化偏移。
-        monitorOffsets.current = items.map(() => 0);
 
         // 预先计算 totalHeight，实现无缝循环，避免在 useFrame 中重复计算。
         const minBaseY = items.length > 0 ? Math.min(...items.map(m => m.baseY)) : 0;
@@ -276,11 +281,12 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         const totalHeight = Math.max(VERTICAL_SPACING * 3, maxBaseY - minBaseY + VERTICAL_SPACING);
 
         return { items, totalHeight };
-    }, [latestContent?.id, responsiveParams.towerRadius, activeContent]);
+    }, [latestContent, responsiveParams.towerRadius, activeContent]);
 
     // 解构以便访问。
     const monitors = monitorData.items;
     const totalHeight = monitorData.totalHeight;
+    useEffect(() => { monitorOffsets.current = monitors.map(() => 0); }, [monitors]);
 
     // lastY 也需要 ref。
     const lastYRef = useRef(0);
@@ -461,21 +467,11 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             }
         });
 
-    }, [isAnimating, camera, responsiveParams, openOverlay]);
+    }, [isAnimating, camera, responsiveParams, openOverlay, unlockAchievement]);
 
     // 仅在遮罩被明确关闭时触发相机返回。
     // 用 ref 记录遮罩此前是否打开，避免初始化竞态。
     const prevOverlayContent = useRef(null);
-
-    useEffect(() => {
-        // 此前打开、现在为 null，且正在查看显示器时，返回相机。
-        if (prevOverlayContent.current && !overlayContent && selectedMonitor && !isAnimating) {
-            handleReturnCamera();
-        }
-
-        // 更新 ref，供下次渲染使用。
-        prevOverlayContent.current = overlayContent;
-    }, [overlayContent, selectedMonitor, isAnimating]);
 
     const handleReturnCamera = useCallback(() => {
         setIsAnimating(true);
@@ -498,6 +494,16 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             setSelectedMonitor(null);
         }
     }, [camera]);
+
+    useEffect(() => {
+        // 此前打开、现在为 null，且正在查看显示器时，返回相机。
+        const closed = prevOverlayContent.current && !overlayContent;
+        prevOverlayContent.current = overlayContent;
+        if (closed && selectedMonitor && !isAnimating) {
+            const frame = requestAnimationFrame(handleReturnCamera);
+            return () => cancelAnimationFrame(frame);
+        }
+    }, [overlayContent, selectedMonitor, isAnimating, handleReturnCamera]);
 
     // 清理旧监听效果，现由上方全局效果管理。
 
@@ -612,7 +618,7 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
     const matRef3 = useRef(); // -Y 底面。
     const matRef4 = useRef(); // +Z 正面。
     const matRef5 = useRef(); // -Z 背面。
-    const matRefs = [matRef0, matRef1, matRef2, matRef3, matRef4, matRef5];
+    const matRefs = useMemo(() => [matRef0, matRef1, matRef2, matRef3, matRef4, matRef5], []);
 
     // 优先使用本地内容的 device 字段，缺省时按平台选择设备类型。
     const deviceShape = item.device || (PLATFORM_CONFIG[item.platform]?.shape) || 'monitor';
@@ -748,6 +754,13 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
         });
     }, [faceConfig, paintOnBeforeCompile]);
 
+    useEffect(() => () => {
+        paintedMaterials?.forEach(material => material?.dispose());
+        sketchMaterials?.forEach(material => material?.dispose());
+    }, [paintedMaterials, sketchMaterials]);
+
+    useEffect(() => () => hideDelayRef.current?.kill(), []);
+
     // 悬停状态管理，避免 React 重渲染。
     const isHoveredRef = useRef(false);
 
@@ -782,7 +795,7 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
                 if (paintedBoxRef.current) paintedBoxRef.current.visible = false;
             });
         }
-    }, [faceConfig, isSelected, isTouch]);
+    }, [faceConfig, isSelected, isTouch, matRefs]);
 
     // 响应纯外部状态变化，例如遮罩关闭后 isSelected 变为 false。
     useEffect(() => {

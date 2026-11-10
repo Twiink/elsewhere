@@ -1,7 +1,10 @@
+import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
+import Text from '../SiteText';
 import { useMemo, useState, useRef, useEffect } from 'react';
-import { useTexture, Text } from '@react-three/drei';
+import { useTexture } from '@react-three/drei';
+
 import * as THREE from 'three';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useThree } from '@react-three/fiber';
 import gsap from 'gsap';
 import '../shaders/RevealMaterial';
 import { isTouchDevice } from '../../../utils/deviceDetect';
@@ -26,7 +29,7 @@ const tempEuler = new THREE.Euler();
 const tempQuat = new THREE.Quaternion();
 
 
-const CABIN_SKETCH_URL = '/fonts/LXGWWenKaiLite-Regular.ttf';
+const CABIN_SKETCH_URL = '/fonts/LXGWWenKaiLite-site.woff';
 
 const PictureContent = ({ imagePath, imagePaintedPath, width, height, isPainted }) => {
     const texture = useTexture(imagePath);
@@ -345,9 +348,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
     // lampGrilleTexture.repeat.set(1, 1);
 
     const lampSideTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/bokilampy.png?imageMogr2/thumbnail/1024x64');
-    lampSideTexture.wrapS = lampSideTexture.wrapT = THREE.RepeatWrapping;
     // 调整长边 UV。
-    lampSideTexture.repeat.set(1, 1);
 
     const lights = useMemo(() => {
         const items = [];
@@ -464,8 +465,6 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
             {/* 顶灯。 */}
             {lights.filter(light => light.z <= zClip).map((light, i) => {
                 // 在循环内配置纹理，确保平铺模式正确。
-                lampGrilleTexture.wrapS = lampGrilleTexture.wrapT = THREE.ClampToEdgeWrapping;
-                lampSideTexture.wrapS = lampSideTexture.wrapT = THREE.ClampToEdgeWrapping; // 侧面也使用边缘钳制，避免条纹。
 
                 return (
                     <group key={`light-${i}`} position={[0, ceilingY, light.z]}>

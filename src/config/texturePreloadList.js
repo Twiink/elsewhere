@@ -1,6 +1,6 @@
 /**
- * 整个体验的纹理预加载列表。
- * 初始加载阶段预加载资源，减少进入房间时的卡顿。
+ * 按场景组织的纹理预取列表。
+ * 房间资源在空闲或交互时按需准备，入口资源由实际场景加载。
  */
 
 // 入口场景纹理。
@@ -263,35 +263,5 @@ export const PRELOAD_LOADER = [
  * @returns {string[]} 过滤后的列表。
  */
 export const filterTexturesByDevice = (list, usePainted) => {
-    // 1. 查找所有存在 _painted 版本的路径。
-    const paintedVersions = new Set(list.filter(p => p.includes('_painted.png')));
-    
-    // 同时处理 css3logo 特例。
-    const hasCss3Painted = list.some(p => p.includes('css3logo_painted.png'));
-    
-    return list.filter(path => {
-        const isPainted = path.includes('_painted.png');
-        const isCss3 = path.includes('css3logo_painted.png');
-        
-        // 彩色路径需先找到对应普通路径。
-        let standardVersion = null;
-        if (isPainted) {
-            standardVersion = path.replace('_painted.png', '.png');
-        } else if (isCss3) {
-            standardVersion = path.replace('css3logo_painted.png', 'csslogo.png');
-        } else {
-            // 检查普通路径在列表中是否有彩色版本。
-            const pVersion = path.replace('.png', '_painted.png');
-            const css3Version = path.replace('csslogo.png', 'css3logo_painted.png');
-            if (list.includes(pVersion) || (path.includes('csslogo.png') && hasCss3Painted)) {
-                // 返回 true 保留普通版本，桌面端与移动端均需要。
-                return true; 
-            }
-            // 没有彩色版本时视为静态纹理，始终保留。
-            return true;
-        }
-
-        // 此项为彩色版本。
-        return usePainted;
-    });
+    return usePainted ? list : list.filter(path => !path.includes('_painted.png'));
 };

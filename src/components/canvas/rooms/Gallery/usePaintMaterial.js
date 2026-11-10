@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
 import * as THREE from 'three';
 import gsap from 'gsap';
 
@@ -124,35 +124,42 @@ export const usePaintMaterial = (options = {}) => {
             }
             `
         );
-    }, [uniformsData]);
+    }, [uniformsData, dirX, dirY, dirZ, startDist, endDist, noiseComponent1, noiseComponent2]);
 
     // 触发过渡的动画方法。
-    const animatePaint = (delay = 0, duration = 2.5) => {
-        gsap.to(uniformsData.uPaintProgress, {
+    const animatePaint = useCallback((delay = 0, duration = 2.5, onComplete, onStart) => {
+        return gsap.to(uniformsData.uPaintProgress, {
             value: 1.0,
             duration: duration,
             delay: delay,
             ease: 'power2.inOut',
-            overwrite: 'auto'
+            overwrite: true,
+            onComplete,
+            onStart,
         });
-    };
+    }, [uniformsData]);
 
-    const resetPaint = () => {
-        uniformsData.uPaintProgress.value = 0.0;
-    };
+    const setPaintProgress = useCallback((value) => {
+        gsap.killTweensOf(uniformsData.uPaintProgress);
+        gsap.set(uniformsData.uPaintProgress, { value });
+    }, [uniformsData]);
+    const resetPaint = useCallback(() => setPaintProgress(0), [setPaintProgress]);
+
+    useEffect(() => () => gsap.killTweensOf(uniformsData.uPaintProgress), [uniformsData]);
 
     // 由组引用的世界位置更新房间原点。
-    const updateRoomOrigin = (groupRef) => {
+    const updateRoomOrigin = useCallback((groupRef) => {
         if (groupRef?.current) {
             groupRef.current.getWorldPosition(uniformsData.uRoomOrigin.value);
         }
-    };
+    }, [uniformsData]);
 
     return {
         onBeforeCompile,
         uniformsData,
         animatePaint,
         resetPaint,
+        setPaintProgress,
         updateRoomOrigin,
         transparent: true,
         needsUpdate: true

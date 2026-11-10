@@ -1,6 +1,7 @@
+import { useScene } from '../../../context/contexts';
 import { memo, useEffect, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
-import { useScene } from '../../../context/SceneContext';
+
 
 // 门位置：第 0 段的全局 Z。
 // 计算：10（起点 Z）+ 相对 Z + 2（门偏移）。

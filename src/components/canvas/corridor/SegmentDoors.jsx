@@ -1,9 +1,12 @@
-import { useRef, useState, useMemo } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useAudio } from '../../../context/contexts';
+import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
+import { useRef, useEffect } from 'react';
+import { useTextureCopy } from '../../../hooks/useTextureCopy';
+import { useThree } from '@react-three/fiber';
 import { useTexture, PositionalAudio } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
-import { useAudio } from '../../../context/AudioManager';
+
 
 // 分段自动门音频的全局设置。
 const SEGMENT_DOOR_AUDIO_SETTINGS = {
@@ -48,9 +51,8 @@ const SegmentDoors = ({
     const handleRightTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/handle_right_sketch.png?imageMogr2/thumbnail/256x512');
     const doorBackTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/door_back.png?imageMogr2/thumbnail/256x512');
     const edgeTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/pien.png?imageMogr2/thumbnail/32x256');
-    const wallTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512');
-
-    wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
+    const wallSource = useTexture('https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512');
+    const wallTexture = useTextureCopy(wallSource, { wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping });
 
     // 踢脚线纹理，1582×94 像素。
     const baseboardTexSrc = useTexture('https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png');
@@ -77,6 +79,20 @@ const SegmentDoors = ({
     const topWallHeight = corridorHeight - doorHeight;
     const topWallCenterY = doorBottomY + doorHeight + topWallHeight / 2;
     const sideWallWidth = (corridorWidth - doorOpeningWidth) / 2;
+
+    const thresholdTexture = useTextureCopy(baseboardTexSrc, {
+        wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping,
+        colorSpace: THREE.SRGBColorSpace,
+        repeatX: (frameWidth + 0.1) / NATURAL_TILE_W,
+    });
+    const boardTexture = useTextureCopy(baseboardTexSrc, {
+        wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping,
+        colorSpace: THREE.SRGBColorSpace,
+        repeatX: sideWallWidth / NATURAL_TILE_W,
+    });
+    useEffect(() => () => {
+        if (closeAudioTimeoutRef.current) clearTimeout(closeAudioTimeoutRef.current);
+    }, []);
 
     // 触发距离。
     const openDistance = 12;
@@ -337,15 +353,6 @@ const SegmentDoors = ({
                 const THRESHOLD_DEPTH = 0.15;
                 const THRESHOLD_WIDTH = frameWidth + 0.1;
 
-                const threshTex = baseboardTexSrc.clone();
-                threshTex.needsUpdate = true;
-                threshTex.wrapS = threshTex.wrapT = THREE.RepeatWrapping;
-                threshTex.rotation = 0; // 不旋转，纹理沿 X 方向延伸。
-                threshTex.offset.set(0, 0);
-                // 自然平铺：1582×94 像素，高 0.15 时宽约 2.524 单位。
-                // 门槛沿 X 宽度方向重复，沿 Z 深度方向只显示一次。
-                threshTex.repeat.set(THRESHOLD_WIDTH / NATURAL_TILE_W, 1);
-
                 return (
                     <mesh
                         position={[0, floorY + 0.005, 0]}
@@ -353,7 +360,7 @@ const SegmentDoors = ({
                     >
                         <planeGeometry args={[THRESHOLD_WIDTH, THRESHOLD_DEPTH]} />
                         <meshBasicMaterial color="#e0e0e0"
-                            map={threshTex}
+                            map={thresholdTexture}
                             roughness={0.9}
                             metalness={0}
                             side={THREE.DoubleSide}
@@ -363,32 +370,20 @@ const SegmentDoors = ({
             })()}
             {/* 左侧踢脚线。 */}
             {(() => {
-                const bbTex = baseboardTexSrc.clone();
-                bbTex.wrapS = bbTex.wrapT = THREE.RepeatWrapping;
-                bbTex.rotation = 0;
-                bbTex.offset.set(0, 0);
-                bbTex.needsUpdate = true;
-                bbTex.repeat.set(sideWallWidth / NATURAL_TILE_W, 1);
                 return (
                     <mesh position={[-(doorOpeningWidth / 2 + sideWallWidth / 2), floorY + 0.075, wallThickness / 2 + 0.01]}>
                         <planeGeometry args={[sideWallWidth, 0.15]} />
-                        <meshBasicMaterial color="#e0e0e0" map={bbTex} roughness={0.8} side={THREE.DoubleSide} />
+                        <meshBasicMaterial color="#e0e0e0" map={boardTexture} roughness={0.8} side={THREE.DoubleSide} />
                     </mesh>
                 );
             })()}
 
             {/* 右侧踢脚线。 */}
             {(() => {
-                const bbTex = baseboardTexSrc.clone();
-                bbTex.wrapS = bbTex.wrapT = THREE.RepeatWrapping;
-                bbTex.rotation = 0;
-                bbTex.offset.set(0, 0);
-                bbTex.needsUpdate = true;
-                bbTex.repeat.set(sideWallWidth / NATURAL_TILE_W, 1);
                 return (
                     <mesh position={[(doorOpeningWidth / 2 + sideWallWidth / 2), floorY + 0.075, wallThickness / 2 + 0.01]}>
                         <planeGeometry args={[sideWallWidth, 0.15]} />
-                        <meshBasicMaterial color="#e0e0e0" map={bbTex} roughness={0.8} side={THREE.DoubleSide} />
+                        <meshBasicMaterial color="#e0e0e0" map={boardTexture} roughness={0.8} side={THREE.DoubleSide} />
                     </mesh>
                 );
             })()}

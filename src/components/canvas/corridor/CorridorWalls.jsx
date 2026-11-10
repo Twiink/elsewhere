@@ -1,7 +1,9 @@
-import { useMemo, useRef } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
+import { useMemo, useRef, useCallback } from 'react';
+import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useTexture } from '@react-three/drei';
+import { useTextureCopy } from '../../../hooks/useTextureCopy';
 
 // 导入常量，以匹配 CorridorSegment 的逻辑。
 // 实际项目中可将这些常量放入共享配置。
@@ -52,12 +54,7 @@ const DoorWallSegment = ({ position, baseRotationY, width, corridorHeight, wallT
     });
 
     // 克隆纹理，以便独立设置重复次数。
-    const segTexture = useMemo(() => {
-        const tex = wallTexture.clone();
-        tex.needsUpdate = true;
-        tex.repeat.set(width / 2, corridorHeight / 2);
-        return tex;
-    }, [wallTexture, width, corridorHeight]);
+    const segTexture = useTextureCopy(wallTexture, { repeatX: width / 2, repeatY: corridorHeight / 2 });
 
     return (
         <mesh ref={meshRef} position={position}>
@@ -65,6 +62,68 @@ const DoorWallSegment = ({ position, baseRotationY, width, corridorHeight, wallT
             <meshBasicMaterial color="#e0e0e0" map={segTexture} roughness={1} metalness={0} />
         </mesh>
     );
+};
+
+
+const FillerWall = ({ seg, wallTexture, baseboardTexture, corridorHeight }) => {
+    const segTexture = useTextureCopy(wallTexture, {
+        wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping,
+        repeatX: seg.width / 2, repeatY: corridorHeight / 2,
+    });
+    const bbTexture = useTextureCopy(baseboardTexture, {
+        wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping,
+        colorSpace: THREE.SRGBColorSpace, repeatX: seg.width / ((1582 / 94) * 0.15),
+    });
+    // =============================================
+    // 裁切门旁踢脚线。
+    // =============================================
+    // 与门相邻的两端分别缩短 0.5，
+    // 由 trimStart 和 trimEnd 控制。
+    // 移动踢脚线中心，使其与墙面保持对齐。
+    // trimHighZ：裁切较大 Z 一端，即门凹槽起点。
+    // trimLowZ：裁切较小 Z 一端，即门凹槽终点。
+    const bbMarginHighZ = seg.trimHighZ ? 0.5 : 0;
+    const bbMarginLowZ = seg.trimLowZ ? 0.5 : 0;
+    const bbWidth = seg.width - bbMarginHighZ - bbMarginLowZ;
+
+    // 沿局部坐标轴移动踢脚线中心，在组内为 X 轴。
+    // 墙段经过旋转，局部 X 轴沿墙延伸。
+    // 左墙旋转 +PI/2 后，局部 +X 指向世界 -Z（较小 Z）。
+    // 右墙旋转 -PI/2 后，局部 +X 指向世界 +Z（较大 Z）。
+    // 因此左右墙面的偏移方向相反。
+    let bbOffsetX;
+    if (seg.isLeft) {
+        // 局部 +X = 世界 -Z = lowZ 一侧。
+        bbOffsetX = (bbMarginLowZ - bbMarginHighZ) / 2;
+    } else {
+        // 局部 +X = 世界 +Z = highZ 一侧。
+        bbOffsetX = (bbMarginHighZ - bbMarginLowZ) / 2;
+    }
+
+    return (
+        <group position={seg.position} rotation={seg.rotation || [0, seg.rotationY, 0]}>
+            {/* 主墙段。 */}
+            <mesh>
+                <planeGeometry args={[seg.width, corridorHeight]} />
+                <meshBasicMaterial color="#e0e0e0"
+                    map={segTexture}
+                    roughness={1}
+                    metalness={0}
+                />
+            </mesh>
+
+            {/* 踢脚线，门边已裁切。 */}
+            <mesh position={[bbOffsetX, -corridorHeight / 2 + 0.075, 0.01]}>
+                <planeGeometry args={[bbWidth, 0.15]} />
+                <meshBasicMaterial color="#e0e0e0"
+                    map={bbTexture}
+                    roughness={0.8}
+                    side={THREE.DoubleSide}
+                />
+            </mesh>
+        </group>
+    );
+
 };
 
 /**
@@ -83,30 +142,24 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
     // =============================================
     // 地面片段纹理：手绘木板。
     const floorTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/kawalekpodlogi.png?imageMogr2/thumbnail/1024x1024');
-    floorTexture.wrapS = floorTexture.wrapT = THREE.ClampToEdgeWrapping;
 
     // 踢脚线纹理。
     // 图片尺寸：1582×94 像素，宽高比 16.83:1。
     const baseboardTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png');
-    baseboardTexture.wrapS = baseboardTexture.wrapT = THREE.RepeatWrapping;
-    baseboardTexture.colorSpace = THREE.SRGBColorSpace;
 
     // 加载墙面纹理。
     const wallTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512');
-    wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
 
     // 加载天花板纹理。
-    const ceilingTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/ceiling_texture.png?imageMogr2/thumbnail/1024x512');
-    ceilingTexture.wrapS = ceilingTexture.wrapT = THREE.RepeatWrapping;
+    const ceilingSource = useTexture('https://media.secknow-ai.com/space/textures/corridor/ceiling_texture.png?imageMogr2/thumbnail/1024x512');
+    const ceilingTexture = useTextureCopy(ceilingSource, { wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping, repeatX: 7 / 2, repeatY: 10 / 2 });
+    const leftSideTexture = useTextureCopy(floorTexture, { repeatY: 1 / 5 });
+    const rightSideTexture = useTextureCopy(floorTexture, { repeatY: 1 / 5, offsetY: 4 / 5 });
 
     // 按裁切条件计算有效几何体。
     // 只渲染 Math.min(zStart, zClip) 至 zStart - length 之间的区域。
     const effectiveStart = Math.min(zStart, zClip);
     const effectiveLength = effectiveStart - (zStart - length);
-    const zCenter = effectiveStart - effectiveLength / 2;
-
-    // 完全被裁切时不渲染。
-    if (effectiveLength <= 0) return null;
 
     // =============================================
     // 调整门边踢脚线的裁切。
@@ -114,10 +167,9 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
     // 设置门框两侧踢脚线各缩短多少个 3D 单位。
     // 数值越大，踢脚线与门之间的间隙越宽。
     // 数值越小，踢脚线越靠近门，可能覆盖门框。
-    const BASEBOARD_DOOR_MARGIN = 0.5;
 
     // 为指定侧面（'left' 或 'right'）生成墙段的辅助函数。
-    const generateWallSegments = (side) => {
+    const generateWallSegments = useCallback((side) => {
         const segments = [];
         const isLeft = side === 'left';
         const baseX = isLeft ? -WALL_X_OUTER : WALL_X_OUTER;
@@ -177,7 +229,6 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
             const dx = innerX - baseX;
             const dz = doorEndZ - doorStartZ; // 负值（-4）。
             const dist = Math.sqrt(dx * dx + dz * dz);
-            const angle = Math.atan2(dx, dz); // 相对于 Z 轴的角度。
             // atan2(dx, dz)：左侧 dx=1.8、dz=-4，角度约 155°。
             // 标准墙面法线为 90°。
             // 需要绕 Y 轴旋转。
@@ -257,10 +308,12 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
         }
 
         return segments;
-    };
+    }, [effectiveStart, effectiveLength, doorPositions, zStart]);
 
-    const leftSegments = useMemo(() => generateWallSegments('left'), [effectiveStart, effectiveLength, doorPositions]);
-    const rightSegments = useMemo(() => generateWallSegments('right'), [effectiveStart, effectiveLength, doorPositions]);
+    const leftSegments = useMemo(() => generateWallSegments('left'), [generateWallSegments]);
+    const rightSegments = useMemo(() => generateWallSegments('right'), [generateWallSegments]);
+
+    if (effectiveLength <= 0) return null;
 
     return (
         <group>
@@ -282,20 +335,6 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
                 const CENTER_WIDTH = 5;          // 中间条带宽度，较窄木板的视觉效果更好。
                 const SIDE_WIDTH = 1;            // 左右两侧条带的宽度。
                 const FLOOR_START_OFFSET = 2;    // 起点偏移：正值更远，负值更靠近相机。
-
-                // 侧面条带使用裁切纹理，与中间保持相同缩放，不拉伸。
-                // UV 重复值表示显示纹理的比例：SIDE_WIDTH / CENTER_WIDTH。
-                const uvFraction = SIDE_WIDTH / CENTER_WIDTH; // 例如 1/5=0.2，显示纹理的 20%。
-
-                const leftSideTexture = floorTexture.clone();
-                leftSideTexture.needsUpdate = true;
-                leftSideTexture.repeat.set(1, uvFraction);    // 长度完整，仅裁切宽度。
-                leftSideTexture.offset.set(0, 0);             // 纹理左边缘。
-
-                const rightSideTexture = floorTexture.clone();
-                rightSideTexture.needsUpdate = true;
-                rightSideTexture.repeat.set(1, uvFraction);
-                rightSideTexture.offset.set(0, 1 - uvFraction); // 纹理右边缘。
 
                 const tiles = [];
                 const floorY = -corridorHeight / 2;
@@ -398,7 +437,6 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
                             <planeGeometry args={[tileWidth, tileLength]} />
                             <meshBasicMaterial color="#e0e0e0"
                                 map={ceilingTexture}
-                                map-repeat={[tileWidth / 2, tileLength / 2]}
                                 side={THREE.DoubleSide}
                                 roughness={1}
                                 metalness={0}
@@ -414,72 +452,7 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
             {/* 跳过 connector 和 door 分段，门段现由 DoorSection 处理。 */}
             {[...leftSegments, ...rightSegments]
                 .filter(seg => seg.type === 'filler')
-                .map((seg, i) => {
-                    // 克隆墙面纹理，墙面与踢脚线采用相同方式。
-                    const segTexture = wallTexture.clone();
-                    segTexture.needsUpdate = true;
-                    segTexture.repeat.set(seg.width / 2, corridorHeight / 2);
-
-                    // 克隆踢脚线纹理。
-                    // 纹理为 1582×94 像素，自然平铺宽度为 (1582/94)×0.15=2.524 单位。
-                    const bbTexture = baseboardTexture.clone();
-                    bbTexture.needsUpdate = true;
-                    bbTexture.wrapS = bbTexture.wrapT = THREE.RepeatWrapping;
-                    bbTexture.rotation = 0; // 关键：重置旋转，共享纹理可能已被门槛设为 PI/2。
-                    bbTexture.offset.set(0, 0);
-                    const NATURAL_TILE_W = (1582 / 94) * 0.15;
-                    bbTexture.repeat.set(seg.width / NATURAL_TILE_W, 1);
-
-                    // =============================================
-                    // 裁切门旁踢脚线。
-                    // =============================================
-                    // 与门相邻的两端分别缩短 BASEBOARD_DOOR_MARGIN，
-                    // 由 trimStart 和 trimEnd 控制。
-                    // 移动踢脚线中心，使其与墙面保持对齐。
-                    // trimHighZ：裁切较大 Z 一端，即门凹槽起点。
-                    // trimLowZ：裁切较小 Z 一端，即门凹槽终点。
-                    const bbMarginHighZ = seg.trimHighZ ? BASEBOARD_DOOR_MARGIN : 0;
-                    const bbMarginLowZ = seg.trimLowZ ? BASEBOARD_DOOR_MARGIN : 0;
-                    const bbWidth = seg.width - bbMarginHighZ - bbMarginLowZ;
-
-                    // 沿局部坐标轴移动踢脚线中心，在组内为 X 轴。
-                    // 墙段经过旋转，局部 X 轴沿墙延伸。
-                    // 左墙旋转 +PI/2 后，局部 +X 指向世界 -Z（较小 Z）。
-                    // 右墙旋转 -PI/2 后，局部 +X 指向世界 +Z（较大 Z）。
-                    // 因此左右墙面的偏移方向相反。
-                    let bbOffsetX;
-                    if (seg.isLeft) {
-                        // 局部 +X = 世界 -Z = lowZ 一侧。
-                        bbOffsetX = (bbMarginLowZ - bbMarginHighZ) / 2;
-                    } else {
-                        // 局部 +X = 世界 +Z = highZ 一侧。
-                        bbOffsetX = (bbMarginHighZ - bbMarginLowZ) / 2;
-                    }
-
-                    return (
-                        <group key={i} position={seg.position} rotation={seg.rotation || [0, seg.rotationY, 0]}>
-                            {/* 主墙段。 */}
-                            <mesh>
-                                <planeGeometry args={[seg.width, corridorHeight]} />
-                                <meshBasicMaterial color="#e0e0e0"
-                                    map={segTexture}
-                                    roughness={1}
-                                    metalness={0}
-                                />
-                            </mesh>
-
-                            {/* 踢脚线，门边已裁切。 */}
-                            <mesh position={[bbOffsetX, -corridorHeight / 2 + 0.075, 0.01]}>
-                                <planeGeometry args={[bbWidth, 0.15]} />
-                                <meshBasicMaterial color="#e0e0e0"
-                                    map={bbTexture}
-                                    roughness={0.8}
-                                    side={THREE.DoubleSide}
-                                />
-                            </mesh>
-                        </group>
-                    );
-                })}
+                .map((seg, i) => <FillerWall key={i} seg={seg} wallTexture={wallTexture} baseboardTexture={baseboardTexture} corridorHeight={corridorHeight} />)}
 
 
 

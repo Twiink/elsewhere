@@ -1,0 +1,14 @@
+.loading-failure {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  background: #faf8f2;
+  color: #25231f;
+  text-align: center;
+  h1 { font-size: 1.6rem; margin-bottom: 1rem; }
+  p { max-width: 28rem; line-height: 1.8; margin-bottom: 1.5rem; }
+  button, a { display: inline-block; margin: .4rem; padding: .7rem 1rem; color: inherit; font: inherit; background: transparent; border: 1px solid currentColor; border-radius: 3px; cursor: pointer; }
+}

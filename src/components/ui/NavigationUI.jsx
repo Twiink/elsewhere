@@ -1,9 +1,10 @@
+import { useScene, useAudio, useAchievements } from '../../context/contexts';
 import { useState, useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import { useScene } from '../../context/SceneContext';
-import { useAudio } from '../../context/AudioManager';
+
+
 import { setMusicVolume, getMusicVolume } from '../../utils/audioManager';
-import { useAchievements } from '../../context/AchievementsContext';
+
 import AchievementPopup from './AchievementPopup';
 import AchievementsPanel from './AchievementsPanel';
 import '../../styles/NavigationUI.scss';
@@ -22,8 +23,8 @@ const PIN_START_POSITION = { x: 50.5, y: 97 };
 
 const NavigationUI = () => {
     const { currentRoom, isInRoom, requestExit, hasEntered, teleportTo, isTeleporting } = useScene();
-    const { isMuted, toggleMute, globalVolume, setGlobalVolume } = useAudio();
-    const { showTutorial, unlockAchievement } = useAchievements();
+    const { isMuted, globalVolume, setGlobalVolume } = useAudio();
+    const { showTutorial } = useAchievements();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [hoveredRoom, setHoveredRoom] = useState(null);
     const [isExiting, setIsExiting] = useState(false); // 跟踪返回按钮点击状态。
@@ -31,7 +32,7 @@ const NavigationUI = () => {
     // 音频控制状态。
     const [isAudioMenuOpen, setIsAudioMenuOpen] = useState(false);
     const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
-    const [bgmVol, setBgmVol] = useState(0.3);
+    const [bgmVol, setBgmVol] = useState(getMusicVolume);
     const [isUIHidden, setIsUIHidden] = useState(false);
 
     // 焦点管理引用。
@@ -51,18 +52,16 @@ const NavigationUI = () => {
         return () => window.removeEventListener('inspectChange', handleInspectChange);
     }, []);
 
-    const paintedMapsRefs = {
-        about: useRef(),
-        gallery: useRef(),
-        contact: useRef(),
-        studio: useRef()
-    };
+    const aboutMapRef = useRef();
+    const galleryMapRef = useRef();
+    const contactMapRef = useRef();
+    const studioMapRef = useRef();
 
     useEffect(() => {
         // 关于我区域：左 10%、上 20%、宽 30%、高 35%。
         // X 范围 10% 至 40%，Y 范围 20% 至 55%。
-        if (paintedMapsRefs.about.current) {
-            gsap.to(paintedMapsRefs.about.current, {
+        if (aboutMapRef.current) {
+            gsap.to(aboutMapRef.current, {
                 clipPath: (hoveredRoom === 'about' || currentRoom === 'about')
                     ? 'polygon(10% 20%, 40% 20%, 40% 55%, 10% 55%)'
                     : 'polygon(10% 20%, 10% 20%, 10% 55%, 10% 55%)',
@@ -73,8 +72,8 @@ const NavigationUI = () => {
 
         // 画廊区域：左 10%、下 8%、宽 30%、高 35%。
         // X 为 10% 至 40%，Y 为 57% 至 92%；顶部为 100-8-35=57%。
-        if (paintedMapsRefs.gallery.current) {
-            gsap.to(paintedMapsRefs.gallery.current, {
+        if (galleryMapRef.current) {
+            gsap.to(galleryMapRef.current, {
                 clipPath: (hoveredRoom === 'gallery' || currentRoom === 'gallery')
                     ? 'polygon(10% 57%, 40% 57%, 40% 92%, 10% 92%)'
                     : 'polygon(10% 57%, 10% 57%, 10% 92%, 10% 92%)',
@@ -85,8 +84,8 @@ const NavigationUI = () => {
 
         // 联系我区域：右 5%、上 10%、宽 35%、高 25%。
         // X 为 60% 至 95%，Y 为 10% 至 35%；左侧为 100-5-35=60%。
-        if (paintedMapsRefs.contact.current) {
-            gsap.to(paintedMapsRefs.contact.current, {
+        if (contactMapRef.current) {
+            gsap.to(contactMapRef.current, {
                 clipPath: (hoveredRoom === 'contact' || currentRoom === 'contact')
                     ? 'polygon(60% 10%, 95% 10%, 95% 35%, 60% 35%)'
                     : 'polygon(95% 10%, 95% 10%, 95% 35%, 95% 35%)',
@@ -97,8 +96,8 @@ const NavigationUI = () => {
 
         // 工作室区域：右 15%、下 19%、宽 25%、高 40%。
         // X 为 60% 至 85%，Y 为 41% 至 81%；左侧为 100-15-25=60%，顶部为 100-19-40=41%。
-        if (paintedMapsRefs.studio.current) {
-            gsap.to(paintedMapsRefs.studio.current, {
+        if (studioMapRef.current) {
+            gsap.to(studioMapRef.current, {
                 clipPath: (hoveredRoom === 'studio' || currentRoom === 'studio')
                     ? 'polygon(60% 41%, 85% 41%, 85% 81%, 60% 81%)'
                     : 'polygon(85% 41%, 85% 41%, 85% 81%, 85% 81%)',
@@ -109,7 +108,6 @@ const NavigationUI = () => {
     }, [hoveredRoom, currentRoom]);
 
     useEffect(() => {
-        setBgmVol(getMusicVolume());
 
         const handleMusicVolumeChange = (e) => {
             setBgmVol(e.detail);
@@ -133,22 +131,17 @@ const NavigationUI = () => {
         }
     }, [hasEntered, isTeleporting, isInRoom, showTutorial]);
 
-    // 进入房间或开始传送时关闭菜单。
-    useEffect(() => {
+    // 房间与传送状态变化时同步调整菜单，避免先渲染过期菜单。
+    const [previousNavigation, setPreviousNavigation] = useState({ isInRoom, isTeleporting });
+    if (previousNavigation.isInRoom !== isInRoom || previousNavigation.isTeleporting !== isTeleporting) {
+        setPreviousNavigation({ isInRoom, isTeleporting });
         if (isInRoom || isTeleporting) {
             setIsMenuOpen(false);
             setIsAudioMenuOpen(false);
             setIsAchievementsOpen(false);
-            setIsExiting(false);
         }
-    }, [isInRoom, isTeleporting]);
-
-    // 离开房间后重置退出状态。
-    useEffect(() => {
-        if (!isInRoom) {
-            setIsExiting(false);
-        }
-    }, [isInRoom]);
+        setIsExiting(false);
+    }
 
     // 地图焦点管理：自动聚焦、Esc 关闭与焦点限制。
     useEffect(() => {
@@ -334,10 +327,10 @@ const NavigationUI = () => {
                             <img src="https://media.secknow-ai.com/space/images/map.png" alt="作品集地图" className="map-image" />
 
                             {/* 地图彩色叠加层。 */}
-                            <img ref={paintedMapsRefs.about} src="https://media.secknow-ai.com/space/images/map_about_painted.png" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(10% 20%, 10% 20%, 10% 55%, 10% 55%)' }} />
-                            <img ref={paintedMapsRefs.gallery} src="https://media.secknow-ai.com/space/images/map_gallery_painted.png" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(10% 57%, 10% 57%, 10% 92%, 10% 92%)' }} />
-                            <img ref={paintedMapsRefs.contact} src="https://media.secknow-ai.com/space/images/map_contact_painted.png" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(95% 10%, 95% 10%, 95% 35%, 95% 35%)' }} />
-                            <img ref={paintedMapsRefs.studio} src="https://media.secknow-ai.com/space/images/map_studio_painted.png" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(85% 41%, 85% 41%, 85% 81%, 85% 81%)' }} />
+                            <img ref={aboutMapRef} src="https://media.secknow-ai.com/space/images/map_about_painted.png" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(10% 20%, 10% 20%, 10% 55%, 10% 55%)' }} />
+                            <img ref={galleryMapRef} src="https://media.secknow-ai.com/space/images/map_gallery_painted.png" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(10% 57%, 10% 57%, 10% 92%, 10% 92%)' }} />
+                            <img ref={contactMapRef} src="https://media.secknow-ai.com/space/images/map_contact_painted.png" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(95% 10%, 95% 10%, 95% 35%, 95% 35%)' }} />
+                            <img ref={studioMapRef} src="https://media.secknow-ai.com/space/images/map_studio_painted.png" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(85% 41%, 85% 41%, 85% 81%, 85% 81%)' }} />
 
                             {/* 四个悬停区域覆盖地图。 */}
                             <button

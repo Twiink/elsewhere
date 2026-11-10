@@ -1,5 +1,6 @@
+import { useScene } from '../context/contexts';
 import { useEffect, useRef } from 'react';
-import { useScene } from '../context/SceneContext';
+
 import { siteInfo } from '../data/content';
 
 /**

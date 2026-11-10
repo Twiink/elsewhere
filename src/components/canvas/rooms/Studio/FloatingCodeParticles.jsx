@@ -1,7 +1,10 @@
+import { usePerformance } from '../../../../context/contexts';
+import Text from '../../SiteText';
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
+
 import * as THREE from 'three';
+
 
 // ============================================
 // 配置。
@@ -42,7 +45,7 @@ const getRandomSymbol = () => {
 
 // 一次性生成粒子数据。
 // 一次性生成粒子数据。
-const generateParticles = () => {
+const generateParticles = (count) => {
     const particles = [];
 
     // 二维平面边界。
@@ -50,7 +53,7 @@ const generateParticles = () => {
     const Z_MIN = -4; // 位于显示器后方，显示器半径约 ±2.2。
     const Z_MAX = -8; // 更靠后。
 
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
+    for (let i = 0; i < count; i++) {
         const symbol = getRandomSymbol();
 
         // 在扁平交互空间内生成随机三维位置。
@@ -80,7 +83,9 @@ const generateParticles = () => {
 // 主组件接收父级 ref，以实现平滑动画。
 // fallOffsetRef 现表示速度 fallSpeed，而非累计偏移。
 const FloatingCodeParticles = ({ towerRotationRef, fallOffsetRef }) => {
-    const particles = useMemo(() => generateParticles(), []);
+    const { settings } = usePerformance();
+    const count = Math.round(PARTICLE_COUNT * settings.particleCount);
+    const particles = useMemo(() => generateParticles(count), [count]);
     const meshRefs = useRef([]);
 
     // 跟踪插值后的数值以平滑运动。
@@ -181,7 +186,7 @@ const FloatingCodeParticles = ({ towerRotationRef, fallOffsetRef }) => {
                     anchorX="center"
                     anchorY="middle"
                     fillOpacity={particle.opacity}
-                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                    font="/fonts/LXGWWenKaiLite-site.woff"
                 >
                     {particle.symbol.text}
                 </Text>

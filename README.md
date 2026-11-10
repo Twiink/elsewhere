@@ -27,17 +27,17 @@ npm run preview
 # 代码检查
 npm run lint
 
-# 个人资料、本地内容、表单与静态起始页检查
-npm run check:content
+# 为已配置预压缩服务的托管环境额外生成 gzip / Brotli
+npm run build:compressed
 ```
 
 ## Git 跟踪范围
 
-仓库跟踪源码、内容数据、测试、发布素材、依赖锁文件和共享配置。`src/data/content.original.json` 作为内容回归测试的参考快照保留；小程序码直接校验发布图片的 SHA-256，不依赖制作归档。
+仓库跟踪源码、内容数据、发布素材、依赖锁文件和共享配置。
 
 `assets/` 是仅保存在本地的素材制作归档，包含附件原件、确认文稿、来源记录、提示词和生成历史，由 `.gitignore` 排除。下文提到的 `assets/` 路径均指本地档案，新克隆的仓库需要另行取回。`public/` 中的 `backups/`、临时文件、试验图及图片生成元数据也排除在 Git 之外，发布用图片与封面继续跟踪。
 
-工具缓存、测试报告、覆盖率和构建目录统一忽略。需要保留的制作档案应单独备份；Git 停止跟踪后仍保留本地文件，历史提交中的副本也仍然存在。
+工具缓存和构建目录统一忽略。需要保留的制作档案应单独备份；Git 停止跟踪后仍保留本地文件，历史提交中的副本也仍然存在。
 
 ## 内容维护
 
@@ -48,7 +48,6 @@ npm run check:content
 | `src/data/profile.json` | 关于我的可编辑资料：身份、简介、技能、工具、经历、爱好和成果 |
 | `src/data/profile.js` | 将个人资料整理为页面与搜索正文共用的数据 |
 | `src/data/content.json` | 站点设置、画廊、生活手记、想做的事、FAQ，以及保留供对照的示例奖项 |
-| `src/data/content.original.json` | 已发布内容的原始返回备份，保留原文和资产引用供对照，不参与运行或构建 |
 | `src/data/content.js` | 将本地内容整理为页面、奖项分组与预加载数据 |
 | `src/hooks/useContentData.js` | 各房间读取本地内容的入口 |
 | `public/content/` | 内容图片与视频的本地归档；页面图片使用对象存储地址 |
@@ -56,7 +55,7 @@ npm run check:content
 | `public/start/` | 独立静态起始页的 HTML、CSS、脚本 |
 | `public/scripts/resume-download.js` | 主站与独立链接页共用的简历下载处理 |
 
-原始 40 条记录保存在 `content.original.json` 供对照；当前 `content.json` 的内容如下：
+`content.json` 的内容如下：
 
 | 字段 | 内容 | 数量 |
 | --- | --- | --- |
@@ -117,7 +116,7 @@ npm run check:content
 
 1. 打开 `src/data/profile.json`，直接修改双引号内的文字并保存。
 2. 运行 `npm run dev`，进入 `/about`，点击顶部「阅读关于我」查看完整内容。房间里的「查看」「完整经历」「会做的事」「荣誉与证书」按钮也会定位到对应段落。
-3. 开发预览会在保存后更新。运行 `npm run check:content` 检查 JSON 和数据格式；线上网站需要重新运行 `npm run build`，再部署生成的 `dist/`。
+3. 开发预览会在保存后更新。运行 `npm run lint` 检查代码，再运行 `npm run build` 生成用于发布的 `dist/`。
 
 | 字段 | 编辑内容及页面位置 |
 | --- | --- |
@@ -147,7 +146,19 @@ JSON 使用英文双引号和英文逗号，不支持注释或最后一项后的
 
 ## 字体
 
-中文 DOM 与三维文字使用本地 `public/fonts/LXGWWenKaiLite-Regular.ttf`（霞鹜文楷轻便版），保证汉字显示；ITOM 品牌字母保留原有拉丁字体。字体许可证保存在 `public/fonts/LXGWWenKaiLite-OFL.txt`。新增中文文字时应继续使用这份中文字体。
+中文使用霞鹜文楷轻便版，源字体与许可证保留在 `public/fonts/`。Vite 会从运行源码、内容 JSON 和 `/start` 收集字符，使用 `subset-font` 自动生成 DOM 使用的 WOFF2 和三维文字使用的 WOFF，并逐字检查生成结果。开发时新增文字会更新子集并刷新页面，生产构建也会自动更新；生成缓存位于 Git 忽略的 `.cache/fonts/`。
+
+三维文字统一通过 `SiteText` 加载字体；访客在留言中输入子集以外的汉字时，按需使用完整文楷。DOM 字体通过 `unicode-range` 选择子集与完整字体。原有品牌拉丁字体保留。
+
+## 加载与发布
+
+入口与走廊就绪后即可开始探索，四个房间分别按需加载。高性能且未启用省流的设备会在空闲时逐个预取，深链接房间优先；门与地图点击也会提前准备目标房间。房间资源就绪后才打开门与纸幕，加载失败或长时间无响应时提供重新加载和返回入口。后台标签页暂停三维渲染，返回前台后恢复。阅读面板在打开时加载；背景音乐在首次交互时初始化，访问统计仅在配置了 Key 时异步加载。
+
+构建按 `scripts/publish-assets.mjs` 中的发布清单输出运行所需的字体、音频、起始页、下载脚本与托管配置。`public/content/`、`public/textures/`、`public/images/` 的本地归档继续保留，页面沿用 CDN 图片地址。这些归档不复制到 `dist/`。
+
+发布前运行 `npm run lint` 和 `npm run build`，再通过 `npm run preview` 查看生产构建的页面与交互。构建会校验发布文件清单与四个房间的独立加载边界，并输出完整产物、入口与走廊共享依赖的 gzip 总量、首次中文字体体积。
+
+默认构建输出通用静态文件。`npm run build:compressed` 额外生成 `.gz` 与 `.br`，需要托管服务根据 `Accept-Encoding` 返回对应文件并设置 `Content-Encoding`。`public/_headers` 提供哈希资源长期缓存、固定名称字体与脚本重新验证的 Pages 规则；其他托管环境可采用相同策略。
 
 ## 外部服务
 
@@ -159,7 +170,7 @@ JSON 使用英文双引号和英文逗号，不支持注释或最后一项后的
 - `VITE_POSTHOG_KEY`、`VITE_POSTHOG_HOST`：PostHog 访问统计配置。
 - 生活手记收录四篇生活存档与一篇人物形象制作记录。编辑 `src/data/content.json` 的 `studio` 数组即可修改标题、`paragraphs` 正文和 `photos` 图片；每张图的 `alt` 是图片说明，人物制作过程另有 `label` 和 `caption`。没有提供日期的记录不填写 `date`。点击场景中的屏幕或「翻翻生活手记」可在站内阅读，也可使用 `/studio?note=记录的id` 直接打开对应记录。
 - 点击房间顶部「翻翻生活手记」，在阅读面板的导航中选择「想做的事」，即可翻到旅行心愿手账；它与东灵山、华山、飞拉达、双人成行和人物制作共用面板，可直接来回切换。长白山插画放在主画面，雪山与滑雪插画错落排列，配以纸张、照片边框和手写愿望；点击插画可查看大图。手机按纵向手账排版，正文可滚动。愿望编辑 `content.json` 的 `wishes` 数组：`id` 唯一、`title` 为一句话愿望、`description` 可选，`image` 与 `imageAlt` 配置插画及其说明，`status` 保存状态并供辅助技术读取。`/studio?view=wishes` 从入口开门后自动打开面板中的心愿手账。三幅淡彩画是对未来旅行的想象，PNG 位于 `public/content/studio/wish-journal/`，生成提示词保存在 `assets/studio/wish-journal/illustrations.json`，当前三条均为「想做的」。
-- 旋转显示器塔同时展示「想做的事」卡片，点击后打开同一页手账。卡片配置在 `content.json` 的 `studioWishCard`，封面默认为黑白版，支持悬停的设备显现彩色版；预加载沿用这一设备规则。三幅插画和两张 SVG 封面统一使用对象存储的 `space/content/studio/wish-journal/` 目录。`node scripts/build-studio-wish-covers.mjs` 将配置中的地址映射到本地素材归档，生成原生 SVG 封面，文字使用文楷字形路径。阅读页沿用生活手记的纸白底色与文字颜色。
+- 旋转显示器塔同时展示「想做的事」卡片，点击后打开同一页手账。卡片配置在 `content.json` 的 `studioWishCard`，封面默认为黑白版，支持悬停的设备显现彩色版；预加载沿用这一设备规则。三幅插画和两张 SVG 封面统一使用对象存储的 `space/content/studio/wish-journal/` 目录。SVG 封面中的文字使用文楷字形路径。阅读页沿用生活手记的纸白底色与文字颜色。
 - 生活照片的原图与素材清单保存在 `assets/studio/life-notes/`，页面图片位于 `public/content/studio/`，人物黑白线稿沿用 `public/textures/twiink/start-bouquet.png`。联系房间已使用 Twiink 的联系方式；`/start` 提供站内导航、GitHub 入口与 Twiink 人物插画。
 
 Matrix 工作室的 CSDN 与微信视频号在 `src/data/content.json` 的 `site.studioChannels` 中编辑，集中展示在联系方式中。视频号支持复制；浏览器不允许自动复制时，会选中账号，方便手动复制。

@@ -1,3 +1,4 @@
+import { useScene } from '../../context/contexts';
 import { useCallback } from 'react';
 import { useThree } from '@react-three/fiber';
 
@@ -5,10 +6,10 @@ import InfiniteCorridorManager from './corridor/InfiniteCorridorManager';
 import EntranceDoors from './entrance/EntranceDoors';
 import EmptyCorridor from './entrance/EmptyCorridor';
 import TeleportRoom from './corridor/TeleportRoom';
-import RoomWarmup from './corridor/RoomWarmup';
+import StartupReady from './StartupReady';
 import useInfiniteCamera from '../../hooks/useInfiniteCamera';
 import SignSystem from './entrance/SignSystem';
-import { useScene } from '../../context/SceneContext';
+
 
 // 位置关系：
 // - 第 -1 段的 SegmentDoors 位于 Z=15。
@@ -25,7 +26,7 @@ const ENTRANCE_DOORS_Z = 22;
  * 2. 点击门后开门，相机穿过入口。
  * 3. 门后是带有 ITOM 标识的无限走廊。
  */
-const Experience = ({ onSceneReady, performanceTier }) => {
+const Experience = ({ onSceneReady, onError }) => {
     // 使用 SceneContext 管理房间状态。
     const { hasEntered, markEntered, enterRoom, isTeleporting, isInRoom } = useScene();
 
@@ -52,16 +53,9 @@ const Experience = ({ onSceneReady, performanceTier }) => {
         enterRoom(doorId);
     }, [enterRoom]);
 
-    // 优化：低性能档采用更简单的光照。
-    const isLowTier = performanceTier === 'LOW';
-
     return (
         <>
-            {/* 房间预热：加载界面期间在屏幕外预渲染全部房间。 */}
-            {/* RoomWarmup 在下方 500 单位处挂载四个房间，并通过 gl.compile() 编译着色器，
-                随后卸载自身并触发 onSceneReady，确保走廊分段
-                与房间着色器都在用户开始交互前完成预编译。 */}
-            <RoomWarmup onWarmupComplete={onSceneReady} isLowTier={isLowTier} />
+            <StartupReady onReady={onSceneReady} onError={onError} />
 
             {/* 空走廊：为入口阶段提供环境。 */}
             {!hasEntered && (

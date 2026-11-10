@@ -1,35 +1,20 @@
+import { useScene } from '../../context/contexts';
 import { useEffect, useRef } from 'react';
-import { useScene } from '../../context/SceneContext';
+
 import { studioContent, studioWishes } from '../../data/content';
 import StudioWishes from './StudioWishes';
 import '../../styles/AboutProfile.scss';
 import '../../styles/StudioNotes.scss';
 
-// 房间导航会重写 URL，先保留访客打开页面时指定的栏目或记录。
-const initialParameters = new URLSearchParams(window.location.search);
-const initialNoteId = initialParameters.get('note');
-const initialWishes = initialParameters.get('view') === 'wishes';
-
 export default function StudioNotes() {
-    const { currentRoom, hasEntered, isInRoom, isTeleporting, overlayContent, openOverlay, closeOverlay } = useScene();
+    const { overlayContent, openOverlay, closeOverlay } = useScene();
     const dialogRef = useRef(null);
     const bodyRef = useRef(null);
-    const initialLinkHandled = useRef(false);
     const noteId = overlayContent?.noteId || overlayContent?.id;
     const note = studioContent.find(item => item.id === noteId);
     const isWishes = overlayContent?.view === 'wishes';
     const isOpen = overlayContent?.layout === 'studio' && (isWishes || Boolean(note));
-    const isInStudio = hasEntered && isInRoom && currentRoom === 'studio' && !isTeleporting;
 
-    useEffect(() => {
-        if (!isInStudio || initialLinkHandled.current) return;
-        initialLinkHandled.current = true;
-        if (initialWishes) {
-            openOverlay({ layout: 'studio', view: 'wishes' });
-        } else if (studioContent.some(item => item.id === initialNoteId)) {
-            openOverlay({ layout: 'studio', noteId: initialNoteId });
-        }
-    }, [isInStudio, openOverlay]);
 
     useEffect(() => {
         const dialog = dialogRef.current;
@@ -43,13 +28,6 @@ export default function StudioNotes() {
 
     return (
         <>
-            {isInStudio && (
-                <nav className="studio-notes-triggers" aria-label="打开生活手记">
-                    <button className="studio-notes-trigger" type="button" aria-haspopup="dialog" aria-controls="studio-notes-dialog" aria-expanded={isOpen} onClick={() => openOverlay({ layout: 'studio', noteId: studioContent[0].id })}>
-                        翻翻生活手记
-                    </button>
-                </nav>
-            )}
             <dialog
                 ref={dialogRef}
                 id="studio-notes-dialog"

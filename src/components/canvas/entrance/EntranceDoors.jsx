@@ -1,15 +1,18 @@
+import { useAchievements } from '../../../context/contexts';
+import Text from '../SiteText';
 import { useRef, useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Text, useTexture } from '@react-three/drei';
+import { useTexture } from '@react-three/drei';
+
 import * as THREE from 'three';
 import gsap from 'gsap';
 import '../shaders/RevealMaterial'; // 注册使用透明度丢弃的显现着色器。
 import { playBackgroundMusic } from '../../../utils/audioManager';
-import { useAchievements } from '../../../context/AchievementsContext';
+
 import { isTouchDevice } from '../../../utils/deviceDetect';
 
 // 使用本地中文字体。
-const FONT_URL = '/fonts/LXGWWenKaiLite-Regular.ttf';
+const FONT_URL = '/fonts/LXGWWenKaiLite-site.woff';
 
 
 
@@ -37,9 +40,7 @@ const EntranceDoors = ({
     const rightHandlePaintedRef = useRef(); // 彩色把手网格的可见状态。
     const groupRef = useRef();
     const [isOpen, setIsOpen] = useState(false);
-    const [isHovered, setIsHovered] = useState(false);
     const [isAnimating, setIsAnimating] = useState(false);
-    const [isWindowHovered, setIsWindowHovered] = useState(false);
     const windowAvatarRef = useRef();
     const { camera } = useThree();
     const { unlockAchievement } = useAchievements();
@@ -91,7 +92,6 @@ const EntranceDoors = ({
 
     // 程序错误点击动画状态。
     const [isBugClicked, setIsBugClicked] = useState(false);
-    const [textVisible, setTextVisible] = useState(false);
     const [clipProgress, setClipProgress] = useState(0); // 铅笔绘制显现进度，范围 0..1。
     const inkSplashRef = useRef();
     const handleHideDelayRef = useRef(); // 跟踪控制把手显隐的待执行 gsap.delayedCall。
@@ -151,7 +151,6 @@ const EntranceDoors = ({
         }
 
         // 铅笔绘制效果，从左至右平滑显现。
-        setTextVisible(true);
         setClipProgress(0);
 
         if (bugFixedTextRef.current) {
@@ -310,7 +309,6 @@ const EntranceDoors = ({
     // 悬停时微开门，提示可交互。
     const handlePointerEnter = () => {
         if (isOpen || isAnimating || isMobile) return;
-        setIsHovered(true);
         document.body.style.cursor = "pointer";
 
         // 悬停时稍微开门。
@@ -386,7 +384,6 @@ const EntranceDoors = ({
 
     const handlePointerLeave = () => {
         if (isOpen || isAnimating || isMobile) return;
-        setIsHovered(false);
         document.body.style.cursor = "auto";
 
         // 重新关门。
@@ -521,7 +518,6 @@ const EntranceDoors = ({
     // 窗户悬停辅助函数。
     const handleWindowEnter = (e) => {
         e.stopPropagation();
-        setIsWindowHovered(true);
         document.body.style.cursor = "pointer";
 
         if (windowAvatarRef.current) {
@@ -542,7 +538,6 @@ const EntranceDoors = ({
 
     const handleWindowLeave = (e) => {
         e.stopPropagation();
-        setIsWindowHovered(false);
         document.body.style.cursor = "auto";
 
         if (windowAvatarRef.current) {
@@ -937,7 +932,7 @@ const EntranceDoors = ({
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                font="/fonts/LXGWWenKaiLite-site.woff"
                 outlineWidth={0.015}
                 outlineColor="#ffffff"
                 clipRect={[-1, -0.5, -1 + (clipProgress * 2.5), 0.5]}

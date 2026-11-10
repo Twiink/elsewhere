@@ -1,23 +1,9 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { useAudio } from './AudioManager';
-import posthog from 'posthog-js';
-
-const AchievementsContext = createContext();
-
-export const ACHIEVEMENTS = {
-    corridor_enter: { id: 'corridor_enter', label: "点击门即可进入", title: "探索者" },
-    corridor_explore: { id: 'corridor_explore', label: "滚动以探索走廊", title: "漫游者" },
-    about_fly: { id: 'about_fly', label: "滚动以飞越我的故事", title: "天空旅人" },
-    studio_interact: { id: 'studio_interact', label: "拖动，翻翻生活手记", title: "记忆收藏家" },
-    gallery_inspect: { id: 'gallery_inspect', label: "点击项目查看详情", title: "艺术鉴赏家" },
-    contact_choose: { id: 'contact_choose', label: "寻找一种联系方式", title: "社交达人" }
-};
+import { AchievementsContext } from './contexts';
+import { ACHIEVEMENTS } from '../data/achievements';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { captureEvent } from '../utils/analytics';
 
 export const AchievementsProvider = ({ children }) => {
-    const { playSound } = useAudio();
-
-    // 同步 ref，防止滚轮等高频事件重复触发。
-    const completedRef = useRef([]);
 
     // 从本地存储读取已完成成就。
     const [completed, setCompleted] = useState(() => {
@@ -27,14 +13,15 @@ export const AchievementsProvider = ({ children }) => {
                 const parsed = JSON.parse(saved);
                 // 加入集合，但忽略 corridor_enter，让入口提示始终出现。
                 const filtered = parsed.filter(id => id !== 'corridor_enter');
-                completedRef.current = [...filtered];
                 return filtered;
             }
             return [];
-        } catch (e) {
+        } catch {
             return [];
         }
     });
+    // 同步 ref，防止滚轮等高频事件重复触发。
+    const completedRef = useRef([...completed]);
 
     // 延迟创建并共享 AudioContext，避免每次解锁都创建。
     const audioCtxRef = useRef(null);
@@ -84,8 +71,8 @@ export const AchievementsProvider = ({ children }) => {
             // start/stop 已注释，音效静音，但仍保持上下文逻辑完整。
             // osc.start(ctx.currentTime);
             // osc.stop(ctx.currentTime + 0.5);
-        } catch (err) {
-            // console.warn('解锁提示音播放失败', err);
+        } catch {
+            // 浏览器不支持音频时保留成就提示。
         }
     }, []);
 
@@ -126,7 +113,7 @@ export const AchievementsProvider = ({ children }) => {
             // 向 PostHog 发送事件。
             const achievementData = ACHIEVEMENTS[id];
             if (achievementData) {
-                posthog.capture('achievement_unlocked', {
+                captureEvent('achievement_unlocked', {
                     achievement_id: id,
                     achievement_title: achievementData.title,
                 });
@@ -181,5 +168,3 @@ export const AchievementsProvider = ({ children }) => {
         </AchievementsContext.Provider>
     );
 };
-
-export const useAchievements = () => useContext(AchievementsContext);

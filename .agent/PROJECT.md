@@ -5,8 +5,7 @@
 ## 当前内容架构
 
 - 实际内容位于 `src/data/content.json`，通过 `src/data/content.js` 整理，供 `src/hooks/useContentData.js` 和搜索输出使用。
-- `content.original.json` 是原始已发布响应的只读参考备份，不导入运行代码。
-- Git 跟踪发布素材、源码与回归测试所需数据；`assets/` 制作归档仅保存在本地并被忽略，下文对应路径需从本地档案另行取回。`public/` 下的备份目录、临时文件、试验图和图片生成元数据同样不跟踪。内容测试通过发布图片的固定 SHA-256 检查小程序码完整性。
+- Git 跟踪发布素材、源码与内容数据；`assets/` 制作归档仅保存在本地并被忽略，下文对应路径需从本地档案另行取回。`public/` 下的备份目录、临时文件、试验图和图片生成元数据同样不跟踪。
 - 运行时图片与场景纹理使用 `https://media.secknow-ai.com/space/` 下的完整 HTTPS 地址，包括「想做的事」的旅行插画与旋转卡片封面；`public/content/`、`public/textures/` 保留素材归档。照片与贴图使用 PNG/JPEG 地址，腾讯云按浏览器能力返回 AVIF/WebP；心愿封面保留 SVG，走廊古风合照单独使用 `space/content/corridor/hanfu-photo.jpg`。高分辨率源图通过 `imageMogr2/thumbnail/宽x高` 保持原有展示尺寸。
 - 第一批个人身份已接入：昵称 Twiink，网站名 Twiink's Space；介绍与网站用途来自用户确认的文案。入口、走廊和关于我使用 `public/textures/twiink/` 下的黑白人物，宽高比取纹理实际尺寸。原作者的九帧人物动画已换成 Twiink 挥手姿势与轻微摆动。
 - 入口双门的技术贴纸与 `profile.json` 中的12项技术一致：左侧 TypeScript、Vue、React、Python、Django、FastAPI，右侧 Java、Spring Boot、Docker、RAG、LangChain、LangGraph。发布贴图为 `public/textures/doors/twiink-entry-{left,right}-{ink,color}-v1.webp`，提示词与素材清单位于 `assets/entrance/door-textures.json`；入口组件和预加载清单共用黑白版，桌面端悬停使用彩色版。
@@ -14,14 +13,14 @@
 - 当前保留站点信息 1 份、画廊项目 5 个（均为个人项目）、生活手记 5 篇、示例证书 16 张和个人 FAQ 6 条；个人荣誉来自 `profile.json`。
 - 生活手记沿用 `/studio` 路径和 `studio` 数据标识。门贴图使用 `life-notes-ink-v1.webp` 与 `life-notes-color-v1.webp`，对应相机、山间日出和手柄；分类为 `life`、`making`。Matrix 工作室的 CSDN、视频号集中在联系面板展示。
 - 房间顶部「翻翻生活手记」打开统一阅读面板，「想做的事」与五篇记录并列在导航中，切换时共用标题栏、导航和正文滚动区。StudioWishes.jsx 使用旅行拼贴手账：左页主图为长白山天池，右页错落展示雪山与滑雪，原句与天池期待均保留；手机为可滚动的纵向排版。三幅淡彩插画使用内置 image_gen 生成，PNG 保存在 `public/content/studio/wish-journal/`，精确提示词位于 `assets/studio/wish-journal/illustrations.json` 并嵌入图片。`content.json` 的 `wishes` 保存标题、可选描述、image/imageAlt 与状态。原生对话框保留关闭、键盘与深层链接 `/studio?view=wishes`，文章沿用 `?note=`；内容继续同步到无障碍、搜索正文和 ItemList。
-- StudioRoom.jsx 的旋转显示器数据由五篇生活手记与 `content.json` 的 `studioWishCard` 合并；心愿卡片通过 `layout: studio`、`view: wishes` 打开同一阅读面板。`content.js` 的 `getContentTextures` 同步包含该卡片，彩色版只为支持悬停的设备预加载。三幅插画及 `cover-ink.svg`、`cover-color.svg` 均从对象存储的 `space/content/studio/wish-journal/` 读取，本地副本归档在 `public/content/studio/wish-journal/`。`scripts/build-studio-wish-covers.mjs` 将配置 URL 的 pathname 映射回本地归档后，使用插画与文楷字形路径生成封面。阅读页背景和文字沿用共享纸白与墨色样式。
+- StudioRoom.jsx 的旋转显示器数据由五篇生活手记与 `content.json` 的 `studioWishCard` 合并；心愿卡片通过 `layout: studio`、`view: wishes` 打开同一阅读面板。`content.js` 的 `getContentTextures` 同步包含该卡片，彩色版只为支持悬停的设备预加载。三幅插画及 `cover-ink.svg`、`cover-color.svg` 均从对象存储的 `space/content/studio/wish-journal/` 读取，本地副本归档在 `public/content/studio/wish-journal/`。SVG 封面内嵌插画与文楷字形路径。阅读页背景和文字沿用共享纸白与墨色样式。
 - 内容读取同步完成，不需要网络内容查询、管理后台或数据库。
 - 简历来源为 `site.resume.url` 配置的对象存储 `/space/Resume.pdf`，下载名为 `郑越-13990529155-Agent全栈开发.pdf`。关于我、联系我、无障碍导航、搜索正文和 `/start` 的下载链接使用 `data-resume-download`，由主站与独立链接页共用的 `public/scripts/resume-download.js` 获取 Blob 并按指定名称保存；在线查看链接直接打开远程 PDF。
 - 个人项目的完整文案、图片、视频与项目入口在 `content.json` 的 `projects[].details` 中编辑。`ProjectDetails.jsx` 使用原生纸张对话框阅读，技术工具默认折叠；Gallery 卡片和无障碍按钮共用该入口，也能在面板中切换项目。图片目录与标题可通过 `photosLabel`、`photosTitle` 设置；`entry.image` 展示小程序码，`entry.url` 提供外部网站入口。视频使用原生播放器，由访客点击播放；切换或关闭时卸载。对话框打开时暂停 Gallery 的滚轮与拖动，避免正文滚动带动画廊。
 - RAG-Center 的图片位于 `public/content/projects/rag-center/`，封面保留黑白与彩色两版，阅读面板展示工作台原型和竖版海报，原型中的数量为示例数据；项目入口为源码仓库。
 - HarnessPRD 的图片位于 `public/content/projects/harness-prd/`，封面保留黑白与彩色两版，阅读面板展示首页流程展示图和竖版海报，项目入口为 `https://github.com/Twiink/HarnessPRD` 源码仓库。
 - `seo-plugin.js` 在开发和构建时从本地内容生成中文语义正文、JSON-LD 和 `/llms.txt`。
-- FAQ 统一编辑 `content.json` 的 `faq`，由 `ContactDetails.jsx` 的原生折叠问答及搜索输出共用；`answer` 用 `\n\n` 分段，`content.original.json` 保留原始快照。
+- FAQ 统一编辑 `content.json` 的 `faq`，由 `ContactDetails.jsx` 的原生折叠问答及搜索输出共用；`answer` 用 `\n\n` 分段。
 - 文字与源码说明注释使用中文，技术标识、品牌及平台名保留原名。入口招牌改为“创意工坊”，经历浮岛改为“自由创作”，使用用户确认的透明 PNG 原图，后续再压缩；其他图片内的文字保留原素材内容。
 
 ## 关键路径
@@ -31,7 +30,7 @@
 | `src/App.jsx` | 画布、预加载、上下文、导航及遮罩 |
 | `src/components/canvas/Experience.jsx` | 主三维场景 |
 | `src/components/canvas/entrance/` | 开门入口与装饰 |
-| `src/components/canvas/corridor/` | 走廊分段、门、相机过渡与房间预热 |
+| `src/components/canvas/corridor/` | 走廊分段、门与相机过渡 |
 | `src/components/canvas/rooms/Gallery/` | 衣绳上悬挂的可翻转项目卡片 |
 | `src/components/canvas/rooms/Studio/` | 可旋转、循环移动的内容显示器塔 |
 | `src/components/canvas/rooms/About/` | 云中飞行、经历、奖项与技能气球 |
@@ -43,12 +42,12 @@
 
 ## 字体与纹理
 
-中文三维文字必须指定 `/fonts/LXGWWenKaiLite-Regular.ttf`。DOM 字体在 `src/styles/_base.scss` 注册为“霞鹜文楷”；原有拉丁手绘字体不包含中文，不能单独用于汉字。
+中文三维文字统一使用 `src/components/canvas/SiteText.jsx`，加载自动生成的 `/fonts/LXGWWenKaiLite-site.woff`。DOM 字体由构建插件生成的 `/fonts/site-font.css` 注册为“霞鹜文楷”，使用 WOFF2 子集。字符从源码、内容与静态起始页提取；新增汉字触发开发服务重建子集，访客输入额外字符时按需加载完整文楷。原始字体与许可证保存在 `public/fonts/`。
 
 ```jsx
-<Text font="/fonts/LXGWWenKaiLite-Regular.ttf" fontSize={0.05}>
-    中文文字
-</Text>
+import Text from '../SiteText';
+
+<Text fontSize={0.05}>中文文字</Text>
 ```
 
 图片地址指向对象存储的 `/space/content/`、`/space/textures/` 或 `/space/images/`，保留对象目录层级与实际后缀。替换图像时同步更新预加载、CSS 背景和独立链接页，注意原始宽高比、透明通道与设备分支。彩色纹理通常只在支持悬停的设备上加载；处理图片文件名时使用 URL 的 pathname，避免尺寸查询参数参与名称匹配。不要改变图片内的文字，除非用户另外要求。
@@ -65,7 +64,7 @@
 
 联系方式集中于 `content.json` 的 `site.contact`，`ContactDetails.jsx` 提供纸张阅读面板、邮件与 GitHub 链接、微信复制及手动复制回退。`ContactRoom.jsx` 的五个木桶对应联系方式、GitHub、微信、邮箱、站内留言。欢迎技术交流、项目合作及实习／工作机会。
 
-表单仍使用 Web3Forms，需在受忽略的本地 `.env` 或部署环境配置绑定收件邮箱的 `VITE_WEB3FORMS_KEY`，模板见 `.env.example`。`src/utils/contactDelivery.js` 按 `site.url` 检查提交域名；未配置或处于预览域名时明确显示尚未发送。频率限制、停留时间与蜜罐检查仍保留，拦截不再假报成功；只有 HTTP 成功且服务返回 success 才通知成功并清空表单。测试不发送真实邮件。
+表单仍使用 Web3Forms，需在受忽略的本地 `.env` 或部署环境配置绑定收件邮箱的 `VITE_WEB3FORMS_KEY`，模板见 `.env.example`。`src/utils/contactDelivery.js` 按 `site.url` 检查提交域名；未配置或处于预览域名时明确显示尚未发送。频率限制、停留时间与蜜罐检查仍保留，拦截不再假报成功；只有 HTTP 成功且服务返回 success 才通知成功并清空表单。本地预览不发送真实邮件。
 
 ## 开发与验证
 
@@ -73,9 +72,9 @@
 npm run dev
 npm run build
 npm run preview
-npm run check:content
+npm run lint
 ```
 
-`npm run lint` 包含项目原有的检查问题，修改时需比较基线，避免混入不相关清理。内容改动需验证 JSON、图片存在性、搜索输出与对应房间的显示。
+发布前运行 `npm run lint` 与 `npm run build`，并通过 `npm run preview` 核对受影响页面。构建与字体工具位于 `scripts/`，自动生成文件位于 `.cache/` 与 `dist/`。
 
 代码采用 MIT 许可证，个人纹理、图片和文案仍受原作者的单独版权声明约束，详见 README。

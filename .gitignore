@@ -12,15 +12,10 @@ dist
 dist-ssr
 *.local
 
-# 工具缓存、测试报告与覆盖率
+# 工具缓存
 .cache/
 .vite/
 .codegraph/
-coverage/
-.nyc_output/
-playwright-report/
-test-results/
-blob-report/
 .eslintcache
 *.tsbuildinfo
 

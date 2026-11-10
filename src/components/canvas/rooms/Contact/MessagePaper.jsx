@@ -1,7 +1,8 @@
-/* eslint-disable react/no-unknown-property */
+import Text from '../../SiteText';
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text, useTexture, Html, useCursor } from '@react-three/drei';
+import { useTexture, Html, useCursor } from '@react-three/drei';
+
 import * as THREE from 'three';
 import { analyzeContentAI } from '../../../../utils/contactValidation';
 import { getContactFormIssue } from '../../../../utils/contactDelivery';
@@ -9,7 +10,7 @@ import { siteInfo } from '../../../../data/content';
 
 const PAPER_WIDTH = 1.51; // 原始比例 1197/1340。
 const PAPER_HEIGHT = 1.7;
-const FONT_PATH = '/fonts/LXGWWenKaiLite-Regular.ttf';
+const FONT_PATH = '/fonts/LXGWWenKaiLite-site.woff';
 
 // 带平滑动画和不可见交互区域的文字输入辅助组件。
 const InteractiveTextField = ({
@@ -45,7 +46,7 @@ const InteractiveTextField = ({
     const targetY = hovered ? position[1] + 0.007 : position[1];
     const targetRotZ = hovered ? baseRotation[2] + 0.015 : baseRotation[2];
 
-    useFrame((state, delta) => {
+    useFrame((_, delta) => {
         // 平滑插值，让动作柔顺。
         const t = delta * 12; // 速度系数。
         if (textRef.current) {
@@ -101,7 +102,7 @@ const SmoothButton = ({ texture, onClick, position, size, text, fontPath }) => {
     const targetY = hovered ? position[1] + 0.007 : position[1];
     const targetRotZ = hovered ? 0.015 : 0;
 
-    useFrame((state, delta) => {
+    useFrame((_, delta) => {
         const t = delta * 12;
         if (groupRef.current) {
             // 对 Y 位置线性插值。
@@ -217,7 +218,7 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend }) => {
     const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
     // 表单校验。
-    const validateForm = () => {
+    const validateForm = useCallback(() => {
         const newErrors = {};
         if (!email.trim()) newErrors.email = "请填写邮箱";
         else if (!isValidEmail(email)) newErrors.email = "邮箱格式不正确";
@@ -225,7 +226,7 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend }) => {
         if (!message.trim()) newErrors.message = "请填写留言";
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
-    };
+    }, [email, subject, message]);
 
     // 加载纹理。
     const paperTexture = useTexture('https://media.secknow-ai.com/space/textures/contact/paper_form.png');
@@ -373,13 +374,12 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend }) => {
             } else {
                 throw new Error(result.message || "发送失败");
             }
-        } catch (error) {
-            // console.error('❌ 发送失败：', error);
+        } catch {
             setSubmitStatus('error');
         } finally {
             setIsSubmitting(false);
         }
-    }, [message, email, subject, onSend, validateForm]);
+    }, [message, email, subject, botcheck, onSend, validateForm]);
 
     // 输入处理函数。
     const handleMessageInput = useCallback((e) => {
@@ -408,7 +408,7 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend }) => {
 
     // 保存原始顶点位置，用于折纸动画。
     // 纸张轻摆动画。
-    useFrame((state, delta) => {
+    useFrame((state) => {
         if (!paperRef.current) return;
 
         const time = state.clock.getElapsedTime();

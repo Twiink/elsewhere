@@ -1,12 +1,13 @@
+import { useScene } from '../../context/contexts';
 import { useEffect, useRef, useState } from 'react';
-import { useScene } from '../../context/SceneContext';
+
 import { contactInfo, siteInfo, resumeInfo, frequentlyAskedQuestions } from '../../data/content';
 import StudioChannels from './StudioChannels';
 import '../../styles/AboutProfile.scss';
 import '../../styles/ContactDetails.scss';
 
 export default function ContactDetails() {
-    const { currentRoom, hasEntered, isInRoom, isTeleporting, overlayContent, openOverlay, closeOverlay } = useScene();
+    const { overlayContent, closeOverlay } = useScene();
     const dialogRef = useRef(null);
     const wechatRef = useRef(null);
     const [copyStatus, setCopyStatus] = useState('');
@@ -38,17 +39,6 @@ export default function ContactDetails() {
     };
 
     return <>
-        {hasEntered && isInRoom && currentRoom === 'contact' && !isTeleporting && (
-            <button
-                type="button"
-                className="about-profile-trigger contact-details-trigger"
-                aria-haspopup="dialog"
-                aria-controls="contact-details-dialog"
-                onClick={() => openOverlay({ layout: 'contact' })}
-            >
-                联系方式
-            </button>
-        )}
         <dialog
             ref={dialogRef}
             id="contact-details-dialog"

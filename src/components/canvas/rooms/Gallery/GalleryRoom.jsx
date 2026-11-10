@@ -1,16 +1,20 @@
+import { useScene, useAchievements, useAudio } from '../../../../context/contexts';
+import Text from '../../SiteText';
 import { useRef, useState, useMemo, useEffect, forwardRef, useImperativeHandle, memo } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
-import { Text, useTexture, Float, PositionalAudio } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { useTexture, Float, PositionalAudio } from '@react-three/drei';
+
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { Observer } from 'gsap/all';
-import { useScene } from '../../../../context/SceneContext';
+
 
 gsap.registerPlugin(Observer);
-import { useAchievements } from '../../../../context/AchievementsContext';
+
 import PaperMaterial from './PaperMaterial';
 import GalleryClouds from './GalleryClouds';
-import { useAudio } from '../../../../context/AudioManager';
+import { useTextureCopy } from '../../../../hooks/useTextureCopy';
+
 import { usePaintMaterial } from './usePaintMaterial';
 import { useGalleryProjects } from '../../../../hooks/useContentData';
 
@@ -21,13 +25,13 @@ const _tempScale = new THREE.Vector3();
 // ⚙️ 音频设置：在此调整。
 // 修改这些值可调整城市环境声的音量与可听范围。
 // ============================================
-export const AUDIO_SETTINGS = {
+const AUDIO_SETTINGS = {
     volume: 0.6,
     distance: 2,
     rolloff: 1.5
 };
 
-export const GALLERY_INTERACTION_AUDIO_SETTINGS = {
+const GALLERY_INTERACTION_AUDIO_SETTINGS = {
     volume: 0.6,      // 纸张点击音效音量。
     distance: 2,      // 空间音频开始衰减前的参考距离。
     rolloff: 2        // 声音随距离指数衰减的速度。
@@ -62,7 +66,6 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     }, [effectiveVolume]);
 
     const groupRef = useRef();
-    const [scrollOffset, setScrollOffset] = useState(0);
     const targetScroll = useRef(0);
     const currentScroll = useRef(0);
     const [selectedCard, setSelectedCard] = useState(null);
@@ -76,7 +79,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     }, [isExiting, isTeleporting, hidePopup]);
 
     // 配置上色过渡。
-    const { onBeforeCompile, animatePaint, resetPaint, uniformsData, updateRoomOrigin } = usePaintMaterial();
+    const { onBeforeCompile, animatePaint, resetPaint, setPaintProgress, uniformsData, updateRoomOrigin } = usePaintMaterial();
     
     // 跟踪过渡状态以禁用交互。
     const [isTransitioning, setIsTransitioning] = useState(false);
@@ -92,25 +95,20 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         if (showRoom && !isWarmup) {
             if (wasTeleportedRef.current || isTeleporting) {
                 // 通过地图传送时跳过上色过渡。
-                uniformsData.uPaintProgress.value = 1.0;
-                setIsTransitioning(false);
+                setPaintProgress(1);
             } else {
-                setIsTransitioning(true);
                 // 重新进入时调用 resetPaint()。
                 resetPaint();
                 // 稍作延迟后开始上色，使动画与飞入过程重叠。
-                animatePaint(0.2, 2.5);
-                
-                // 上色完成后恢复交互。
-                setTimeout(() => {
-                    setIsTransitioning(false);
-                }, 2700); // 0.2 + 2.5
+                const animation = animatePaint(0.2, 2.5,
+                    () => setIsTransitioning(false), () => setIsTransitioning(true));
+                return () => animation.kill();
             }
         } else {
             // 预热时立即显现；不展示时隐藏。
-            uniformsData.uPaintProgress.value = 1.0;
+            setPaintProgress(1);
         }
-    }, [showRoom, isWarmup, isTeleporting]);
+    }, [showRoom, isWarmup, isTeleporting, animatePaint, resetPaint, setPaintProgress]);
 
     const handleCardClick = async (clickedIndex) => {
         if (globalIsAnimating || isTransitioning) return;
@@ -209,6 +207,16 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     
     useTexture(allLogos);
 
+    const colorTextures = useMemo(() => new Map(
+        [...new Set([...projectTextures, ...paintedTextures, backTextureRaw, overlayTextureRaw])].map(source => {
+            const texture = source.clone();
+            texture.colorSpace = THREE.SRGBColorSpace;
+            texture.needsUpdate = true;
+            return [source, texture];
+        })
+    ), [projectTextures, paintedTextures, backTextureRaw, overlayTextureRaw]);
+    useEffect(() => () => colorTextures.forEach(texture => texture.dispose()), [colorTextures]);
+
     // 构造重复项目列表，并附加纹理。
     const projects = useMemo(() => {
         return Array.from({ length: PROJECT_COUNT }).map((_, i) => {
@@ -216,23 +224,8 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             const projectData = activeProjects[projectIndex];
 
             // 提取正面纹理。
-            const frontTex = projectTextures[projectIndex];
-            const paintedTex = paintedTextures[projectIndex];
-
-            // 配置纹理。
-            if (frontTex) {
-                frontTex.colorSpace = THREE.SRGBColorSpace;
-                // frontTex.encoding = THREE.sRGBEncoding;
-            }
-            if (paintedTex) {
-                paintedTex.colorSpace = THREE.SRGBColorSpace;
-            }
-            if (backTextureRaw) {
-                backTextureRaw.colorSpace = THREE.SRGBColorSpace;
-            }
-            if (overlayTextureRaw) {
-                overlayTextureRaw.colorSpace = THREE.SRGBColorSpace;
-            }
+            const frontTex = colorTextures.get(projectTextures[projectIndex]);
+            const paintedTex = colorTextures.get(paintedTextures[projectIndex]);
 
             // 将技术栈标志映射至对应的彩色或普通版本。
             const techStack = projectData.techStack.map(path => {
@@ -247,12 +240,12 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 index: i,
                 frontTexture: frontTex,
                 paintedTexture: (paintedTex !== frontTex && canHover) ? paintedTex : null,
-                backTexture: backTextureRaw,
-                buttonTexture: overlayTextureRaw,
+                backTexture: colorTextures.get(backTextureRaw),
+                buttonTexture: colorTextures.get(overlayTextureRaw),
                 techStack: techStack
             };
         });
-    }, [activeProjects, projectTextures, paintedTextures, canHover, backTextureRaw, overlayTextureRaw]);
+    }, [activeProjects, projectTextures, paintedTextures, canHover, backTextureRaw, overlayTextureRaw, colorTextures]);
 
     // 滚动到指定项目索引的函数。
     const scrollToIndex = (index, onComplete) => {
@@ -322,26 +315,15 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     });
 
     // 几何体与材质。
-    const floorTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/floor.png');
-    const railingTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/railing.png');
+    const floorSource = useTexture('https://media.secknow-ai.com/space/textures/gallery/floor.png');
+    const floorTexture = useTextureCopy(floorSource, { wrapS: THREE.MirroredRepeatWrapping, wrapT: THREE.MirroredRepeatWrapping, repeatX: 0.5, repeatY: 0.5 * 1.835 });
+    const railingSource = useTexture('https://media.secknow-ai.com/space/textures/gallery/railing.png');
+    const railingTexture = useTextureCopy(railingSource, { wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping, repeatX: 7 });
     const housesTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/domki.png');
     const cityTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/miastotlo.png');
     const birdTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/bird_gray.png');
     const clothespinTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/klamerka.png');
-
-    useEffect(() => {
-        if (floorTexture) {
-            floorTexture.wrapS = THREE.MirroredRepeatWrapping;
-            floorTexture.wrapT = THREE.MirroredRepeatWrapping;
-            floorTexture.repeat.set(0.5, 0.5 * 1.835); // 按原始比例 1.835 调整重复次数，保持缩放一致。
-            floorTexture.needsUpdate = true;
-        }
-        if (railingTexture) {
-            railingTexture.wrapS = railingTexture.wrapT = THREE.RepeatWrapping;
-            railingTexture.repeat.set(7, 1);
-            railingTexture.needsUpdate = true;
-        }
-    }, [floorTexture, railingTexture]);
+    const thresholdTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png');
 
     const materials = useMemo(() => {
         const floorMat = new THREE.MeshBasicMaterial({
@@ -361,10 +343,11 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         const thresholdMat = new THREE.MeshBasicMaterial({
             color: '#e0e0e0',
             map: (() => {
-                const t = new THREE.TextureLoader().load('https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png');
+                const t = thresholdTexture.clone();
                 t.colorSpace = THREE.SRGBColorSpace;
                 t.wrapS = t.wrapT = THREE.RepeatWrapping;
                 t.repeat.set(15 / 2.524, 1);
+                t.needsUpdate = true;
                 return t;
             })(),
             side: THREE.DoubleSide
@@ -378,7 +361,12 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             rope: ropeMat,
             threshold: thresholdMat
         };
-    }, [floorTexture, onBeforeCompile]);
+    }, [floorTexture, thresholdTexture, onBeforeCompile]);
+
+    useEffect(() => () => {
+        materials.threshold.map.dispose();
+        Object.values(materials).forEach(material => material.dispose());
+    }, [materials]);
 
     const curve = useMemo(() => {
         return new THREE.CatmullRomCurve3([
@@ -649,7 +637,7 @@ const FlyingBird = ({ texture }) => {
 };
 
 // 单张项目卡片子组件。
-const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, currentScroll, materials, curve, isSelected, scrollToIndex, onClick, isMobile, isTransitioning, paintProgress, roomOrigin }, ref) => {
+const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, currentScroll, curve, isSelected, scrollToIndex, onClick, isMobile, isTransitioning, paintProgress, roomOrigin }, ref) => {
     const { openOverlay } = useScene();
     const cardRef = useRef();
     const paperRef = useRef(); // 可移动纸张部分的引用。
@@ -665,11 +653,10 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
     const [hovered, setHovered] = useState(false);
     const [btnHovered, setBtnHovered] = useState(false);
     const [isAnimating, setIsAnimating] = useState(false);  // 仅在翻转动画期间为 true。
-    const [isScrolling, setIsScrolling] = useState(false);  // 滚动阶段为 true。
 
     // 随机摆动属性。
-    const swaySpeed = useRef(Math.random() * 0.2 + 0.3); // 较慢的摆动速度。
-    const swayOffset = useRef(Math.random() * 100);
+    const [swaySpeed] = useState(() => Math.random() * 0.2 + 0.3); // 较慢的摆动速度。
+    const [swayOffset] = useState(() => Math.random() * 100);
 
     // 音频引用。
     const paperAudioRef = useRef();
@@ -763,9 +750,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
         },
         openCard: () => {
             return new Promise((resolve) => {
-                setIsScrolling(true);
                 scrollToIndex(index, () => {
-                    setIsScrolling(false);
                     setIsAnimating(true);
                     playPaperSound();
 
@@ -1028,7 +1013,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
 
         // 风与摆动动画。
         const time = state.clock.getElapsedTime();
-        const wind = Math.sin(time * swaySpeed.current + swayOffset.current) * 0.05;
+        const wind = Math.sin(time * swaySpeed + swayOffset) * 0.05;
 
         cardRef.current.rotation.z = wind;
         cardRef.current.rotation.x = 0;
@@ -1127,7 +1112,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                         position={[0, 0, 0.01]}
                         fontSize={0.11}
                         color={btnHovered ? "#333333" : "#1c1c1c"}
-                        font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                        font="/fonts/LXGWWenKaiLite-site.woff"
                         anchorX="center"
                         anchorY="middle"
                         fillOpacity={0} // 初始隐藏。
@@ -1174,7 +1159,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                         position={[0, 0.28, 0.01]} // 相对于 detailsGroupRef 中心向上。
                         fontSize={0.10}
                         color="#1c1c1c"
-                        font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                        font="/fonts/LXGWWenKaiLite-site.woff"
                         anchorX="center"
                         anchorY="middle"
                         fillOpacity={0} // 初始隐藏。
@@ -1187,7 +1172,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                         position={[0, 0.2, 0.01]} // 位于标题下方。
                         fontSize={0.06}
                         color="#333333"
-                        font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                        font="/fonts/LXGWWenKaiLite-site.woff"
                         anchorX="center"
                         anchorY="top"
                         maxWidth={1.1} // 触发换行前的最大宽度。
@@ -1211,7 +1196,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                         position={[0, 0.15, 0.01]}
                         fontSize={0.08}
                         color="#1c1c1c"
-                        font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                        font="/fonts/LXGWWenKaiLite-site.woff"
                         anchorX="center"
                         anchorY="middle"
                         fillOpacity={0} // 初始隐藏。
@@ -1225,7 +1210,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                             <Text
                                 key={note}
                                 position={[(noteIndex - (project.cardNotes.length - 1) / 2) * 0.3, 0, 0]}
-                                font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                                font="/fonts/LXGWWenKaiLite-site.woff"
                                 fontSize={0.05}
                                 color="#333333"
                                 maxWidth={0.25}
@@ -1271,7 +1256,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                     textAlign="center"
                     lineHeight={1.25}
                     color="#1c1c1c"
-                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                    font="/fonts/LXGWWenKaiLite-site.woff"
                     anchorX="center"
                     anchorY="middle"
                     fillOpacity={0} // 初始隐藏。
@@ -1307,6 +1292,8 @@ const RightSideHouses = ({ texture, baseWidth, baseHeight, cropAmount }) => {
         t.needsUpdate = true;
         return t;
     }, [texture, cropAmount]);
+
+    useEffect(() => () => croppedTexture.dispose(), [croppedTexture]);
 
     // 计算新宽度与位置。
     const newWidth = baseWidth * (1 - cropAmount);

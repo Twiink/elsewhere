@@ -21,7 +21,6 @@ const PaperMaterial = forwardRef(({ color = '#e0e0e0', roughness = 0.6, map, sid
         shader.uniforms.uWindStrength = { value: 0 }; // 额外飘动强度。
         shader.uniforms.mapBack = { value: null }; // 背面纹理。
         shader.uniforms.mapPainted = { value: null }; // 彩色纹理。
-        shader.uniforms.mapPainted = { value: null }; // 彩色纹理。
         shader.uniforms.uProgress = { value: 0.0 }; // 显现进度。
         shader.uniforms.uPaintProgress = paintProgress || { value: 1.0 };
         shader.uniforms.uRoomOrigin = roomOrigin || { value: new THREE.Vector3(0, 0, 0) };
@@ -168,7 +167,7 @@ const PaperMaterial = forwardRef(({ color = '#e0e0e0', roughness = 0.6, map, sid
         if (props.mapPainted && shader.uniforms.mapPainted) {
             shader.uniforms.mapPainted.value = props.mapPainted;
         }
-    }, [props.mapBack, props.mapPainted]);
+    }, [props.mapBack, props.mapPainted, paintProgress, roomOrigin]);
 
     useImperativeHandle(ref, () => ({
         // bend 的读取与设置接口。

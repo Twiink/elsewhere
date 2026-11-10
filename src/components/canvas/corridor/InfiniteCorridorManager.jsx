@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 
 import CorridorSegment, { SEGMENT_LENGTH } from './CorridorSegment';
+import { CorridorActivityContext } from '../../../context/CorridorActivityContext';
 
 /**
  * 按相机位置切换分段显隐的包装组件。
@@ -9,6 +10,7 @@ import CorridorSegment, { SEGMENT_LENGTH } from './CorridorSegment';
  */
 const SegmentVisibilityWrapper = ({ children, segmentIndex }) => {
     const groupRef = useRef();
+    const activity = useRef(true);
     const { camera } = useThree();
 
     // 当前分段的 Z 边界。
@@ -27,6 +29,7 @@ const SegmentVisibilityWrapper = ({ children, segmentIndex }) => {
         const isFarAhead = camera.position.z > startZ + 30;
 
         const isVisible = !(isBehindCamera || isFarAhead);
+        activity.current = isVisible;
 
         if (groupRef.current.visible !== isVisible) {
             groupRef.current.visible = isVisible;
@@ -35,7 +38,7 @@ const SegmentVisibilityWrapper = ({ children, segmentIndex }) => {
 
     return (
         <group ref={groupRef}>
-            {children}
+            <CorridorActivityContext.Provider value={activity}>{children}</CorridorActivityContext.Provider>
         </group>
     );
 };

@@ -1,12 +1,15 @@
-import { useRef, useState, useEffect } from 'react';
+import { useScene, useAchievements, useAudio } from '../../../../context/contexts';
+import Text from '../../SiteText';
+import { useRef, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Text, PositionalAudio } from '@react-three/drei';
+import { PositionalAudio } from '@react-three/drei';
+
 import * as THREE from 'three';
 import PaperAirplane from './PaperAirplane';
 import InfiniteSkyManager from './InfiniteSkyManager';
-import { useScene } from '../../../../context/SceneContext';
-import { useAchievements } from '../../../../context/AchievementsContext';
-import { useAudio } from '../../../../context/AudioManager';
+
+
+
 
 // 循环飞行分块长度，与 SkyChunk 一致。
 const CHUNK_LENGTH = 40;
@@ -15,13 +18,13 @@ const CHUNK_LENGTH = 40;
 // ⚙️ 音频设置：在此调整。
 // 修改这些数值可调整风声的音量和可听范围。
 // ============================================
-export const AUDIO_SETTINGS = {
+const AUDIO_SETTINGS = {
     volume: 2.5,
     distance: 2,
     rolloff: 0.8
 };
 
-const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
+const AboutRoom = ({ onReady, isExiting, isWarmup }) => {
     const { camera } = useThree();
     const { isTeleporting, overlayContent } = useScene();
     const { showTutorial, unlockAchievement, hidePopup } = useAchievements();
@@ -168,8 +171,7 @@ const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             currentPitch.current = THREE.MathUtils.lerp(currentPitch.current, pitchAngle, lerpSpeed);
 
             // 相机值为基础值加效果偏移。
-            camera.rotation.x = baseCameraRotation.current.x + currentPitch.current;
-            camera.rotation.z = baseCameraRotation.current.z + currentBank.current;
+            state.camera.rotation.set(baseCameraRotation.current.x + currentPitch.current, camera.rotation.y, baseCameraRotation.current.z + currentBank.current);
         } else {
             // 飞行未启用时始终归零。
             currentBank.current = 0;

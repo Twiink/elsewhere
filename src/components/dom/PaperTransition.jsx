@@ -1,7 +1,8 @@
-import { useEffect, useRef, useMemo } from 'react';
+import { useScene, useAudio } from '../../context/contexts';
+import { useEffect, useRef, useMemo, useState } from 'react';
 import gsap from 'gsap';
-import { useScene } from '../../context/SceneContext';
-import { useAudio } from '../../context/AudioManager';
+
+
 import '../../styles/Preloader.scss'; // 复用加载界面样式。
 
 /**
@@ -36,8 +37,7 @@ const PaperTransition = () => {
     const {
         teleportPhase,
         startTeleportTransition,
-        finishPaperOpen,
-        teleportTarget
+        finishPaperOpen
     } = useScene();
     const { play } = useAudio();
 
@@ -47,7 +47,7 @@ const PaperTransition = () => {
     const timelineRef = useRef(null);
 
     // 生成撕裂路径，与 Preloader 逻辑相同。
-    const tearPoints = useMemo(() => {
+    const [tearPoints] = useState(() => {
         const points = [];
         const segments = 12;
 
@@ -62,7 +62,7 @@ const PaperTransition = () => {
 
         points.push([50, 100]);
         return points;
-    }, []);
+    });
 
     const svgPathData = useMemo(() => {
         return tearPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0]} ${p[1]} `).join(' ');

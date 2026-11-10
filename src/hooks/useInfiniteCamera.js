@@ -1,3 +1,4 @@
+import { useAchievements } from '../context/contexts';
 import { useRef, useEffect, useCallback, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { Observer } from 'gsap/all';
@@ -5,7 +6,7 @@ import { Observer } from 'gsap/all';
 gsap.registerPlugin(Observer);
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useAchievements } from '../context/AchievementsContext';
+
 
 // 用于自动侧看的门位置。
 const DOOR_POSITIONS = [
@@ -66,6 +67,39 @@ const useInfiniteCamera = ({
     // 保存最近鼠标位置，归一化至 -1..1。
     const lastMousePos = useRef({ x: 0, y: 0 });
 
+    const calculateGlance = useCallback((z, segment) => {
+        const zOffset = 10 - (segment * segmentLength);
+        let bestStrength = 0;
+        let bestDir = 0;
+
+        const START_DIST = 15;
+        const PEAK_DIST = 8;
+        const END_DIST = -2;
+
+        for (const door of DOOR_POSITIONS) {
+            const doorGlobalZ = zOffset + door.z;
+            const dist = z - doorGlobalZ;
+
+            let strength = 0;
+            if (dist > PEAK_DIST && dist < START_DIST) {
+                strength = (START_DIST - dist) / (START_DIST - PEAK_DIST);
+            } else if (dist <= PEAK_DIST && dist > END_DIST) {
+                strength = (dist - END_DIST) / (PEAK_DIST - END_DIST);
+            }
+
+            if (strength > 0) {
+                const easedStrength = strength * (2 - strength);
+                const dir = door.side === 'left' ? -1 : 1;
+                if (easedStrength > bestStrength) {
+                    bestStrength = easedStrength;
+                    bestDir = dir;
+                }
+            }
+        }
+
+        return bestDir * bestStrength * glanceIntensity * 3.5;
+    }, [segmentLength, glanceIntensity]);
+
     // 更新启用状态引用。
     useLayoutEffect(() => {
         const wasScrollEnabled = scrollEnabledRef.current;
@@ -115,7 +149,7 @@ const useInfiniteCamera = ({
             // 重新计算分段。
             currentSegment.current = Math.floor((10 - currentZ.current) / segmentLength);
         }
-    }, [scrollEnabled, parallaxEnabled, camera, parallaxIntensity]);
+    }, [scrollEnabled, parallaxEnabled, camera, parallaxIntensity, calculateGlance, segmentLength]);
 
     // 处理桌面滚轮滚动。
     const handleWheel = useCallback((e) => {
@@ -207,7 +241,7 @@ const useInfiniteCamera = ({
 
         touchStart.current.x = currentX;
         touchStart.current.y = currentY;
-    }, [scrollSpeed, MAX_SWIPE_GLANCE]);
+    }, [scrollSpeed, MAX_SWIPE_GLANCE, unlockAchievement]);
 
     // 处理设备方向，用移动端陀螺仪产生视差。
     const handleDeviceOrientation = useCallback((e) => {
@@ -239,7 +273,7 @@ const useInfiniteCamera = ({
                     useGyroscope.current = true;
                     window.addEventListener('deviceorientation', handleDeviceOrientation);
                 }
-            } catch (error) {
+            } catch {
                 // console.log('陀螺仪权限被拒绝');
             }
         } else {
@@ -287,7 +321,7 @@ const useInfiniteCamera = ({
     }, [handleWheel, handleMouseMove, handleKeyDown, handleTouchStart, handleTouchMove, handleDeviceOrientation, requestGyroscopePermission]);
 
     // 主相机更新循环。
-    useFrame(() => {
+    useFrame(({ camera }) => {
         // 相机接管启用时交给外部代码控制。
         if (cameraOverride.current) {
             return;
@@ -389,38 +423,7 @@ const useInfiniteCamera = ({
     });
 
     // 按 Z 位置计算侧看的辅助函数。
-    const calculateGlance = useCallback((z, segment) => {
-        const zOffset = 10 - (segment * segmentLength);
-        let bestStrength = 0;
-        let bestDir = 0;
 
-        const START_DIST = 15;
-        const PEAK_DIST = 8;
-        const END_DIST = -2;
-
-        for (const door of DOOR_POSITIONS) {
-            const doorGlobalZ = zOffset + door.z;
-            const dist = z - doorGlobalZ;
-
-            let strength = 0;
-            if (dist > PEAK_DIST && dist < START_DIST) {
-                strength = (START_DIST - dist) / (START_DIST - PEAK_DIST);
-            } else if (dist <= PEAK_DIST && dist > END_DIST) {
-                strength = (dist - END_DIST) / (PEAK_DIST - END_DIST);
-            }
-
-            if (strength > 0) {
-                const easedStrength = strength * (2 - strength);
-                const dir = door.side === 'left' ? -1 : 1;
-                if (easedStrength > bestStrength) {
-                    bestStrength = easedStrength;
-                    bestDir = dir;
-                }
-            }
-        }
-
-        return bestDir * bestStrength * glanceIntensity * 3.5;
-    }, [segmentLength, glanceIntensity]);
 
     // 启用或禁用相机接管的函数。
     const setCameraOverride = useCallback((active) => {

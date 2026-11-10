@@ -1,37 +1,3 @@
-.studio-notes-triggers {
-    position: fixed;
-    inset: max(1rem, env(safe-area-inset-top)) auto auto 50%;
-    transform: translateX(-50%);
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    max-width: calc(100% - 7rem);
-    color: #292824;
-    font-family: '霞鹜文楷', serif;
-
-    button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.45rem;
-        min-height: 44px;
-        padding: 0.35rem 0.25rem;
-        border: 0;
-        background: transparent;
-        color: inherit;
-        font: inherit;
-        white-space: nowrap;
-        cursor: pointer;
-        text-underline-offset: 0.4em;
-
-        &:hover { text-decoration: underline; }
-        &:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
-    }
-
-    .studio-notes-trigger { text-decoration: underline; text-decoration-style: dotted; }
-}
-
 .studio-notes-dialog {
     width: min(1000px, calc(100% - 2rem));
 

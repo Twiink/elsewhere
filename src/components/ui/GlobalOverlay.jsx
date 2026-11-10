@@ -1,5 +1,6 @@
+import { useScene } from '../../context/contexts';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useScene } from '../../context/SceneContext';
+
 import gsap from 'gsap';
 import { TextPlugin } from 'gsap/TextPlugin';
 import '../../styles/GlobalOverlay.scss';
@@ -8,8 +9,9 @@ gsap.registerPlugin(TextPlugin);
 
 const GlobalOverlay = () => {
     const { overlayContent, closeOverlay } = useScene();
-    const [isVisible, setIsVisible] = useState(false);
-    const [animateOpen, setAnimateOpen] = useState(false);
+    const [cachedContent, setCachedContent] = useState(overlayContent);
+    const [openedContent, setOpenedContent] = useState(null);
+    if (overlayContent && overlayContent !== cachedContent) setCachedContent(overlayContent);
 
     // 按窗口宽度判断是否为移动端。
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -21,48 +23,15 @@ const GlobalOverlay = () => {
     }, []);
 
     useEffect(() => {
-        if (overlayContent) {
-            setIsVisible(true);
-            // 延迟动画，让 DOM 挂载并先绘制关闭状态。
-            const delayAnim = setTimeout(() => {
-                setAnimateOpen(true);
-            }, 50); // 50 毫秒可留出 React 渲染与浏览器绘制时间。
-            return () => clearTimeout(delayAnim);
-        } else {
-            setAnimateOpen(false);
-            // 等待退出动画，时长需匹配约 0.6 至 1 秒的过渡。
-            const timer = setTimeout(() => setIsVisible(false), 800);
-            return () => clearTimeout(timer);
-        }
+        const timer = overlayContent
+            ? setTimeout(() => setOpenedContent(overlayContent), 50)
+            : setTimeout(() => { setCachedContent(null); setOpenedContent(null); }, 800);
+        return () => clearTimeout(timer);
     }, [overlayContent]);
 
-    // 使用独立缓存，在退出动画期间保留内容。
-    const [cachedContent, setCachedContent] = useState(null);
-    useEffect(() => {
-        if (overlayContent) {
-            setCachedContent(overlayContent);
-        }
-    }, [overlayContent]);
-
-    // 取消 return null，让开销较大的模糊滤镜和 SVG 始终留在 DOM 中，
-    // 避免首次调用时卡顿。
-    // if (!isVisible && !overlayContent && !cachedContent) return null;
-
-    // 不可见地预渲染最复杂的证书网格布局，
-    // 在页面加载时完成 CSS 布局计算，避免首次点击才计算。
-    const dummyGridContent = {
-        title: "加载中……",
-        layout: 'certificate_grid',
-        items: [
-            { label: '', date: '', image: '' },
-            { label: '', date: '', image: '' },
-            { label: '', date: '', image: '' },
-            { label: '', date: '', image: '' }
-        ],
-        platformConfig: { label: '...' }
-    };
-
-    const content = overlayContent || cachedContent || dummyGridContent;
+    const content = overlayContent || cachedContent;
+    const animateOpen = Boolean(overlayContent && overlayContent === openedContent);
+    if (!content) return null;
 
     // 传递 animateOpen 状态，控制 CSS 过渡。
     if (content.layout === 'profile' || content.layout === 'project' || content.layout === 'contact' || content.layout === 'studio') return null;
@@ -70,8 +39,6 @@ const GlobalOverlay = () => {
 };
 
 const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
-    if (!content) return null;
-
     const label = content.platformConfig?.label || '内容';
 
     // 使用 GSAP TextPlugin 实现说明文字打字效果。

@@ -1,5 +1,6 @@
+import { useScene } from '../../context/contexts';
 import { useEffect, useRef } from 'react';
-import { useScene } from '../../context/SceneContext';
+
 import { galleryProjects } from '../../data/content';
 import '../../styles/AboutProfile.scss';
 import '../../styles/ProjectDetails.scss';
@@ -35,12 +36,11 @@ function ProjectSection({ section }) {
 }
 
 export default function ProjectDetails() {
-    const { currentRoom, hasEntered, isInRoom, isTeleporting, overlayContent, openOverlay, closeOverlay } = useScene();
+    const { overlayContent, openOverlay, closeOverlay } = useScene();
     const dialogRef = useRef(null);
     const bodyRef = useRef(null);
     const project = readableProjects.find(item => item.id === overlayContent?.projectId);
     const isOpen = overlayContent?.layout === 'project' && Boolean(project);
-    const featuredProject = readableProjects[0];
     const photos = project?.details.photos || [];
     const videos = project?.details.videos || [];
     const entry = project?.details.entry;
@@ -61,17 +61,6 @@ export default function ProjectDetails() {
 
     return (
         <>
-            {hasEntered && isInRoom && currentRoom === 'gallery' && !isTeleporting && featuredProject && (
-                <button
-                    type="button"
-                    className="about-profile-trigger project-details-trigger"
-                    aria-haspopup="dialog"
-                    aria-controls="project-details-dialog"
-                    onClick={() => openOverlay({ layout: 'project', projectId: featuredProject.id })}
-                >
-                    阅读项目介绍
-                </button>
-            )}
             <dialog
                 ref={dialogRef}
                 id="project-details-dialog"

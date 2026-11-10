@@ -1,5 +1,6 @@
+import Text from '../SiteText';
 import { useMemo, memo } from 'react';
-import { Text } from '@react-three/drei';
+
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 

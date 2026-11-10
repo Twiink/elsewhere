@@ -1,225 +1,173 @@
+import { useAudio, usePerformance, useScene } from './context/contexts';
 import { useState, Suspense, useEffect, useCallback, lazy } from 'react';
-import { Canvas, useLoader } from '@react-three/fiber';
-import { Preload, useTexture, PerformanceMonitor } from '@react-three/drei';
-
+import { Canvas } from '@react-three/fiber';
+import { PerformanceMonitor } from '@react-three/drei';
 import Preloader from './components/dom/Preloader';
+import SceneErrorBoundary from './components/dom/SceneErrorBoundary';
+import LoadingFailure from './components/dom/LoadingFailure';
 import PaperTransition from './components/dom/PaperTransition';
-import { AudioProvider, useAudio } from './context/AudioManager';
+import { usePageVisibility } from './hooks/usePageVisibility';
+import { AudioProvider } from './context/AudioManager';
 import { initAudio } from './utils/audioManager';
-import { PerformanceProvider, usePerformance } from './context/PerformanceContext';
-import { SceneProvider, useScene } from './context/SceneContext';
+import { PerformanceProvider } from './context/PerformanceContext';
+import { canPrefetchRooms } from './utils/performance';
+import { SceneProvider } from './context/SceneContext';
+import { AchievementsProvider } from './context/AchievementsContext';
 import NavigationUI from './components/ui/NavigationUI';
-import GlobalOverlay from './components/ui/GlobalOverlay';
-import AboutProfile from './components/ui/AboutProfile';
-import ProjectDetails from './components/ui/ProjectDetails';
-import StudioNotes from './components/ui/StudioNotes';
-import ContactDetails from './components/ui/ContactDetails';
 import ScreenReaderOverlay from './components/ui/ScreenReaderOverlay';
 import { useDocumentMeta } from './hooks/useDocumentMeta';
-import posthog from 'posthog-js';
-import { getContentTextures } from './data/content';
-
-// 初始化 PostHog。
-if (import.meta.env.VITE_POSTHOG_KEY) {
-  posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
-    api_host: import.meta.env.VITE_POSTHOG_HOST,
-    person_profiles: 'identified_only', // 设为 'always' 时也为匿名用户创建画像。
-  });
-}
-
-// 延迟加载体积较大的 3D 场景。
-const Experience = lazy(() => import('./components/canvas/Experience'));
-
+import { scheduleRoomPrefetch } from './config/roomResources';
+import { initAnalytics } from './utils/analytics';
+import { startLoadingTimeout } from './utils/loadingTimeout';
+import { galleryProjects, studioContent } from './data/content';
 import './styles/main.scss';
+import './styles/ReadingTrigger.scss';
 
-// 按设备条件预加载资源
-// 高性能设备预加载全部资源，避免卡顿。
-// 移动端和低性能设备只预加载核心纹理，防止内存耗尽。
-import { 
-  ENTRANCE_TEXTURES, 
-  CORRIDOR_TEXTURES, 
-  UI_TEXTURES,
-  PRELOAD_ALL, 
-  PRELOAD_LOADER,
-  ABOUT_TEXTURES,
-  IMAGE_ASSETS,
-  filterTexturesByDevice
-} from './config/texturePreloadList';
-import { TextureLoader } from 'three';
+const Experience = lazy(() => import('./components/canvas/Experience'));
+const GlobalOverlay = lazy(() => import('./components/ui/GlobalOverlay'));
+const AboutProfile = lazy(() => import('./components/ui/AboutProfile'));
+const ProjectDetails = lazy(() => import('./components/ui/ProjectDetails'));
+const StudioNotes = lazy(() => import('./components/ui/StudioNotes'));
+const ContactDetails = lazy(() => import('./components/ui/ContactDetails'));
+const PANELS = { about: AboutProfile, gallery: ProjectDetails, studio: StudioNotes, contact: ContactDetails };
+const PANEL_ROOMS = { profile: 'about', project: 'gallery', studio: 'studio', contact: 'contact' };
 
-// 标准浏览器图片预加载（用于 <img> 标签）。
-const preloadBrowserImage = (path) => {
-  if (typeof window === 'undefined') return;
-  const img = new Image();
-  img.src = path;
-};
-
-const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '');
-const isWeakCPU = typeof navigator.hardwareConcurrency !== 'undefined' && navigator.hardwareConcurrency <= 4;
-const isLowRAM = typeof navigator.deviceMemory !== 'undefined' && navigator.deviceMemory <= 4;
-const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 450;
-const isLowEnd = isMobileDevice || isWeakCPU || isLowRAM || isSmallScreen;
-
-// 精确检测悬停能力；非触摸设备应支持 hover: hover。
-// 带鼠标或触控板的触屏笔记本在此也会返回 true。
-const supportsHover = typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches;
-
-// 按 Drei 惯例在模块级触发 Three.js 预加载。
-if (isLowEnd) {
-  const CORE_TEXTURES = [...ENTRANCE_TEXTURES, ...CORRIDOR_TEXTURES, ...UI_TEXTURES, ...IMAGE_ASSETS, ...getContentTextures(supportsHover)];
-  const filteredCore = filterTexturesByDevice(CORE_TEXTURES, supportsHover);
-  const filteredAbout = filterTexturesByDevice(ABOUT_TEXTURES, supportsHover);
-
-  filteredCore.forEach(path => useTexture.preload(path));
-  filteredAbout.forEach(path => useLoader.preload(TextureLoader, path));
-} else {
-  const filteredAll = filterTexturesByDevice([...PRELOAD_ALL, ...getContentTextures(supportsHover)], supportsHover);
-  const filteredLoader = filterTexturesByDevice(PRELOAD_LOADER, supportsHover);
-  
-  filteredAll.forEach(path => useTexture.preload(path));
-  filteredLoader.forEach(path => useLoader.preload(TextureLoader, path));
-}
-
-
-// 在用户交互时启用全局音频的辅助组件。
-const GlobalAudioEnabler = () => {
+function GlobalAudioEnabler() {
   const { enableAudio } = useAudio();
   useEffect(() => {
-    const handleInteraction = () => enableAudio();
-    window.addEventListener('click', handleInteraction, { once: true });
-    window.addEventListener('touchstart', handleInteraction, { once: true });
-    window.addEventListener('keydown', handleInteraction, { once: true });
-    return () => {
-      window.removeEventListener('click', handleInteraction);
-      window.removeEventListener('touchstart', handleInteraction);
-      window.removeEventListener('keydown', handleInteraction);
-    };
+    const handleInteraction = () => { enableAudio(); initAudio(); };
+    const events = ['click', 'touchstart', 'keydown'];
+    events.forEach(name => window.addEventListener(name, handleInteraction, { once: true }));
+    return () => events.forEach(name => window.removeEventListener(name, handleInteraction));
   }, [enableAudio]);
   return null;
-};
+}
 
-// 桥接组件，用于在 SceneProvider 内调用 Hook。
-// 处理动态元标签和深层链接自动传送。
 function DocumentMetaBridge() {
   useDocumentMeta();
-
-  const { initialRoom, deeplinkHandled: deeplinkHandledRef, hasEntered, teleportTo } = useScene();
-
-  // 深层链接：直接访问 /gallery 等路径时，场景加载后自动传送。
+  const { initialRoom, deeplinkHandled, hasEntered, teleportTo } = useScene();
   useEffect(() => {
-    if (initialRoom && hasEntered && !deeplinkHandledRef.current) {
-      deeplinkHandledRef.current = true;
-      // 稍作延迟，让走廊先完成渲染。
-      setTimeout(() => teleportTo(initialRoom), 300);
-    }
-  }, [initialRoom, hasEntered, teleportTo, deeplinkHandledRef]);
-
+    if (!initialRoom || !hasEntered || deeplinkHandled.current) return;
+    const timer = setTimeout(() => {
+      deeplinkHandled.current = true;
+      teleportTo(initialRoom);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [initialRoom, hasEntered, teleportTo, deeplinkHandled]);
   return null;
+}
+
+function RoomPanels() {
+  const { currentRoom, overlayContent, hasEntered, isInRoom, isTeleporting, openOverlay, closeOverlay, initialStudioLink, consumeStudioLink } = useScene();
+  const Panel = PANELS[PANEL_ROOMS[overlayContent?.layout]];
+  useEffect(() => {
+    if (currentRoom !== 'studio' || isTeleporting || !consumeStudioLink()) return;
+    if (initialStudioLink.wishes) openOverlay({ layout: 'studio', view: 'wishes' });
+    else if (studioContent.some(note => note.id === initialStudioLink.noteId)) openOverlay({ layout: 'studio', noteId: initialStudioLink.noteId });
+  }, [currentRoom, isTeleporting, consumeStudioLink, initialStudioLink, openOverlay]);
+  const readers = {
+    about: { title: '阅读关于我', dialog: 'about-profile-dialog', target: { layout: 'profile' } },
+    gallery: { title: '阅读项目介绍', className: 'project-details-trigger', dialog: 'project-details-dialog', target: { layout: 'project', projectId: galleryProjects[0]?.id } },
+    studio: { title: '翻翻生活手记', dialog: 'studio-notes-dialog', target: { layout: 'studio', noteId: studioContent[0]?.id } },
+    contact: { title: '联系方式', className: 'contact-details-trigger', dialog: 'contact-details-dialog', target: { layout: 'contact' } },
+  };
+  const reader = readers[currentRoom];
+  return <>
+    {hasEntered && isInRoom && !isTeleporting && reader && (currentRoom === 'studio'
+      ? <nav className="studio-notes-triggers" aria-label="打开生活手记"><button type="button" className="studio-notes-trigger" aria-haspopup="dialog" aria-controls={reader.dialog} aria-expanded={overlayContent?.layout === 'studio'} onClick={() => openOverlay(reader.target)}>{reader.title}</button></nav>
+      : <button type="button" className={`about-profile-trigger ${reader.className ?? ''}`} aria-haspopup="dialog" aria-controls={reader.dialog} onClick={() => openOverlay(reader.target)}>{reader.title}</button>
+    )}
+    <Suspense fallback={null}>{hasEntered && <GlobalOverlay />}</Suspense>
+    <Suspense fallback={<div className="reader-loading" role="status">正在翻开纸页…… <button type="button" onClick={closeOverlay}>取消</button></div>}>
+      {Panel && <Panel />}
+    </Suspense>
+  </>;
 }
 
 function AppContent() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
-
-  // 使用性能上下文。
+  const pageVisible = usePageVisibility();
   const { settings, downgradeTier, tier } = usePerformance();
+  const { initialRoom, isTeleporting, isInRoom, loadingError, reportLoadingError } = useScene();
 
-  // 挂载时在后台初始化音频。
   useEffect(() => {
-    initAudio();
-  }, []);
+    if (sceneReady) return;
+    return startLoadingTimeout(reportLoadingError);
+  }, [sceneReady, reportLoadingError]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    const timer = setTimeout(() => { void initAnalytics(); }, 2500);
+    if (!pageVisible || !canPrefetchRooms(navigator, tier) || isTeleporting || isInRoom) return () => clearTimeout(timer);
+    const stop = scheduleRoomPrefetch({
+      initialRoom,
+      canRun: () => !document.hidden && canPrefetchRooms(navigator, tier),
+      schedule(callback) {
+        const pending = { timer: setTimeout(() => {
+          if (window.requestIdleCallback) pending.idle = window.requestIdleCallback(callback, { timeout: 3000 });
+          else void callback();
+        }, 2000) };
+        return pending;
+      },
+      cancel(pending) {
+        clearTimeout(pending.timer);
+        if (pending.idle !== undefined) window.cancelIdleCallback(pending.idle);
+      },
+    });
+    return () => { clearTimeout(timer); stop(); };
+  }, [isLoaded, tier, initialRoom, isTeleporting, isInRoom, pageVisible]);
 
   const handleSceneReady = useCallback(() => {
-    requestAnimationFrame(() => {
-      setSceneReady(true);
-    });
+    performance.mark('app:scene-ready');
+    setSceneReady(true);
+  }, []);
+  const handleLoaded = useCallback(() => {
+    performance.mark('app:entrance-ready');
+    setIsLoaded(true);
   }, []);
 
-  return (
-    <AudioProvider>
-      <SceneProvider>
-        <DocumentMetaBridge />
-        <GlobalAudioEnabler />
-        <div className="app">
-          {/* 全屏 3D 画布。 */}
-          <div className="canvas-wrapper">
-            <Canvas
-              camera={{
-                position: [0, 0.2, 28],
-                fov: 60,
-                near: 0.1,
-                far: 150
-              }}
-              gl={{
-                antialias: settings.antialias,
-                alpha: false,
-                powerPreference: settings.powerPreference,
-                localClippingEnabled: true,
-                failIfMajorPerformanceCaveat: true
-              }}
-              dpr={settings.dpr}
-              shadows={settings.shadows}
-            >
-              <color attach="background" args={['#fafafa']} />
-              <fog attach="fog" args={['#fafafa', 15, 50]} />
+  if (loadingError) return <LoadingFailure />;
 
-              {/* 帧率下降时降低渲染开销。 */}
-              <PerformanceMonitor
-                onDecline={() => downgradeTier()}
-                flipflops={3}
-                onFallback={() => downgradeTier()}
-              />
-
-              <Suspense fallback={null}>
-                <Experience
-                  onSceneReady={handleSceneReady}
-                  performanceTier={tier}
-                />
-                <Preload all />
-              </Suspense>
-            </Canvas>
-          </div>
-
-          {/* 导航界面：菜单、地图、返回和音频。 */}
-          {isLoaded && (
-            <>
-              <NavigationUI />
-              <GlobalOverlay />
-              <AboutProfile />
-              <ProjectDetails />
-              <StudioNotes />
-              <ContactDetails />
-              <PaperTransition />
-              <ScreenReaderOverlay />
-            </>
-          )}
-
-          {/* 二维加载界面。 */}
-          <Preloader
-            ready={sceneReady}
-            onComplete={() => setIsLoaded(true)}
-          />
-        </div>
-      </SceneProvider>
-    </AudioProvider>
-  );
+  return <>
+    <DocumentMetaBridge />
+    <GlobalAudioEnabler />
+    <div className="app">
+      <div className="canvas-wrapper">
+        <Canvas
+          frameloop={pageVisible ? 'always' : 'never'}
+          camera={{ position: [0, 0.2, 28], fov: 60, near: 0.1, far: 150 }}
+          gl={{ antialias: settings.antialias, alpha: false, powerPreference: settings.powerPreference, localClippingEnabled: true, failIfMajorPerformanceCaveat: true }}
+          dpr={settings.dpr}
+          shadows={settings.shadows}
+        >
+          <color attach="background" args={['#fafafa']} />
+          <fog attach="fog" args={['#fafafa', 15, 50]} />
+          <PerformanceMonitor onDecline={downgradeTier} flipflops={3} onFallback={downgradeTier} />
+          <Suspense fallback={null}>
+            <Experience onSceneReady={handleSceneReady} onError={reportLoadingError} />
+          </Suspense>
+        </Canvas>
+      </div>
+      {isLoaded && <>
+        <NavigationUI />
+        <RoomPanels />
+        <PaperTransition />
+        <ScreenReaderOverlay />
+      </>}
+      <Preloader ready={sceneReady} onComplete={handleLoaded} />
+    </div>
+  </>;
 }
 
-import { AchievementsProvider } from './context/AchievementsContext';
-
 export default function App() {
-  // App 挂载后立即预加载浏览器图片（用于标准 <img> 标签）。
-  // 让这些资源在初始加载阶段便进入网络请求队列。
-  useEffect(() => {
-    const filteredImages = filterTexturesByDevice(IMAGE_ASSETS, supportsHover);
-    filteredImages.forEach(path => preloadBrowserImage(path));
-  }, []);
-
-  return (
+  return <SceneErrorBoundary>
     <PerformanceProvider>
-      <AchievementsProvider>
-        <AppContent />
-      </AchievementsProvider>
+      <AudioProvider>
+        <AchievementsProvider>
+          <SceneProvider><AppContent /></SceneProvider>
+        </AchievementsProvider>
+      </AudioProvider>
     </PerformanceProvider>
-  );
+  </SceneErrorBoundary>;
 }

@@ -1,5 +1,7 @@
-import { useRef, useMemo } from 'react';
-import { Text, useTexture } from '@react-three/drei';
+import Text from '../SiteText';
+import { useRef, useState } from 'react';
+import { useTexture } from '@react-three/drei';
+
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { siteInfo } from '../../../data/content';
@@ -10,7 +12,7 @@ const SignSystem = (props) => {
     const mountTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/belka.png');
 
     // 物理参数。
-    const timeOffset = useMemo(() => Math.random() * 100, []);
+    const [timeOffset] = useState(() => Math.random() * 100);
 
     useFrame((state) => {
         if (groupRef.current) {
@@ -27,7 +29,7 @@ const SignSystem = (props) => {
         <group {...props}>
             <Text
                 position={[0, 0.78, 0.65]}
-                font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                font="/fonts/LXGWWenKaiLite-site.woff"
                 fontSize={0.13}
                 color="#333333"
                 anchorX="center"

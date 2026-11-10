@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import * as THREE from 'three';
+import { useAudio } from '../../context/contexts';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import gsap from 'gsap';
-import { useAudio } from '../../context/AudioManager';
+
 
 // 可复用 SVG 线条组件，现支持 ref。
 const TearLineSVG = ({ svgPathData, pathLength, strokeDashoffset, pathRef }) => (
@@ -98,54 +98,10 @@ const percentageStyle = {
 const Preloader = ({ onComplete, ready }) => {
   const [isDone, setIsDone] = useState(false);
 
-  // 节流更新进度状态，避免 React 报更新深度超限。
-  const [realProgress, setRealProgress] = useState(0);
-  const [active, setActive] = useState(true);
-
-  useEffect(() => {
-    let t = 0;
-    const origOnStart = THREE.DefaultLoadingManager.onStart;
-    const origOnProgress = THREE.DefaultLoadingManager.onProgress;
-    const origOnLoad = THREE.DefaultLoadingManager.onLoad;
-
-    THREE.DefaultLoadingManager.onStart = (url, loaded, total) => {
-      setActive(true);
-      origOnStart?.(url, loaded, total);
-    };
-
-    THREE.DefaultLoadingManager.onProgress = (url, loaded, total) => {
-      cancelAnimationFrame(t);
-      t = requestAnimationFrame(() => {
-        setRealProgress((loaded / total) * 100);
-      });
-      origOnProgress?.(url, loaded, total);
-    };
-
-    THREE.DefaultLoadingManager.onLoad = () => {
-      cancelAnimationFrame(t);
-      setRealProgress(100);
-      setActive(false);
-      
-      const loadEnd = performance.now();
-      const loadDuration = ((loadEnd - loadStartTime.current) / 1000).toFixed(2);
-      // console.info(`📦 资源加载完成： ${loadDuration}s`);
-      
-      origOnLoad?.();
-    };
-
-    return () => {
-      THREE.DefaultLoadingManager.onStart = origOnStart;
-      THREE.DefaultLoadingManager.onProgress = origOnProgress;
-      THREE.DefaultLoadingManager.onLoad = origOnLoad;
-    };
-  }, []);
-
   const { play } = useAudio();
   // 跟踪音频句柄，以便停止循环。
   const pencilSoundRef = useRef(null);
 
-  // 性能跟踪。
-  const loadStartTime = useRef(performance.now());
 
   // 动画目标使用 ref。
   const containerRef = useRef(null);
@@ -157,17 +113,19 @@ const Preloader = ({ onComplete, ready }) => {
   const textRightRef = useRef(null);
 
   // 视觉进度完全保存在 ref 中，避免每秒 60 次 React 渲染。
-  const [targetProgress, setTargetProgress] = useState(0);
+  const targetProgress = ready ? 100 : 85;
   const displayProgressRef = useRef(0);
   const trackerRef = useRef({ val: 0 });
   const readyRef = useRef(ready);
+  const exitStarted = useRef(false);
+  const exitTimelineRef = useRef(null);
 
   useEffect(() => { readyRef.current = ready; }, [ready]);
 
   // ----------------------------------------
   // 生成撕裂路径。
   // ----------------------------------------
-  const tearPoints = useMemo(() => {
+  const [tearPoints] = useState(() => {
     const points = [];
     const segments = 12; // 减少分段数。
 
@@ -182,7 +140,7 @@ const Preloader = ({ onComplete, ready }) => {
 
     points.push([50, 100]);
     return points;
-  }, []);
+  });
 
   const svgPathData = useMemo(() => {
     return tearPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0]} ${p[1]} `).join(' ');
@@ -203,105 +161,8 @@ const Preloader = ({ onComplete, ready }) => {
   }, [tearPoints]);
 
 
-  // ----------------------------------------
-  // 平滑加载逻辑。
-  // ----------------------------------------
-  useEffect(() => {
-    let newTarget = 0;
-    if (active) {
-      newTarget = (realProgress / 100) * 85;
-    } else {
-      if (ready) {
-        newTarget = 100;
-      } else {
-        newTarget = 90;
-      }
-    }
-
-    setTargetProgress(prev => Math.max(prev, newTarget));
-  }, [realProgress, active, ready]);
-
-  // 动态处理铅笔音效与退出检查。
-  const checkProgressTriggers = (val) => {
-    // 铅笔音效。
-    if (val < 99 && !pencilSoundRef.current) {
-      pencilSoundRef.current = play('pencil', { loop: true, volume: 0.5 });
-    }
-    else if (val >= 99 && pencilSoundRef.current) {
-      pencilSoundRef.current.stop();
-      pencilSoundRef.current = null;
-    }
-
-    // 退出阶段。
-    if (val >= 99.5 && readyRef.current && !exitStarted.current) {
-      exitStarted.current = true;
-      startExit();
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (pencilSoundRef.current) {
-        pencilSoundRef.current.stop();
-        pencilSoundRef.current = null;
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    const distance = targetProgress - displayProgressRef.current;
-    let duration = 0.5;
-
-    if (distance > 60) {
-      duration = 1.5;
-    } else if (distance > 30) {
-      duration = 1.0;
-    } else if (distance > 10) {
-      duration = 0.6;
-    } else if (distance > 0) {
-      duration = 0.4;
-    }
-
-    gsap.to(trackerRef.current, {
-      val: targetProgress,
-      duration: duration,
-      ease: "power2.out",
-      overwrite: true, // 自动终止 trackerRef 上的旧动画。
-      onUpdate: () => {
-        const val = trackerRef.current.val;
-        displayProgressRef.current = val;
-
-        const safeProgress = Math.min(100, Math.max(0, val));
-        const strokeDashoffset = 120 - (120 * safeProgress) / 100;
-        const percentageText = `${Math.round(safeProgress)}%`;
-
-        // 直接更新 DOM，绕过 React 渲染。
-        if (textLeftRef.current) textLeftRef.current.innerText = percentageText;
-        if (textRightRef.current) textRightRef.current.innerText = percentageText;
-        if (pathLeftRef.current) pathLeftRef.current.style.strokeDashoffset = strokeDashoffset;
-        if (pathRightRef.current) pathRightRef.current.style.strokeDashoffset = strokeDashoffset;
-
-        checkProgressTriggers(val);
-      }
-    });
-
-  }, [targetProgress]);
-
-
-  // ----------------------------------------
-  // 退出流程。
-  // ----------------------------------------
-  const exitStarted = useRef(false);
-
-  // 达到 99.5% 后才就绪时，使用回退触发。
-  useEffect(() => {
-    if (displayProgressRef.current >= 99.5 && ready && !exitStarted.current) {
-      exitStarted.current = true;
-      startExit();
-    }
-  }, [ready]);
-
-  const startExit = () => {
+  const startExit = useCallback(() => {
+    if (exitStarted.current) return;
     exitStarted.current = true;
 
     if (pencilSoundRef.current) {
@@ -313,17 +174,12 @@ const Preloader = ({ onComplete, ready }) => {
     const tl = gsap.timeline({
       onComplete: () => {
         setIsDone(true);
-        
-        const exitEnd = performance.now();
-        const totalDuration = ((exitEnd - loadStartTime.current) / 1000).toFixed(2);
-        // console.group("⏱️ 作品集加载性能");
-        // console.log(`- 开始： %c${loadStartTime.current.toFixed(0)}ms`, "color: #888");
-        // console.log(`- 总时长： %c${totalDuration}s`, "color: #00ff00; font-weight: bold;");
-        // console.groupEnd();
-        
+
         onComplete?.();
       }
     });
+
+    exitTimelineRef.current = tl;
 
     // 1. 撕开前短暂停顿。
     tl.to({}, { duration: 0.1 });
@@ -348,13 +204,95 @@ const Preloader = ({ onComplete, ready }) => {
       opacity: 0,
       duration: 0.5
     }, '-=0.5');
-  };
+  }, [play, onComplete]);
+
+  // ----------------------------------------
+  // 平滑加载逻辑。
+  // ----------------------------------------
+  // 动态处理铅笔音效与退出检查。
+  const checkProgressTriggers = useCallback((val) => {
+    // 铅笔音效。
+    if (val < 99 && !pencilSoundRef.current) {
+      pencilSoundRef.current = play('pencil', { loop: true, volume: 0.5 });
+    }
+    else if (val >= 99 && pencilSoundRef.current) {
+      pencilSoundRef.current.stop();
+      pencilSoundRef.current = null;
+    }
+
+    // 退出阶段。
+    if (val >= 99.5 && readyRef.current && !exitStarted.current) {
+      startExit();
+    }
+  }, [play, startExit]);
+
+  useEffect(() => {
+    return () => {
+      if (pencilSoundRef.current) {
+        pencilSoundRef.current.stop();
+        pencilSoundRef.current = null;
+      }
+      exitTimelineRef.current?.kill();
+    };
+  }, []);
+
+  useEffect(() => {
+    const distance = targetProgress - displayProgressRef.current;
+    let duration = 0.5;
+
+    if (distance > 60) {
+      duration = 1.5;
+    } else if (distance > 30) {
+      duration = 1.0;
+    } else if (distance > 10) {
+      duration = 0.6;
+    } else if (distance > 0) {
+      duration = 0.4;
+    }
+
+    const tween = gsap.to(trackerRef.current, {
+      val: targetProgress,
+      duration: duration,
+      ease: "power2.out",
+      overwrite: true, // 自动终止 trackerRef 上的旧动画。
+      onUpdate: () => {
+        const val = trackerRef.current.val;
+        displayProgressRef.current = val;
+
+        const safeProgress = Math.min(100, Math.max(0, val));
+        const strokeDashoffset = 120 - (120 * safeProgress) / 100;
+        const percentageText = `${Math.round(safeProgress)}%`;
+
+        // 直接更新 DOM，绕过 React 渲染。
+        if (textLeftRef.current) textLeftRef.current.innerText = percentageText;
+        if (textRightRef.current) textRightRef.current.innerText = percentageText;
+        if (pathLeftRef.current) pathLeftRef.current.style.strokeDashoffset = strokeDashoffset;
+        if (pathRightRef.current) pathRightRef.current.style.strokeDashoffset = strokeDashoffset;
+
+        checkProgressTriggers(val);
+      }
+    });
+
+    return () => tween.kill();
+  }, [targetProgress, checkProgressTriggers]);
+
+
+  // ----------------------------------------
+  // 退出流程。
+  // ----------------------------------------
+  // 达到 99.5% 后才就绪时，使用回退触发。
+  useEffect(() => {
+    if (displayProgressRef.current >= 99.5 && ready && !exitStarted.current) {
+      startExit();
+    }
+  }, [ready, startExit]);
+
 
   if (isDone) return null;
 
   const pathLength = 120;
   // 初始化数值。
-  const safeProgress = Math.min(100, Math.max(0, displayProgressRef.current));
+  const safeProgress = 0;
   const strokeDashoffset = pathLength - (pathLength * safeProgress) / 100;
   const percentageText = `${Math.round(safeProgress)}%`;
 

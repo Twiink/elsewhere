@@ -1,12 +1,14 @@
+import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
+import Text from '../SiteText';
 import { useRef, useMemo, useState, useEffect } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
+import { useThree } from '@react-three/fiber';
+
 import * as THREE from 'three';
 import { siteInfo } from '../../../data/content';
 
-// 本地字体；troika 需要 TTF 格式。
+// 品牌字母使用原有字体，中文使用自动生成的 WOFF 子集。
 const RUBIK_SCRIBBLE_URL = '/fonts/RubikScribble-Regular.ttf';
-const CABIN_SKETCH_URL = '/fonts/LXGWWenKaiLite-Regular.ttf';
+const CABIN_SKETCH_URL = '/fonts/LXGWWenKaiLite-site.woff';
 
 /**
  * HeroText：使用手绘字体的标题组件。
@@ -69,7 +71,7 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
     ], []);
 
     // 动画循环。
-    useFrame((state, delta) => {
+    useFrame((state) => {
         if (!groupRef.current) return;
 
         const time = state.clock.elapsedTime;

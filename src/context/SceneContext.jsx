@@ -1,20 +1,21 @@
-import { createContext, useContext, useState, useCallback, useMemo, useRef } from 'react';
+import { SceneContext } from './contexts';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { getInitialRoomFromUrl } from '../utils/roomRoutes';
-
-const SceneContext = createContext(null);
-
-export const useScene = () => {
-    const context = useContext(SceneContext);
-    if (!context) {
-        throw new Error("useScene 必须在 SceneProvider 内使用");
-    }
-    return context;
-};
+import { initialStudioLink } from '../utils/initialLocation';
+import { prefetchRoom } from '../config/roomResources';
 
 export const SceneProvider = ({ children }) => {
     // 深层链接：首次加载时检查 URL 是否指向指定房间。
-    const initialRoom = useRef(getInitialRoomFromUrl());
+    const [initialRoom] = useState(getInitialRoomFromUrl);
     const deeplinkHandled = useRef(false);
+    const studioLinkHandled = useRef(false);
+    const consumeStudioLink = useCallback(() => {
+        if (studioLinkHandled.current) return false;
+        studioLinkHandled.current = true;
+        return true;
+    }, []);
+    const [loadingError, setLoadingError] = useState(false);
+    const reportLoadingError = useCallback(() => setLoadingError(true), []);
 
     const [currentRoom, setCurrentRoom] = useState(null); // null 表示走廊，其他值为 about、portfolio 等房间 ID。
     const [hasEntered, setHasEntered] = useState(false);  // 用户是否点击过入口门。
@@ -78,6 +79,8 @@ export const SceneProvider = ({ children }) => {
     const teleportTo = useCallback((roomId) => {
         if (isTeleporting || roomId === currentRoom) return; // 防止重复传送或传往当前房间。
 
+        void prefetchRoom(roomId).catch(() => {});
+
         setTeleportTarget(roomId);
         setIsTeleporting(true);
         setIsFastTeleport(true); // 启用快速传送模式。
@@ -137,6 +140,10 @@ export const SceneProvider = ({ children }) => {
     }, []);
 
     const value = useMemo(() => ({
+        initialStudioLink,
+        consumeStudioLink,
+        loadingError,
+        reportLoadingError,
         currentRoom,
         hasEntered,
         exitRequested,
@@ -150,7 +157,7 @@ export const SceneProvider = ({ children }) => {
         closeOverlay,   // 对外暴露。
         isInRoom: currentRoom !== null,
         // 深层链接。
-        initialRoom: initialRoom.current,
+        initialRoom,
         deeplinkHandled,
         // 传送。
         teleportTarget,
@@ -166,6 +173,10 @@ export const SceneProvider = ({ children }) => {
         finishPaperOpen,
         cancelTeleport,
     }), [
+        initialRoom,
+        consumeStudioLink,
+        loadingError,
+        reportLoadingError,
         currentRoom,
         hasEntered,
         exitRequested,
@@ -198,5 +209,3 @@ export const SceneProvider = ({ children }) => {
         </SceneContext.Provider>
     );
 };
-
-export default SceneContext;

@@ -1,15 +1,18 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useScene, useAchievements, useAudio } from '../../../../context/contexts';
+import Text from '../../SiteText';
+import { useRef, useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Text, PositionalAudio } from '@react-three/drei';
+import { PositionalAudio } from '@react-three/drei';
+
 import * as THREE from 'three';
-import gsap from 'gsap';
 import MessagePaper from './MessagePaper';
+import { useTextureCopy } from '../../../../hooks/useTextureCopy';
 import SocialBarrel from './SocialBarrel';
-import { useScene } from '../../../../context/SceneContext';
+
 import { contactInfo, siteInfo } from '../../../../data/content';
 import GalleryClouds from '../Gallery/GalleryClouds';
-import { useAchievements } from '../../../../context/AchievementsContext';
-import { useAudio } from '../../../../context/AudioManager';
+
+
 
 // ============================================
 // ============================================
@@ -25,7 +28,7 @@ const WAVE_LAYERS = 4;
 // ⚙️ 音频设置：在此调整。
 // 修改这些值可调整海浪声的音量和可听范围。
 // ============================================
-export const AUDIO_SETTINGS = {
+const AUDIO_SETTINGS = {
     volume: 2,
     distance: 2,           // 声音开始衰减的距离 refDistance。
     rolloff: 1.2           // 声音衰减速度 rolloffFactor。
@@ -35,7 +38,7 @@ export const AUDIO_SETTINGS = {
 // ⚙️ 灯塔设置：在此调整。
 // 修改灯塔的位置、旋转和尺寸。
 // ============================================
-export const LATARNIA_SETTINGS = {
+const LATARNIA_SETTINGS = {
     // 位置：[左右 X、上下 Y、前后 Z]。
     position: [-10, 5, -20],
 
@@ -50,7 +53,7 @@ export const LATARNIA_SETTINGS = {
 // ⚙️ 船设置：在此调整。
 // 修改船的位置、旋转和尺寸。
 // ============================================
-export const STATEK_SETTINGS = {
+const STATEK_SETTINGS = {
     // 位置：[左右 X、上下 Y、前后 Z]。
     position: [0, 1.6, -15],
 
@@ -81,17 +84,6 @@ const CAMERA_SETTINGS = {
     lerpSpeed: 2.5
 };
 
-// 体验阶段。
-const PHASE = {
-    ENTERING: 'entering',      // 相机进入房间，面向菜单。
-    LOOKING_DOWN: 'looking_down', // 相机转向码头的动画。
-    WRITING: 'writing',        // 用户在纸上写信。
-    ROLLING: 'rolling',        // 信纸卷入瓶中。
-    HOLDING: 'holding',        // 相机持瓶面向海面。
-    THROWING: 'throwing',      // 投出瓶子。
-    DONE: 'done'               // 瓶子漂远。
-};
-
 const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     const { camera } = useThree();
     const { isTeleporting, openOverlay } = useScene();
@@ -113,31 +105,14 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     }, [isExiting, isTeleporting, hidePopup]);
 
     // 加载海面纹理。
-    const seaTexture = useTexture("https://media.secknow-ai.com/space/textures/contact/faletopdown.png?imageMogr2/thumbnail/1351x675");
+    const seaTexture = useTextureCopy(useTexture("https://media.secknow-ai.com/space/textures/contact/faletopdown.png?imageMogr2/thumbnail/1351x675"), { wrapS: THREE.MirroredRepeatWrapping, wrapT: THREE.MirroredRepeatWrapping, repeatX: 6, repeatY: 4 });
     // 加载码头纹理。
-    const moloTexture = useTexture("https://media.secknow-ai.com/space/textures/contact/molo.png");
+    const moloTexture = useTextureCopy(useTexture("https://media.secknow-ai.com/space/textures/contact/molo.png"), { wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping, rotation: Math.PI / 2, centerX: 0.5, centerY: 0.5 });
     // 加载灯塔纹理。
     const latarniaTexture = useTexture("https://media.secknow-ai.com/space/textures/contact/latarnia.png?imageMogr2/thumbnail/1024x1024");
     // 加载船纹理。
     const statekTexture = useTexture("https://media.secknow-ai.com/space/textures/contact/statek.png");
 
-
-    // 配置纹理按 1:1 比例重复。
-    useEffect(() => {
-        if (seaTexture) {
-            seaTexture.wrapS = seaTexture.wrapT = THREE.MirroredRepeatWrapping;
-            seaTexture.repeat.set(6, 4);
-            seaTexture.needsUpdate = true;
-        }
-
-        if (moloTexture) {
-            moloTexture.wrapS = moloTexture.wrapT = THREE.RepeatWrapping;
-            moloTexture.center.set(0.5, 0.5);
-            moloTexture.rotation = Math.PI / 2;
-            moloTexture.repeat.set(1, 1);
-            moloTexture.needsUpdate = true;
-        }
-    }, [seaTexture, moloTexture]);
 
     useEffect(() => {
         // 挂载时平滑切换为 YXZ 顺序，使点头动作正确，
@@ -153,7 +128,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     // 上色过渡。
     // 联系我房间位于走廊右侧，显现从右侧 +X 向房间内部推进。
     const groupRef = useRef();
-    const { onBeforeCompile, animatePaint, resetPaint, uniformsData, updateRoomOrigin } = usePaintMaterial({
+    const { onBeforeCompile, animatePaint, resetPaint, setPaintProgress, uniformsData, updateRoomOrigin } = usePaintMaterial({
         dirX: 1.0,    // 与画廊方向相反，对应右侧门。
         dirY: 0.0,
         dirZ: -0.1,   // 略微倾斜以匹配镜像方向。
@@ -162,7 +137,6 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         noiseAxes: 'yz'
     });
 
-    const [isTransitioning, setIsTransitioning] = useState(false);
 
     const wasTeleportedRef = useRef(false);
     useEffect(() => {
@@ -172,20 +146,16 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     useEffect(() => {
         if (showRoom && !isWarmup) {
             if (wasTeleportedRef.current || isTeleporting) {
-                uniformsData.uPaintProgress.value = 1.0;
-                setIsTransitioning(false);
+                setPaintProgress(1);
             } else {
-                setIsTransitioning(true);
                 resetPaint();
-                animatePaint(0.2, 2.5);
-                setTimeout(() => {
-                    setIsTransitioning(false);
-                }, 2700);
+                const animation = animatePaint(0.2, 2.5);
+                return () => animation.kill();
             }
         } else {
-            uniformsData.uPaintProgress.value = 1.0;
+            setPaintProgress(1);
         }
-    }, [showRoom, isWarmup, isTeleporting]);
+    }, [showRoom, isWarmup, isTeleporting, animatePaint, resetPaint, setPaintProgress]);
 
     // 跟踪是否已发出就绪信号。
     const hasSignaledReady = useRef(false);
@@ -193,18 +163,16 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     const FRAMES_TO_WAIT = 5;
 
     // 阶段状态。
-    const [currentPhase, setCurrentPhase] = useState(PHASE.ENTERING);
+
     const [showSelection, setShowSelection] = useState(true);
+    if ((!showRoom || isTeleporting) && !showSelection) setShowSelection(true);
 
     const hasAnimatedDown = useRef(false);
     // 锁定退出状态，防止闪变。
     const hasExitTriggered = useRef(false);
-    if (isExiting && !hasExitTriggered.current) {
-        hasExitTriggered.current = true;
-        // 此处不切回 XYZ，让 DoorSection 的 GSAP 在 YXZ 下将相机移回门边。
-        // 这样可防止视角突然扭转，因为在 YXZ 下
-        // 将 X 插值到 0 会自然抬头，而不会扭曲转向。
-    }
+    useEffect(() => {
+        if (isExiting) hasExitTriggered.current = true;
+    }, [isExiting]);
 
     // 动画引用。
     const waveRefs = useRef([]);
@@ -223,8 +191,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             targetRotX.current = 0;
             targetRotY.current = 0;
             targetRotZ.current = 0;
-            setCurrentPhase(PHASE.ENTERING);
-            setShowSelection(true); // 重置选择菜单。
+
         }
     }, [isTeleporting]);
 
@@ -240,13 +207,12 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             hasExitTriggered.current = false;
             if (hasAnimatedDown.current) {
                 hasAnimatedDown.current = false;
-                setCurrentPhase(PHASE.ENTERING);
+
                 targetRotX.current = 0;
                 targetRotZ.current = 0;
-                setShowSelection(true);
             }
         }
-    }, [hasSignaledReady.current, showRoom, camera]);
+    }, [showRoom]);
 
     const handleMailSelect = () => {
         // 备用 mailto 跳转。
@@ -265,7 +231,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         targetRotZ.current = camera.rotation.z;
 
         // 直接开始流程。
-        setCurrentPhase(PHASE.LOOKING_DOWN);
+
 
         // 1. 设置 X：低头。
         targetRotX.current = CAMERA_SETTINGS.lookDownAngle;
@@ -282,7 +248,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 
         // 阶段过渡。
         setTimeout(() => {
-            setCurrentPhase(PHASE.WRITING);
+
         }, 1500);
         */
     };
@@ -311,9 +277,11 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             const lerpSpeed = safeDelta * CAMERA_SETTINGS.lerpSpeed;
 
             // 正常模式：低头。
-            camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, targetRotX.current, lerpSpeed);
-            camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, targetRotY.current, lerpSpeed);
-            camera.rotation.z = THREE.MathUtils.lerp(camera.rotation.z, targetRotZ.current, lerpSpeed);
+            state.camera.rotation.set(
+                THREE.MathUtils.lerp(camera.rotation.x, targetRotX.current, lerpSpeed),
+                THREE.MathUtils.lerp(camera.rotation.y, targetRotY.current, lerpSpeed),
+                THREE.MathUtils.lerp(camera.rotation.z, targetRotZ.current, lerpSpeed)
+            );
         }
 
         // 2. 波浪动画。
@@ -502,7 +470,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             {contactInfo.showMessageForm && <group visible={!showSelection}>
                 <MessagePaper
                     position={[0, 0.07, 2]}
-                    onSend={(data) => {
+                    onSend={() => {
                         // console.log('📬 联系表单已提交：', data);
                         unlockAchievement('contact_submit');
                     }}

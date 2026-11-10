@@ -52,7 +52,7 @@ const GalleryClouds = ({ count = 12, seed = 42, rotationOffset = [0, -Math.PI / 
         }
 
         return items;
-    }, [count, seed]);
+    }, [count, seed, totalDistance]);
 
     return (
         <group>

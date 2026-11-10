@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useTexture } from '@react-three/drei';
+import { useTextureCopy } from '../../../hooks/useTextureCopy';
 
 /**
  * EmptyCorridor 空走廊组件。
@@ -12,13 +13,11 @@ import { useTexture } from '@react-three/drei';
  */
 const EmptyCorridor = ({ camera }) => {
     const corridorWidth = 25; // 宽地面。
-    const corridorHeight = 3.5; // 用于计算地面位置的标准高度。
     const [segmentBase, setSegmentBase] = useState(0);
 
     // 加载地面纹理。
-    const floorTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/floor_paper.png?imageMogr2/thumbnail/1024x512');
-    floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-    floorTexture.repeat.set(6.6, 20); // 根据 2816×1536 的比例与新宽度调整重复次数。
+    const floorSource = useTexture('https://media.secknow-ai.com/space/textures/entrance/floor_paper.png?imageMogr2/thumbnail/1024x512');
+    const floorTexture = useTextureCopy(floorSource, { wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping, repeatX: 6.6, repeatY: 20 });
 
     // 相机进入新分段时才更新分段基准，避免逐帧更新。
     useFrame(() => {
@@ -46,7 +45,6 @@ const EmptyCorridor = ({ camera }) => {
                     key={zStart}
                     zStart={zStart}
                     corridorWidth={corridorWidth}
-                    corridorHeight={corridorHeight}
                     floorTexture={floorTexture}
                 />
             ))}
@@ -57,7 +55,7 @@ const EmptyCorridor = ({ camera }) => {
 /**
  * 单个空走廊分段。
  */
-const CorridorSegmentEmpty = ({ zStart, corridorWidth, corridorHeight, floorTexture }) => {
+const CorridorSegmentEmpty = ({ zStart, corridorWidth, floorTexture }) => {
     const length = 40;
     const zCenter = zStart - length / 2;
 

@@ -1,13 +1,20 @@
+import { useScene, useAudio } from '../../../context/contexts';
+import { prefetchRoom, ROOM_LABELS } from '../../../config/roomResources';
+import { startLoadingTimeout } from '../../../utils/loadingTimeout';
+import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
+import Text from '../SiteText';
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
-import { Text, useTexture, PositionalAudio } from '@react-three/drei';
+import { useThree } from '@react-three/fiber';
+import { useTexture, PositionalAudio } from '@react-three/drei';
+
 import * as THREE from 'three';
 import gsap from 'gsap';
 import RoomInterior from './RoomInterior';
+import { useTextureCopy } from '../../../hooks/useTextureCopy';
 import '../shaders/RevealMaterial'; // 注册使用透明度丢弃的显现着色器。
-import { useScene } from '../../../context/SceneContext';
-import { useAchievements } from '../../../context/AchievementsContext';
-import { useAudio } from '../../../context/AudioManager';
+
+
+
 import { isTouchDevice } from '../../../utils/deviceDetect';
 
 // 来自 CorridorSegment 的常量。
@@ -69,9 +76,7 @@ const DoorSection = ({
     side = 'left',
     label,
     roomId, // 用于更新上下文的 ID，如 gallery、studio。
-    icon,
     onEnter,
-    autoCloseDelay = 3000,
     enterDistance = 8, // 默认穿行距离。
     setCameraOverride, // 从相机 Hook 接管控制的函数。
     segmentIndex
@@ -91,26 +96,24 @@ const DoorSection = ({
     const [isInsideRoom, setIsInsideRoom] = useState(false);
     const [isTiltLocked, setIsTiltLocked] = useState(false); // 进入房间时锁定倾斜。
     const [shouldRenderRoom, setShouldRenderRoom] = useState(false); // 延迟加载状态。
-    const [roomReady, setRoomReady] = useState(false); // 房间已发出就绪信号。
     const { camera } = useThree();
-    const closeTimerRef = useRef(null);
-    const loadTimeoutRef = useRef(null); // 房间加载回退定时器引用。
+    const loadTimeoutRef = useRef(null);
+    const roomReadyRef = useRef(false);
 
     // 从上下文获取退出请求信号。
     const {
         currentRoom, // 检测全局房间是否因传送而改变。
         exitRequested,
-        clearExitRequest,
         exitRoom: contextExitRoom,
         enterRoom,
         pendingDoorClick,
         isTeleporting,
         isFastTeleport,
         signalRoomReady,
+        reportLoadingError,
         teleportPhase // 用于将重置延迟到幕布关闭后。
     } = useScene();
 
-    const { unlockAchievement } = useAchievements();
     const { globalVolume, isMuted } = useAudio();
 
     // 三维位置音频引用。
@@ -130,53 +133,24 @@ const DoorSection = ({
         return null;
     }, [label, roomId]);
 
-    // 监听待处理的门点击，传送后自动点击。
+    // 纸幕合拢后卸载旧房间，再由传送逻辑移动相机。
+    if (isTeleporting && teleportPhase === 'teleporting' && isInsideRoom && currentRoom === doorId) {
+        setIsOpen(false);
+        setIsInsideRoom(false);
+        setIsAnimating(false);
+        setShouldRenderRoom(false);
+        setIsTiltLocked(false);
+    }
+
     useEffect(() => {
-        // 仅触发最靠近起点的第 0 段中 ID 匹配的门。
-        // 假定传送始终前往第 0 段。
-        const isSegment0 = segmentIndex === 0;
-
-        if (pendingDoorClick && pendingDoorClick === doorId && isSegment0 && !isOpen && !isAnimating) {
-            handleClick({ stopPropagation: () => { }, isTeleport: true }); // 带上传送标记，触发模拟点击。
-        }
-    }, [pendingDoorClick, doorId, segmentIndex, isOpen, isAnimating]);
-
-    // 传送时静默重置。
-    // 传送开始且用户位于当前房间时，
-    // 静默重置状态为门外和关闭状态，
-    // 但需等待幕布关闭，即 phase === 'teleporting'。
-    useEffect(() => {
-        // 加入 currentRoom === doorId 检查，仅重置原房间。
-        // 加入 teleportPhase === 'teleporting' 检查，等待幕布关闭。
-        if (isTeleporting && teleportPhase === 'teleporting' && isInsideRoom && currentRoom === doorId) {
-            // console.log(`[DoorSection ${label}] 传送时静默重置原房间`);
-
-            // 1. 立即重置内部状态。
-            setIsOpen(false);
-            setIsInsideRoom(false);
-            setIsAnimating(false);
-            setShouldRenderRoom(false); // 卸载房间内容。
-            setIsTiltLocked(false);
-            setRoomReady(false);
+        if (isTeleporting && teleportPhase === 'teleporting' && currentRoom === doorId) {
             roomReadyRef.current = false;
-
-            // 2. 重置门和把手的旋转状态。
-            // 此时屏幕已遮挡，可立即或快速完成。
             if (doorRef.current) doorRef.current.rotation.y = 0;
             if (handleRef.current) handleRef.current.rotation.z = 0;
-
-            // 3. 重置相机接管状态。
-            // 注意：此处不要释放相机控制权。
-            // isTeleporting 期间由 Experience.jsx 管理相机接管。
-            // 此处释放会使 useInfiniteCamera 在新房间就绪前接管。
-            // 已移除：setCameraOverride?.(false)。
-
-            // 4. 重置计时器。
-            if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+            loadTimeoutRef.current?.();
         }
-    }, [isTeleporting, teleportPhase, isInsideRoom, currentRoom, doorId, label, setCameraOverride]);
+    }, [isTeleporting, teleportPhase, currentRoom, doorId]);
 
-    // 保存进入前的相机状态，用于按 Esc 退出。
     // 保存进入前的相机状态，用于按 Esc 退出。
     // 保存完整的 x、y、z 旋转，防止退出时跳变。
     const savedCameraState = useRef({ x: 0, y: 0, z: 0, rotationX: 0, rotationY: 0, rotationZ: 0 });
@@ -191,21 +165,10 @@ const DoorSection = ({
     // 加载墙面纹理。
     const originalWallTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512');
 
-    // 克隆纹理，独立设置重复次数，修正缩放问题。
-    const wallTexture = useMemo(() => {
-        const tex = originalWallTexture.clone();
-        tex.needsUpdate = true;
-        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-
-        // ShapeGeometry 使用世界空间 UV（1 单位=1 米），PlaneGeometry 则为 0..1。
-        // 每 2 米重复一次，所以将 repeat 设为 0.5。
-        tex.repeat.set(0.5, 0.5);
-
-        // 可选：调整偏移，让纹理居中对齐。
-        tex.offset.set(0.5, 0.5);
-
-        return tex;
-    }, [originalWallTexture]);
+    const wallTexture = useTextureCopy(originalWallTexture, {
+        wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping,
+        repeatX: 0.5, repeatY: 0.5, offsetX: 0.5, offsetY: 0.5,
+    });
 
     // 按门标签加载对应纹理。
     const doorTexturePath = DOOR_TEXTURES[label] || DOOR_TEXTURES["作品画廊"];
@@ -224,31 +187,17 @@ const DoorSection = ({
 
     // 门区域的踢脚线纹理：1582×94 像素，比例 16.83:1。
     const baseboardTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png');
-    baseboardTexture.wrapS = baseboardTexture.wrapT = THREE.RepeatWrapping;
-    baseboardTexture.colorSpace = THREE.SRGBColorSpace;
-
-    // 通过 useMemo 预先创建踢脚线纹理，与上方 legTexture 的方式相同。
     const doorBoardWidth = (WALL_LENGTH - 1.1) / 2;
-    const NATURAL_TILE_W = (1582 / 94) * 0.15; // 每次自然平铺宽度为 2.524 单位。
-    const doorBbTexLeft = useMemo(() => {
-        const tex = baseboardTexture.clone();
-        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-        tex.rotation = 0; // 重置旋转，共享纹理可能已被门槛设为 PI/2。
-        tex.offset.set(0, 0);
-        tex.needsUpdate = true;
-        tex.repeat.set(doorBoardWidth / NATURAL_TILE_W, 1);
-        return tex;
-    }, [baseboardTexture]);
-
-    const doorBbTexRight = useMemo(() => {
-        const tex = baseboardTexture.clone();
-        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-        tex.rotation = 0; // 重置旋转，共享纹理可能已被门槛设为 PI/2。
-        tex.offset.set(0, 0);
-        tex.needsUpdate = true;
-        tex.repeat.set(doorBoardWidth / NATURAL_TILE_W, 1);
-        return tex;
-    }, [baseboardTexture]);
+    const naturalTileWidth = (1582 / 94) * 0.15;
+    const doorBbTexLeft = useTextureCopy(baseboardTexture, {
+        wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping,
+        colorSpace: THREE.SRGBColorSpace, repeatX: doorBoardWidth / naturalTileWidth,
+    });
+    const doorBbTexRight = doorBbTexLeft;
+    const thresholdTexture = useTextureCopy(baseboardTexture, {
+        wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping,
+        colorSpace: THREE.SRGBColorSpace, repeatX: 1.1 / naturalTileWidth,
+    });
 
     // 门尺寸按原始纹理宽高比计算，约为 0.376。
     const doorRatio = label === "生活手记" ? 0.388 : 0.376;
@@ -294,6 +243,9 @@ const DoorSection = ({
 
         return new THREE.ShapeGeometry(wallShape);
     }, [holeWidth, holeHeight, holeOffsetY]);
+
+    useEffect(() => () => wallWithHoleGeometry.dispose(), [wallWithHoleGeometry]);
+    useEffect(() => () => handleHideDelayRef.current?.kill(), []);
 
     // 倾斜参数。
     const BASE_ROTATION = Math.PI / 2; // 90°，侧墙朝向。
@@ -378,10 +330,72 @@ const DoorSection = ({
 
     useEffect(() => {
         return () => {
-            if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
-            if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
+            loadTimeoutRef.current?.();
         };
     }, []);
+
+    const closeDoor = useCallback((onDoorClosed) => {
+        if (!doorRef.current || !isOpen) return;
+        loadTimeoutRef.current?.();
+
+        setIsAnimating(true);
+
+        if (closeAudioRef.current) {
+            setTimeout(() => {
+                const vol = isMuted ? 0 : DOOR_AUDIO_SETTINGS.closeVolume * globalVolume;
+                if (closeAudioRef.current) {
+                    closeAudioRef.current.setVolume(vol);
+                    if (closeAudioRef.current.isPlaying) closeAudioRef.current.stop();
+                    closeAudioRef.current.play();
+                }
+            }, DOOR_AUDIO_SETTINGS.closeDelay * 1000);
+        }
+
+        // 重置把手。
+        if (handleRef.current) {
+            gsap.to(handleRef.current.rotation, {
+                z: 0,
+                duration: 0.2,
+                ease: 'power2.out'
+            });
+        }
+
+        // 反向执行笔刷显现，去除门上的彩色层。
+        if (doorMaterialRef.current) {
+            gsap.to(doorMaterialRef.current, {
+                uProgress: 0.0,
+                duration: 0.6,
+                ease: 'power2.out',
+                overwrite: true
+            });
+        }
+        if (handleMaterialRef.current) {
+            gsap.to(handleMaterialRef.current, {
+                uProgress: 0.0,
+                duration: 0.6,
+                ease: 'power2.out',
+                overwrite: true
+            });
+        }
+        // 动画完成后隐藏彩色层。
+        if (handleHideDelayRef.current) handleHideDelayRef.current.kill();
+        handleHideDelayRef.current = gsap.delayedCall(0.65, () => {
+            if (handlePaintedRef.current) handlePaintedRef.current.visible = false;
+            if (doorPaintedRef.current) doorPaintedRef.current.visible = false;
+        });
+
+        gsap.to(doorRef.current.rotation, {
+            y: 0,
+            duration: 0.6,
+            ease: 'power2.in',
+            onComplete: () => {
+                setIsOpen(false);
+                setIsAnimating(false);
+                // 调用可选的完成回调。
+                onDoorClosed?.();
+            }
+        });
+    }, [isOpen, isMuted, globalVolume]);
 
     const handleClick = useCallback((e) => {
         // e 可能为 null，也可能是传送生成的事件。
@@ -393,6 +407,8 @@ const DoorSection = ({
             closeDoor();
             return;
         }
+
+        void prefetchRoom(ROOM_LABELS[label]).catch(() => {});
 
         // 过渡时重置光标。
         document.body.style.cursor = "auto";
@@ -488,7 +504,7 @@ const DoorSection = ({
             duration: alignDuration,
             ease: useFastMode ? 'none' : 'power2.inOut',
             onUpdate: () => {
-                camera.rotation.y = rotationProxy.y;
+                camera.rotation.set(camera.rotation.x, rotationProxy.y, camera.rotation.z);
             },
             onComplete: () => {
                 // 保存对齐状态，用于反向动画。
@@ -502,28 +518,34 @@ const DoorSection = ({
                 // 延迟加载房间：
                 // 1. 相机已对齐。
                 // 2. 开始渲染房间。
-                // 3. 房间通过 onReady 通知就绪后开门，
-                //    或在不支持 onReady 时等待回退超时。
+                // 3. 房间通过 onReady 通知资源与场景就绪后开门。
                 setShouldRenderRoom(true);
 
                 // 快速传送时也需要等待房间就绪。
                 // 不再立即开门，改由 onReady 回调处理。
                 // 仍设置模式标记，让 handleRoomReady 使用快速动画。
 
-                // 回退：房间在 8000 毫秒内未调用 onReady 时仍然开门。
-                // 保证没有实现 onReady 的房间也可进入。
-                loadTimeoutRef.current = setTimeout(() => {
-                    if (!roomReadyRef.current) {
-                        console.warn(`[DoorSection ${label}] 房间加载超时，继续开门`);
-                        roomReadyRef.current = true;
-                        setRoomReady(true);
-                        // 超时后仍使用当前模式设置。
-                        openDoor(useFastMode);
-                    }
-                }, 8000);
+                // 网络过慢或资源失败时保留遮挡，提供明确的恢复入口。
+                loadTimeoutRef.current?.();
+                loadTimeoutRef.current = startLoadingTimeout(() => {
+                    if (!roomReadyRef.current) reportLoadingError();
+                });
             }
         });
-    }, [camera, side, isOpen, isAnimating, setCameraOverride, isFastTeleport]);
+    }, [camera, side, isOpen, isAnimating, setCameraOverride, isFastTeleport, closeDoor, label, position, reportLoadingError]);
+
+    // 监听待处理的门点击，传送后自动点击。
+    useEffect(() => {
+        // 仅触发最靠近起点的第 0 段中 ID 匹配的门。
+        // 假定传送始终前往第 0 段。
+        const isSegment0 = segmentIndex === 0;
+
+        if (pendingDoorClick && pendingDoorClick === doorId && isSegment0 && !isOpen && !isAnimating) {
+            // 等纸幕与相机位置提交到当前帧后，再启动入门动画。
+            const frame = requestAnimationFrame(() => handleClick({ stopPropagation() {}, isTeleport: true }));
+            return () => cancelAnimationFrame(frame);
+        }
+    }, [pendingDoorClick, doorId, segmentIndex, isOpen, isAnimating, handleClick]);
 
     const openDoor = useCallback((fastMode = false) => {
         if (!doorRef.current) return;
@@ -603,24 +625,24 @@ const DoorSection = ({
                 });
             }
         });
-    }, [side, onEnter, camera, enterRoom, doorId, signalRoomReady]);
+    }, [side, onEnter, camera, enterRoom, doorId, signalRoomReady, enterDistance, globalVolume, isMuted]);
 
     // 处理房间就绪回调，加载完成后开门。
     // 使用 ref 防止重复调用，因为状态更新可能不够及时。
-    const roomReadyRef = useRef(false);
 
     const handleRoomReady = useCallback(() => {
         // 确保 openDoor 只调用一次。
         if (roomReadyRef.current) return;
 
         // 就绪后清除回退定时器。
-        if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
+        loadTimeoutRef.current?.();
 
         roomReadyRef.current = true;
-        setRoomReady(true);
+        performance.mark(`app:room-ready:${ROOM_LABELS[label]}`);
+
         // 按当前上下文状态决定是否快速开门。
         openDoor(isFastTeleport);
-    }, [openDoor, isFastTeleport]);
+    }, [openDoor, isFastTeleport, label]);
 
     // 退出房间：像倒放视频一样反向执行动画。
     const exitRoom = useCallback(() => {
@@ -716,7 +738,7 @@ const DoorSection = ({
                                 setIsInsideRoom(false);
                                 setIsAnimating(false);
                                 setIsTiltLocked(false);
-                                setRoomReady(false);
+
                                 roomReadyRef.current = false;
 
                                 setShouldRenderRoom(false);
@@ -728,7 +750,7 @@ const DoorSection = ({
                 });
             }
         });
-    }, [isInsideRoom, isAnimating, camera, setCameraOverride, contextExitRoom]);
+    }, [isInsideRoom, isAnimating, camera, setCameraOverride, contextExitRoom, closeDoor]);
 
     // 监听 Esc 键退出房间。
     useEffect(() => {
@@ -750,76 +772,14 @@ const DoorSection = ({
             // 干扰即将开始的每秒 60 帧 GSAP 动画。
             // setExitRequested(false) 由 contextExitRoom()
             // 在动画末尾安全处理。
-            exitRoom(); // 触发退出动画。
+            const frame = requestAnimationFrame(exitRoom);
+            return () => cancelAnimationFrame(frame);
         }
     }, [exitRequested, isInsideRoom, isAnimating, exitRoom]);
 
-    const closeDoor = useCallback((onDoorClosed) => {
-        if (!doorRef.current || !isOpen) return;
-        if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
-        if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
-
-        setIsAnimating(true);
-
-        if (closeAudioRef.current) {
-            setTimeout(() => {
-                const vol = isMuted ? 0 : DOOR_AUDIO_SETTINGS.closeVolume * globalVolume;
-                if (closeAudioRef.current) {
-                    closeAudioRef.current.setVolume(vol);
-                    if (closeAudioRef.current.isPlaying) closeAudioRef.current.stop();
-                    closeAudioRef.current.play();
-                }
-            }, DOOR_AUDIO_SETTINGS.closeDelay * 1000);
-        }
-
-        // 重置把手。
-        if (handleRef.current) {
-            gsap.to(handleRef.current.rotation, {
-                z: 0,
-                duration: 0.2,
-                ease: 'power2.out'
-            });
-        }
-
-        // 反向执行笔刷显现，去除门上的彩色层。
-        if (doorMaterialRef.current) {
-            gsap.to(doorMaterialRef.current, {
-                uProgress: 0.0,
-                duration: 0.6,
-                ease: 'power2.out',
-                overwrite: true
-            });
-        }
-        if (handleMaterialRef.current) {
-            gsap.to(handleMaterialRef.current, {
-                uProgress: 0.0,
-                duration: 0.6,
-                ease: 'power2.out',
-                overwrite: true
-            });
-        }
-        // 动画完成后隐藏彩色层。
-        if (handleHideDelayRef.current) handleHideDelayRef.current.kill();
-        handleHideDelayRef.current = gsap.delayedCall(0.65, () => {
-            if (handlePaintedRef.current) handlePaintedRef.current.visible = false;
-            if (doorPaintedRef.current) doorPaintedRef.current.visible = false;
-        });
-
-        gsap.to(doorRef.current.rotation, {
-            y: 0,
-            duration: 0.6,
-            ease: 'power2.in',
-            onComplete: () => {
-                setIsOpen(false);
-                setIsAnimating(false);
-                // 调用可选的完成回调。
-                onDoorClosed?.();
-            }
-        });
-    }, [isOpen]);
-
     // 处理悬停效果。
     const handlePointerEnter = () => {
+        void prefetchRoom(ROOM_LABELS[label]).catch(() => {});
         if (isOpen || isAnimating) return;
         setIsHovered(true);
         document.body.style.cursor = "pointer";
@@ -934,13 +894,9 @@ const DoorSection = ({
     const doorMeshX = side === 'left' ? doorWidth / 2 : -doorWidth / 2;
 
     // 把手位置按纹理确定，左侧门的把手在右边。
-    const handlePivotX = side === 'left' ? doorWidth * 0.25 : -doorWidth * 0.25;
 
     // 标牌纹理映射，现统一使用空白标牌纹理。
     const signTextureUrl = 'https://media.secknow-ai.com/space/textures/corridor/pustatabliczka.png?imageMogr2/thumbnail/2048x1024';
-    const signLegacyRatio = 1.792; // 2752x1536
-    const signHeight = 0.55;
-    const signWidth = signHeight * signLegacyRatio;
     const signTexture = useTexture(signTextureUrl);
 
     return (
@@ -1026,12 +982,6 @@ const DoorSection = ({
                     // 门槛宽度等于门洞宽度，约 1.1。
                     const THRESH_W = 1.1;   // 宽度沿局部 X 轴，即沿墙面方向。
                     const THRESH_D = 0.15;  // 深度沿局部 Z 轴，即伸入走廊方向。
-                    const threshTex = baseboardTexture.clone();
-                    threshTex.needsUpdate = true;
-                    threshTex.wrapS = threshTex.wrapT = THREE.RepeatWrapping;
-                    threshTex.rotation = 0;
-                    threshTex.offset.set(0, 0);
-                    threshTex.repeat.set(THRESH_W / NATURAL_TILE_W, 1);
                     return (
                         <mesh
                             position={[wallOffsetX, -CORRIDOR_HEIGHT / 2 + 0.005, 0.02]}
@@ -1039,7 +989,7 @@ const DoorSection = ({
                         >
                             <planeGeometry args={[THRESH_W, THRESH_D]} />
                             <meshBasicMaterial color="#e0e0e0"
-                                map={threshTex}
+                                map={thresholdTexture}
                                 roughness={0.9}
                                 metalness={0}
                                 side={THREE.DoubleSide}
@@ -1072,7 +1022,7 @@ const DoorSection = ({
                         {label === "作品画廊" && (
                             <group position={[0, 0, 0.01]}>
                                 <Text
-                                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                                    font="/fonts/LXGWWenKaiLite-site.woff"
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
@@ -1082,7 +1032,7 @@ const DoorSection = ({
                                     我的
                                 </Text>
                                 <Text
-                                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                                    font="/fonts/LXGWWenKaiLite-site.woff"
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
@@ -1096,7 +1046,7 @@ const DoorSection = ({
                         {label === "生活手记" && (
                             <group position={[0, 0, 0.01]}>
                                 <Text
-                                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                                    font="/fonts/LXGWWenKaiLite-site.woff"
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
@@ -1106,7 +1056,7 @@ const DoorSection = ({
                                     生活
                                 </Text>
                                 <Text
-                                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                                    font="/fonts/LXGWWenKaiLite-site.woff"
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
@@ -1119,7 +1069,7 @@ const DoorSection = ({
                         )}
                         {label === "关于我" && (
                             <Text
-                                font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                                font="/fonts/LXGWWenKaiLite-site.woff"
                                 fontSize={0.30}
                                 color="#111111"
                                 anchorX="center"
@@ -1131,7 +1081,7 @@ const DoorSection = ({
                         )}
                         {label === "联系我" && (
                             <Text
-                                font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                                font="/fonts/LXGWWenKaiLite-site.woff"
                                 fontSize={0.25}
                                 color="#111111"
                                 anchorX="center"

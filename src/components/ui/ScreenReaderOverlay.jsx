@@ -1,4 +1,5 @@
-import { useScene } from '../../context/SceneContext';
+import { useScene } from '../../context/contexts';
+
 import { useGalleryProjects, useStudioContent } from '../../hooks/useContentData';
 import '../../styles/ScreenReaderOverlay.scss';
 import { personalProfile, contactInfo, siteInfo, resumeInfo, studioWishes } from '../../data/content';

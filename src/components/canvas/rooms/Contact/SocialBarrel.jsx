@@ -1,6 +1,8 @@
-import { useRef, useState, useEffect } from 'react';
+import Text from '../../SiteText';
+import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useTexture, Text } from '@react-three/drei';
+import { useTexture } from '@react-three/drei';
+
 import * as THREE from 'three';
 import gsap from 'gsap';
 import '../../shaders/RevealMaterial';
@@ -144,7 +146,7 @@ const SocialBarrel = ({ position, rotation = [0, 0, 0], texturePath, label, onCl
                     position={[0, scale[1] * 0.26, 0.05]} // 调整 Y，让文字落在木桶顶部木牌上。
                     rotation={[0, 0, 0.03]} // 轻微倾斜，匹配手绘木牌。
                     fontSize={scale[0] * 0.14}
-                    font="/fonts/LXGWWenKaiLite-Regular.ttf"
+                    font="/fonts/LXGWWenKaiLite-site.woff"
                     color="#111111"
                     fillOpacity={paintUniforms ? 0 : 1}
                     anchorX="center"

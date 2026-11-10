@@ -1,13 +1,10 @@
+import Text from '../SiteText';
 import { useMemo, memo, Suspense, useEffect } from 'react';
-import { Text } from '@react-three/drei';
+
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
-// 直接导入房间组件，纹理在加载阶段预加载。
-import GalleryRoom from '../rooms/Gallery/GalleryRoom';
-import StudioRoom from '../rooms/Studio/StudioRoom';
-import AboutRoom from '../rooms/About/AboutRoom';
-import ContactRoom from '../rooms/Contact/ContactRoom';
+import { ROOM_COMPONENTS, ROOM_LABELS } from '../../../config/roomResources';
 
 // 房间配置。
 const ROOM_CONFIG = {
@@ -74,12 +71,14 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
 
         // 左侧踢脚线。
         const bbLeft = bbTexSrc.clone();
+        bbLeft.colorSpace = THREE.SRGBColorSpace;
         bbLeft.needsUpdate = true;
         bbLeft.wrapS = bbLeft.wrapT = THREE.RepeatWrapping;
         bbLeft.repeat.set(corridorDepth / NATURAL_TILE_W, 1);
 
         // 右侧踢脚线。
         const bbRight = bbTexSrc.clone();
+        bbRight.colorSpace = THREE.SRGBColorSpace;
         bbRight.needsUpdate = true;
         bbRight.wrapS = bbRight.wrapT = THREE.RepeatWrapping;
         bbRight.repeat.set(corridorDepth / NATURAL_TILE_W, 1);
@@ -94,6 +93,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
             threshold: new THREE.MeshBasicMaterial({ color: '#e0e0e0', 
                 map: (() => {
                     const t = bbTexSrc.clone();
+                    t.colorSpace = THREE.SRGBColorSpace;
                     t.needsUpdate = true;
                     t.wrapS = t.wrapT = THREE.RepeatWrapping;
                     t.repeat.set(corridorWidth / NATURAL_TILE_W, 1);
@@ -107,7 +107,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
             roomWall: new THREE.MeshBasicMaterial({ color: '#f0f0f0', side: THREE.DoubleSide }),
             roomBackWall: new THREE.MeshBasicMaterial({ color: '#f5f5f5', side: THREE.DoubleSide }),
         };
-    }, [floorTexSrc, wallTexSrc, ceilingTexSrc, bbTexSrc]);
+    }, [floorTexSrc, wallTexSrc, ceilingTexSrc, bbTexSrc, corridorWidth, corridorHeight, corridorDepth]);
 
     // 缓存几何体。
     const geometries = useMemo(() => ({
@@ -118,9 +118,20 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
         roomFloorCeiling: new THREE.PlaneGeometry(roomWidth, roomDepth),
         roomSideWall: new THREE.PlaneGeometry(roomDepth, roomHeight),
         roomBackWall: new THREE.PlaneGeometry(roomWidth, roomHeight)
-    }), []);
+    }), [corridorDepth, corridorHeight, corridorWidth, roomDepth, roomHeight, roomWidth]);
 
-    const isGallery = label === "作品画廊";
+    useEffect(() => () => {
+        Object.values(materials).forEach(material => {
+            material.map?.dispose();
+            material.dispose();
+        });
+    }, [materials]);
+
+    useEffect(() => () => {
+        Object.values(geometries).forEach(geometry => geometry.dispose());
+    }, [geometries]);
+
+    const Room = ROOM_COMPONENTS[ROOM_LABELS[label]];
 
     // 通用房间没有独立组件负责就绪通知，需在此触发 onReady。
     useEffect(() => {
@@ -191,33 +202,10 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
             {/* 房间内容。 */}
             {showRoom && (
                 <group>
-                    {isGallery ? (
-                        // 画廊房间。
-                        // 位于走廊末端。
+                    {Room ? (
                         <group position={[0, -0.5, -corridorDepth]}>
                             <Suspense fallback={null}>
-                                <GalleryRoom showRoom={showRoom} onReady={onReady} isExiting={isExiting} />
-                            </Suspense>
-                        </group>
-                    ) : label === "生活手记" ? (
-                        // 生活手记房间。
-                        <group position={[0, -0.5, -corridorDepth]}>
-                            <Suspense fallback={null}>
-                                <StudioRoom showRoom={showRoom} onReady={onReady} isExiting={isExiting} />
-                            </Suspense>
-                        </group>
-                    ) : label === "关于我" ? (
-                        // 关于我房间。
-                        <group position={[0, -0.5, -corridorDepth]}>
-                            <Suspense fallback={null}>
-                                <AboutRoom showRoom={showRoom} onReady={onReady} isExiting={isExiting} />
-                            </Suspense>
-                        </group>
-                    ) : label === "联系我" ? (
-                        // 联系我房间。
-                        <group position={[0, -0.5, -corridorDepth]}>
-                            <Suspense fallback={null}>
-                                <ContactRoom showRoom={showRoom} onReady={onReady} isExiting={isExiting} />
+                                <Room showRoom={showRoom} onReady={onReady} isExiting={isExiting} />
                             </Suspense>
                         </group>
                     ) : (

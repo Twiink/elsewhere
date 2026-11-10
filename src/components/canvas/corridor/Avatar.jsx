@@ -1,5 +1,6 @@
+import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
 import { useRef } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useThree } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 

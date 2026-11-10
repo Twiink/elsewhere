@@ -1,12 +1,13 @@
+import { useScene } from '../../context/contexts';
 import { useEffect, useRef } from 'react';
-import { useScene } from '../../context/SceneContext';
+
 import { personalProfile, resumeInfo } from '../../data/content';
 import { getProfileSections } from '../../data/profile.js';
 import ProfileContent from './ProfileContent';
 import '../../styles/AboutProfile.scss';
 
 export default function AboutProfile() {
-    const { currentRoom, hasEntered, isInRoom, isTeleporting, overlayContent, openOverlay, closeOverlay } = useScene();
+    const { overlayContent, closeOverlay } = useScene();
     const dialogRef = useRef(null);
     const bodyRef = useRef(null);
     const isOpen = overlayContent?.layout === 'profile';
@@ -31,17 +32,6 @@ export default function AboutProfile() {
 
     return (
         <>
-            {hasEntered && isInRoom && currentRoom === 'about' && !isTeleporting && (
-                <button
-                    type="button"
-                    className="about-profile-trigger"
-                    aria-haspopup="dialog"
-                    aria-controls="about-profile-dialog"
-                    onClick={() => openOverlay({ layout: 'profile' })}
-                >
-                    阅读关于我
-                </button>
-            )}
             <dialog
                 ref={dialogRef}
                 id="about-profile-dialog"
@@ -49,6 +39,7 @@ export default function AboutProfile() {
                 aria-labelledby="about-profile-title"
                 onCancel={closeOverlay}
                 onClose={closeOverlay}
+                onKeyDown={event => { if (event.key === 'Escape') event.stopPropagation(); }}
                 onClick={event => { if (event.target === event.currentTarget) closeOverlay(); }}
             >
                 <div className="about-profile-paper">
