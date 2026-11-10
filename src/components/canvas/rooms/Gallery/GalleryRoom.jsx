@@ -40,7 +40,6 @@ const GALLERY_INTERACTION_AUDIO_SETTINGS = {
 // 画廊内容来自统一的本地数据文件。
 
 
-const PROJECT_COUNT = 10; // 保留足够数量，营造无限滚动感。
 const GAP = 2.5;
 
 // 调整这些数值以匹配鸟的比例，原始比例 1.41。
@@ -169,7 +168,9 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     // 用 matchMedia('(hover: hover)') 检测鼠标与悬停能力。
     const [canHover, setCanHover] = useState(() => typeof window !== 'undefined' ? window.matchMedia('(hover: hover)').matches : true);
 
-    const activeProjects = useGalleryProjects();
+    const allProjects = useGalleryProjects();
+    // 正文可以先发布，封面上传后再将对应项目加入三维纸卡。
+    const activeProjects = useMemo(() => allProjects.filter(project => project.front), [allProjects]);
 
     useEffect(() => {
         const mq = window.matchMedia('(hover: hover)');
@@ -217,11 +218,9 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     ), [projectTextures, paintedTextures, backTextureRaw, overlayTextureRaw]);
     useEffect(() => () => colorTextures.forEach(texture => texture.dispose()), [colorTextures]);
 
-    // 构造重复项目列表，并附加纹理。
+    // 每个项目只挂一张纸卡，循环滚动由位置取模完成。
     const projects = useMemo(() => {
-        return Array.from({ length: PROJECT_COUNT }).map((_, i) => {
-            const projectIndex = i % activeProjects.length;
-            const projectData = activeProjects[projectIndex];
+        return activeProjects.map((projectData, projectIndex) => {
 
             // 提取正面纹理。
             const frontTex = colorTextures.get(projectTextures[projectIndex]);
@@ -237,7 +236,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 
             return {
                 ...projectData,
-                index: i,
+                index: projectIndex,
                 frontTexture: frontTex,
                 paintedTexture: (paintedTex !== frontTex && canHover) ? paintedTex : null,
                 backTexture: colorTextures.get(backTextureRaw),
@@ -249,7 +248,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 
     // 滚动到指定项目索引的函数。
     const scrollToIndex = (index, onComplete) => {
-        const totalWidth = PROJECT_COUNT * GAP;
+        const totalWidth = projects.length * GAP;
         const targetScrollValue = index * GAP;
         const currentScrollValue = currentScroll.current;
 
@@ -458,12 +457,12 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                     {/* 项目卡片。 */}
                     {projects.map((project, i) => (
                         <ProjectCard
-                            key={i}
+                            key={project.id}
                             index={i}
                             ref={el => cardRefs.current[i] = el}
                             project={project}
                             clothespinTexture={clothespinTexture}
-                            total={PROJECT_COUNT}
+                            total={projects.length}
                             currentScroll={currentScroll}
                             materials={materials}
                             curve={curve}
@@ -637,7 +636,7 @@ const FlyingBird = ({ texture }) => {
 };
 
 // 单张项目卡片子组件。
-const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, currentScroll, curve, isSelected, scrollToIndex, onClick, isMobile, isTransitioning, paintProgress, roomOrigin }, ref) => {
+const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture, currentScroll, curve, isSelected, scrollToIndex, onClick, isMobile, isTransitioning, paintProgress, roomOrigin }, ref) => {
     const { openOverlay } = useScene();
     const cardRef = useRef();
     const paperRef = useRef(); // 可移动纸张部分的引用。
@@ -1000,7 +999,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
         // 仅在翻转动画期间跳过位置更新，滚动时仍更新。
         if (isAnimating || isSelected) return;
 
-        const totalWidth = PROJECT_COUNT * GAP; // GAP 在当前文件中定义，可直接访问。
+        const totalWidth = total * GAP;
         let rawX = (index * GAP) - currentScroll.current;
         const halfWidth = totalWidth / 2;
         let displayX = ((rawX + halfWidth) % totalWidth + totalWidth) % totalWidth - halfWidth;
@@ -1027,6 +1026,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
     return (
         <group
             ref={cardRef}
+            name={`project-card-${project.id}`}
             onClick={handleClick}
             onPointerEnter={(e) => {
                 if (isMobile || isTransitioning) return;
@@ -1084,6 +1084,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                         mapBack={project.backTexture}
                         mapPainted={project.paintedTexture}
                         side={THREE.DoubleSide}
+                        alphaTest={0.1}
                         roughness={0.6}
                         paintProgress={paintProgress}
                         roomOrigin={roomOrigin}
@@ -1250,6 +1251,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                 */}
                 <Text
                     ref={textRef}
+                    visible={!project.titleInCover}
                     position={[0, 0.7, 0]} // 这里只有前两个参数 X、Y 生效。
                     fontSize={project.cardTitle ? 0.15 : 0.20}
                     maxWidth={project.cardTitle ? 1.3 : undefined}

@@ -4,7 +4,7 @@
 
 已接入第一批个人资料：网站名为 **Twiink's Space**，介绍为“做点有趣的东西，放一些舍不得关掉的脑洞。”入口窗边、走廊和云上人物使用根据用户照片制作的黑白线稿，发布用纹理位于 `public/textures/twiink/`。照片参考仅在本地忽略目录中保存。
 
-「关于我」已接入个人简介、技术栈、六段经历、兴趣和项目成果，统一编辑 `src/data/profile.json`。房间里的纸片、经历岛屿、技能气球和完整阅读面板共用这些资料。画廊已接入「泡芙大作战 PuffWar 乐园」「无界宇宙 Infinite Cosmos」「SecKnow AI 教育平台」「RAG 中台 RAG-Center」和「HarnessPRD 智能需求文档平台」五个个人项目，包含完整介绍、图片或开场视频，以及小程序码、官网或 GitHub 源码入口。「联系我」已接入邮箱、GitHub、微信和站内留言入口，纸页中的「随便聊聊」展示六条已确认的常见问题；生活手记收录四篇生活存档与一篇人物形象制作记录。示例内容中的 `authorName` 保留原作者归属。站点域名按用户提供的 `http://space.twiink.cn` 配置，站点与联系人信息在 `content.json` 的 `site` 中编辑。
+「关于我」已接入个人简介、技术栈、六段经历、兴趣和项目成果，统一编辑 `src/data/profile.json`。房间里的纸片、经历岛屿、技能气球和完整阅读面板共用这些资料。画廊已接入「泡芙大作战 PuffWar 乐园」「无界宇宙 Infinite Cosmos」「SecKnow AI 教育平台」「RAG 中台 RAG-Center」「HarnessPRD 智能需求文档平台」「齐爱农」和「海晶集团全员创新平台」七个个人项目，提供完整介绍，以及已备齐的图片、开场视频、小程序码、官网或 GitHub 源码入口。「联系我」已接入邮箱、GitHub、微信和站内留言入口，纸页中的「随便聊聊」展示六条已确认的常见问题；生活手记收录四篇生活存档与一篇人物形象制作记录。示例内容中的 `authorName` 保留原作者归属。站点域名按用户提供的 `http://space.twiink.cn` 配置，站点与联系人信息在 `content.json` 的 `site` 中编辑。
 
 ## 本地运行
 
@@ -60,7 +60,7 @@ npm run build:compressed
 | 字段 | 内容 | 数量 |
 | --- | --- | --- |
 | `site` | 站点标题、一句话介绍、域名及社交链接 | 1 |
-| `projects` | 画廊项目：5 个个人项目 | 5 |
+| `projects` | 画廊条目：7 个个人项目及 1 份开源贡献记录 | 8 |
 | `studio` | 四篇生活存档与一篇人物形象制作记录 | 5 |
 | `studioWishCard` | 旋转显示器塔中的「想做的事」卡片入口与封面 | 1 |
 | `wishes` | 想做的事：长白山、雪山与滑雪 | 3 |
@@ -73,24 +73,39 @@ npm run build:compressed
 
 ### 编辑项目介绍
 
-画廊的五张卡片依次是「泡芙大作战 PuffWar 乐园」「无界宇宙 Infinite Cosmos」「SecKnow AI 教育平台」「RAG 中台 RAG-Center」和「HarnessPRD 智能需求文档平台」。点击翻转，再点「查看项目」即可阅读完整介绍；也可以使用画廊顶部的「阅读项目介绍」，在面板内切换项目。介绍中提供项目图片或开场视频、小程序码、官网或 GitHub 源码链接，工具说明默认收起。视频由访客点击播放，切换项目或关闭介绍时停止播放。
+画廊的纸卡依次是「泡芙大作战 PuffWar 乐园」「无界宇宙 Infinite Cosmos」「SecKnow AI 教育平台」「RAG 中台 RAG-Center」「HarnessPRD 智能需求文档平台」「齐爱农」「海晶集团全员创新平台」和「开源贡献」。点击翻转，再点「查看项目」即可阅读完整介绍，也可在面板内切换项目。介绍中提供项目图片或开场视频、小程序码、官网、PR 或 GitHub 源码链接，工具说明默认收起。视频由访客点击播放，切换项目或关闭介绍时停止播放。
 
-页面直接读取 `src/data/content.json` 的 `projects`，五个个人项目的 `id` 分别为 `puffwar`、`boundless-universe`、`secknow`、`rag-center` 和 `harness-prd`。保存 JSON 后开发预览会更新；线上环境需要重新构建部署。
+纸卡数量取自实际项目，每个条目一张；循环滚动只改变位置，不补重复卡片。阅读面板通过标题旁的「切换项目」下拉菜单选择条目，下方保留一排正文目录；窄屏可横向滚动目录。
+
+页面读取 `src/data/content.json` 的 `projects`，七个个人项目的 `id` 分别为 `puffwar`、`boundless-universe`、`secknow`、`rag-center`、`harness-prd`、`qiainong` 和 `haijing`；`open-source` 是开源贡献合集。保存 JSON 后开发预览会更新；线上环境需要重新构建部署。
+
+「齐爱农」已接入确认文案、两条报道链接、小程序首页设计图与微信小程序码，并在三维画廊展示秋收与粮库主题的新封面。图片均从 `https://media.secknow-ai.com/space/content/projects/qiainong/` 加载，封面使用 `cover-sketch-v2.png`、`cover-color-v2.png`，标题由场景文字层绘制。PNG 地址由对象存储按浏览器能力返回合适格式。附件原件、上传清单与来源记录保存在本地忽略目录 `assets/projects/qiainong/`。
+
+「海晶集团全员创新平台」已接入确认文案、黑白和彩色纸卡及微信小程序码。三张图片均从 `https://media.secknow-ai.com/space/content/projects/haijing/` 加载，封面使用厂区同事讨论主题的 `cover-sketch-v2.png`、`cover-color-v2.png`，标题由场景文字层绘制。附件原件、文稿及上传和核验摘要保存在 `assets/projects/haijing/`。
+
+「开源贡献」收录 Agenta、LoopX、DeerFlow、Apache Superset 的六个 PR，以及自己的 AgentTemplate、EnvSetup 仓库。四张手绘示意图解释对应改动，每段正文下直接提供原始链接。协作工作台主题的黑白和彩色封面从 `https://media.secknow-ai.com/space/content/projects/open-source/cover-{sketch,color}-v2.png` 加载。正文配图组件为 `src/components/ui/ContributionIllustration.jsx`，以网页代码绘制；正文、链接和插画说明统一编辑 `content.json`。
+
+画廊全部八个条目已统一为铅笔线稿与淡彩插画，每个条目包含黑白、彩色两版，均从对象存储加载 `cover-sketch-v2.png`、`cover-color-v2.png`。1086×1448 PNG 原件分两批保存在本地 `assets/gallery-cover-refresh/upload/space/content/projects/` 和 `assets/gallery-cover-refresh/remaining/upload/space/content/projects/`，对应的 `manifest.json` 记录精确提示词、尺寸、哈希和对象地址。八个条目均使用 `titleInCover: false`，标题由场景文字层绘制在图片顶部留白处；支持悬停的设备显现彩色版。
 
 | 字段 | 用途 |
 | --- | --- |
 | `title`、`shortTitle`、`cardTitle` | 完整名称、简称和卡片上的分行标题，换行写成 `\n` |
+| `titleInCover` | 封面本身已画好标题时设为 `true`，纸卡使用图中的标题 |
+| `front`、`painted` 为空 | 素材上传前可先开放完整文字介绍，上传核验后填写图片地址启用纸卡 |
 | `description`、`cardNotes`、`cardNotesTitle` | 纸卡背面的短介绍、游玩提示和提示栏标题 |
 | `details.tagline` | 阅读面板的一句话介绍 |
 | `details.sections` | 正文各节：`paragraphs` 一项一段，`entries` 填标题 `title` 和说明 `description`；保留 `id` 以供目录定位，`collapsible: true` 表示默认折叠 |
+| `details.sections[].navLabel` | 可选的目录文字，适用于开源小记、贡献记录和自己的项目等章节 |
+| `details.sections[].entries[].links` | 段落下的原始链接，各项填写 `title` 和 `url`；同步输出到搜索 HTML 与 `/llms.txt` |
+| `details.sections[].entries[].illustration` | 手绘配图：`kind` 为 `agenta`、`loopx`、`deerflow` 或 `superset`；`alt` 描述画面，`caption` 是图注 |
 | `details.photos` | 项目图片：`src` 是图片路径，`alt` 是画面描述，`caption` 是图片下的文字，`width`、`height` 填原尺寸 |
 | `details.photosLabel`、`details.photosTitle` | 图片目录的名称和图片区标题，未设置时沿用现场照片的称呼 |
 | `details.videos` | 视频：`src`、`poster` 是视频和封面路径，`title`、`caption` 描述内容，`mimeType` 填视频格式，`width`、`height` 填原尺寸，`hasAudio: false` 表示无声 |
-| `details.references` | 视频下的补充入口：`title` 填链接文字，`url` 填地址 |
+| `details.references`、`details.referencesTitle` | 相关报道或补充链接：各项填写 `title` 和 `url`，可自定义这一节的标题 |
 | `details.entry` | 项目入口：`title`、`description` 和可选 `hint` 填说明；小程序填 `image`、`width`、`height`，网站填 `url` 与链接文字 `label` |
 | `seoTitle`、`seoDescription` | 搜索摘要；详细正文也会同步输出到搜索 HTML 和 `/llms.txt` |
 
-发布用素材分别在 `public/content/projects/puffwar/`、`public/content/projects/boundless-universe/`、`public/content/projects/secknow/`、`public/content/projects/rag-center/` 和 `public/content/projects/harness-prd/`；附件原件、确认版文稿与来源记录保存在 `assets/projects/` 下的对应目录。页面正文以 JSON 为准，`copy-draft.md` 是确认文稿的归档。SecKnow 的竖版海报用于纸卡封面，横版海报、两张页面截图和户外照片用于阅读面板。RAG-Center 与 HarnessPRD 的竖版海报用于纸卡封面，阅读面板展示界面展示图与海报，并在底部提供 GitHub 仓库入口；发布副本转换为 WebP，原件保留。
+早期项目素材归档分别在 `public/content/projects/puffwar/`、`public/content/projects/boundless-universe/`、`public/content/projects/secknow/`、`public/content/projects/rag-center/` 和 `public/content/projects/harness-prd/`；附件原件、确认版文稿与来源记录保存在 `assets/projects/` 下的对应目录，页面图片以 JSON 中的对象存储地址为准。页面正文以 JSON 为准，`copy-draft.md` 是确认文稿的归档。SecKnow 的横版海报、两张页面截图和户外照片用于阅读面板。RAG-Center 与 HarnessPRD 的阅读面板展示界面展示图与海报，并在底部提供 GitHub 仓库入口。
 
 ### 编辑联系方式
 

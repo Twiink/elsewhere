@@ -2,6 +2,7 @@ import { useScene } from '../../context/contexts';
 import { useEffect, useRef } from 'react';
 
 import { galleryProjects } from '../../data/content';
+import ContributionIllustration from './ContributionIllustration';
 import '../../styles/AboutProfile.scss';
 import '../../styles/ProjectDetails.scss';
 
@@ -13,9 +14,19 @@ function ProjectSection({ section }) {
         {section.entries.length > 0 && (
             <ul className="project-detail-entries">
                 {section.entries.map(entry => (
-                    <li key={entry.title}>
-                        <h4>{entry.title}</h4>
-                        <p>{entry.description}</p>
+                    <li key={entry.title} className={entry.illustration ? 'project-detail-illustrated-entry' : undefined}>
+                        <div>
+                            <h4>{entry.title}</h4>
+                            <p>{entry.description}</p>
+                            {entry.links?.length > 0 && (
+                                <div className="project-entry-links">
+                                    {entry.links.map(link => (
+                                        <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer">{link.title}</a>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        {entry.illustration && <ContributionIllustration {...entry.illustration} />}
                     </li>
                 ))}
             </ul>
@@ -75,32 +86,38 @@ export default function ProjectDetails() {
                     <div className="about-profile-paper">
                         <header className="about-profile-header">
                             <h2 id="project-details-title">{project.title}</h2>
-                            <button type="button" className="studio-close-btn" aria-label="关闭项目介绍" onClick={closeOverlay}>
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <line x1="6" y1="6" x2="18" y2="18" />
-                                    <line x1="6" y1="18" x2="18" y2="6" />
-                                </svg>
-                            </button>
+                            <div className="project-header-actions">
+                                {readableProjects.length > 1 && (
+                                    <label className="project-detail-picker">
+                                        <select
+                                            aria-label="切换项目"
+                                            value=""
+                                            onChange={event => openOverlay({ layout: 'project', projectId: event.target.value })}
+                                        >
+                                            <option value="" disabled>切换项目</option>
+                                            {readableProjects.map(item => (
+                                                <option key={item.id} value={item.id} disabled={item.id === project.id}>{item.shortTitle || item.title}</option>
+                                            ))}
+                                        </select>
+                                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg>
+                                    </label>
+                                )}
+                                <button type="button" className="studio-close-btn" aria-label="关闭项目介绍" onClick={closeOverlay}>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <line x1="6" y1="6" x2="18" y2="18" />
+                                        <line x1="6" y1="18" x2="18" y2="6" />
+                                    </svg>
+                                </button>
+                            </div>
                         </header>
-                        {readableProjects.length > 1 && (
-                            <nav className="project-detail-switcher" aria-label="切换项目">
-                                {readableProjects.map(item => (
-                                    <button
-                                        key={item.id}
-                                        type="button"
-                                        aria-pressed={item.id === project.id}
-                                        onClick={() => openOverlay({ layout: 'project', projectId: item.id })}
-                                    >
-                                        {item.shortTitle || item.title}
-                                    </button>
-                                ))}
-                            </nav>
-                        )}
                         <nav className="about-profile-nav" aria-label="项目介绍目录">
-                            <a href="#project-story" onClick={event => goToSection(event, 'story')}>项目介绍</a>
+                            <a href="#project-story" onClick={event => goToSection(event, 'story')}>{project.details.sections.find(section => section.id === 'story')?.navLabel || '项目介绍'}</a>
                             {photos.length > 0 && <a href="#project-photos" onClick={event => goToSection(event, 'photos')}>{project.details.photosLabel || '现场照片'}</a>}
                             {videos.length > 0 && <a href="#project-videos" onClick={event => goToSection(event, 'videos')}>开场小片段</a>}
-                            <a href="#project-contributions" onClick={event => goToSection(event, 'contributions')}>我做了什么</a>
+                            {project.details.sections.filter(section => section.id !== 'story' && (section.id === 'contributions' || section.navLabel)).map(section => (
+                                <a key={section.id} href={`#project-${section.id}`} onClick={event => goToSection(event, section.id)}>{section.navLabel || '我做了什么'}</a>
+                            ))}
+                            {project.details.references?.length > 0 && <a href="#project-references" onClick={event => goToSection(event, 'references')}>{project.details.referencesTitle || '相关链接'}</a>}
                             <a href="#project-entry" onClick={event => goToSection(event, 'entry')}>{entry.navLabel || (entry.image ? '打开小程序' : '访问网站')}</a>
                         </nav>
                         <div key={project.id} ref={bodyRef} className="about-profile-body project-details-body" tabIndex={0} aria-label="项目介绍正文">
@@ -144,15 +161,20 @@ export default function ProjectDetails() {
                                                     </figure>
                                                 ))}
                                             </div>
-                                            {project.details.references?.map(reference => (
-                                                <p key={reference.url} className="project-detail-reference">
-                                                    <a href={reference.url} target="_blank" rel="noopener noreferrer">{reference.title}</a>
-                                                </p>
-                                            ))}
                                         </section>
                                     )}
                                 </div>
                             ))}
+                            {project.details.references?.length > 0 && (
+                                <section className="project-detail-section" id="project-references">
+                                    <h3>{project.details.referencesTitle || '相关链接'}</h3>
+                                    {project.details.references.map(reference => (
+                                        <p key={reference.url} className="project-detail-reference">
+                                            <a href={reference.url} target="_blank" rel="noopener noreferrer">{reference.title}</a>
+                                        </p>
+                                    ))}
+                                </section>
+                            )}
                             <section className={`project-detail-section project-detail-entry${entry.image ? '' : ' project-detail-entry-site'}`} id="project-entry">
                                 <div>
                                     <h3>{entry.title}</h3>

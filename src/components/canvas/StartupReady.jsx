@@ -11,7 +11,8 @@ export default function StartupReady({ onReady, onError }) {
   useFrame(() => {
     if (started.current || ++frames.current < 3) return;
     started.current = true;
-    const compile = gl.compileAsync ? gl.compileAsync(scene, camera) : Promise.resolve().then(() => gl.compile(scene, camera));
+    // 字体布局可能替换材质，在同一任务内预编译，避免跨帧访问失效的材质。
+    const compile = Promise.resolve().then(() => gl.compile(scene, camera));
     Promise.all([compile, document.fonts.load('16px "霞鹜文楷"', '创意工坊')])
       .then(() => { if (active.current) onReady(); })
       .catch(() => { if (active.current) onError(); });

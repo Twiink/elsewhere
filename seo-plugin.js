@@ -58,7 +58,8 @@ export function buildJsonLd({ site, projects, studio, wishes = [], awards, faq, 
                 item: {
                     '@type': 'CreativeWork', name: item.seoTitle || item.title,
                     description: item.seoDescription || item.description,
-                    url: item.url, image: absoluteUrl(item.front, site.url),
+                    url: item.url,
+                    ...(item.front ? { image: absoluteUrl(item.front, site.url) } : {}),
                     creator: contentAuthor(item, personId), inLanguage: 'zh-CN',
                 },
             })),
@@ -129,7 +130,13 @@ export function buildLlmsTxt({ site, projects, studio, wishes = [], awards, faq,
             }
             for (const section of item.details?.sections || []) {
                 lines.push(`### ${section.title}`, ...section.paragraphs);
-                for (const entry of section.entries) lines.push(`- ${entry.title}：${entry.description}`);
+                for (const entry of section.entries) {
+                    lines.push(`- ${entry.title}：${entry.description}`);
+                    for (const link of entry.links || []) lines.push(`  [${link.title}](${link.url})`);
+                }
+            }
+            for (const reference of item.details?.references || []) {
+                lines.push(`- [${reference.title}](${reference.url})`);
             }
         }
         if (title === '生活手记' && wishes.length) {
@@ -164,11 +171,16 @@ export function buildProfileHtml(profile) {
 }
 
 function buildProjectBody(item) {
-    return (item.details?.sections || []).map(section => {
+    const body = (item.details?.sections || []).map(section => {
         const paragraphs = section.paragraphs.map(text => `<p>${escapeHtml(text)}</p>`).join('');
-        const entries = section.entries.map(entry => `<li><h5>${escapeHtml(entry.title)}</h5><p>${escapeHtml(entry.description)}</p></li>`).join('');
+        const entries = section.entries.map(entry => {
+            const links = (entry.links || []).map(link => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.title)}</a>`).join(' · ');
+            return `<li><h5>${escapeHtml(entry.title)}</h5><p>${escapeHtml(entry.description)}</p>${links ? `<p>${links}</p>` : ''}</li>`;
+        }).join('');
         return `<section><h4>${escapeHtml(section.title)}</h4>${paragraphs}${entries ? `<ul>${entries}</ul>` : ''}</section>`;
     }).join('');
+    const references = (item.details?.references || []).map(reference => `<p><a href="${escapeHtml(reference.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(reference.title)}</a></p>`).join('');
+    return `${body}${references}`;
 }
 
 function buildStudioBody(item) {

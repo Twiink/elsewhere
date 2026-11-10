@@ -34,7 +34,11 @@
       "description": "欢迎技术交流、项目合作，也欢迎聊聊实习和工作机会。",
       "email": "zy13990529155@163.com",
       "wechatId": "xyz13990529155",
-      "topics": ["技术交流", "项目合作", "实习／工作机会"],
+      "topics": [
+        "技术交流",
+        "项目合作",
+        "实习／工作机会"
+      ],
       "showMessageForm": true
     }
   },
@@ -48,8 +52,9 @@
       "seoTitle": "泡芙大作战 PuffWar 乐园：把逛乐园变成一场闯关游戏",
       "seoDescription": "平时去线下乐园，大多就是到处逛逛、玩玩项目。做「泡芙大作战 PuffWar 乐园」的时候，我们想让逛乐园这件事更像在打一场真人的闯关游戏。\n\n进场戴上手环、用小程序绑好之后，就可以照着地图去找任务做了。在场馆里的游戏设备上刷手环打卡、闯关，手机里就会跟着攒积分、点亮图鉴和徽章，还能看看自己和所在阵营排在第几名。攒够了积分，可以直接在小程序商城里挑礼物，再去现场柜台把实物领走。\n\n里面还有一个我很喜欢的小玩法：走到场馆的大屏幕前扫个码，手机屏幕就会变成一个游戏手柄。拖一拖摇杆，就能直接操控大屏里的角色到处跑，还能顺手发个表情和文字上去，大家一起在屏幕前闹腾，气氛一下就热闹起来了。",
       "url": "/gallery",
-      "front": "https://media.secknow-ai.com/space/content/projects/puffwar/cover-sketch.png?imageMogr2/thumbnail/1200x1600",
-      "painted": "https://media.secknow-ai.com/space/content/projects/puffwar/cover-color.png?imageMogr2/thumbnail/1200x1600",
+      "front": "https://media.secknow-ai.com/space/content/projects/puffwar/cover-sketch-v2.png",
+      "painted": "https://media.secknow-ai.com/space/content/projects/puffwar/cover-color-v2.png",
+      "titleInCover": false,
       "techStack": [],
       "cardNotes": [
         "手环闯关",
@@ -190,8 +195,9 @@
       "seoTitle": "无界宇宙 Infinite Cosmos：带着小宇航员逛科技馆",
       "seoDescription": "去科技馆逛展的时候，很多小朋友和观众走马观花看一圈就出来了。「无界宇宙」想做的事情很简单：让大家进馆之后多一个自己的宇航员小分身，边逛展、边做任务，像在完成一场小小的太空探险。这也是我参与的第一个正式投入使用的小程序。\n\n进馆戴上手环、在手机里绑好之后，就能领到自己的小宇航员。一边在展馆里打卡做任务、攒积分，一边慢慢收集新装备和勋章——头盔、衣服、身边跟着的小玩偶，还有身上的小特效都能自己挑着搭。每次拿到新东西，回手机里给小人换一身装扮，逛展就多了一点收集的乐趣。\n\n走到馆里的互动大屏前，还可以掏出手机扫个码，把手机变成游戏手柄。穿过一段小小的太空隧道动画，刚才自己亲手打扮好的那个小宇航员就会降落到大屏幕上。手指拖一拖摇杆，大屏里的角色就跟着到处走，还能顺手发几句文字和表情上去凑热闹。\n\n逛完离场前，可以在小程序里看看今天一共攒了多少分、能去现场哪里换小奖品，也能把自己的宇航员造型和点亮的勋章生成一张纪念海报，存下来或者发给朋友看。",
       "url": "/gallery",
-      "front": "https://media.secknow-ai.com/space/content/projects/boundless-universe/cover-sketch.png?imageMogr2/thumbnail/1200x1600",
-      "painted": "https://media.secknow-ai.com/space/content/projects/boundless-universe/cover-color.png?imageMogr2/thumbnail/1200x1600",
+      "front": "https://media.secknow-ai.com/space/content/projects/boundless-universe/cover-sketch-v2.png",
+      "painted": "https://media.secknow-ai.com/space/content/projects/boundless-universe/cover-color-v2.png",
+      "titleInCover": false,
       "techStack": [],
       "cardNotesTitle": "在科技馆里",
       "cardNotes": [
@@ -330,8 +336,9 @@
       "seoTitle": "SecKnow AI 教育平台：让好奇心带你去探索",
       "seoDescription": "SecKnow 把图文、视频、互动实验、AI 答疑和趣味测验放进一节节课程里，让孩子边看、边动手试、边提问。老师可以在后台生成、预览和修改教材与教案。Twiink 参与了前后端、教材准备、课程学习、语音辅导、课程开通与后台管理。",
       "url": "https://www.secknow-ai.com/",
-      "front": "https://media.secknow-ai.com/space/content/projects/secknow/cover-sketch.png",
-      "painted": "https://media.secknow-ai.com/space/content/projects/secknow/cover-color.png",
+      "front": "https://media.secknow-ai.com/space/content/projects/secknow/cover-sketch-v2.png",
+      "painted": "https://media.secknow-ai.com/space/content/projects/secknow/cover-color-v2.png",
+      "titleInCover": false,
       "techStack": [],
       "cardNotesTitle": "边看边探索",
       "cardNotes": [
@@ -482,8 +489,9 @@
       "seoTitle": "RAG 中台 RAG-Center：帮你翻资料，也把出处找出来",
       "seoDescription": "平时不管是做项目还是大家一起干活，电脑和网盘里总会攒下一大堆 PDF、Word 和笔记。明明记得“这件事之前哪份文件里写过”，真着急用的时候，光靠搜一两个词还是得把好几个文档挨个点开，来回翻上半天；要是直接丢给 AI 问，有时候又怕它顺嘴胡编，不敢直接信。\n\n做「RAG 中台（RAG-Center）」的时候，我想做的其实就是个“帮人翻资料、还会把原文翻开指给你看”的小管家。平时把零散的文档传上去分门别类放好，想查什么的时候，直接像平时说话一样问就行——哪怕你随口问的是“出差住酒店能报多少”，而文件里写的是“差旅住宿标准”，记不清原话也没关系，它照样能顺着意思和字眼把那几段翻出来。\n\n要是碰到那种一句两句说不清、得翻好几份文件才能凑齐答案的问题，还可以切到“深度研究”。它会像个耐心的搭档一样，先把大问题拆成几件要先搞明白的小事，去资料库里分头翻一圈；发现哪块还缺材料，再顺着线索去补查一轮，最后把整理好的回答连着出处小标号一起摆到你面前。哪句话出自哪份文件、哪一节，点一下就能跳回原文核对；要是资料库里压根没写这件事，它也会老老实实告诉你还没找到依据，绝不硬编。",
       "url": "/gallery",
-      "front": "https://media.secknow-ai.com/space/content/projects/rag-center/cover-sketch.png",
-      "painted": "https://media.secknow-ai.com/space/content/projects/rag-center/cover-color.png",
+      "front": "https://media.secknow-ai.com/space/content/projects/rag-center/cover-sketch-v2.png",
+      "painted": "https://media.secknow-ai.com/space/content/projects/rag-center/cover-color-v2.png",
+      "titleInCover": false,
       "techStack": [],
       "cardNotesTitle": "查资料的时候",
       "cardNotes": [
@@ -620,8 +628,9 @@
       "seoTitle": "HarnessPRD 智能需求文档平台：把半成品点子聊透，理成能直接开工的清单",
       "seoDescription": "平时突然冒出个新点子，跟朋友或者搭档说“咱们做个……吧”，嘴上聊起来热火朝天，觉得三天就能做完；可真坐到电脑前准备动手，或者想让 AI 帮着写代码的时候，脑子一下就卡壳了——总共要有几个页面？按钮点完去哪儿？万一填错了或者中途反悔怎么处理？要是前期全靠一句“你懂我意思吧”，做到一半准得推倒重来。\n\n做「HarnessPRD 智能需求文档平台」（界面里叫 ReqFlow）的时候，我想做的其实就是个“陪你把想法聊明白、再理成开工资料”的小帮手。刚开始哪怕只有一个模糊念头也没关系，先把大概想法填进去，AI 就会像个爱操心的搭档一样，顺着你的话追问那些容易漏掉的细节。聊完之后，它会把刚补齐的内容整理出来摆在你面前，让你先过目确认“对，我就是这个意思”，再往下动笔。\n\n等最核心的“到底要做什么”拍板定下来了，它就会顺着这份底子，帮你理出三样可以直接拿去干活的东西：一份讲清楚功能和页面的产品说明书（PRD）、一份前后端对表用的数据接口清单，还有一份专门喂给 AI 编程工具的写代码任务单。如果手头本来就已经写好了一半文档，也不用从头走流程，直接塞进去就能接着往下写；全部收拾停当之后打包带走，就能踏踏实实开工了。",
       "url": "/gallery",
-      "front": "https://media.secknow-ai.com/space/content/projects/harness-prd/cover-sketch.png",
-      "painted": "https://media.secknow-ai.com/space/content/projects/harness-prd/cover-color.png",
+      "front": "https://media.secknow-ai.com/space/content/projects/harness-prd/cover-sketch-v2.png",
+      "painted": "https://media.secknow-ai.com/space/content/projects/harness-prd/cover-color-v2.png",
+      "titleInCover": false,
       "techStack": [],
       "cardNotesTitle": "准备开工前",
       "cardNotes": [
@@ -748,6 +757,356 @@
           "navLabel": "项目源码"
         }
       }
+    },
+    {
+      "id": "qiainong",
+      "title": "齐爱农",
+      "shortTitle": "齐爱农",
+      "cardTitle": "齐爱农\n粮食收购",
+      "titleInCover": false,
+      "description": "找粮库、约时间、看排队进度。跟语音助手「小齐」说说想办的事，让卖粮这趟路少一点来回打听。",
+      "seoTitle": "齐爱农：卖粮前，先问问小齐",
+      "seoDescription": "收完粮食往外拉的时候，农户最怕两件事：一是不知道附近哪个粮库今天收粮、价格怎么样；二是开着满载的大车赶过去，结果门口已经排起了长队，只能在路边干等大半天。\n\n做「齐爱农」这个微信小程序，就是想帮大家在装车出发前先把这些事摸清楚。打开手机就能看到附近的收储点和行情，提前约好送粮的时间；就算到了现场，也能在手机上看一眼自己的车走到了哪一步、前面大概还要等多久，不用一直守在窗口打听。\n\n考虑到很多种地的大叔大婶平时不习惯在手机上一层层翻菜单、打字，里面专门做了一个叫「小齐」的语音助手。按住说话就行，哪怕带着当地口音或者方言，随口问一句“附近哪儿能卖粮”“我今天想去送粮”，它都能听明白，顺着话头帮着查地方、办预约。",
+      "url": "/gallery",
+      "front": "https://media.secknow-ai.com/space/content/projects/qiainong/cover-sketch-v2.png",
+      "painted": "https://media.secknow-ai.com/space/content/projects/qiainong/cover-color-v2.png",
+      "techStack": [],
+      "cardNotes": [
+        "找粮库",
+        "预约卖粮",
+        "排队进度",
+        "语音帮忙"
+      ],
+      "cardNotesTitle": "卖粮这件事",
+      "authorName": "Twiink",
+      "details": {
+        "tagline": "帮乡亲们在拉粮出门前，先在手机上把去哪卖、怎么约、要等多久问明白的小程序。",
+        "sections": [
+          {
+            "id": "story",
+            "title": "项目介绍",
+            "paragraphs": [
+              "收完粮食往外拉的时候，农户最怕两件事：一是不知道附近哪个粮库今天收粮、价格怎么样；二是开着满载的大车赶过去，结果门口已经排起了长队，只能在路边干等大半天。",
+              "做「齐爱农」这个微信小程序，就是想帮大家在装车出发前先把这些事摸清楚。打开手机就能看到附近的收储点和行情，提前约好送粮的时间；就算到了现场，也能在手机上看一眼自己的车走到了哪一步、前面大概还要等多久，不用一直守在窗口打听。",
+              "考虑到很多种地的大叔大婶平时不习惯在手机上一层层翻菜单、打字，里面专门做了一个叫「小齐」的语音助手。按住说话就行，哪怕带着当地口音或者方言，随口问一句“附近哪儿能卖粮”“我今天想去送粮”，它都能听明白，顺着话头帮着查地方、办预约。"
+            ],
+            "entries": []
+          },
+          {
+            "id": "contributions",
+            "title": "我做了什么",
+            "paragraphs": [
+              "我在这个项目里主要负责「小齐」背后的 Agent 开发，也就是让这个语音助手不仅能陪人说话，还能真的帮大家把卖粮的事办成："
+            ],
+            "entries": [
+              {
+                "title": "听懂平时随口说的大白话",
+                "description": "大家来问问题的时候，很少会一板一眼地说标准词。有人上来只说一句“我想卖玉米”，有人会问“现在去某某库还排大队吗”。我做的就是让「小齐」先听懂大家心里真正想办哪件事。"
+              },
+              {
+                "title": "把聊天和查粮库、约时间连起来",
+                "description": "光回答几句说明是不够的。比如农户说想去卖粮，「小齐」如果发现还不知道他想去哪个片区、送什么粮，就会顺着话头多问一句；等问清楚了，直接帮他把附近的收储点找出来，或者带着他把预约办好。"
+              },
+              {
+                "title": "随时帮忙盯着现场排队的进度",
+                "description": "车到了粮库之后，大家最挂心的就是“到哪一步了、还要等多久”。把这部分的查询接进对话里之后，只要开口问一句，助手就能去把当前的环节和预计等待时间查出来告诉他。"
+              }
+            ]
+          },
+          {
+            "id": "details",
+            "title": "做的时候多花了一点心思的地方",
+            "paragraphs": [],
+            "entries": [
+              {
+                "title": "话没说全的时候，别让人家重头再来",
+                "description": "平时说话本来就是一句接一句的，很少有人一口气把粮食品种、去哪个库、哪天去全说完。所以在做对话的时候，我专门处理了这种“半截话”的情况——缺哪样就温和地追问哪样，聊着聊着就把事情办完了，不用像填死板的表格那样一旦填错就重来。"
+              },
+              {
+                "title": "答复尽量说人话，别甩一堆看不明白的词",
+                "description": "查出来的粮库信息或者排队状态，如果直接把后台生硬的数据搬出来，看着依然费劲。我把助手的回复尽量理成了顺口、好懂的话，把最要紧的地点、时间和下一步该干啥放在最前面。"
+              }
+            ]
+          },
+          {
+            "id": "reflection",
+            "title": "一点感想",
+            "paragraphs": [
+              "2026 年 10 月，「齐爱农」在山东聊城正式投入试运行，后来还上了央视网的报道。",
+              "以前做 AI 相关的东西，很容易光顾着琢磨怎么让它看起来更聪明；但在这个项目里，想到屏幕那头可能是正忙着秋收、急着拉粮出门的农户，就会觉得“少让人点两下屏幕、少让人在粮库门口白等一会儿”，比什么花哨的说法都实在。"
+            ],
+            "entries": []
+          }
+        ],
+        "referencesTitle": "相关报道",
+        "references": [
+          {
+            "title": "央视网报道",
+            "url": "https://city.news.cctv.com/2026/10/14/ARTImlC1s2dhcn8uTXmOCHcr261014.shtml"
+          },
+          {
+            "title": "微信相关文章",
+            "url": "https://mp.weixin.qq.com/s/Dud39lgi3j3g1SyIaGswXQ"
+          }
+        ],
+        "photosLabel": "小程序设计",
+        "photosTitle": "先看看小程序",
+        "photos": [
+          {
+            "src": "https://media.secknow-ai.com/space/content/projects/qiainong/homepage-design.png",
+            "alt": "齐爱农小程序首页设计图，展示预约卖粮、库点与行情、惠农金融及最新资讯入口。",
+            "caption": "小程序首页设计图：先约好时间，再看看收储点、行情和卖粮前后用得上的信息。",
+            "width": 941,
+            "height": 1672
+          }
+        ],
+        "entry": {
+          "title": "去小程序里看看",
+          "description": "用微信扫一扫，或搜索「齐爱农」，就能打开小程序。",
+          "navLabel": "打开小程序",
+          "image": "https://media.secknow-ai.com/space/content/projects/qiainong/miniprogram-code.png",
+          "width": 430,
+          "height": 430
+        }
+      }
+    },
+    {
+      "id": "haijing",
+      "title": "海晶集团全员创新平台",
+      "shortTitle": "海晶全员创新",
+      "cardTitle": "海晶集团\n全员创新平台",
+      "titleInCover": false,
+      "description": "工作里觉得哪儿能改得更省事，就在手机上提个建议。我参与了专题评审和多部门审批，让建议交到对应的同事手里，接着往下看。",
+      "seoTitle": "海晶集团全员创新平台：工作里的小想法，也值得提一提",
+      "seoDescription": "平时在厂里或者办公室干活，总会有那种时候：天天走同一个步骤，心里忍不住嘀咕一句“这地方要是改一下，不就少跑一趟了吗？”但以前这种念头往往随口一说就过去了，或者要填纸质单子、一层层找人签字，嫌麻烦就干脆算了。\n\n「海晶集团全员创新平台」就是给集团和各个分公司的三千多名员工做的一个微信小程序。大家在日常工作里不管是发现了安全隐患、想到了省事的小窍门，还是觉得哪个地方能改得更顺手，掏出手机随手就能写下来提上去。\n\n提上去的点子也不是石沉大海，小程序里会有人接手往后看、给反馈。等于给平时干活时冒出来的有用想法，找了一个随时能递上去、也真的有人回应的地方。",
+      "url": "/gallery",
+      "front": "https://media.secknow-ai.com/space/content/projects/haijing/cover-sketch-v2.png",
+      "painted": "https://media.secknow-ai.com/space/content/projects/haijing/cover-color-v2.png",
+      "techStack": [],
+      "cardNotes": [
+        "随手提建议",
+        "按专题评审",
+        "多部门接力",
+        "集团与分公司"
+      ],
+      "cardNotesTitle": "让建议有人接着看",
+      "authorName": "Twiink",
+      "details": {
+        "tagline": "上班时觉得哪儿不顺手、能改得更省事，打开手机就能提个建议的小程序。",
+        "sections": [
+          {
+            "id": "story",
+            "title": "项目介绍",
+            "paragraphs": [
+              "平时在厂里或者办公室干活，总会有那种时候：天天走同一个步骤，心里忍不住嘀咕一句“这地方要是改一下，不就少跑一趟了吗？”但以前这种念头往往随口一说就过去了，或者要填纸质单子、一层层找人签字，嫌麻烦就干脆算了。",
+              "「海晶集团全员创新平台」就是给集团和各个分公司的三千多名员工做的一个微信小程序。大家在日常工作里不管是发现了安全隐患、想到了省事的小窍门，还是觉得哪个地方能改得更顺手，掏出手机随手就能写下来提上去。",
+              "提上去的点子也不是石沉大海，小程序里会有人接手往后看、给反馈。等于给平时干活时冒出来的有用想法，找了一个随时能递上去、也真的有人回应的地方。"
+            ],
+            "entries": []
+          },
+          {
+            "id": "contributions",
+            "title": "我参与的部分",
+            "paragraphs": [
+              "一条建议从员工手机里点下“提交”只需要几秒钟，但落到后台，经常会遇到一个很现实的问题：这事到底该谁来看？我在这个项目里，主要就是负责把“提完之后怎么往下走”这段路铺顺："
+            ],
+            "entries": [
+              {
+                "title": "不同主题的点子，送到懂行的人手里",
+                "description": "集团里有时会专门征集某一类的点子，比如安全上的、生产上的，或者某个分厂自己的活动。不同主题看的重点不一样，集团本部和各个分公司的部门设置也不太一样。我把这块做成能按主题和单位灵活安排的样子，让提上来的建议一开始就能分到对的人手里，不用在群里问来问去“这归谁管”。"
+              },
+              {
+                "title": "几个部门一起看的事，像接力一样一棒接一棒",
+                "description": "有些建议牵扯的事情比较多，光一个部门拍板还不行，得车间先看看靠不靠谱，再交到技术或管理部门接着评。我参与了这段多部门接力的开发，把谁先看、谁后看、看完往哪儿转安排清楚。前面的人处理完，下一位负责的同事手机上就能接着看到，提建议的员工自己也能看清现在走到哪一步了。"
+              }
+            ]
+          },
+          {
+            "id": "details",
+            "title": "做的时候多花了一点心思的地方",
+            "paragraphs": [],
+            "entries": [
+              {
+                "title": "既不让一线同事觉得烦，也不让后面处理的人乱套",
+                "description": "集团加分公司有三千多人，如果让大家提建议的时候自己去选“该交给我厂哪个科、再转给集团哪个部”，估计没几个人分得清。所以做的时候，尽量把这些绕人的规矩藏在后面：提建议的人只管挑个大概方向、把想法写清楚；至于这条建议该在哪些部门之间转、在集团本部和分公司里分别找谁，都由程序在底下静悄悄地跑完。"
+              }
+            ]
+          },
+          {
+            "id": "reflection",
+            "title": "一点感想",
+            "paragraphs": [
+              "做这个项目的时候挺有感触的。很多在工厂、企业里用起来的系统，看着没有那么多花哨的效果，但它管的是大家每天上班最实在的事。把“谁先看、谁后看”这些藏在背后的顺序理顺了，一线同事随口提的一句“这里能不能改改”，才不会在中途掉地上，能顺顺利利地落到实处。"
+            ],
+            "entries": []
+          }
+        ],
+        "photos": [],
+        "entry": {
+          "title": "去小程序里看看",
+          "description": "用微信扫一扫，或搜索「海晶集团全员创新平台」，就能找到小程序。",
+          "navLabel": "打开小程序",
+          "image": "https://media.secknow-ai.com/space/content/projects/haijing/miniprogram-code.png",
+          "width": 430,
+          "height": 430
+        }
+      }
+    },
+    {
+      "id": "open-source",
+      "title": "开源贡献",
+      "shortTitle": "开源贡献",
+      "cardTitle": "开源贡献\n一起补点小缺口",
+      "front": "https://media.secknow-ai.com/space/content/projects/open-source/cover-sketch-v2.png",
+      "painted": "https://media.secknow-ai.com/space/content/projects/open-source/cover-color-v2.png",
+      "description": "给 Agenta、LoopX、DeerFlow 和 Superset 修过一些小问题，也把自己做的 AgentTemplate、EnvSetup 放出来，和大家一起用、一起改。",
+      "seoTitle": "开源贡献：一起补点小缺口",
+      "seoDescription": "Twiink 在 Agenta、LoopX、DeerFlow 与 Apache Superset 中的开源贡献，以及自己开源的 AgentTemplate、EnvSetup。每段改动都附上手绘示意图与原始 PR 或仓库链接。",
+      "url": "/gallery",
+      "techStack": [],
+      "cardNotes": [
+        "Agenta",
+        "LoopX",
+        "DeerFlow",
+        "Superset"
+      ],
+      "cardNotesTitle": "一起修点小问题",
+      "authorName": "Twiink",
+      "details": {
+        "tagline": "平时用大家做的工具，也想顺手帮它们补点小缺口。",
+        "sections": [
+          {
+            "id": "story",
+            "title": "开源路上的一点记录",
+            "navLabel": "开源小记",
+            "paragraphs": [
+              "平时写代码，没少用开源社区里现成的好东西。偶尔碰上一个不太顺手的地方，或者一个能复现的小问题，就会顺着代码找一找：要是自己能解决，也试着把它改好，再把改动提回去。",
+              "这里记下几次给别人的项目搭把手的经历，也放了两个自己开源的小工具。改动有大有小，能让下一位用到它的人少踩一个坑，就挺值得。"
+            ],
+            "entries": []
+          },
+          {
+            "id": "contributions",
+            "title": "给常用的工具修点小问题",
+            "navLabel": "参与的贡献",
+            "paragraphs": [],
+            "entries": [
+              {
+                "title": "Agenta｜一条记录坏了，别把整张列表藏起来",
+                "description": "原本只是一条工具连接记录出了问题，结果其他正常的连接也一起不见了。我把这件事拆开处理：有问题的那条单独记下来，其他连接照常显示。排查一个小问题时，至少不用先面对一张空白列表。",
+                "illustration": {
+                  "kind": "agenta",
+                  "alt": "手绘的两张连接列表：左边有一条记录出错，右边其余正常记录继续显示。",
+                  "caption": "一条出错，其他照常。"
+                },
+                "links": [
+                  {
+                    "title": "看看 Agenta PR #7667",
+                    "url": "https://github.com/Agenta-AI/agenta/pull/7667"
+                  }
+                ]
+              },
+              {
+                "title": "LoopX｜同一件事，几处别各说各话",
+                "description": "报告的名字怎么写、通知里的时间怎么认、进度用哪些词描述，几处都自己抄一份，改起来就容易漏。我把这些重复的约定放回各自负责的地方，其他地方直接引用。这样改一处的时候，几边也能跟着保持一致。",
+                "illustration": {
+                  "kind": "loopx",
+                  "alt": "手绘的报告、通知和进度三张便签，通过线条连接到同一本约定册。",
+                  "caption": "一处定义，多处一起读。"
+                },
+                "links": [
+                  {
+                    "title": "报告命名 #6922",
+                    "url": "https://github.com/loopx-project/loopx/pull/6922"
+                  },
+                  {
+                    "title": "通知时间 #6923",
+                    "url": "https://github.com/loopx-project/loopx/pull/6923"
+                  },
+                  {
+                    "title": "进度用词 #6924",
+                    "url": "https://github.com/loopx-project/loopx/pull/6924"
+                  }
+                ]
+              },
+              {
+                "title": "DeerFlow｜等待时间填得不对，也有个兜底",
+                "description": "让 AI 去网页上找资料时，等待时间如果填成零、负数，或者一个无效的值，网页明明能打开，工具也可能直接报错。我给这些值补上了检查，不合适时就回到默认等待时间，也加了测试，把这个容易忽略的小坑记住。",
+                "illustration": {
+                  "kind": "deerflow",
+                  "alt": "手绘便签上的零和负数被划掉，箭头指向一只正常运行的秒表。",
+                  "caption": "遇到不合适的值，用默认时间。"
+                },
+                "links": [
+                  {
+                    "title": "看看 DeerFlow PR #7300",
+                    "url": "https://github.com/bytedance/deer-flow/pull/7300"
+                  }
+                ]
+              },
+              {
+                "title": "Apache Superset｜整理日期时，把时区也带上",
+                "description": "把日期归到某个季度的开头，本来只是一次普通的整理。但原来的写法会把日期里的时区弄丢，后面再拿它做比较，就可能报错。我调整了这一步：日期换到季度开头，原有的时区也一起留下来。",
+                "illustration": {
+                  "kind": "superset",
+                  "alt": "两张手绘日历从五月十二日变为四月一日，底部都保留同一个加八小时时区。",
+                  "caption": "日期换了位置，时区一起带着。"
+                },
+                "links": [
+                  {
+                    "title": "看看 Superset PR #45671",
+                    "url": "https://github.com/apache/superset/pull/45671"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "own-projects",
+            "title": "自己也开源了两个小工具",
+            "navLabel": "自己的项目",
+            "paragraphs": [],
+            "entries": [
+              {
+                "title": "AgentTemplate｜给下一次折腾先备好工具箱",
+                "description": "每次做一个新的 AI 小助手，总要重新接工具、记对话、处理任务中途停下来的情况。我把这些经常重复写的部分整理成一个能按需要取用的模板，下次有了新想法，就可以把心思多放在具体要做的事上。",
+                "links": [
+                  {
+                    "title": "打开 AgentTemplate 仓库",
+                    "url": "https://github.com/Twiink/AgentTemplate"
+                  }
+                ]
+              },
+              {
+                "title": "EnvSetup｜少花点时间跟开发环境较劲",
+                "description": "换台电脑或者重装系统后，装工具、配环境总要折腾一阵。我把这些事做成了一个桌面小工具：选好需要的东西，看清准备怎么装，再交给它一步步处理；也留了快照和回滚，方便不合适时退回去。",
+                "links": [
+                  {
+                    "title": "打开 EnvSetup 仓库",
+                    "url": "https://github.com/Twiink/EnvSetup"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "reflection",
+            "title": "一点感想",
+            "paragraphs": [
+              "补一个自己也会遇到的小问题，看懂一段以前没看过的代码，再跟维护者聊明白怎么改。每次留下的东西可能不大，但也算给经常用到的开源工具搭了把手。"
+            ],
+            "entries": []
+          }
+        ],
+        "entry": {
+          "title": "去 GitHub 串个门",
+          "description": "完整的改动、讨论和这些小工具都放在 GitHub。碰到感兴趣的地方，可以点开上面的链接继续看。",
+          "url": "https://github.com/Twiink",
+          "label": "看看我的 GitHub",
+          "navLabel": "GitHub"
+        }
+      },
+      "titleInCover": false
     }
   ],
   "studio": [
