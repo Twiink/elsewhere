@@ -116,18 +116,6 @@
         overflow-y: auto;
         padding-right: 4px;
 
-        // 自定义滚动条。
-        scrollbar-width: thin;
-        scrollbar-color: #ccc transparent;
-
-        &::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-            background-color: #ccc;
-            border-radius: 2px;
-        }
     }
 
     .achievement-item {

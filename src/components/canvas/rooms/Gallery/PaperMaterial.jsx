@@ -103,8 +103,19 @@ const PaperMaterial = forwardRef(({ color = '#e0e0e0', roughness = 0.6, map, sid
                 
                 diffuseColor *= sampledDiffuseColor;
                 
-                // 略微提亮，提高可读性。
-                diffuseColor.rgb *= 1.4;
+                // 正面保留场景的上色处理，纸背使用素材本身的纸色。
+                if (gl_FrontFacing) diffuseColor.rgb *= 1.4;
+            #endif
+            `
+        );
+
+        // 纸背是供近距离阅读的水彩纸，保留 sRGB 素材的色阶。
+        // 正面继续使用场景的 tone mapping。
+        shader.fragmentShader = shader.fragmentShader.replace(
+            '#include <tonemapping_fragment>',
+            `
+            #ifdef TONE_MAPPING
+                if (gl_FrontFacing) gl_FragColor.rgb = toneMapping(gl_FragColor.rgb);
             #endif
             `
         );

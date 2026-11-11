@@ -1,3 +1,5 @@
+import { NOTEBOOK_ASSETS, NOTEBOOK_FEATURE_SPRITES } from './projectNotebook';
+
 /**
  * 按场景组织的纹理预取列表。
  * 房间资源在空闲或交互时按需准备，入口资源由实际场景加载。
@@ -117,6 +119,8 @@ export const UI_TEXTURES = [
 // 画廊纹理，通过 Drei 的 useTexture 加载。
 // 按条件组织彩色与普通版本。
 export const GALLERY_TEXTURES_BASE = [
+    ...Object.values(NOTEBOOK_ASSETS),
+    ...NOTEBOOK_FEATURE_SPRITES,
     'https://media.secknow-ai.com/space/textures/gallery/floor.png',
     'https://media.secknow-ai.com/space/textures/gallery/railing.png',
     'https://media.secknow-ai.com/space/textures/gallery/domki.png',
@@ -132,9 +136,6 @@ export const GALLERY_TEXTURES_VERSIONED = [
     'timberkittyprzod',
     'youngmultiprzod',
     'bioprzod',
-    // 卡片背面。
-    'tylkartki',
-    'przyciskdotylukartki',
     // 技术栈标志。
     'csslogo',
     'elementorlogo',

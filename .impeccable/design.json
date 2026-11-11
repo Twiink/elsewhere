@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-11T03:37:43.199Z",
+  "title": "Design System: Twiink's Space · 画廊项目手记",
+  "extensions": {
+    "colorMeta": {
+      "honey-bookmark": {
+        "role": "primary",
+        "displayName": "蜂蜜书签"
+      },
+      "honey-chapter": {
+        "role": "primary",
+        "displayName": "蜂蜜章节"
+      },
+      "honey-mark": {
+        "role": "primary",
+        "displayName": "蜂蜜划痕"
+      },
+      "chapter-green": {
+        "role": "secondary",
+        "displayName": "浅绿章节"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "石墨墨色"
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "淡石墨"
+      },
+      "current-ink": {
+        "role": "neutral",
+        "displayName": "深蜂蜜墨色"
+      },
+      "paper-tab": {
+        "role": "neutral",
+        "displayName": "纸签底"
+      },
+      "paper-rule": {
+        "role": "neutral",
+        "displayName": "纸面分隔线"
+      },
+      "focus-ink": {
+        "role": "neutral",
+        "displayName": "焦点墨色"
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "项目标题",
+        "purpose": "项目详情顶部标题；窄屏覆盖见组件样式。"
+      },
+      "title": {
+        "displayName": "章节标题",
+        "purpose": "阅读正文的浅绿三级标题。"
+      },
+      "intro": {
+        "displayName": "项目引言",
+        "purpose": "项目标题下的一句话介绍。"
+      },
+      "body": {
+        "displayName": "连续正文",
+        "purpose": "项目说明与真实内容的连续阅读。"
+      },
+      "label": {
+        "displayName": "项目书签",
+        "purpose": "顶部八个项目的纸签文字。"
+      }
+    },
+    "shadows": [
+      {
+        "name": "notebook-lift",
+        "value": "drop-shadow(0 12px 20px rgb(64 49 28 / 17%))",
+        "purpose": "笔记本整体的 filter 投影，沿水彩纸透明轮廓托起阅读页。"
+      }
+    ],
+    "motion": [
+      {
+        "name": "notebook-open",
+        "value": "240ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "详情打开时由下方 10px 移入；减少动态分支取消该动画。"
+      },
+      {
+        "name": "bookmark-chapter-state",
+        "value": "160ms ease",
+        "purpose": "项目书签与章节链接的颜色状态过渡；减少动态分支取消过渡。"
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "notebook-medium",
+        "value": "1024px"
+      },
+      {
+        "name": "notebook-compact",
+        "value": "700px"
+      },
+      {
+        "name": "notebook-short-height",
+        "value": "600px"
+      },
+      {
+        "name": "notebook-container",
+        "value": "1100px",
+        "container": "project-notebook"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "八项目纸书签",
+      "kind": "nav",
+      "refersTo": "project-bookmark",
+      "description": "提取顶部八个项目的默认、当前、悬停和焦点样式；切换逻辑见 ProjectDetails.jsx。",
+      "html": "<div class=\"ds-context\"><nav class=\"ds-project-tabs\" aria-label=\"切换项目\"><button type=\"button\" aria-current=\"page\" tabindex=\"0\">泡芙大作战</button><button type=\"button\" tabindex=\"-1\">无界宇宙</button><button type=\"button\" tabindex=\"-1\">SecKnow</button><button type=\"button\" tabindex=\"-1\">RAG 中台</button><button type=\"button\" tabindex=\"-1\">HarnessPRD</button><button type=\"button\" tabindex=\"-1\">齐爱农</button><button type=\"button\" tabindex=\"-1\">海晶全员创新</button><button type=\"button\" tabindex=\"-1\">开源贡献</button></nav></div>",
+      "css": ".ds-context {\n  --profile-ink: #3c382f;\n  --profile-muted: #655f51;\n  --profile-rule: #cbbfa9;\n  --notebook-paper: url('https://media.secknow-ai.com/space/textures/gallery/notebook/paper.png');\n  --notebook-button: url('https://media.secknow-ai.com/space/textures/gallery/notebook/button.png');\n  color: var(--profile-ink);\n  font-family: \"霞鹜文楷\", serif;\n}.ds-context button {\n  background: none;\n  border: none;\n  cursor: pointer;\n  font: inherit;\n  color: inherit;\n}.ds-context a {\n    color: inherit;\n    text-decoration: none;\n}.ds-context :focus-visible {\n  outline: 2px solid #78603b;\n  outline-offset: 3px;\n}.ds-context ::selection {\n  background: #f4dca5;\n  color: #322f29;\n}.ds-project-tabs {\n  display: flex;\n  align-items: flex-end;\n  flex-shrink: 0;\n  min-height: 54px;\n  gap: 3px;\n  padding: 5px 26px 0;\n  overflow-x: auto;\n  overscroll-behavior-x: contain;\n  scroll-padding-inline: 26px;\n}.ds-project-tabs button {\n  position: relative;\n  flex: 1 0 auto;\n  min-height: 46px;\n  padding: 10px 14px 12px;\n  border: 1px solid #bdb3a0;\n  border-bottom: 0;\n  border-radius: 9px 12px 0 0;\n  background: #f8f5eb var(--notebook-paper) center/100% 100%;\n  background-blend-mode: multiply;\n  color: var(--profile-muted);\n  font-size: 1rem;\n  white-space: nowrap;\n  transition: color 160ms ease, background-color 160ms ease;\n}.ds-project-tabs button:nth-child(even) {\n  border-radius: 12px 6px 0 0;\n}.ds-project-tabs button:hover {\n  background-color: #f3e9d2;\n  color: var(--profile-ink);\n}.ds-project-tabs button[aria-current] {\n  background-color: #f6dca3;\n  color: #3f3524;\n  font-weight: 600;\n}.ds-project-tabs button:focus-visible {\n  outline-offset: -5px;\n}@media (max-width: 1024px) {\n  .ds-project-tabs {\n    padding-inline: 20px;\n    scroll-padding-inline: 20px;\n  }\n  .ds-project-tabs button {\n    padding-inline: 13px;\n  }\n}@media (max-width: 700px) {\n  .ds-project-tabs {\n    min-height: 46px;\n    padding: 4px 15px 0;\n    scroll-padding-inline: 15px;\n  }\n  .ds-project-tabs button {\n    min-height: 44px;\n    padding: 7px 13px 9px;\n    font-size: 1rem;\n  }\n}@media (prefers-reduced-motion: reduce) {\n  .ds-project-tabs button {\n    transition: none;\n  }\n}"
+    },
+    {
+      "name": "项目章节目录",
+      "kind": "nav",
+      "refersTo": "chapter-link",
+      "description": "项目介绍、实际媒体、参与内容与项目入口的纸按钮导航。",
+      "html": "<div class=\"ds-context\"><nav class=\"ds-project-chapters\" aria-label=\"项目介绍目录\"><a href=\"#project-story\" aria-current=\"location\">项目介绍</a><a href=\"#project-photos\">现场照片</a><a href=\"#project-contributions\">我做了什么</a><a href=\"#project-entry\">打开小程序</a></nav></div>",
+      "css": ".ds-context {\n  --profile-ink: #3c382f;\n  --profile-muted: #655f51;\n  --profile-rule: #cbbfa9;\n  --notebook-paper: url('https://media.secknow-ai.com/space/textures/gallery/notebook/paper.png');\n  --notebook-button: url('https://media.secknow-ai.com/space/textures/gallery/notebook/button.png');\n  color: var(--profile-ink);\n  font-family: \"霞鹜文楷\", serif;\n}.ds-context button {\n  background: none;\n  border: none;\n  cursor: pointer;\n  font: inherit;\n  color: inherit;\n}.ds-context a {\n    color: inherit;\n    text-decoration: none;\n}.ds-context :focus-visible {\n  outline: 2px solid #78603b;\n  outline-offset: 3px;\n}.ds-context ::selection {\n  background: #f4dca5;\n  color: #322f29;\n}.ds-project-chapters {\n  display: flex;\n  flex-shrink: 0;\n  gap: 0.55rem;\n  padding: 0.2rem 3px 0.45rem;\n  overflow-x: auto;\n  overscroll-behavior-x: contain;\n  scroll-padding-inline: 3px;\n}.ds-project-chapters a {\n  display: inline-flex;\n  flex: 1 0 auto;\n  align-items: center;\n  justify-content: center;\n  min-height: 44px;\n  padding: 0.3rem 0.65rem;\n  border: 1px solid #bfb29a;\n  border-radius: 6px 9px 5px 7px;\n  font-size: 0.98rem;\n  color: var(--profile-ink);\n  white-space: nowrap;\n  text-decoration: none;\n  background: rgba(255, 253, 246, 0.4);\n  transition: background-color 160ms ease;\n}.ds-project-chapters a:hover {\n  background: #f5ead4;\n}.ds-project-chapters a[aria-current] {\n  background: #f6dfac var(--notebook-button) center/100% 100%;\n  background-blend-mode: multiply;\n  border-color: #ad956b;\n}@media (max-width: 700px) {\n  .ds-project-chapters {\n    gap: 0.4rem;\n    padding-bottom: 0.4rem;\n  }\n  .ds-project-chapters a {\n    font-size: 0.95rem;\n    padding-inline: 0.6rem;\n  }\n}@media (prefers-reduced-motion: reduce) {\n  .ds-project-chapters a {\n    transition: none;\n  }\n}"
+    },
+    {
+      "name": "项目标题与引言",
+      "kind": "custom",
+      "refersTo": "project-heading",
+      "description": "霞鹜文楷标题、蜂蜜下划线及一句话介绍，保留实际窄屏规则。",
+      "html": "<div class=\"ds-context\"><header class=\"ds-project-notebook-heading\"><h2>泡芙大作战 PuffWar 乐园</h2><p>一个和线下游乐园搭着一起玩的微信小程序。</p></header></div>",
+      "css": ".ds-context {\n  --profile-ink: #3c382f;\n  --profile-muted: #655f51;\n  --profile-rule: #cbbfa9;\n  --notebook-paper: url('https://media.secknow-ai.com/space/textures/gallery/notebook/paper.png');\n  --notebook-button: url('https://media.secknow-ai.com/space/textures/gallery/notebook/button.png');\n  color: var(--profile-ink);\n  font-family: \"霞鹜文楷\", serif;\n}.ds-context button {\n  background: none;\n  border: none;\n  cursor: pointer;\n  font: inherit;\n  color: inherit;\n}.ds-context a {\n    color: inherit;\n    text-decoration: none;\n}.ds-context :focus-visible {\n  outline: 2px solid #78603b;\n  outline-offset: 3px;\n}.ds-context ::selection {\n  background: #f4dca5;\n  color: #322f29;\n}.ds-project-notebook-heading {\n  flex-shrink: 0;\n  padding: 4px 16px 0 0;\n}.ds-project-notebook-heading h2 {\n  position: relative;\n  isolation: isolate;\n  width: fit-content;\n  max-width: 100%;\n  margin: 0;\n  font-size: clamp(1.5rem, 2.45vw, 2.25rem);\n  font-weight: 600;\n  line-height: 1.4;\n  text-wrap: balance;\n}.ds-project-notebook-heading h2::after {\n  content: \"\";\n  position: absolute;\n  z-index: -1;\n  left: 0;\n  bottom: 0.02em;\n  width: min(13em, 72%);\n  height: 0.17em;\n  background: #efd191;\n  border-radius: 45% 21% 40% 18%;\n  transform: rotate(-0.6deg);\n}.ds-project-notebook-heading p {\n  margin: 0.9rem 0 1.4rem;\n  font-size: 1.13rem;\n  line-height: 1.7;\n  text-wrap: pretty;\n}@media (max-width: 1024px) {\n  .ds-project-notebook-heading h2 {\n    font-size: 1.75rem;\n  }\n}@media (max-width: 700px) {\n  .ds-project-notebook-heading {\n    padding: 0;\n  }\n  .ds-project-notebook-heading h2 {\n    font-size: 1.55rem;\n    line-height: 1.35;\n  }\n  .ds-project-notebook-heading p {\n    margin: 0.65rem 0 0.85rem;\n    font-size: 1rem;\n    line-height: 1.6;\n  }\n}@media (max-width: 700px) and (max-height: 700px) {\n  .ds-project-notebook-heading p {\n    margin-block: 0.4rem;\n  }\n}"
+    },
+    {
+      "name": "浅绿章节标题",
+      "kind": "custom",
+      "refersTo": "chapter-heading",
+      "description": "阅读正文中的实际三级标题样式。",
+      "html": "<div class=\"ds-context\"><section class=\"ds-project-details-body\"><h3>在乐园里</h3></section></div>",
+      "css": ".ds-context {\n  --profile-ink: #3c382f;\n  --profile-muted: #655f51;\n  --profile-rule: #cbbfa9;\n  --notebook-paper: url('https://media.secknow-ai.com/space/textures/gallery/notebook/paper.png');\n  --notebook-button: url('https://media.secknow-ai.com/space/textures/gallery/notebook/button.png');\n  color: var(--profile-ink);\n  font-family: \"霞鹜文楷\", serif;\n}.ds-context button {\n  background: none;\n  border: none;\n  cursor: pointer;\n  font: inherit;\n  color: inherit;\n}.ds-context a {\n    color: inherit;\n    text-decoration: none;\n}.ds-context :focus-visible {\n  outline: 2px solid #78603b;\n  outline-offset: 3px;\n}.ds-context ::selection {\n  background: #f4dca5;\n  color: #322f29;\n}.ds-project-details-body h3 {\n  width: fit-content;\n  margin: 0 0 0.9rem;\n  padding: 0.05rem 0.45rem;\n  font-size: 1.4rem;\n  font-weight: 600;\n  line-height: 1.45;\n  background: #e5e9cf;\n  border-radius: 7px 3px 9px 4px;\n}"
+    },
+    {
+      "name": "网站入口",
+      "kind": "button",
+      "refersTo": "site-entry",
+      "description": "真实项目网站链接，使用水彩按钮背景、文字下划线与可见焦点。",
+      "html": "<div class=\"ds-context\"><div class=\"ds-project-details-body\"><a class=\"ds-project-detail-site-link\" href=\"https://github.com/Twiink/HarnessPRD\" target=\"_blank\" rel=\"noopener noreferrer\">前往 GitHub 查看 HarnessPRD 源码</a></div></div>",
+      "css": ".ds-context {\n  --profile-ink: #3c382f;\n  --profile-muted: #655f51;\n  --profile-rule: #cbbfa9;\n  --notebook-paper: url('https://media.secknow-ai.com/space/textures/gallery/notebook/paper.png');\n  --notebook-button: url('https://media.secknow-ai.com/space/textures/gallery/notebook/button.png');\n  color: var(--profile-ink);\n  font-family: \"霞鹜文楷\", serif;\n}.ds-context button {\n  background: none;\n  border: none;\n  cursor: pointer;\n  font: inherit;\n  color: inherit;\n}.ds-context a {\n    color: inherit;\n    text-decoration: none;\n}.ds-context :focus-visible {\n  outline: 2px solid #78603b;\n  outline-offset: 3px;\n}.ds-context ::selection {\n  background: #f4dca5;\n  color: #322f29;\n}.ds-project-details-body {\n  flex: 1;\n  min-height: 0;\n  padding: 1.35rem 0.45rem 1.4rem 0;\n  overflow-y: auto;\n  overscroll-behavior: contain;\n  scroll-padding-top: 1rem;\n  font-size: 1.04rem;\n  line-height: 1.85;\n}.ds-project-details-body .ds-project-detail-site-link {\n  display: inline-flex;\n  min-height: 44px;\n  align-items: center;\n  padding: 0.35rem 1rem;\n  background: var(--notebook-button) center/100% 100%;\n  text-decoration: underline;\n  text-underline-offset: 0.25em;\n}@media (max-width: 700px) {\n  .ds-project-details-body {\n    padding-top: 1rem;\n    font-size: 1rem;\n  }\n}"
+    },
+    {
+      "name": "关闭项目介绍",
+      "kind": "button",
+      "refersTo": "close-button",
+      "description": "关闭按钮的实际图形、颜色、焦点与窄屏尺寸；片段省略原页面的绝对定位。",
+      "html": "<div class=\"ds-context\"><button type=\"button\" class=\"ds-project-details-close\" aria-label=\"关闭项目介绍\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"m6 6 12 12M6 18 18 6\"></path></svg></button></div>",
+      "css": ".ds-context {\n  --profile-ink: #3c382f;\n  --profile-muted: #655f51;\n  --profile-rule: #cbbfa9;\n  --notebook-paper: url('https://media.secknow-ai.com/space/textures/gallery/notebook/paper.png');\n  --notebook-button: url('https://media.secknow-ai.com/space/textures/gallery/notebook/button.png');\n  color: var(--profile-ink);\n  font-family: \"霞鹜文楷\", serif;\n}.ds-context button {\n  background: none;\n  border: none;\n  cursor: pointer;\n  font: inherit;\n  color: inherit;\n}.ds-context a {\n    color: inherit;\n    text-decoration: none;\n}.ds-context :focus-visible {\n  outline: 2px solid #78603b;\n  outline-offset: 3px;\n}.ds-context ::selection {\n  background: #f4dca5;\n  color: #322f29;\n}.ds-project-details-close {\n  display: grid;\n  place-items: center;\n  width: 44px;\n  height: 44px;\n  color: #655e52;\n}.ds-project-details-close svg {\n  width: 24px;\n  height: 24px;\n  fill: none;\n  stroke: currentColor;\n  stroke-width: 1.8;\n  stroke-linecap: round;\n}.ds-project-details-close:hover {\n  color: #2d2b25;\n}@media (max-width: 700px) {\n  .ds-project-details-close {\n    width: 38px;\n    height: 38px;\n    background: rgba(255, 250, 239, 0.88);\n    border-radius: 50%;\n  }\n}"
+    },
+    {
+      "name": "水彩封面与阅读页",
+      "kind": "card",
+      "refersTo": "notebook-sheet",
+      "description": "宽面板保留双栏；窄面板下，云端PNG封面小图与标题并排，章节和正文各占下方整行。",
+      "html": "<div class=\"ds-context\"><div class=\"ds-project-notebook\" style=\"height:min(720px,80vh)\"><article class=\"ds-project-notebook-sheet\"><figure class=\"ds-project-notebook-cover\"><img src=\"https://media.secknow-ai.com/space/textures/gallery/notebook/puffwar-cover.png\" alt=\"泡芙大作战项目插画\" decoding=\"async\"></figure><div class=\"ds-project-reading-sheet\"><header class=\"ds-project-notebook-heading\"><h2>泡芙大作战 PuffWar 乐园</h2><p>一个和线下游乐园搭着一起玩的微信小程序。</p></header><nav class=\"ds-project-chapters\" aria-label=\"项目介绍目录\"><a href=\"#project-story\" aria-current=\"location\">项目介绍</a><a href=\"#project-photos\">现场照片</a><a href=\"#project-contributions\">我做了什么</a><a href=\"#project-entry\">打开小程序</a></nav><div class=\"ds-project-details-body\" tabindex=\"0\" aria-label=\"项目介绍正文\"><p>平时去线下乐园，大多就是到处逛逛、玩玩项目。做「泡芙大作战 PuffWar 乐园」的时候，我们想让逛乐园这件事更像在打一场真人的闯关游戏。</p><h3>在乐园里</h3></div></div></article></div></div>",
+      "css": ".ds-context {\n  --profile-ink: #3c382f;\n  --profile-muted: #655f51;\n  --profile-rule: #cbbfa9;\n  --notebook-paper: url('https://media.secknow-ai.com/space/textures/gallery/notebook/paper.png');\n  --notebook-button: url('https://media.secknow-ai.com/space/textures/gallery/notebook/button.png');\n  color: var(--profile-ink);\n  font-family: \"霞鹜文楷\", serif;\n}.ds-context button {\n  background: none;\n  border: none;\n  cursor: pointer;\n  font: inherit;\n  color: inherit;\n}.ds-context a {\n    color: inherit;\n    text-decoration: none;\n}.ds-context :focus-visible {\n  outline: 2px solid #78603b;\n  outline-offset: 3px;\n}.ds-context ::selection {\n  background: #f4dca5;\n  color: #322f29;\n}\n\n.ds-project-notebook {\n  container: project-notebook/inline-size;\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  filter: drop-shadow(0 12px 20px rgba(64, 49, 28, 0.17));\n}\n\n.ds-project-notebook-sheet {\n  position: relative;\n  display: grid;\n  grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr);\n  flex: 1;\n  min-height: 0;\n  gap: 32px;\n  padding: 25px 24px 27px;\n  border: 20px solid transparent;\n  border-image: var(--notebook-paper) 48 fill stretch;\n  margin-top: -2px;\n}\n\n.ds-project-notebook-cover {\n  position: relative;\n  min-width: 0;\n  min-height: 0;\n  max-height: 680px;\n  margin: 0;\n  overflow: hidden;\n  border-radius: 7px 11px 6px 9px;\n}\n\n.ds-project-notebook-cover img {\n  position: absolute;\n  inset: auto 0 0;\n  display: block;\n  width: 100%;\n  height: 135%;\n  object-fit: cover;\n  object-position: center bottom;\n}\n\n.ds-project-reading-sheet {\n  display: flex;\n  flex-direction: column;\n  min-width: 0;\n  min-height: 0;\n}\n\n.ds-project-notebook-heading {\n  flex-shrink: 0;\n  padding: 4px 16px 0 0;\n}\n\n.ds-project-notebook-heading h2 {\n  position: relative;\n  isolation: isolate;\n  width: fit-content;\n  max-width: 100%;\n  margin: 0;\n  font-size: clamp(1.5rem, 2.45vw, 2.25rem);\n  font-weight: 600;\n  line-height: 1.4;\n  text-wrap: balance;\n}\n\n.ds-project-notebook-heading h2::after {\n  content: \"\";\n  position: absolute;\n  z-index: -1;\n  left: 0;\n  bottom: 0.02em;\n  width: min(13em, 72%);\n  height: 0.17em;\n  background: #efd191;\n  border-radius: 45% 21% 40% 18%;\n  transform: rotate(-0.6deg);\n}\n\n.ds-project-notebook-heading p {\n  margin: 0.9rem 0 1.4rem;\n  font-size: 1.13rem;\n  line-height: 1.7;\n  text-wrap: pretty;\n}\n\n.ds-project-chapters {\n  display: flex;\n  flex-shrink: 0;\n  gap: 0.55rem;\n  padding: 0.2rem 3px 0.45rem;\n  overflow-x: auto;\n  overscroll-behavior-x: contain;\n  scroll-padding-inline: 3px;\n}\n\n.ds-project-chapters a {\n  display: inline-flex;\n  flex: 1 0 auto;\n  align-items: center;\n  justify-content: center;\n  min-height: 44px;\n  padding: 0.3rem 0.65rem;\n  border: 1px solid #bfb29a;\n  border-radius: 6px 9px 5px 7px;\n  font-size: 0.98rem;\n  color: var(--profile-ink);\n  white-space: nowrap;\n  text-decoration: none;\n  background: rgba(255, 253, 246, 0.4);\n  transition: background-color 160ms ease;\n}\n\n.ds-project-chapters a:hover {\n  background: #f5ead4;\n}\n\n.ds-project-chapters a[aria-current] {\n  background: #f6dfac var(--notebook-button) center/100% 100%;\n  background-blend-mode: multiply;\n  border-color: #ad956b;\n}\n\n.ds-project-details-body {\n  flex: 1;\n  min-height: 0;\n  padding: 1.35rem 0.45rem 1.4rem 0;\n  overflow-y: auto;\n  overscroll-behavior: contain;\n  scroll-padding-top: 1rem;\n  font-size: 1.04rem;\n  line-height: 1.85;\n}\n\n.ds-project-details-body p {\n  margin: 0 0 0.9rem;\n  overflow-wrap: anywhere;\n}\n\n.ds-project-details-body h3 {\n  width: fit-content;\n  margin: 0 0 0.9rem;\n  padding: 0.05rem 0.45rem;\n  font-size: 1.4rem;\n  font-weight: 600;\n  line-height: 1.45;\n  background: #e5e9cf;\n  border-radius: 7px 3px 9px 4px;\n}\n\n.ds-project-details-body h4 {\n  margin: 0 0 0.3rem;\n  font-size: 1.1rem;\n  line-height: 1.5;\n  font-weight: 600;\n}\n\n@media (max-width: 1024px) {\n  .ds-project-notebook-sheet {\n    grid-template-columns: minmax(0, 0.3fr) minmax(0, 0.7fr);\n    gap: 22px;\n    padding: 20px 14px;\n    border-width: 15px;\n  }\n  .ds-project-notebook-heading h2 {\n    font-size: 1.75rem;\n  }\n}\n\n@container project-notebook (max-width: 1100px) {\n  .ds-project-notebook-sheet {\n    grid-template-columns: clamp(84px, 18cqi, 152px) minmax(0, 1fr);\n    grid-template-rows: auto auto minmax(0, 1fr);\n    gap: 0 24px;\n  }\n  .ds-project-notebook-cover {\n    grid-area: 1/1;\n    align-self: center;\n    width: 100%;\n    max-height: none;\n    aspect-ratio: 1;\n  }\n  .ds-project-reading-sheet {\n    display: contents;\n  }\n  .ds-project-notebook-heading {\n    grid-area: 1/2;\n    align-self: center;\n    padding: 4px 32px 0 0;\n  }\n  .ds-project-notebook-heading h2 {\n    font-size: 1.75rem;\n  }\n  .ds-project-notebook-heading p {\n    margin: 0.65rem 0 0;\n  }\n  .ds-project-chapters {\n    grid-area: 2/1/auto/-1;\n    min-width: 0;\n    margin-top: 1rem;\n  }\n  .ds-project-details-body {\n    grid-area: 3/1/auto/-1;\n    min-width: 0;\n  }\n}\n\n@media (max-width: 700px) {\n  .ds-project-notebook-sheet {\n    column-gap: 14px;\n    padding: 18px 12px 10px;\n    border-width: 12px;\n  }\n  .ds-project-notebook-heading {\n    padding: 0 20px 0 0;\n  }\n  .ds-project-notebook-heading h2 {\n    font-size: 1.55rem;\n    line-height: 1.35;\n  }\n  .ds-project-notebook-heading p {\n    margin: 0.65rem 0 0.85rem;\n    font-size: 1rem;\n    line-height: 1.6;\n  }\n  .ds-project-chapters {\n    gap: 0.4rem;\n    margin-top: 0.85rem;\n    padding-bottom: 0.4rem;\n  }\n  .ds-project-chapters a {\n    font-size: 0.95rem;\n    padding-inline: 0.6rem;\n  }\n  .ds-project-details-body {\n    padding-top: 1rem;\n    font-size: 1rem;\n  }\n}\n\n@media (max-height: 600px) {\n  .ds-project-notebook-sheet {\n    padding-block: 10px;\n    border-block-width: 10px;\n  }\n  .ds-project-notebook-heading h2 {\n    font-size: 1.4rem;\n    line-height: 1.3;\n  }\n  .ds-project-notebook-heading p {\n    margin: 0.4rem 0 0.5rem;\n    font-size: 1rem;\n    line-height: 1.5;\n  }\n  .ds-project-chapters {\n    margin-top: 0.6rem;\n  }\n  .ds-project-details-body {\n    padding-top: 0.6rem;\n  }\n  @container project-notebook (max-width: 1100px) {\n    .ds-project-notebook-sheet {\n      grid-template-columns: clamp(56px, 12cqi, 80px) minmax(0, 1fr);\n      column-gap: 14px;\n    }\n    .ds-project-notebook-cover {\n      align-self: start;\n    }\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .ds-project-chapters a {\n    transition: none;\n  }\n}"
+    }
+  ],
+  "narrative": {
+    "northStar": "淡彩项目手记",
+    "overview": "把项目当作一本可以翻开的手记：水彩纸边承接插画与真实照片，石墨手写保持亲近的阅读语气，蜂蜜色标出当前选择与标题重点，浅绿托住正文的章节标题。纸张的细微不规则和柔和投影提供触感，连续文字保持清楚、舒展。\n\n本记录只适用于画廊项目纸背和项目详情。三维纸背先介绍项目，再通过“查看项目”进入完整阅读；详情展开封面、正文与真实媒体。入口页及生活手记、关于、联系等房间各有现有实现，本记录不将这套版式扩展为它们的采用状态。",
+    "keyCharacteristics": [
+      "水彩纸边与轻微不规则轮廓承载内容。",
+      "石墨手写、蜂蜜色重点和浅绿章节标题形成阅读层次。",
+      "八项目纸书签连接封面与可滚动阅读列。",
+      "三维翻纸与完整项目详情共享项目内容和水彩素材。"
+    ],
+    "rules": [
+      {
+        "name": "The 蜂蜜标记 Rule",
+        "body": "蜂蜜色用于当前项目、当前章节与标题下划线，浅绿用于正文章节标题，石墨文字承担连续阅读。",
+        "section": "colors"
+      },
+      {
+        "name": "The 同一字形 Rule",
+        "body": "项目详情沿用霞鹜文楷；纸背通过同源场景字体保留相同字形，字号按各自 DOM 或三维坐标体系记录。",
+        "section": "typography"
+      },
+      {
+        "name": "The 可滚动阅读 Rule",
+        "body": "隐藏的是滚动条；项目书签、章节目录和正文分别保留各自的滚动方向及键盘入口。",
+        "section": "layout"
+      }
+    ],
+    "dos": [
+      "**Do** 将这套淡彩手记规则限定于画廊项目纸背与项目详情。",
+      "**Do** 保留八项目的真实文字、照片、视频及小程序或网站入口。",
+      "**Do** 让宽屏封面与阅读列并排，窄面板改为顶部封面小图与标题，下方正文占满宽度。",
+      "**Do** 保留可滚动正文、可见键盘焦点和项目详情已有的减少动态分支。",
+      "**Do** 使用现有水彩素材，并让三维纸背内容跟随纸面弯曲。"
+    ],
+    "donts": [
+      "**Don't** 将这套画廊版式记为入口或其他房间已经采用的整站规范。",
+      "**Don't** 用禁用内容滚动或移除焦点轮廓实现隐藏滚动条。",
+      "**Don't** 把仍在校准的纸背截图采样色固化成色板。",
+      "**Don't** 用水彩插画替代项目真实媒体或真实访问入口。"
+    ]
+  }
+}

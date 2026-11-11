@@ -1,5 +1,5 @@
 import { useScene } from '../../context/contexts';
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 import gsap from 'gsap';
 import { TextPlugin } from 'gsap/TextPlugin';
@@ -57,109 +57,6 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
             );
         }
     }, [isOpen, content]);
-
-    // 自定义滚动条状态。
-    const scrollContainerRef = useRef(null);
-    const trackRef = useRef(null);
-    const thumbRef = useRef(null);
-    const isDragging = useRef(false);
-    const dragStartY = useRef(0);
-    const dragStartScroll = useRef(0);
-    const [scrollThumbTop, setScrollThumbTop] = useState(0);
-    const [showScrollbar, setShowScrollbar] = useState(false);
-
-    // 根据滚动位置更新滑块。
-    const updateThumbPosition = useCallback(() => {
-        const el = scrollContainerRef.current;
-        if (!el) return;
-        const { scrollTop, scrollHeight, clientHeight } = el;
-        const maxScroll = scrollHeight - clientHeight;
-        setShowScrollbar(maxScroll > 10);
-        if (maxScroll <= 0) return;
-        const scrollRatio = scrollTop / maxScroll;
-        // 轨道区域为高度的 5% 至 90%，与 CSS 一致。
-        const trackEl = trackRef.current;
-        if (!trackEl) return;
-        const trackHeight = trackEl.clientHeight;
-        const thumbHeight = 32; // 与 CSS 一致。
-        const usableHeight = trackHeight * 0.9 - thumbHeight;
-        const topOffset = trackHeight * 0.05;
-        setScrollThumbTop(topOffset + scrollRatio * usableHeight);
-    }, []);
-
-    // 滚动监听。
-    useEffect(() => {
-        const el = scrollContainerRef.current;
-        if (!el) return;
-        const onScroll = () => updateThumbPosition();
-        el.addEventListener('scroll', onScroll, { passive: true });
-        // 初始检查。
-        const raf = requestAnimationFrame(updateThumbPosition);
-        return () => {
-            el.removeEventListener('scroll', onScroll);
-            cancelAnimationFrame(raf);
-        };
-    }, [updateThumbPosition, content]);
-
-    // 内容或打开状态变化时重新计算。
-    useEffect(() => {
-        const timer = setTimeout(updateThumbPosition, 200);
-        return () => clearTimeout(timer);
-    }, [isOpen, content, updateThumbPosition]);
-
-    // 拖动处理。
-    const handleThumbMouseDown = useCallback((e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        isDragging.current = true;
-        dragStartY.current = e.clientY;
-        dragStartScroll.current = scrollContainerRef.current?.scrollTop || 0;
-        document.body.style.cursor = 'grabbing';
-        document.body.style.userSelect = 'none';
-    }, []);
-
-    useEffect(() => {
-        const handleMouseMove = (e) => {
-            if (!isDragging.current) return;
-            const el = scrollContainerRef.current;
-            const trackEl = trackRef.current;
-            if (!el || !trackEl) return;
-            const deltaY = e.clientY - dragStartY.current;
-            const trackHeight = trackEl.clientHeight;
-            const thumbHeight = 32;
-            const usableHeight = trackHeight * 0.9 - thumbHeight;
-            const { scrollHeight, clientHeight } = el;
-            const maxScroll = scrollHeight - clientHeight;
-            const scrollDelta = (deltaY / usableHeight) * maxScroll;
-            el.scrollTop = dragStartScroll.current + scrollDelta;
-        };
-        const handleMouseUp = () => {
-            if (isDragging.current) {
-                isDragging.current = false;
-                document.body.style.cursor = '';
-                document.body.style.userSelect = '';
-            }
-        };
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, []);
-
-    // 点击轨道可跳转。
-    const handleTrackClick = useCallback((e) => {
-        const el = scrollContainerRef.current;
-        const trackEl = trackRef.current;
-        if (!el || !trackEl) return;
-        const rect = trackEl.getBoundingClientRect();
-        const clickY = e.clientY - rect.top;
-        const trackHeight = trackEl.clientHeight;
-        const ratio = Math.max(0, Math.min(1, (clickY - trackHeight * 0.05) / (trackHeight * 0.9)));
-        const { scrollHeight, clientHeight } = el;
-        el.scrollTop = ratio * (scrollHeight - clientHeight);
-    }, []);
 
     const handleBackdropClick = (e) => {
         // 仅点击充当背景的包装层自身时关闭，
@@ -378,7 +275,6 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                     {content.layout === 'certificate_grid' ? (
                         <div style={{ position: 'relative', flex: 1, minHeight: 0 }}>
                             <div
-                                ref={scrollContainerRef}
                                 className="awards-scroll-container"
                                 style={{
                                     display: 'grid',
@@ -444,23 +340,6 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                                 ))}
                             </div>
 
-                            {/* 自定义撕纸滚动条。 */}
-                            {showScrollbar && (
-                                <div
-                                    ref={trackRef}
-                                    className="torn-scroll-track"
-                                    onClick={handleTrackClick}
-                                    style={{ pointerEvents: 'auto' }}
-                                >
-                                    <div className="torn-scroll-line" />
-                                    <div
-                                        ref={thumbRef}
-                                        className="torn-scroll-thumb"
-                                        style={{ top: `${scrollThumbTop}px` }}
-                                        onMouseDown={handleThumbMouseDown}
-                                    />
-                                </div>
-                            )}
                         </div>
                     ) : (
                         /* 默认布局，采用工作室风格。 */

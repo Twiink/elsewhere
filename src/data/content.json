@@ -53,7 +53,7 @@
       "seoDescription": "平时去线下乐园，大多就是到处逛逛、玩玩项目。做「泡芙大作战 PuffWar 乐园」的时候，我们想让逛乐园这件事更像在打一场真人的闯关游戏。\n\n进场戴上手环、用小程序绑好之后，就可以照着地图去找任务做了。在场馆里的游戏设备上刷手环打卡、闯关，手机里就会跟着攒积分、点亮图鉴和徽章，还能看看自己和所在阵营排在第几名。攒够了积分，可以直接在小程序商城里挑礼物，再去现场柜台把实物领走。\n\n里面还有一个我很喜欢的小玩法：走到场馆的大屏幕前扫个码，手机屏幕就会变成一个游戏手柄。拖一拖摇杆，就能直接操控大屏里的角色到处跑，还能顺手发个表情和文字上去，大家一起在屏幕前闹腾，气氛一下就热闹起来了。",
       "url": "/gallery",
       "front": "https://media.secknow-ai.com/space/content/projects/puffwar/cover-sketch-v2.png",
-      "painted": "https://media.secknow-ai.com/space/content/projects/puffwar/cover-color-v2.png",
+      "painted": "https://media.secknow-ai.com/space/textures/gallery/notebook/puffwar-cover.png",
       "titleInCover": false,
       "techStack": [],
       "cardNotes": [
@@ -155,7 +155,7 @@
         ],
         "photos": [
           {
-            "src": "https://media.secknow-ai.com/space/content/projects/puffwar/ball-pit.png",
+            "src": "https://media.secknow-ai.com/space/textures/gallery/notebook/puffwar-photo.png",
             "alt": "乐园里的海洋球区，抬头还能看到悬挂的气球与球形屏幕。",
             "caption": "乐园里的海洋球区，抬头还能看到悬挂的气球与球形屏幕。",
             "width": 1220,

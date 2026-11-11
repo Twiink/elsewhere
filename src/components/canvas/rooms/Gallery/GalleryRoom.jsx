@@ -17,6 +17,7 @@ import { useTextureCopy } from '../../../../hooks/useTextureCopy';
 
 import { usePaintMaterial } from './usePaintMaterial';
 import { useGalleryProjects } from '../../../../hooks/useContentData';
+import { NOTEBOOK_ASSETS, NOTEBOOK_FEATURE_ICONS, NOTEBOOK_FEATURE_SPRITES } from '../../../../config/projectNotebook';
 
 // 复用 Vector3，避免 useFrame 中分配对象。
 const _tempScale = new THREE.Vector3();
@@ -72,10 +73,10 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     const cardRefs = useRef([]);
 
     useEffect(() => {
-        if (isExiting || isTeleporting) {
+        if (isExiting || isTeleporting || selectedCard !== null || overlayContent) {
             hidePopup();
         }
-    }, [isExiting, isTeleporting, hidePopup]);
+    }, [isExiting, isTeleporting, selectedCard, overlayContent, hidePopup]);
 
     // 配置上色过渡。
     const { onBeforeCompile, animatePaint, resetPaint, setPaintProgress, uniformsData, updateRoomOrigin } = usePaintMaterial();
@@ -187,9 +188,8 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     const paintedUrls = activeProjects.map(p => (canHover && p.painted) ? p.painted : p.front);
     const paintedTextures = useTexture(paintedUrls);
 
-    // 按条件加载通用背面纹理与按钮纹理。
-    const backTextureRaw = useTexture(canHover ? 'https://media.secknow-ai.com/space/textures/gallery/tylkartki_painted.png' : 'https://media.secknow-ai.com/space/textures/gallery/tylkartki.png');
-    const overlayTextureRaw = useTexture(canHover ? 'https://media.secknow-ai.com/space/textures/gallery/przyciskdotylukartki_painted.png' : 'https://media.secknow-ai.com/space/textures/gallery/przyciskdotylukartki.png');
+    const [backTextureRaw, illustrationRaw, iconsRaw, buttonRaw] = useTexture(Object.values(NOTEBOOK_ASSETS));
+    const featureSpriteRaws = useTexture(NOTEBOOK_FEATURE_SPRITES);
 
     // 预加载技术栈标志，避免首次翻面卡顿。
     // 采用相同条件：桌面端彩色，触摸设备普通图。
@@ -209,14 +209,37 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     useTexture(allLogos);
 
     const colorTextures = useMemo(() => new Map(
-        [...new Set([...projectTextures, ...paintedTextures, backTextureRaw, overlayTextureRaw])].map(source => {
+        [...new Set([...projectTextures, ...paintedTextures, backTextureRaw, illustrationRaw, iconsRaw, buttonRaw, ...featureSpriteRaws])].map(source => {
             const texture = source.clone();
             texture.colorSpace = THREE.SRGBColorSpace;
             texture.needsUpdate = true;
             return [source, texture];
         })
-    ), [projectTextures, paintedTextures, backTextureRaw, overlayTextureRaw]);
+    ), [projectTextures, paintedTextures, backTextureRaw, illustrationRaw, iconsRaw, buttonRaw, featureSpriteRaws]);
     useEffect(() => () => colorTextures.forEach(texture => texture.dispose()), [colorTextures]);
+
+    const notebookIcons = useMemo(() => Array.from({ length: 12 }, (_, index) => {
+        const texture = colorTextures.get(index < 4 ? featureSpriteRaws[index] : iconsRaw).clone();
+        if (index >= 4) {
+            texture.repeat.set(0.25, 1 / 3);
+            texture.offset.set((index % 4) / 4, 1 - (Math.floor(index / 4) + 1) / 3);
+        }
+        texture.needsUpdate = true;
+        return texture;
+    }), [colorTextures, iconsRaw, featureSpriteRaws]);
+    useEffect(() => () => notebookIcons.forEach(texture => texture.dispose()), [notebookIcons]);
+
+    const cardIllustrations = useMemo(() => activeProjects.map((project, index) => {
+        const source = project.id === 'puffwar' ? illustrationRaw : paintedTextures[index];
+        const texture = colorTextures.get(source).clone();
+        if (project.id !== 'puffwar') {
+            texture.repeat.set(1, 0.35);
+            texture.offset.set(0, 0.22);
+        }
+        texture.needsUpdate = true;
+        return texture;
+    }), [activeProjects, colorTextures, illustrationRaw, paintedTextures]);
+    useEffect(() => () => cardIllustrations.forEach(texture => texture.dispose()), [cardIllustrations]);
 
     // 每个项目只挂一张纸卡，循环滚动由位置取模完成。
     const projects = useMemo(() => {
@@ -240,11 +263,13 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 frontTexture: frontTex,
                 paintedTexture: (paintedTex !== frontTex && canHover) ? paintedTex : null,
                 backTexture: colorTextures.get(backTextureRaw),
-                buttonTexture: colorTextures.get(overlayTextureRaw),
+                buttonTexture: colorTextures.get(buttonRaw),
+                cardIllustrationTexture: cardIllustrations[projectIndex],
+                noteIconTextures: (NOTEBOOK_FEATURE_ICONS[projectData.id] || [4, 5, 6, 7]).map(icon => notebookIcons[icon]),
                 techStack: techStack
             };
         });
-    }, [activeProjects, projectTextures, paintedTextures, canHover, backTextureRaw, overlayTextureRaw, colorTextures]);
+    }, [activeProjects, projectTextures, paintedTextures, canHover, backTextureRaw, colorTextures, buttonRaw, cardIllustrations, notebookIcons]);
 
     // 滚动到指定项目索引的函数。
     const scrollToIndex = (index, onComplete) => {
@@ -645,9 +670,9 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
     const buttonGroupRef = useRef(); // 背面交互按钮引用。
     const detailsGroupRef = useRef(); // 背面项目详情引用。
     const techStackGroupRef = useRef(); // 背面技术栈区域引用。
+    const artworkGroupRef = useRef();
     const detailsTextRef1 = useRef();
     const detailsTextRef2 = useRef();
-    const techTextRef = useRef();
     const openTextRef = useRef();
     const [hovered, setHovered] = useState(false);
     const [btnHovered, setBtnHovered] = useState(false);
@@ -912,7 +937,6 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
                 applyOpacity(textRef);
                 applyOpacity(detailsTextRef1);
                 applyOpacity(detailsTextRef2);
-                applyOpacity(techTextRef);
                 applyOpacity(openTextRef);
             }
         }
@@ -935,65 +959,22 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
             textRef.current.rotation.x = Math.atan(dz_dy);
         }
 
-        // 让背面按钮 Z 与纸背动画一致。
-        if (buttonGroupRef.current && materialRef.current) {
-            const y = buttonGroupRef.current.position.y;
-            const uBend = materialRef.current.bend;
-            const uWindStrength = materialRef.current.windStrength || 0;
-            const uTime = state.clock.getElapsedTime();
-
-            const bendAmount = Math.pow(y, 2.0) * uBend;
-            const totalWind = 0.02 + uWindStrength;
-            const flutter = Math.sin(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
-
-            // 注意：整个平面向父级 +Z 方向弯曲。
-            // 按钮在背面外侧，应位于平面后少许，例如 -0.03。
-            // 不要将整个弯曲方程取负，否则会反转波动方向。
-            buttonGroupRef.current.position.z = bendAmount + flutter - 0.03;
-
-            // 按钮在另一侧，额外旋转 PI 以贴合曲面。
-            const dz_dy = 2.0 * y * uBend + 2.0 * Math.cos(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
-            buttonGroupRef.current.rotation.x = Math.PI + Math.atan(dz_dy);
-
-            // 按钮悬停放大动画，文字随之放大。
-            const targetScale = btnHovered ? 1.08 : 1;
+        // 纸背的文字、插画、功能提示和入口共享同一张弯曲纸面。
+        const uTime = state.clock.getElapsedTime();
+        const bend = materialRef.current?.bend || 0;
+        const paperWind = 0.02 + (materialRef.current?.windStrength || 0);
+        for (const groupRef of [buttonGroupRef, detailsGroupRef, techStackGroupRef, artworkGroupRef]) {
+            const group = groupRef.current;
+            if (!group) continue;
+            const y = group.position.y;
+            const flutter = Math.sin(uTime * 2 + y * 2) * paperWind * (1 + Math.abs(bend * 3));
+            group.position.z = y * y * bend + flutter - 0.03;
+            const slope = 2 * y * bend + 2 * Math.cos(uTime * 2 + y * 2) * paperWind * (1 + Math.abs(bend * 3));
+            group.rotation.x = Math.PI + Math.atan(slope);
+        }
+        if (buttonGroupRef.current) {
+            const targetScale = btnHovered ? 1.025 : 1;
             buttonGroupRef.current.scale.lerp(_tempScale.set(targetScale, targetScale, 1), 0.15);
-        }
-
-        // 对齐顶部项目详情的位置。
-        if (detailsGroupRef.current && materialRef.current) {
-            const y = detailsGroupRef.current.position.y;
-            const uBend = materialRef.current.bend;
-            const uWindStrength = materialRef.current.windStrength || 0;
-            const uTime = state.clock.getElapsedTime();
-
-            const bendAmount = Math.pow(y, 2.0) * uBend;
-            const totalWind = 0.02 + uWindStrength;
-            const flutter = Math.sin(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
-
-            // 位于背面，与按钮相同。
-            detailsGroupRef.current.position.z = bendAmount + flutter - 0.03;
-
-            // 旋转。
-            const dz_dy = 2.0 * y * uBend + 2.0 * Math.cos(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
-            detailsGroupRef.current.rotation.x = Math.PI + Math.atan(dz_dy);
-        }
-
-        // 对齐技术栈区域的位置。
-        if (techStackGroupRef.current && materialRef.current) {
-            const y = techStackGroupRef.current.position.y;
-            const uBend = materialRef.current.bend;
-            const uWindStrength = materialRef.current.windStrength || 0;
-            const uTime = state.clock.getElapsedTime();
-
-            const bendAmount = Math.pow(y, 2.0) * uBend;
-            const totalWind = 0.02 + uWindStrength;
-            const flutter = Math.sin(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
-
-            techStackGroupRef.current.position.z = bendAmount + flutter - 0.03;
-
-            const dz_dy = 2.0 * y * uBend + 2.0 * Math.cos(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
-            techStackGroupRef.current.rotation.x = Math.PI + Math.atan(dz_dy);
         }
 
         // 仅在翻转动画期间跳过位置更新，滚动时仍更新。
@@ -1097,22 +1078,17 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
                     position={[0, 0.75, 0]}
                     rotation={[Math.PI, 0, 0]}
                 >
-                    {/* 第 1 层：按钮外框，不接收事件。 */}
                     <mesh>
-                        <planeGeometry args={[1.2, 1.2 / 3.613]} />
-                        <meshBasicMaterial color="#ffffff"
-                            map={project.buttonTexture}
-                            transparent={true}
-                            alphaTest={0.05}
-                        />
+                        <planeGeometry args={[1.1, 0.25]} />
+                        <meshBasicMaterial toneMapped={false} fog={false} map={project.buttonTexture} color={btnHovered ? '#fff4d5' : '#ffffff'} transparent alphaTest={0.03} />
                     </mesh>
 
                     {/* 第 2 层：“打开项目”文字，不接收事件。 */}
                     <Text
                         ref={openTextRef}
-                        position={[0, 0, 0.01]}
-                        fontSize={0.11}
-                        color={btnHovered ? "#333333" : "#1c1c1c"}
+                        position={[-0.035, 0, 0.01]}
+                        fontSize={0.073}
+                        color="#433b2e"
                         font="/fonts/LXGWWenKaiLite-site.woff"
                         anchorX="center"
                         anchorY="middle"
@@ -1120,6 +1096,11 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
                     >
                         查看项目
                     </Text>
+                    <group position={[0.44, 0, 0.01]}>
+                        <mesh><planeGeometry args={[0.09, 0.006]} /><meshBasicMaterial toneMapped={false} fog={false} color="#433b2e" /></mesh>
+                        <mesh position={[0.029, 0.014, 0]} rotation={[0, 0, -Math.PI / 4]}><planeGeometry args={[0.04, 0.006]} /><meshBasicMaterial toneMapped={false} fog={false} color="#433b2e" /></mesh>
+                        <mesh position={[0.029, -0.014, 0]} rotation={[0, 0, Math.PI / 4]}><planeGeometry args={[0.04, 0.006]} /><meshBasicMaterial toneMapped={false} fog={false} color="#433b2e" /></mesh>
+                    </group>
 
                     {/* 第 3 层：覆盖整个按钮的不可见区域，接收全部事件。 */}
                     <mesh
@@ -1144,8 +1125,8 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
                             setBtnHovered(false);
                         }}
                     >
-                        <planeGeometry args={[1.2, 1.2 / 3.613]} />
-                        <meshBasicMaterial color="#e0e0e0" transparent={true} opacity={0} />
+                        <planeGeometry args={[1.14, 0.25]} />
+                        <meshBasicMaterial toneMapped={false} fog={false} color="#e0e0e0" transparent={true} opacity={0} />
                     </mesh>
                 </group>
 
@@ -1157,83 +1138,72 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
                 >
                     <Text
                         ref={detailsTextRef1}
-                        position={[0, 0.28, 0.01]} // 相对于 detailsGroupRef 中心向上。
-                        fontSize={0.10}
-                        color="#1c1c1c"
+                        position={[-0.57, 0.36, 0.01]}
+                        fontSize={0.15}
+                        maxWidth={1.14}
+                        lineHeight={1.2}
+                        color="#30362f"
                         font="/fonts/LXGWWenKaiLite-site.woff"
-                        anchorX="center"
-                        anchorY="middle"
+                        anchorX="left"
+                        anchorY="top"
                         fillOpacity={0} // 初始隐藏。
                     >
-                        项目介绍：
+                        {project.shortTitle || project.cardTitle || project.title}
                     </Text>
+
+                    <mesh position={[-0.25, 0.225, 0.005]} rotation={[0, 0, -0.012]}>
+                        <planeGeometry args={[0.65, 0.014]} />
+                        <meshBasicMaterial toneMapped={false} fog={false} color="#edcc85" />
+                    </mesh>
 
                     <Text
                         ref={detailsTextRef2}
-                        position={[0, 0.2, 0.01]} // 位于标题下方。
-                        fontSize={0.06}
-                        color="#333333"
+                        position={[-0.57, 0.16, 0.01]}
+                        fontSize={0.057}
+                        color="#4a4d43"
                         font="/fonts/LXGWWenKaiLite-site.woff"
-                        anchorX="center"
+                        anchorX="left"
                         anchorY="top"
-                        maxWidth={1.1} // 触发换行前的最大宽度。
+                        maxWidth={1.14}
                         overflowWrap="break-word"
-                        lineHeight={1.4}
-                        textAlign="center"
+                        lineHeight={1.55}
+                        textAlign="left"
                         fillOpacity={0} // 初始隐藏。
                     >
                         {project.description || "项目介绍将在这里显示。"}
                     </Text>
                 </group>
 
-                {/* 纸背面的技术栈区域。 */}
-                <group
-                    ref={techStackGroupRef}
-                    position={[0, 0.30, 0]} // 位于项目详情与打开项目按钮之间。
-                    rotation={[Math.PI, 0, 0]}
-                >
-                    <Text
-                        ref={techTextRef}
-                        position={[0, 0.15, 0.01]}
-                        fontSize={0.08}
-                        color="#1c1c1c"
-                        font="/fonts/LXGWWenKaiLite-site.woff"
-                        anchorX="center"
-                        anchorY="middle"
-                        fillOpacity={0} // 初始隐藏。
-                    >
-                        {project.cardNotes ? project.cardNotesTitle || '在乐园里' : '技术栈'}
-                    </Text>
+                <group ref={artworkGroupRef} position={[0, -0.065, 0]} rotation={[Math.PI, 0, 0]}>
+                    <mesh>
+                        <planeGeometry args={[1.14, 0.5]} />
+                        <meshBasicMaterial toneMapped={false} fog={false} map={project.cardIllustrationTexture} transparent alphaTest={0.03} />
+                    </mesh>
+                </group>
 
-                    {/* 横向排列标志的容器。 */}
-                    <group position={[0, -0.05, 0.01]}>
-                        {project.cardNotes?.map((note, noteIndex) => (
-                            <Text
-                                key={note}
-                                position={[(noteIndex - (project.cardNotes.length - 1) / 2) * 0.3, 0, 0]}
-                                font="/fonts/LXGWWenKaiLite-site.woff"
-                                fontSize={0.05}
-                                color="#333333"
-                                maxWidth={0.25}
-                                anchorX="center"
-                                anchorY="middle"
-                                textAlign="center"
-                                lineHeight={1.5}
-                            >
+                <group ref={techStackGroupRef} position={[0, 0.395, 0]} rotation={[Math.PI, 0, 0]}>
+                    {[-0.185, -0.005, 0.175].map(y => <mesh key={y} position={[0, y, 0.005]}>
+                        <planeGeometry args={[1.14, 0.0015]} />
+                        <meshBasicMaterial toneMapped={false} fog={false} color="#cdbfa4" />
+                    </mesh>)}
+                    <mesh position={[0, -0.005, 0.005]}>
+                        <planeGeometry args={[0.0015, 0.36]} />
+                        <meshBasicMaterial toneMapped={false} fog={false} color="#cdbfa4" />
+                    </mesh>
+                    {project.cardNotes?.map((note, noteIndex) => {
+                        const x = -0.49 + (noteIndex % 2) * 0.59;
+                        const y = 0.075 - Math.floor(noteIndex / 2) * 0.17;
+                        return <group key={note} position={[x, y, 0.01]}>
+                            <mesh>
+                                <planeGeometry args={[0.17, 0.17]} />
+                                <meshBasicMaterial toneMapped={false} fog={false} map={project.noteIconTextures[noteIndex]} transparent alphaTest={0.03} />
+                            </mesh>
+                            <Text position={[0.115, 0, 0.005]} font="/fonts/LXGWWenKaiLite-site.woff" fontSize={note.replace(/[A-Za-z]/g, "").length > 5 ? 0.055 : 0.066} color="#433c31" maxWidth={0.36} anchorX="left" anchorY="middle" lineHeight={1.4}>
                                 {note}
                             </Text>
-                        ))}
-                        {project.techStack && project.techStack.map((logoPath, idx) => {
-                            // 四个方块居中排列的间距。
-                            const spacing = 0.30;
-                            const startX = -((project.techStack.length - 1) * spacing) / 2;
-                            const xPos = startX + (idx * spacing);
-
-                            return (
-                                <TechStackLogo key={idx} path={logoPath} position={[xPos, 0, 0]} />
-                            );
-                        })}
-                    </group>
+                        </group>;
+                    })}
+                    {project.techStack?.map((logoPath, idx) => <TechStackLogo key={logoPath} path={logoPath} position={[(idx - (project.techStack.length - 1) / 2) * 0.3, 0, 0]} />)}
                 </group>
 
                 {/* 
