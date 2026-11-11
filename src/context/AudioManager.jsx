@@ -1,3 +1,4 @@
+import { media } from '../media';
 import { AudioContext } from './contexts';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
@@ -68,12 +69,12 @@ export const AudioProvider = ({ children }) => {
         if (!audioEnabled) return { stop() {} };
         // 文件缺失时平稳降级。
         const soundPaths = {
-            'tear': '/sounds/papersound.mp3',
-            'szumwiatru': '/sounds/szumwiatru.mp3', // 关于我房间的风声。
-            'szummiasta': '/sounds/szummiasta.mp3', // 画廊房间的城市声。
-            'uchyleniedrzwi': '/sounds/uchyleniedrzwi.mp3', // 悬停时的吱呀声。
-            'otwarciedrzwi': '/sounds/otwarciedrzwi.mp3',   // 主门和侧门的开门声。
-            'zamknieciedrzwi': '/sounds/zamknieciedrzwi.mp3' // 关门声。
+            'tear': media.audio.paper,
+            'szumwiatru': media.audio.wind, // 关于我房间的风声。
+            'szummiasta': media.audio.city, // 画廊房间的城市声。
+            'uchyleniedrzwi': media.audio.doorCreak, // 悬停时的吱呀声。
+            'otwarciedrzwi': media.audio.doorOpen,   // 主门和侧门的开门声。
+            'zamknieciedrzwi': media.audio.doorClose // 关门声。
         };
         const path = soundPaths[soundName];
         if (!path) return { stop() {} };

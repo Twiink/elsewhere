@@ -1,3 +1,4 @@
+import { media } from '../../../../media';
 import { useScene, useAchievements, useAudio } from '../../../../context/contexts';
 import Text from '../../SiteText';
 import { useRef, useEffect } from 'react';
@@ -230,7 +231,7 @@ const AboutRoom = ({ onReady, isExiting, isWarmup }) => {
             {!isWarmup && (
                 <PositionalAudio
                     ref={audioRef}
-                    url="/sounds/szumwiatru.mp3"
+                    url={media.audio.wind}
                     distanceModel="exponential"
                     refDistance={AUDIO_SETTINGS.distance}
                     rolloffFactor={AUDIO_SETTINGS.rolloff}

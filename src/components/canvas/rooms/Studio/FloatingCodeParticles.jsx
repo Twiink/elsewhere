@@ -186,7 +186,7 @@ const FloatingCodeParticles = ({ towerRotationRef, fallOffsetRef }) => {
                     anchorX="center"
                     anchorY="middle"
                     fillOpacity={particle.opacity}
-                    font="/fonts/LXGWWenKaiLite-site.woff"
+                    font="/media/fonts/LXGWWenKaiLite-site.woff"
                 >
                     {particle.symbol.text}
                 </Text>

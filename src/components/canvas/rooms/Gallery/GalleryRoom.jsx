@@ -1,8 +1,10 @@
+import { useTexture } from '../../../../hooks/useMediaTexture';
+import { media } from '../../../../media';
 import { useScene, useAchievements, useAudio } from '../../../../context/contexts';
 import Text from '../../SiteText';
 import { useRef, useState, useMemo, useEffect, forwardRef, useImperativeHandle, memo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useTexture, Float, PositionalAudio } from '@react-three/drei';
+import { Float, PositionalAudio } from '@react-three/drei';
 
 import * as THREE from 'three';
 import gsap from 'gsap';
@@ -421,7 +423,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             {!isWarmup && (
                 <PositionalAudio
                     ref={audioRef}
-                    url="/sounds/szummiasta.mp3"
+                    url={media.audio.city}
                     distanceModel="exponential"
                     refDistance={AUDIO_SETTINGS.distance}
                     rolloffFactor={AUDIO_SETTINGS.rolloff}
@@ -1089,7 +1091,7 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
                         position={[-0.035, 0, 0.01]}
                         fontSize={0.073}
                         color="#433b2e"
-                        font="/fonts/LXGWWenKaiLite-site.woff"
+                        font="/media/fonts/LXGWWenKaiLite-site.woff"
                         anchorX="center"
                         anchorY="middle"
                         fillOpacity={0} // 初始隐藏。
@@ -1143,7 +1145,7 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
                         maxWidth={1.14}
                         lineHeight={1.2}
                         color="#30362f"
-                        font="/fonts/LXGWWenKaiLite-site.woff"
+                        font="/media/fonts/LXGWWenKaiLite-site.woff"
                         anchorX="left"
                         anchorY="top"
                         fillOpacity={0} // 初始隐藏。
@@ -1161,7 +1163,7 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
                         position={[-0.57, 0.16, 0.01]}
                         fontSize={0.057}
                         color="#4a4d43"
-                        font="/fonts/LXGWWenKaiLite-site.woff"
+                        font="/media/fonts/LXGWWenKaiLite-site.woff"
                         anchorX="left"
                         anchorY="top"
                         maxWidth={1.14}
@@ -1198,7 +1200,7 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
                                 <planeGeometry args={[0.17, 0.17]} />
                                 <meshBasicMaterial toneMapped={false} fog={false} map={project.noteIconTextures[noteIndex]} transparent alphaTest={0.03} />
                             </mesh>
-                            <Text position={[0.115, 0, 0.005]} font="/fonts/LXGWWenKaiLite-site.woff" fontSize={note.replace(/[A-Za-z]/g, "").length > 5 ? 0.055 : 0.066} color="#433c31" maxWidth={0.36} anchorX="left" anchorY="middle" lineHeight={1.4}>
+                            <Text position={[0.115, 0, 0.005]} font="/media/fonts/LXGWWenKaiLite-site.woff" fontSize={note.replace(/[A-Za-z]/g, "").length > 5 ? 0.055 : 0.066} color="#433c31" maxWidth={0.36} anchorX="left" anchorY="middle" lineHeight={1.4}>
                                 {note}
                             </Text>
                         </group>;
@@ -1217,7 +1219,7 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
                   
                   fontSize：字号，默认 0.15。
                   color：文字颜色。
-                  font：可选，可使用 /public/fonts/ 中的其他字体。
+                  font：可选，可使用 /public/media/fonts/ 中的其他字体。
                 */}
                 <Text
                     ref={textRef}
@@ -1228,7 +1230,7 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
                     textAlign="center"
                     lineHeight={1.25}
                     color="#1c1c1c"
-                    font="/fonts/LXGWWenKaiLite-site.woff"
+                    font="/media/fonts/LXGWWenKaiLite-site.woff"
                     anchorX="center"
                     anchorY="middle"
                     fillOpacity={0} // 初始隐藏。
@@ -1238,7 +1240,7 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
 
                 <PositionalAudio
                     ref={paperAudioRef}
-                    url="/sounds/papersound.mp3"
+                    url={media.audio.paper}
                     distanceModel="exponential"
                     rolloffFactor={GALLERY_INTERACTION_AUDIO_SETTINGS.rolloff}
                     refDistance={GALLERY_INTERACTION_AUDIO_SETTINGS.distance}

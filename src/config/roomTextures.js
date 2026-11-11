@@ -1,19 +1,9 @@
-import { TextureLoader } from 'three';
+import { MediaTextureLoader } from '../media/MediaTextureLoader';
+
 import { useLoader } from '@react-three/fiber';
 import { GALLERY_TEXTURES, STUDIO_TEXTURES, ABOUT_TEXTURES, CONTACT_TEXTURES, filterTexturesByDevice } from './texturePreloadList';
 import { galleryProjects, studioContent, studioWishCard } from '../data/content';
-import { createResourceCache } from '../utils/resourceCache';
-
-const loadImage = createResourceCache(url => new Promise((resolve, reject) => {
-  const image = new Image();
-  image.crossOrigin = 'anonymous';
-  image.onload = () => {
-    useLoader.preload(TextureLoader, url);
-    resolve();
-  };
-  image.onerror = () => reject(new Error('房间图片加载失败'));
-  image.src = url;
-}));
+import { loadImage } from '../media';
 
 export function preloadRoomTextures(id) {
   const hover = window.matchMedia('(hover: hover)').matches;
@@ -30,5 +20,7 @@ export function preloadRoomTextures(id) {
     contact: CONTACT_TEXTURES,
   };
   const urls = [...new Set(filterTexturesByDevice((lists[id] ?? []).filter(Boolean), hover))];
-  return Promise.all(urls.map(loadImage));
+  return Promise.all(urls.map(url => loadImage(url).then(() => {
+    useLoader.preload(MediaTextureLoader, url);
+  })));
 }

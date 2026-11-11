@@ -1,3 +1,4 @@
+import { media } from '../media';
 /**
  * 简单的全局背景音乐管理器。
  */
@@ -15,8 +16,8 @@ export const initAudio = () => {
     isMuted = savedMuted === 'true';
 
     if (!bgMusicAudio) {
-        // 使用 public/sounds/ 中提供的音频文件。
-        bgMusicAudio = new Audio('/sounds/cfl_turningpages-belem-breeze-487596.ogg');
+        // 背景音乐与场景音效统一读取 media 清单。
+        bgMusicAudio = new Audio(media.audio.background);
         bgMusicAudio.preload = 'auto'; // 立即让浏览器获取数据。
         bgMusicAudio.loop = true;
         bgMusicAudio.volume = 0.3; // 舒缓背景音乐的默认音量。

@@ -33,10 +33,10 @@ dist-ssr
 
 # 发布目录中的备份、试验图与生成元数据
 /public/**/backups/
-/public/textures/**/*_ORIGINAL.*
-/public/textures/**/*_backup.*
-/public/textures/**/*_test.*
-/public/textures/entrance/pot_with_duck1.webp
+/public/media/images/textures/**/*_ORIGINAL.*
+/public/media/images/textures/**/*_backup.*
+/public/media/images/textures/**/*_test.*
+/public/media/images/textures/entrance/pot_with_duck1.webp
 /public/**/*.webp.json
 /public/**/*.png.json
 /public/**/*.jpg.json

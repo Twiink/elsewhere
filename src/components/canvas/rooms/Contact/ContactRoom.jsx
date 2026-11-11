@@ -1,3 +1,5 @@
+import { useTexture } from '../../../../hooks/useMediaTexture';
+import { media } from '../../../../media';
 import { useScene, useAchievements, useAudio } from '../../../../context/contexts';
 import Text from '../../SiteText';
 import { useRef, useState, useEffect } from 'react';
@@ -19,7 +21,7 @@ import GalleryClouds from '../Gallery/GalleryClouds';
 // 🌊 联系我房间第二版：漂流瓶留言。
 // 沉浸体验：写信、卷入瓶中、投出漂流瓶。
 // ============================================
-import { useTexture } from '@react-three/drei';
+
 import { usePaintMaterial } from '../Gallery/usePaintMaterial';
 
 const WAVE_LAYERS = 4;
@@ -330,7 +332,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             {!isWarmup && (
                 <PositionalAudio
                     ref={audioRef}
-                    url="/sounds/szummorza.mp3"
+                    url={media.audio.sea}
                     distanceModel="exponential"
                     refDistance={AUDIO_SETTINGS.distance}
                     rolloffFactor={AUDIO_SETTINGS.rolloff}

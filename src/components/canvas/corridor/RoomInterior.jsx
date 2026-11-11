@@ -1,7 +1,8 @@
+import { useTexture } from '../../../hooks/useMediaTexture';
 import Text from '../SiteText';
 import { useMemo, memo, Suspense, useEffect } from 'react';
 
-import { useTexture } from '@react-three/drei';
+
 import * as THREE from 'three';
 
 import { ROOM_COMPONENTS, ROOM_LABELS } from '../../../config/roomResources';

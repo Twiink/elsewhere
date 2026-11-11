@@ -1,7 +1,8 @@
+import { useTexture } from '../../../hooks/useMediaTexture';
 import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
 import Text from '../SiteText';
 import { useMemo, useState, useRef, useEffect } from 'react';
-import { useTexture } from '@react-three/drei';
+
 
 import * as THREE from 'three';
 import { useThree } from '@react-three/fiber';
@@ -29,7 +30,7 @@ const tempEuler = new THREE.Euler();
 const tempQuat = new THREE.Quaternion();
 
 
-const CABIN_SKETCH_URL = '/fonts/LXGWWenKaiLite-site.woff';
+const CABIN_SKETCH_URL = '/media/fonts/LXGWWenKaiLite-site.woff';
 
 const PictureContent = ({ imagePath, imagePaintedPath, width, height, isPainted }) => {
     const texture = useTexture(imagePath);

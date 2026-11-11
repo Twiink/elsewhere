@@ -1,3 +1,5 @@
+import { useTexture } from '../../../hooks/useMediaTexture';
+import { media } from '../../../media';
 import { useScene, useAudio } from '../../../context/contexts';
 import { prefetchRoom, ROOM_LABELS } from '../../../config/roomResources';
 import { startLoadingTimeout } from '../../../utils/loadingTimeout';
@@ -5,7 +7,7 @@ import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
 import Text from '../SiteText';
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { useThree } from '@react-three/fiber';
-import { useTexture, PositionalAudio } from '@react-three/drei';
+import { PositionalAudio } from '@react-three/drei';
 
 import * as THREE from 'three';
 import gsap from 'gsap';
@@ -1022,7 +1024,7 @@ const DoorSection = ({
                         {label === "作品画廊" && (
                             <group position={[0, 0, 0.01]}>
                                 <Text
-                                    font="/fonts/LXGWWenKaiLite-site.woff"
+                                    font="/media/fonts/LXGWWenKaiLite-site.woff"
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
@@ -1032,7 +1034,7 @@ const DoorSection = ({
                                     我的
                                 </Text>
                                 <Text
-                                    font="/fonts/LXGWWenKaiLite-site.woff"
+                                    font="/media/fonts/LXGWWenKaiLite-site.woff"
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
@@ -1046,7 +1048,7 @@ const DoorSection = ({
                         {label === "生活手记" && (
                             <group position={[0, 0, 0.01]}>
                                 <Text
-                                    font="/fonts/LXGWWenKaiLite-site.woff"
+                                    font="/media/fonts/LXGWWenKaiLite-site.woff"
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
@@ -1056,7 +1058,7 @@ const DoorSection = ({
                                     生活
                                 </Text>
                                 <Text
-                                    font="/fonts/LXGWWenKaiLite-site.woff"
+                                    font="/media/fonts/LXGWWenKaiLite-site.woff"
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
@@ -1069,7 +1071,7 @@ const DoorSection = ({
                         )}
                         {label === "关于我" && (
                             <Text
-                                font="/fonts/LXGWWenKaiLite-site.woff"
+                                font="/media/fonts/LXGWWenKaiLite-site.woff"
                                 fontSize={0.30}
                                 color="#111111"
                                 anchorX="center"
@@ -1081,7 +1083,7 @@ const DoorSection = ({
                         )}
                         {label === "联系我" && (
                             <Text
-                                font="/fonts/LXGWWenKaiLite-site.woff"
+                                font="/media/fonts/LXGWWenKaiLite-site.woff"
                                 fontSize={0.25}
                                 color="#111111"
                                 anchorX="center"
@@ -1206,7 +1208,7 @@ const DoorSection = ({
                 {/* 空间音频节点，位于门前少许。 */}
                 <PositionalAudio
                     ref={hoverAudioRef}
-                    url="/sounds/uchyleniedrzwi.mp3"
+                    url={media.audio.doorCreak}
                     distanceModel="exponential"
                     rolloffFactor={DOOR_AUDIO_SETTINGS.rolloff}
                     refDistance={DOOR_AUDIO_SETTINGS.distance}
@@ -1214,7 +1216,7 @@ const DoorSection = ({
                 />
                 <PositionalAudio
                     ref={openAudioRef}
-                    url="/sounds/otwarciedrzwi.mp3"
+                    url={media.audio.doorOpen}
                     distanceModel="exponential"
                     rolloffFactor={DOOR_AUDIO_SETTINGS.rolloff}
                     refDistance={DOOR_AUDIO_SETTINGS.distance}
@@ -1222,7 +1224,7 @@ const DoorSection = ({
                 />
                 <PositionalAudio
                     ref={closeAudioRef}
-                    url="/sounds/zamknieciedrzwi.mp3"
+                    url={media.audio.doorClose}
                     distanceModel="exponential"
                     rolloffFactor={DOOR_AUDIO_SETTINGS.rolloff}
                     refDistance={DOOR_AUDIO_SETTINGS.distance}

@@ -1,3 +1,4 @@
+import { MediaTextureLoader } from '../../../../media/MediaTextureLoader';
 import { useMemo, useRef } from 'react';
 import { useLoader, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -83,7 +84,7 @@ const StaticCloud = ({ position, scale, opacity, textureIndex, driftSpeed, initi
     const totalDistance = startX - endX;
 
     // 加载指定云纹理。
-    const texture = useLoader(THREE.TextureLoader, CLOUD_TEXTURES[textureIndex]);
+    const texture = useLoader(MediaTextureLoader, CLOUD_TEXTURES[textureIndex]);
 
     // 使用原始宽高比，防止二次幂尺寸转换后拉伸。
     const legacyCloudAspects = {

@@ -1,8 +1,9 @@
+import { useTexture } from '../../../hooks/useMediaTexture';
 import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
 import { useMemo, useRef, useCallback } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useTexture } from '@react-three/drei';
+
 import { useTextureCopy } from '../../../hooks/useTextureCopy';
 
 // 导入常量，以匹配 CorridorSegment 的逻辑。

@@ -1,3 +1,5 @@
+import { MediaTextureLoader } from '../../../../media/MediaTextureLoader';
+import { media } from '../../../../media';
 import { useScene, useAudio } from '../../../../context/contexts';
 import Text from '../../SiteText';
 import { useTextureCopy } from '../../../../hooks/useTextureCopy';
@@ -137,7 +139,7 @@ const AwardButton = ({ onClick, texture, paintedTexture, width, height, position
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/LXGWWenKaiLite-site.woff"
+                font="/media/fonts/LXGWWenKaiLite-site.woff"
             >
                 {label}
             </Text>
@@ -149,8 +151,8 @@ const AwardButton = ({ onClick, texture, paintedTexture, width, height, position
 const ProfileButton = ({ section, position, label = '查看', width = 2.2 }) => {
     const { openOverlay } = useScene();
     const isTouch = isTouchDevice();
-    const texture = useTextureCopy(useLoader(THREE.TextureLoader, 'https://media.secknow-ai.com/space/textures/about/button.png?imageMogr2/thumbnail/512x128'), { colorSpace: THREE.SRGBColorSpace });
-    const paintedTexture = useTextureCopy(useLoader(THREE.TextureLoader, isTouch ? 'https://media.secknow-ai.com/space/textures/about/button.png?imageMogr2/thumbnail/512x128' : 'https://media.secknow-ai.com/space/textures/about/button_painted.png?imageMogr2/thumbnail/512x128'), { colorSpace: THREE.SRGBColorSpace });
+    const texture = useTextureCopy(useLoader(MediaTextureLoader, 'https://media.secknow-ai.com/space/textures/about/button.png?imageMogr2/thumbnail/512x128'), { colorSpace: THREE.SRGBColorSpace });
+    const paintedTexture = useTextureCopy(useLoader(MediaTextureLoader, isTouch ? 'https://media.secknow-ai.com/space/textures/about/button.png?imageMogr2/thumbnail/512x128' : 'https://media.secknow-ai.com/space/textures/about/button_painted.png?imageMogr2/thumbnail/512x128'), { colorSpace: THREE.SRGBColorSpace });
 
     return <AwardButton
         texture={texture}
@@ -285,7 +287,7 @@ const InfiniteSkyManager = ({ scrollProgressRef }) => {
  */
 const IntroMilestone = ({ z, scrollProgressRef }) => {
     // 加载人物纹理。
-    const avatarTexture = useLoader(THREE.TextureLoader, 'https://media.secknow-ai.com/space/textures/twiink/cloud-ink.png');
+    const avatarTexture = useLoader(MediaTextureLoader, 'https://media.secknow-ai.com/space/textures/twiink/cloud-ink.png');
 
     // 全部动画元素的引用。
     const groupRef = useRef();
@@ -372,7 +374,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/LXGWWenKaiLite-site.woff"
+                font="/media/fonts/LXGWWenKaiLite-site.woff"
             >
                 {siteInfo.nickname}
             </Text>
@@ -385,7 +387,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 color="#4a4a4a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/LXGWWenKaiLite-site.woff"
+                font="/media/fonts/LXGWWenKaiLite-site.woff"
             >
                 {siteInfo.siteTitle}
             </Text>
@@ -412,7 +414,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 color="#555555"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/LXGWWenKaiLite-site.woff"
+                font="/media/fonts/LXGWWenKaiLite-site.woff"
                 fontStyle="italic"
             >
                 {personalProfile.role}
@@ -428,7 +430,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 color="#555555"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/LXGWWenKaiLite-site.woff"
+                font="/media/fonts/LXGWWenKaiLite-site.woff"
                 fontStyle="italic"
             >
                 {personalProfile.keywords.join(' · ')}
@@ -446,7 +448,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
 const HighlightsMilestone = ({ z, scrollProgressRef }) => {
     const groupRef = useRef();
     const noteRefs = useRef([]);
-    const noteTexture = useLoader(THREE.TextureLoader, 'https://media.secknow-ai.com/space/textures/twiink/profile-note.png?imageMogr2/thumbnail/800x560');
+    const noteTexture = useLoader(MediaTextureLoader, 'https://media.secknow-ai.com/space/textures/twiink/profile-note.png?imageMogr2/thumbnail/800x560');
 
     useFrame(state => {
         if (!groupRef.current) return;
@@ -464,7 +466,7 @@ const HighlightsMilestone = ({ z, scrollProgressRef }) => {
 
     return (
         <group ref={groupRef} position={[0, 2, z]}>
-            <Text position={[0, 4, 0]} fontSize={1} color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/LXGWWenKaiLite-site.woff">
+            <Text position={[0, 4, 0]} fontSize={1} color="#1a1a1a" anchorX="center" anchorY="middle" font="/media/fonts/LXGWWenKaiLite-site.woff">
                 {personalProfile.titles.highlights}
             </Text>
             {personalProfile.honors?.length > 0 && (
@@ -476,10 +478,10 @@ const HighlightsMilestone = ({ z, scrollProgressRef }) => {
                         <planeGeometry args={[3.6, 2.52]} />
                         <meshBasicMaterial map={noteTexture} transparent side={THREE.DoubleSide} />
                     </mesh>
-                    <Text position={[0, 0.5, 0.03]} fontSize={0.32} maxWidth={2.8} textAlign="center" color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/LXGWWenKaiLite-site.woff">
+                    <Text position={[0, 0.5, 0.03]} fontSize={0.32} maxWidth={2.8} textAlign="center" color="#1a1a1a" anchorX="center" anchorY="middle" font="/media/fonts/LXGWWenKaiLite-site.woff">
                         {item.sceneTitle || item.title}
                     </Text>
-                    <Text position={[0, 0, 0.03]} fontSize={0.24} color="#555555" anchorX="center" anchorY="middle" font="/fonts/LXGWWenKaiLite-site.woff">
+                    <Text position={[0, 0, 0.03]} fontSize={0.24} color="#555555" anchorX="center" anchorY="middle" font="/media/fonts/LXGWWenKaiLite-site.woff">
                         {formatProfileDate(item.date)}
                     </Text>
                     <ProfileButton section="highlights" position={[0, -0.65, 0.05]} />
@@ -502,8 +504,8 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
     const firstProject = personalProfile.timeline.find(item => item.kind === 'project');
 
     // 加载纹理。
-    const uoTexture = useTextureCopy(useLoader(THREE.TextureLoader, 'https://media.secknow-ai.com/space/textures/twiink/profile-island.png?imageMogr2/thumbnail/800x500'), { colorSpace: THREE.SRGBColorSpace });
-    const freelanceTexture = useTextureCopy(useLoader(THREE.TextureLoader, 'https://media.secknow-ai.com/space/textures/about/island-free-creation.png'), { colorSpace: THREE.SRGBColorSpace });
+    const uoTexture = useTextureCopy(useLoader(MediaTextureLoader, 'https://media.secknow-ai.com/space/textures/twiink/profile-island.png?imageMogr2/thumbnail/800x500'), { colorSpace: THREE.SRGBColorSpace });
+    const freelanceTexture = useTextureCopy(useLoader(MediaTextureLoader, 'https://media.secknow-ai.com/space/textures/about/island-free-creation.png'), { colorSpace: THREE.SRGBColorSpace });
 
     // 纹理设置。
 
@@ -577,7 +579,7 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/LXGWWenKaiLite-site.woff"
+                font="/media/fonts/LXGWWenKaiLite-site.woff"
             >
                 {personalProfile.titles.timeline}
             </Text>
@@ -589,7 +591,7 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                 color="#555555"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/LXGWWenKaiLite-site.woff"
+                font="/media/fonts/LXGWWenKaiLite-site.woff"
             >
                 {personalProfile.timeline.map(item => item.date.slice(0, 4)).filter((year, index, years) => years.indexOf(year) === index).join(' · ')}
             </Text>
@@ -606,7 +608,7 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                         side={THREE.DoubleSide}
                     />
                 </mesh>
-                <Text position={[0, 0.95, 0.1]} fontSize={0.42} maxWidth={3.6} textAlign="center" color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/LXGWWenKaiLite-site.woff">
+                <Text position={[0, 0.95, 0.1]} fontSize={0.42} maxWidth={3.6} textAlign="center" color="#1a1a1a" anchorX="center" anchorY="middle" font="/media/fonts/LXGWWenKaiLite-site.woff">
                     {education?.organization || education?.title || personalProfile.titles.timeline}
                 </Text>
                 {/* 日期与完整经历使用同一条数据。 */}
@@ -616,7 +618,7 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                     color="#1a1a1a"
                     anchorX="center"
                     anchorY="middle"
-                    font="/fonts/LXGWWenKaiLite-site.woff"
+                    font="/media/fonts/LXGWWenKaiLite-site.woff"
                 >
                     {formatProfileDate(education?.date)}
                 </Text>
@@ -639,7 +641,7 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                     color="#1a1a1a"
                     anchorX="center"
                     anchorY="middle"
-                    font="/fonts/LXGWWenKaiLite-site.woff"
+                    font="/media/fonts/LXGWWenKaiLite-site.woff"
                 >
                     {formatProfileDate(firstProject?.date)}
                 </Text>
@@ -683,9 +685,9 @@ const SIZE_MULTIPLIERS = {
 // 单个气球组件。
 const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => {
     const isTouch = isTouchDevice();
-    const texture = useTextureCopy(useLoader(THREE.TextureLoader, config.texture), { colorSpace: THREE.SRGBColorSpace });
+    const texture = useTextureCopy(useLoader(MediaTextureLoader, config.texture), { colorSpace: THREE.SRGBColorSpace });
     const paintedTextureUrl = isTouch ? config.texture : config.paintedTexture;
-    const paintedTexture = useTextureCopy(useLoader(THREE.TextureLoader, paintedTextureUrl), { colorSpace: THREE.SRGBColorSpace });
+    const paintedTexture = useTextureCopy(useLoader(MediaTextureLoader, paintedTextureUrl), { colorSpace: THREE.SRGBColorSpace });
 
     const [isPopping, setIsPopping] = useState(false);
     const [hovered, setHovered] = useState(false);
@@ -971,7 +973,7 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
                 </mesh>
 
                 {!isPopping && (
-                    <Text position={[0, baseHeight * 0.2, 0.02]} fontSize={baseHeight * 0.08} maxWidth={baseHeight * 0.42} textAlign="center" color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/LXGWWenKaiLite-site.woff">
+                    <Text position={[0, baseHeight * 0.2, 0.02]} fontSize={baseHeight * 0.08} maxWidth={baseHeight * 0.42} textAlign="center" color="#1a1a1a" anchorX="center" anchorY="middle" font="/media/fonts/LXGWWenKaiLite-site.woff">
                         {config.label}
                     </Text>
                 )}
@@ -985,7 +987,7 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
                         color="#1a1a1a"
                         anchorX="center"
                         anchorY="middle"
-                        font="/fonts/LXGWWenKaiLite-site.woff"
+                        font="/media/fonts/LXGWWenKaiLite-site.woff"
                         fillOpacity={0}
                         outlineWidth={0.02}
                         outlineColor="#fff"
@@ -997,7 +999,7 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
 
                 <PositionalAudio
                     ref={balloonAudioRef}
-                    url="/sounds/baloonpoop.mp3"
+                    url={media.audio.balloonPop}
                     distanceModel="exponential"
                     rolloffFactor={BALLOON_AUDIO_SETTINGS.rolloff}
                     refDistance={BALLOON_AUDIO_SETTINGS.distance}
@@ -1072,7 +1074,7 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/LXGWWenKaiLite-site.woff"
+                font="/media/fonts/LXGWWenKaiLite-site.woff"
             >
                 {personalProfile.titles.skills}
             </Text>
@@ -1084,7 +1086,7 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
                 color="#555555"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/LXGWWenKaiLite-site.woff"
+                font="/media/fonts/LXGWWenKaiLite-site.woff"
             >
                 {personalProfile.skills.map(group => group.title).join(' · ')}
             </Text>

@@ -1,3 +1,4 @@
+import { MediaTextureLoader } from '../../../../media/MediaTextureLoader';
 import { useMemo, useRef } from 'react';
 import { useFrame, useThree, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -102,7 +103,7 @@ const Cloud = ({
     const basePosition = useRef(position);
 
     // 加载指定云纹理。
-    const texture = useLoader(THREE.TextureLoader, CLOUD_TEXTURES[textureIndex]);
+    const texture = useLoader(MediaTextureLoader, CLOUD_TEXTURES[textureIndex]);
 
     // 使用原始宽高比，防止二次幂尺寸转换后拉伸。
     const legacyCloudAspects = {

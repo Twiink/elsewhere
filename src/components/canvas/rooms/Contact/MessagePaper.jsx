@@ -1,7 +1,8 @@
+import { useTexture } from '../../../../hooks/useMediaTexture';
 import Text from '../../SiteText';
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useTexture, Html, useCursor } from '@react-three/drei';
+import { Html, useCursor } from '@react-three/drei';
 
 import * as THREE from 'three';
 import { analyzeContentAI } from '../../../../utils/contactValidation';
@@ -10,7 +11,7 @@ import { siteInfo } from '../../../../data/content';
 
 const PAPER_WIDTH = 1.51; // 原始比例 1197/1340。
 const PAPER_HEIGHT = 1.7;
-const FONT_PATH = '/fonts/LXGWWenKaiLite-site.woff';
+const FONT_PATH = '/media/fonts/LXGWWenKaiLite-site.woff';
 
 // 带平滑动画和不可见交互区域的文字输入辅助组件。
 const InteractiveTextField = ({

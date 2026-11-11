@@ -7,8 +7,8 @@ import * as THREE from 'three';
 import { siteInfo } from '../../../data/content';
 
 // 品牌字母使用原有字体，中文使用自动生成的 WOFF 子集。
-const RUBIK_SCRIBBLE_URL = '/fonts/RubikScribble-Regular.ttf';
-const CABIN_SKETCH_URL = '/fonts/LXGWWenKaiLite-site.woff';
+const RUBIK_SCRIBBLE_URL = '/media/fonts/RubikScribble-Regular.ttf';
+const CABIN_SKETCH_URL = '/media/fonts/LXGWWenKaiLite-site.woff';
 
 /**
  * HeroText：使用手绘字体的标题组件。

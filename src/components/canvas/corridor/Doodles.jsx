@@ -1,8 +1,9 @@
+import { useTexture } from '../../../hooks/useMediaTexture';
 import { usePerformance } from '../../../context/contexts';
 import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
 import { useRef } from 'react';
 
-import { useTexture } from '@react-three/drei';
+
 import * as THREE from 'three';
 
 

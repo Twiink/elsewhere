@@ -1,8 +1,9 @@
+import { useTexture } from '../../../hooks/useMediaTexture';
 import { useAchievements } from '../../../context/contexts';
 import Text from '../SiteText';
 import { useRef, useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useTexture } from '@react-three/drei';
+
 
 import * as THREE from 'three';
 import gsap from 'gsap';
@@ -12,7 +13,7 @@ import { playBackgroundMusic } from '../../../utils/audioManager';
 import { isTouchDevice } from '../../../utils/deviceDetect';
 
 // 使用本地中文字体。
-const FONT_URL = '/fonts/LXGWWenKaiLite-site.woff';
+const FONT_URL = '/media/fonts/LXGWWenKaiLite-site.woff';
 
 
 
@@ -932,7 +933,7 @@ const EntranceDoors = ({
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/LXGWWenKaiLite-site.woff"
+                font="/media/fonts/LXGWWenKaiLite-site.woff"
                 outlineWidth={0.015}
                 outlineColor="#ffffff"
                 clipRect={[-1, -0.5, -1 + (clipProgress * 2.5), 0.5]}

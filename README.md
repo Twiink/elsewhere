@@ -2,7 +2,7 @@
 
 这是基于 Tomasz “ITom” Szmajda 作品集改造的 Twiink 个人空间，使用 React 19、Three.js、React Three Fiber、GSAP 和 Vite。用户从入口进入无限走廊，探索作品画廊、生活手记、关于我和联系我四个房间；`/start` 是独立的静态链接页。
 
-已接入第一批个人资料：网站名为 **Twiink's Space**，介绍为“做点有趣的东西，放一些舍不得关掉的脑洞。”入口窗边、走廊和云上人物使用根据用户照片制作的黑白线稿，发布用纹理位于 `public/textures/twiink/`。照片参考仅在本地忽略目录中保存。
+已接入第一批个人资料：网站名为 **Twiink's Space**，介绍为“做点有趣的东西，放一些舍不得关掉的脑洞。”入口窗边、走廊和云上人物使用根据用户照片制作的黑白线稿，发布用纹理位于 `public/media/images/textures/twiink/`。照片参考仅在本地忽略目录中保存。
 
 「关于我」已接入个人简介、技术栈、六段经历、兴趣和项目成果，统一编辑 `src/data/profile.json`。房间里的纸片、经历岛屿、技能气球和完整阅读面板共用这些资料。画廊已接入「泡芙大作战 PuffWar 乐园」「无界宇宙 Infinite Cosmos」「SecKnow AI 教育平台」「RAG 中台 RAG-Center」「HarnessPRD 智能需求文档平台」「齐爱农」和「海晶集团全员创新平台」七个个人项目，提供完整介绍，以及已备齐的图片、开场视频、小程序码、官网或 GitHub 源码入口。「联系我」已接入邮箱、GitHub、微信和站内留言入口，纸页中的「随便聊聊」展示六条已确认的常见问题；生活手记收录四篇生活存档与一篇人物形象制作记录。示例内容中的 `authorName` 保留原作者归属。站点域名按用户提供的 `http://space.twiink.cn` 配置，站点与联系人信息在 `content.json` 的 `site` 中编辑。
 
@@ -41,7 +41,7 @@ npm run build:compressed
 
 ## 内容维护
 
-网站从仓库内的 JSON 读取文字，图片与场景贴图统一从 `https://media.secknow-ai.com/space/` 加载，包括「想做的事」的三幅旅行插画与两张旋转卡片封面。本地 `public/content/` 与 `public/textures/` 保留素材归档。修改内容后，开发服务会更新页面；发布环境需重新构建部署。
+网站从仓库内的 JSON 读取文字，图片与场景贴图统一从 `https://media.secknow-ai.com/space/` 加载，包括「想做的事」的三幅旅行插画与两张旋转卡片封面。本地发布素材统一放在 `public/media/`，`manifest.json` 管理 CDN 图片与本地备用文件的对应关系；图片优先从 CDN 加载，失败或超过 8 秒后改用随站点发布的本地文件。修改内容后，开发服务会更新页面；发布环境需重新构建部署。
 
 | 文件或目录 | 用途 |
 | --- | --- |
@@ -50,8 +50,9 @@ npm run build:compressed
 | `src/data/content.json` | 站点设置、画廊、生活手记、想做的事、FAQ，以及保留供对照的示例奖项 |
 | `src/data/content.js` | 将本地内容整理为页面、奖项分组与预加载数据 |
 | `src/hooks/useContentData.js` | 各房间读取本地内容的入口 |
-| `public/content/` | 内容图片与视频的本地归档；页面图片使用对象存储地址 |
-| `public/textures/` | 场景、门牌、纸张及装饰纹理的本地归档 |
+| `public/media/manifest.json` | CDN 图片与本地备用文件，以及音频、视频和字体的统一清单 |
+| `public/media/images/` | 图片、场景贴图与界面素材的发布副本 |
+| `public/media/audio/`、`public/media/video/` | 声音和视频的发布副本 |
 | `public/start/` | 独立静态起始页的 HTML、CSS、脚本 |
 | `public/scripts/resume-download.js` | 主站与独立链接页共用的简历下载处理 |
 
@@ -105,7 +106,7 @@ npm run build:compressed
 | `details.entry` | 项目入口：`title`、`description` 和可选 `hint` 填说明；小程序填 `image`、`width`、`height`，网站填 `url` 与链接文字 `label` |
 | `seoTitle`、`seoDescription` | 搜索摘要；详细正文也会同步输出到搜索 HTML 和 `/llms.txt` |
 
-早期项目素材归档分别在 `public/content/projects/puffwar/`、`public/content/projects/boundless-universe/`、`public/content/projects/secknow/`、`public/content/projects/rag-center/` 和 `public/content/projects/harness-prd/`；附件原件、确认版文稿与来源记录保存在 `assets/projects/` 下的对应目录，页面图片以 JSON 中的对象存储地址为准。页面正文以 JSON 为准，`copy-draft.md` 是确认文稿的归档。SecKnow 的横版海报、两张页面截图和户外照片用于阅读面板。RAG-Center 与 HarnessPRD 的阅读面板展示界面展示图与海报，并在底部提供 GitHub 仓库入口。
+早期项目素材归档分别在 `public/media/images/content/projects/puffwar/`、`public/media/images/content/projects/boundless-universe/`、`public/media/images/content/projects/secknow/`、`public/media/images/content/projects/rag-center/` 和 `public/media/images/content/projects/harness-prd/`；附件原件、确认版文稿与来源记录保存在 `assets/projects/` 下的对应目录，页面图片以 JSON 中的对象存储地址为准。页面正文以 JSON 为准，`copy-draft.md` 是确认文稿的归档。SecKnow 的横版海报、两张页面截图和户外照片用于阅读面板。RAG-Center 与 HarnessPRD 的阅读面板展示界面展示图与海报，并在底部提供 GitHub 仓库入口。
 
 ### 编辑联系方式
 
@@ -153,7 +154,7 @@ npm run build:compressed
 
 JSON 使用英文双引号和英文逗号，不支持注释或最后一项后的逗号。文字中的英文双引号需写成 `\"`，也可以直接使用中文引号。站点名称、一句话介绍、域名和社交链接继续在 `content.json` 的 `site` 中编辑。
 
-替换图片时，先上传到对象存储的 `space/` 目录，再将完整 HTTPS 地址写入 JSON 或对应组件。保留原有目录层级与宽高比，SVG 封面保留 `.svg` 后缀；PNG/JPEG 地址可由腾讯云按浏览器能力自动返回 AVIF/WebP，不要直接把地址后缀改成 `.webp`。走廊古风合照使用 `https://media.secknow-ai.com/space/content/corridor/hanfu-photo.jpg`，避免超出在线处理的原图体积限制。
+替换图片时，将发布副本放入 `public/media/images/`，在 `public/media/manifest.json` 的 `images` 中登记对象路径和本地路径，再上传到对象存储的 `space/` 目录，将完整 HTTPS 地址写入 JSON 或对应组件。保留原有目录层级与宽高比，SVG 封面保留 `.svg` 后缀；PNG/JPEG 地址可由腾讯云按浏览器能力自动返回 AVIF/WebP，不要直接把地址后缀改成 `.webp`。走廊古风合照使用 `https://media.secknow-ai.com/space/content/corridor/hanfu-photo.jpg`，避免超出在线处理的原图体积限制。
 
 高分辨率源图通过 `?imageMogr2/thumbnail/宽x高` 请求原有展示尺寸，控制下载体积和三维纹理占用。图片预加载、CSS 背景、分享图与 `/start` 的地址同步使用对象存储。覆盖同一路径的图片后，需刷新对应 CDN 缓存。字体、音效和视频继续使用本地静态文件，简历从对象存储读取。
 
@@ -161,7 +162,7 @@ JSON 使用英文双引号和英文逗号，不支持注释或最后一项后的
 
 ## 字体
 
-中文使用霞鹜文楷轻便版，源字体与许可证保留在 `public/fonts/`。Vite 会从运行源码、内容 JSON 和 `/start` 收集字符，使用 `subset-font` 自动生成 DOM 使用的 WOFF2 和三维文字使用的 WOFF，并逐字检查生成结果。开发时新增文字会更新子集并刷新页面，生产构建也会自动更新；生成缓存位于 Git 忽略的 `.cache/fonts/`。
+中文使用霞鹜文楷轻便版，源字体与许可证保留在 `public/media/fonts/`。Vite 会从运行源码、内容 JSON 和 `/start` 收集字符，使用 `subset-font` 自动生成 DOM 使用的 WOFF2 和三维文字使用的 WOFF，并逐字检查生成结果。开发时新增文字会更新子集并刷新页面，生产构建也会自动更新；生成缓存位于 Git 忽略的 `.cache/fonts/`。
 
 三维文字统一通过 `SiteText` 加载字体；访客在留言中输入子集以外的汉字时，按需使用完整文楷。DOM 字体通过 `unicode-range` 选择子集与完整字体。原有品牌拉丁字体保留。
 
@@ -169,9 +170,11 @@ JSON 使用英文双引号和英文逗号，不支持注释或最后一项后的
 
 入口与走廊就绪后即可开始探索，四个房间分别按需加载。高性能且未启用省流的设备会在空闲时逐个预取，深链接房间优先；门与地图点击也会提前准备目标房间。房间资源就绪后才打开门与纸幕，加载失败或长时间无响应时提供重新加载和返回入口。后台标签页暂停三维渲染，返回前台后恢复。阅读面板在打开时加载；背景音乐在首次交互时初始化，访问统计仅在配置了 Key 时异步加载。
 
-构建按 `scripts/publish-assets.mjs` 中的发布清单输出运行所需的字体、音频、起始页、下载脚本与托管配置。`public/content/`、`public/textures/`、`public/images/` 的本地归档继续保留，页面沿用 CDN 图片地址。这些归档不复制到 `dist/`。
+构建按 `public/media/manifest.json` 打包图片备用文件、音频、视频、字体和光标，统一输出到 `dist/media/`。图片保留 CDN 首选地址，普通图片、CSS 背景、视频封面、图标及三维贴图在 CDN 失败或超时后切换到本地副本；同一图片的并发请求共用结果，两种来源都失败时保留现有加载失败处理。独立 `/start` 页面使用同一套回退逻辑。制作过程、原始附件和旧版本继续留在忽略的 `assets/`，发布所需文件不依赖该目录。
 
 发布前运行 `npm run lint` 和 `npm run build`，再通过 `npm run preview` 查看生产构建的页面与交互。构建会校验发布文件清单与四个房间的独立加载边界，并输出完整产物、入口与走廊共享依赖的 gzip 总量、首次中文字体体积。
+
+调整素材清单或加载逻辑后，运行 `npm run test:media` 检查 CDN 首选、超时与错误回退、并发请求以及本地文件完整性。目录约定见 `public/media/README.md`。
 
 默认构建输出通用静态文件。`npm run build:compressed` 额外生成 `.gz` 与 `.br`，需要托管服务根据 `Accept-Encoding` 返回对应文件并设置 `Content-Encoding`。`public/_headers` 提供哈希资源长期缓存、固定名称字体与脚本重新验证的 Pages 规则；其他托管环境可采用相同策略。
 
@@ -184,23 +187,23 @@ JSON 使用英文双引号和英文逗号，不支持注释或最后一项后的
 - `VITE_WEB3FORMS_KEY`：绑定收件邮箱的 Web3Forms 配置，放在本地 `.env` 或部署平台环境变量中。允许提交的域名来自 `site.url`；未配置、预览域名或发送被拦截时均明确提示，只有服务确认接收才显示成功。
 - `VITE_POSTHOG_KEY`、`VITE_POSTHOG_HOST`：PostHog 访问统计配置。
 - 生活手记收录四篇生活存档与一篇人物形象制作记录。编辑 `src/data/content.json` 的 `studio` 数组即可修改标题、`paragraphs` 正文和 `photos` 图片；每张图的 `alt` 是图片说明，人物制作过程另有 `label` 和 `caption`。没有提供日期的记录不填写 `date`。点击场景中的屏幕或「翻翻生活手记」可在站内阅读，也可使用 `/studio?note=记录的id` 直接打开对应记录。
-- 点击房间顶部「翻翻生活手记」，在阅读面板的导航中选择「想做的事」，即可翻到旅行心愿手账；它与东灵山、华山、飞拉达、双人成行和人物制作共用面板，可直接来回切换。长白山插画放在主画面，雪山与滑雪插画错落排列，配以纸张、照片边框和手写愿望；点击插画可查看大图。手机按纵向手账排版，正文可滚动。愿望编辑 `content.json` 的 `wishes` 数组：`id` 唯一、`title` 为一句话愿望、`description` 可选，`image` 与 `imageAlt` 配置插画及其说明，`status` 保存状态并供辅助技术读取。`/studio?view=wishes` 从入口开门后自动打开面板中的心愿手账。三幅淡彩画是对未来旅行的想象，PNG 位于 `public/content/studio/wish-journal/`，生成提示词保存在 `assets/studio/wish-journal/illustrations.json`，当前三条均为「想做的」。
+- 点击房间顶部「翻翻生活手记」，在阅读面板的导航中选择「想做的事」，即可翻到旅行心愿手账；它与东灵山、华山、飞拉达、双人成行和人物制作共用面板，可直接来回切换。长白山插画放在主画面，雪山与滑雪插画错落排列，配以纸张、照片边框和手写愿望；点击插画可查看大图。手机按纵向手账排版，正文可滚动。愿望编辑 `content.json` 的 `wishes` 数组：`id` 唯一、`title` 为一句话愿望、`description` 可选，`image` 与 `imageAlt` 配置插画及其说明，`status` 保存状态并供辅助技术读取。`/studio?view=wishes` 从入口开门后自动打开面板中的心愿手账。三幅淡彩画是对未来旅行的想象，PNG 位于 `public/media/images/content/studio/wish-journal/`，生成提示词保存在 `assets/studio/wish-journal/illustrations.json`，当前三条均为「想做的」。
 - 旋转显示器塔同时展示「想做的事」卡片，点击后打开同一页手账。卡片配置在 `content.json` 的 `studioWishCard`，封面默认为黑白版，支持悬停的设备显现彩色版；预加载沿用这一设备规则。三幅插画和两张 SVG 封面统一使用对象存储的 `space/content/studio/wish-journal/` 目录。SVG 封面中的文字使用文楷字形路径。阅读页沿用生活手记的纸白底色与文字颜色。
-- 生活照片的原图与素材清单保存在 `assets/studio/life-notes/`，页面图片位于 `public/content/studio/`，人物黑白线稿沿用 `public/textures/twiink/start-bouquet.png`。联系房间已使用 Twiink 的联系方式；`/start` 提供站内导航、GitHub 入口与 Twiink 人物插画。
+- 生活照片的原图与素材清单保存在 `assets/studio/life-notes/`，页面图片位于 `public/media/images/content/studio/`，人物黑白线稿沿用 `public/media/images/textures/twiink/start-bouquet.png`。联系房间已使用 Twiink 的联系方式；`/start` 提供站内导航、GitHub 入口与 Twiink 人物插画。
 
 Matrix 工作室的 CSDN 与微信视频号在 `src/data/content.json` 的 `site.studioChannels` 中编辑，集中展示在联系方式中。视频号支持复制；浏览器不允许自动复制时，会选中账号，方便手动复制。
 
-生活手记的门牌、地图和页面标题统一显示「生活手记」。门贴图位于 `public/textures/corridor/doors/life-notes-ink-v1.webp` 与 `life-notes-color-v1.webp`，图案为相机、山间日出和手柄；生成提示词与处理说明保存在 `assets/studio/door-textures.json`。阅读面板展示个人记录，房间背景使用日出、合照、存档等手写词。
+生活手记的门牌、地图和页面标题统一显示「生活手记」。门贴图位于 `public/media/images/textures/corridor/doors/life-notes-ink-v1.webp` 与 `life-notes-color-v1.webp`，图案为相机、山间日出和手柄；生成提示词与处理说明保存在 `assets/studio/door-textures.json`。阅读面板展示个人记录，房间背景使用日出、合照、存档等手写词。
 
 简历 PDF 使用对象存储地址 `https://media.secknow-ai.com/space/Resume.pdf`，入口位于「关于我」「联系我」与独立链接页 `/start`。「联系我」同时支持新窗口查看和下载。下载文件名为 `郑越-13990529155-Agent全栈开发.pdf`；`public/scripts/resume-download.js` 将 PDF 获取为 Blob 后保存，保证跨域下载时的中文文件名。说明、地址和下载文件名在 `site.resume` 中编辑；若更改地址或文件名，也要同步 `/start/index.html` 中的静态链接。两个页面均加载这份共享下载脚本。
 
-走廊的两幅竖版照片位于 `public/content/corridor/`：右侧 `frame-3` 展示花束与牵手照，左侧 `frame-4` 展示红灯笼前的古风合照。原图与处理记录保存在 `assets/corridor/`。图片按原始比例展示，桌面端点击查看时会自动适配视口高度；路径和画框尺寸在 `src/components/canvas/corridor/CorridorDecorations.jsx` 的 `frames` 中编辑，新增图片时同步 `src/config/texturePreloadList.js`。
+走廊的两幅竖版照片位于 `public/media/images/content/corridor/`：右侧 `frame-3` 展示花束与牵手照，左侧 `frame-4` 展示红灯笼前的古风合照。原图与处理记录保存在 `assets/corridor/`。图片按原始比例展示，桌面端点击查看时会自动适配视口高度；路径和画框尺寸在 `src/components/canvas/corridor/CorridorDecorations.jsx` 的 `frames` 中编辑，新增图片时同步 `src/config/texturePreloadList.js`。
 
-网站图标使用浅绿纸飞机与金色星星，保留奶油色纸底和完整构图。主站与 `/start` 的浏览器图标分别使用 `public/textures/twiink/site-icon-airplane-v1-32.png`、`site-icon-airplane-v1-64.png`，手机主屏幕图标使用同目录的 `site-icon-airplane-v1-180.png`；走廊 `frame-1` 与纹理预加载使用 `site-icon-airplane-v1-512.png`。更换时同步两处 HTML、走廊画框与预加载清单。
+网站图标使用浅绿纸飞机与金色星星，保留奶油色纸底和完整构图。主站与 `/start` 的浏览器图标分别使用 `public/media/images/textures/twiink/site-icon-airplane-v1-32.png`、`site-icon-airplane-v1-64.png`，手机主屏幕图标使用同目录的 `site-icon-airplane-v1-180.png`；走廊 `frame-1` 与纹理预加载使用 `site-icon-airplane-v1-512.png`。更换时同步两处 HTML、走廊画框与预加载清单。
 
-入口双门的技术贴纸与 `profile.json` 一致：左门展示 TypeScript、Vue、React、Python、Django、FastAPI，右门展示 Java、Spring Boot、Docker、RAG、LangChain、LangGraph。贴图位于 `public/textures/doors/twiink-entry-{left,right}-{ink,color}-v1.webp`，各有黑白和彩色版本；生成提示词、技术清单与文件校验信息保存在 `assets/entrance/door-textures.json`。后续修改门上的技术名称时需重新制作贴图，并同步 `EntranceDoors.jsx` 与 `texturePreloadList.js` 中的路径。
+入口双门的技术贴纸与 `profile.json` 一致：左门展示 TypeScript、Vue、React、Python、Django、FastAPI，右门展示 Java、Spring Boot、Docker、RAG、LangChain、LangGraph。贴图位于 `public/media/images/textures/doors/twiink-entry-{left,right}-{ink,color}-v1.webp`，各有黑白和彩色版本；生成提示词、技术清单与文件校验信息保存在 `assets/entrance/door-textures.json`。后续修改门上的技术名称时需重新制作贴图，并同步 `EntranceDoors.jsx` 与 `texturePreloadList.js` 中的路径。
 
-分享封面使用 `public/content/social/twiink-share-cover-v1.jpg`，为已确认的淡彩古风横版图片，尺寸 1200×630。主站的 Open Graph 与 Twitter 分享信息由 `site.shareImage` 和 `seo-plugin.js` 输出；独立链接页 `/start` 的同类标签位于 `public/start/index.html`。更换图片路径、尺寸或说明时，同步这两处配置。
+分享封面使用 `public/media/images/content/social/twiink-share-cover-v1.jpg`，为已确认的淡彩古风横版图片，尺寸 1200×630。主站的 Open Graph 与 Twitter 分享信息由 `site.shareImage` 和 `seo-plugin.js` 输出；独立链接页 `/start` 的同类标签位于 `public/start/index.html`。更换图片路径、尺寸或说明时，同步这两处配置。
 
 这些配置不影响本地 JSON 的读取，也不提供内容管理功能。凭据和私人配置不要写入 Git。
 

@@ -1,9 +1,11 @@
+import { useTexture } from '../../../hooks/useMediaTexture';
+import { media } from '../../../media';
 import { useAudio } from '../../../context/contexts';
 import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
 import { useRef, useEffect } from 'react';
 import { useTextureCopy } from '../../../hooks/useTextureCopy';
 import { useThree } from '@react-three/fiber';
-import { useTexture, PositionalAudio } from '@react-three/drei';
+import { PositionalAudio } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 
@@ -391,7 +393,7 @@ const SegmentDoors = ({
             {/* 空间音频节点。 */}
             <PositionalAudio
                 ref={openAudioRef}
-                url="/sounds/otwarciedrzwi.mp3"
+                url={media.audio.doorOpen}
                 distanceModel="exponential"
                 rolloffFactor={SEGMENT_DOOR_AUDIO_SETTINGS.rolloff}
                 refDistance={SEGMENT_DOOR_AUDIO_SETTINGS.distance}
@@ -399,7 +401,7 @@ const SegmentDoors = ({
             />
             <PositionalAudio
                 ref={closeAudioRef}
-                url="/sounds/zamknieciedrzwi.mp3"
+                url={media.audio.doorClose}
                 distanceModel="exponential"
                 rolloffFactor={SEGMENT_DOOR_AUDIO_SETTINGS.rolloff}
                 refDistance={SEGMENT_DOOR_AUDIO_SETTINGS.distance}

@@ -4,26 +4,21 @@ import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
 import subsetFont from 'subset-font';
 import { create as readFont } from 'fontkit';
+import { createMediaRuntime } from '../src/media/imageRuntime.js';
 
 export const PUBLISH_PATHS = [
   'start/index.html', 'start/style.css', 'start/script.js',
-  'start/fonts/barlow-condensed-700-latin.woff2', 'start/fonts/OFL.txt',
   'scripts/resume-download.js',
-  'fonts/LXGWWenKaiLite-Regular.ttf', 'fonts/LXGWWenKaiLite-OFL.txt',
-  'fonts/CabinSketch-Regular.ttf', 'fonts/CabinSketch-Bold.ttf',
-  'fonts/FrederickatheGreat-Regular.ttf', 'fonts/RubikScribble-Regular.ttf',
-  'sounds/szumwiatru.mp3', 'sounds/szummonitorow.mp3', 'sounds/szummorza.mp3',
-  'sounds/otwarciedrzwi.mp3', 'sounds/papersound.mp3', 'sounds/baloonpoop.mp3',
-  'sounds/szummiasta.mp3', 'sounds/zamknieciedrzwi.mp3', 'sounds/uchyleniedrzwi.mp3',
-  'sounds/cfl_turningpages-belem-breeze-487596.ogg',
-  'cursors/cursor-default.webp', 'cursors/cursor-pointer.webp',
   '_headers', '_redirects', 'robots.txt', 'sitemap.xml',
 ];
 export const FONT_FILES = {
-  scene: 'fonts/LXGWWenKaiLite-site.woff',
-  dom: 'fonts/LXGWWenKaiLite-site.woff2',
-  full: 'fonts/LXGWWenKaiLite-Regular.ttf',
+  scene: 'media/fonts/LXGWWenKaiLite-site.woff',
+  dom: 'media/fonts/LXGWWenKaiLite-site.woff2',
+  full: 'media/fonts/LXGWWenKaiLite-Regular.ttf',
 };
+
+const readMediaManifest = async root => JSON.parse(await readFile(resolve(root, 'public/media/manifest.json'), 'utf8'));
+const mediaScript = manifest => `;(${createMediaRuntime.toString()})(${JSON.stringify(manifest)}).install();\n`;
 
 async function walk(path) {
   const entries = await readdir(path, { withFileTypes: true });
@@ -84,11 +79,15 @@ export async function prepareFonts(root) {
 }
 
 export async function getPublishFiles(root) {
-  return PUBLISH_PATHS.map(name => ({ file: resolve(root, 'public', name), name }));
+  const manifest = await readMediaManifest(root);
+  const mediaFiles = ['media/manifest.json', ...['images', 'audio', 'video', 'fonts', 'cursors']
+    .flatMap(kind => Object.values(manifest[kind]).map(path => path.replace(/^\//, '')))];
+  return [...new Set([...PUBLISH_PATHS, ...mediaFiles])].map(name => ({ file: resolve(root, 'public', name), name }));
 }
 
 export function publishAssets() {
   const virtualId = '\0virtual:site-font';
+  const mediaId = '\0virtual:media-manifest';
   let root;
   let fontsPromise;
   const fonts = () => fontsPromise ??= prepareFonts(root);
@@ -97,20 +96,32 @@ export function publishAssets() {
     configResolved(config) {
       root = config.root;
     },
-    resolveId(id) { if (id === 'virtual:site-font') return virtualId; },
+    resolveId(id) {
+      if (id === 'virtual:site-font') return virtualId;
+      if (id === 'virtual:media-manifest') return mediaId;
+    },
     async load(id) {
+      if (id === mediaId) return `export default ${JSON.stringify(await readMediaManifest(root))};`;
       if (id !== virtualId) return;
       const data = await fonts();
       return `export const characters=${JSON.stringify(data.characters)};export const unavailable=${JSON.stringify(data.unavailable)};export const sceneFont='/${FONT_FILES.scene}';export const fullFont='/${FONT_FILES.full}';`;
     },
     transformIndexHtml() {
-      return [{ tag: 'link', attrs: { rel: 'stylesheet', href: '/fonts/site-font.css' }, injectTo: 'head' }];
+      return [{ tag: 'link', attrs: { rel: 'stylesheet', href: '/media/fonts/site-font.css' }, injectTo: 'head' }];
     },
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const path = req.url?.split('?')[0];
+        if (path === '/scripts/media-fallback.js') {
+          try {
+            res.setHeader('Content-Type', 'text/javascript; charset=utf-8');
+            res.setHeader('Cache-Control', 'no-cache');
+            res.end(mediaScript(await readMediaManifest(root)));
+          } catch (error) { next(error); }
+          return;
+        }
         const format = path === `/${FONT_FILES.scene}` ? 'woff' : path === `/${FONT_FILES.dom}` ? 'woff2' : null;
-        if (!format && path !== '/fonts/site-font.css') return next();
+        if (!format && path !== '/media/fonts/site-font.css') return next();
         try {
           const data = await fonts();
           res.setHeader('Content-Type', format ? `font/${format}` : 'text/css; charset=utf-8');
@@ -121,6 +132,12 @@ export function publishAssets() {
     },
     async hotUpdate(context) {
       const path = relative(root, context.file).replaceAll('\\', '/');
+      if (path === 'public/media/manifest.json') {
+        const module = context.server.moduleGraph.getModuleById(mediaId);
+        if (module) context.server.moduleGraph.invalidateModule(module);
+        context.server.ws.send({ type: 'full-reload' });
+        return [];
+      }
       if (!(path.startsWith('src/') || path.startsWith('public/start/') || path === 'index.html')) return;
       const previous = await fonts();
       fontsPromise = prepareFonts(root);
@@ -137,13 +154,14 @@ export function publishAssets() {
       for (const { file, name } of await getPublishFiles(root)) {
         this.emitFile({ type: 'asset', fileName: name, source: await readFile(file) });
       }
+      this.emitFile({ type: 'asset', fileName: 'scripts/media-fallback.js', source: mediaScript(await readMediaManifest(root)) });
       this.emitFile({ type: 'asset', fileName: FONT_FILES.scene, source: data.buffers.woff });
       this.emitFile({ type: 'asset', fileName: FONT_FILES.dom, source: data.buffers.woff2 });
-      this.emitFile({ type: 'asset', fileName: 'fonts/site-font.css', source: data.css });
-      this.emitFile({ type: 'asset', fileName: 'fonts/site-font-coverage.json', source: JSON.stringify({ characters: data.characters, unavailable: data.unavailable }) });
+      this.emitFile({ type: 'asset', fileName: 'media/fonts/site-font.css', source: data.css });
+      this.emitFile({ type: 'asset', fileName: 'media/fonts/site-font-coverage.json', source: JSON.stringify({ characters: data.characters, unavailable: data.unavailable }) });
     },
     async writeBundle(_options, bundle) {
-      const required = [...PUBLISH_PATHS, ...Object.values(FONT_FILES), 'fonts/site-font.css', 'fonts/site-font-coverage.json', 'index.html', 'llms.txt'];
+      const required = [...(await getPublishFiles(root)).map(item => item.name), ...Object.values(FONT_FILES), 'scripts/media-fallback.js', 'media/fonts/site-font.css', 'media/fonts/site-font-coverage.json', 'index.html', 'llms.txt'];
       for (const name of required) {
         if (!bundle[name]) this.error(`发布文件缺失：${name}`);
       }

@@ -1,6 +1,7 @@
+import { useTexture } from '../../../hooks/useMediaTexture';
 import Text from '../SiteText';
 import { useRef, useState } from 'react';
-import { useTexture } from '@react-three/drei';
+
 
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -29,7 +30,7 @@ const SignSystem = (props) => {
         <group {...props}>
             <Text
                 position={[0, 0.78, 0.65]}
-                font="/fonts/LXGWWenKaiLite-site.woff"
+                font="/media/fonts/LXGWWenKaiLite-site.woff"
                 fontSize={0.13}
                 color="#333333"
                 anchorX="center"

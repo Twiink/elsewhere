@@ -1,8 +1,8 @@
-@import url('/fonts/site-font.css');
+@import url('/media/fonts/site-font.css');
 
 @font-face {
   font-family: 'Barlow Condensed';
-  src: url('/start/fonts/barlow-condensed-700-latin.woff2') format('woff2');
+  src: url('/media/fonts/start/barlow-condensed-700-latin.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;

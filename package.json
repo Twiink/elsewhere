@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "test:media": "node --test tests/media.test.mjs",
     "preview": "vite preview",
     "build:compressed": "node scripts/build-compressed.mjs"
   },
