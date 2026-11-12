@@ -1,5 +1,7 @@
-// 给共享带宽与浏览器排队留出时间；场景仍由整体加载超时提供重试入口。
-export function createMediaRuntime({ timeoutMs = 30000 } = {}) {
+import { LOADING_TIMEOUT_MS } from '../utils/loadingTimeout';
+
+// 与场景共用加载时限，给并发图片下载及浏览器排队留出时间。
+export function createMediaRuntime({ timeoutMs = LOADING_TIMEOUT_MS } = {}) {
     const pending = new Map();
 
     function loadImage(url) {

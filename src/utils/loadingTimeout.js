@@ -1,5 +1,7 @@
+export const LOADING_TIMEOUT_MS = 45000;
+
 // 后台页面暂停渲染时也暂停加载判断；回到前台后重新留出加载时间。
-export function startLoadingTimeout(onTimeout, delay = 45000) {
+export function startLoadingTimeout(onTimeout, delay = LOADING_TIMEOUT_MS) {
     let timer;
     const cancel = () => {
         clearTimeout(timer);

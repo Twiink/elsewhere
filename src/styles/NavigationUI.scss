@@ -180,7 +180,9 @@
     left: 50%;
     transform: translateX(-50%) translateY(-100%);
     width: 90%;
-    max-width: 500px;
+    // 地图原图比例为 1351:1290；为标题、内边距和底部留出 124px。
+    max-width: min(500px, calc((100vh - 124px) * 1.0473 + 40px));
+    max-width: min(500px, calc((100dvh - 124px) * 1.0473 + 40px));
     border: none;
     border-radius: 0;
     filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.15));
@@ -725,7 +727,8 @@
 
     .map-panel {
         width: 95%;
-        max-width: none;
+        max-width: calc((100vh - 124px) * 1.0473 + 40px);
+        max-width: calc((100dvh - 124px) * 1.0473 + 40px);
 
         .map-header h3 {
             font-size: 14px;
