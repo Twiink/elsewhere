@@ -2,6 +2,9 @@ import { useTexture } from '../../../hooks/useMediaTexture';
 import { usePerformance } from '../../../context/contexts';
 import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
 import { useRef } from 'react';
+import { useThree } from '@react-three/fiber';
+import { CoffeeSteam, PaperPlaneTrick } from './CorridorSurprises';
+import { useReducedMotion } from '../../../hooks/useReducedMotion';
 
 
 import * as THREE from 'three';
@@ -14,12 +17,13 @@ import * as THREE from 'three';
  * - 速写纸元素：纸团、纸飞机、铅笔和咖啡。
  * - 带有物理感的漂浮动画。
  * - 统一的手绘美感。
- * - 为提升性能已移除交互。
+ * - 纸飞机与咖啡保留按需播放的轻量彩蛋。
  */
 const Doodles = () => {
     const groupRef = useRef();
     const { tier } = usePerformance();
     const isLowTier = tier === 'LOW';
+    const isNarrow = useThree(state => state.size.width < 640);
 
     // 加载全部速写纹理。
     const textures = useTexture({
@@ -37,14 +41,16 @@ const Doodles = () => {
     return (
         <group ref={groupRef}>
             {/* 放大的纸飞机，位于头顶。 */}
-            <SketchElement
-                texture={textures.paperAirplane}
-                position={[0.5, 0.8, 0.3]}
-                scale={0.55}
-                rotationSpeed={0.15}
-                floatSpeed={0.7}
-                floatAmount={0.04}
-            />
+            <PaperPlaneTrick position={[0.5, 0.8, 0.3]} width={0.55 * textures.paperAirplane.image.width / textures.paperAirplane.image.height} height={0.55}>
+                <SketchElement
+                    texture={textures.paperAirplane}
+                    position={[0, 0, 0]}
+                    scale={0.55}
+                    rotationSpeed={0.15}
+                    floatSpeed={0.7}
+                    floatAmount={0.04}
+                />
+            </PaperPlaneTrick>
 
             {/* 放大的纸团，位于“创意开发者”文字左下方。 */}
             <SketchElement
@@ -78,14 +84,16 @@ const Doodles = () => {
             />
 
             {/* 放大的咖啡杯，位于右上方。 */}
-            <SketchElement
-                texture={textures.coffeeCup}
-                position={[1.2, 0.6, -0.1]}
-                scale={0.35}
-                rotationSpeed={0.05}
-                floatSpeed={0.35}
-                floatAmount={0.025}
-            />
+            <CoffeeSteam position={isNarrow ? [0.65, 0.55, -0.1] : [1.2, 0.6, -0.1]} width={0.35 * textures.coffeeCup.image.width / textures.coffeeCup.image.height} height={0.35}>
+                <SketchElement
+                    texture={textures.coffeeCup}
+                    position={[0, 0, 0]}
+                    scale={0.35}
+                    rotationSpeed={0.05}
+                    floatSpeed={0.35}
+                    floatAmount={0.025}
+                />
+            </CoffeeSteam>
 
             {/* 低性能档隐藏次要装饰，以降低开销。 */}
             {!isLowTier && (
@@ -125,11 +133,12 @@ const SketchElement = ({
     initialRotation = 0
 }) => {
     const ref = useRef();
+    const reducedMotion = useReducedMotion();
     const aspectRatio = texture.image ? texture.image.width / texture.image.height : 1;
     const dimensions = { width: scale * aspectRatio, height: scale };
 
     useFrame((state) => {
-        if (!ref.current) return;
+        if (!ref.current || reducedMotion) return;
 
         const time = state.clock.elapsedTime;
 

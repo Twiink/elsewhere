@@ -9,6 +9,7 @@ import { useThree } from '@react-three/fiber';
 import gsap from 'gsap';
 import '../shaders/RevealMaterial';
 import { isTouchDevice } from '../../../utils/deviceDetect';
+import { HiddenNote } from './CorridorSurprises';
 /**
  * CorridorDecorations：走廊装饰。
  * 
@@ -319,6 +320,9 @@ const InspectableFrame = ({ frame, wallX, frameTexture, framePaintedTexture, CAB
                 >
                     {frame.signature}
                 </Text>
+            )}
+            {frame.id === 'frame-1' && (
+                <HiddenNote position={[frame.width * 0.32, -frame.height / 2 - 0.08, 0.035]} />
             )}
         </group>
     );
