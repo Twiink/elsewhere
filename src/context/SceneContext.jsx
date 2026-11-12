@@ -14,8 +14,11 @@ export const SceneProvider = ({ children }) => {
         studioLinkHandled.current = true;
         return true;
     }, []);
+    const [loadingRoom, setLoadingRoom] = useState(null);
+    const beginRoomLoading = useCallback(roomId => setLoadingRoom(roomId), []);
+    const finishRoomLoading = useCallback(roomId => setLoadingRoom(current => current === roomId ? null : current), []);
     const [loadingError, setLoadingError] = useState(false);
-    const reportLoadingError = useCallback(() => setLoadingError(true), []);
+    const reportLoadingError = useCallback(() => { setLoadingRoom(null); setLoadingError(true); }, []);
 
     const [currentRoom, setCurrentRoom] = useState(null); // null 表示走廊，其他值为 about、portfolio 等房间 ID。
     const [hasEntered, setHasEntered] = useState(false);  // 用户是否点击过入口门。
@@ -33,6 +36,7 @@ export const SceneProvider = ({ children }) => {
 
     const enterRoom = useCallback((roomId) => {
         setCurrentRoom(roomId);
+        setLoadingRoom(null);
         setExitRequested(false); // 清除待处理退出请求。
         setOverlayContent(null); // 房间变化时清除遮罩。
 
@@ -46,6 +50,7 @@ export const SceneProvider = ({ children }) => {
 
     const exitRoom = useCallback(() => {
         setCurrentRoom(null);
+        setLoadingRoom(null);
         setExitRequested(false);
         setOverlayContent(null);
     }, []);
@@ -80,6 +85,7 @@ export const SceneProvider = ({ children }) => {
         if (isTeleporting || roomId === currentRoom) return; // 防止重复传送或传往当前房间。
 
         void prefetchRoom(roomId).catch(() => {});
+        setLoadingRoom(roomId);
 
         setTeleportTarget(roomId);
         setIsTeleporting(true);
@@ -132,6 +138,7 @@ export const SceneProvider = ({ children }) => {
 
     // 发生错误时取消传送。
     const cancelTeleport = useCallback(() => {
+        setLoadingRoom(null);
         setTeleportTarget(null);
         setIsTeleporting(false);
         setTeleportPhase(null);
@@ -140,6 +147,9 @@ export const SceneProvider = ({ children }) => {
     }, []);
 
     const value = useMemo(() => ({
+        loadingRoom,
+        beginRoomLoading,
+        finishRoomLoading,
         initialStudioLink,
         consumeStudioLink,
         loadingError,
@@ -173,6 +183,9 @@ export const SceneProvider = ({ children }) => {
         finishPaperOpen,
         cancelTeleport,
     }), [
+        loadingRoom,
+        beginRoomLoading,
+        finishRoomLoading,
         initialRoom,
         consumeStudioLink,
         loadingError,

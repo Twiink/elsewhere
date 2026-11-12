@@ -10,7 +10,7 @@
     z-index: $z-preloader;
     // 容器自身无背景，由两半纸张处理。
     pointer-events: auto;
-    cursor: auto;
+    cursor: var(--cursor-default, auto);
 
     &__half {
         position: absolute;
@@ -67,4 +67,16 @@
         z-index: 20;
         mix-blend-mode: multiply; // 使其看起来像写在纸上。
     }
+}
+.preloader__status {
+    position: absolute;
+    z-index: 25;
+    top: calc(50% + 76px);
+    left: 20px;
+    right: 20px;
+    margin: 0;
+    color: #514b40;
+    font-family: '霞鹜文楷', serif;
+    font-size: 1rem;
+    text-align: center;
 }

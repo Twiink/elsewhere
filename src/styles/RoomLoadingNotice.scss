@@ -1,0 +1,31 @@
+// 门上的可见提示由三维便签承载；文字状态继续供屏幕阅读器播报。
+.room-loading-notice {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    pointer-events: none;
+
+    // 地图传送时房门被纸幕遮住，将手写提示留在纸幕上。
+    &--paper {
+        position: fixed;
+        z-index: 10020;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) rotate(-1deg);
+        width: min(320px, calc(100vw - 40px));
+        height: auto;
+        margin: 0;
+        overflow: visible;
+        clip-path: none;
+        white-space: normal;
+        text-align: center;
+        color: #4c4032;
+        span { display: block; font-size: clamp(18px, 4.5vw, 23px); line-height: 1.6; }
+        small { display: block; margin-top: 8px; font-size: 15px; line-height: 1.5; color: #71624d; }
+    }
+}

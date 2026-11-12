@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 import { Edges } from '@react-three/drei';
 
@@ -88,6 +88,8 @@ const PaperAirplane = ({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1, 
 
         return geo;
     }, []);
+
+    useEffect(() => () => geometry.dispose(), [geometry]);
 
     return (
         <group position={position} rotation={rotation} scale={scale}>

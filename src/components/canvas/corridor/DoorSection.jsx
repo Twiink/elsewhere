@@ -12,6 +12,11 @@ import { PositionalAudio } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import RoomInterior from './RoomInterior';
+import DoorAnnotation from './DoorAnnotation';
+import { DOOR_ANNOTATIONS } from '../../../config/doorAnnotations';
+import { useGalleryDoorTexture } from '../../../hooks/useGalleryDoorTexture';
+import { useDoorArtworkTexture } from '../../../hooks/useDoorArtworkTexture';
+import { useReducedMotion } from '../../../hooks/useReducedMotion';
 import { useTextureCopy } from '../../../hooks/useTextureCopy';
 import '../shaders/RevealMaterial'; // 注册使用透明度丢弃的显现着色器。
 
@@ -98,7 +103,10 @@ const DoorSection = ({
     const [isInsideRoom, setIsInsideRoom] = useState(false);
     const [isTiltLocked, setIsTiltLocked] = useState(false); // 进入房间时锁定倾斜。
     const [shouldRenderRoom, setShouldRenderRoom] = useState(false); // 延迟加载状态。
-    const { camera } = useThree();
+    const [tagPhase, setTagPhase] = useState(null);
+    const readyOpenDelay = useRef(null);
+    const reducedMotion = useReducedMotion();
+    const { camera, size } = useThree();
     const loadTimeoutRef = useRef(null);
     const roomReadyRef = useRef(false);
 
@@ -113,6 +121,8 @@ const DoorSection = ({
         isFastTeleport,
         signalRoomReady,
         reportLoadingError,
+        beginRoomLoading,
+        finishRoomLoading,
         teleportPhase // 用于将重置延迟到幕布关闭后。
     } = useScene();
 
@@ -142,6 +152,7 @@ const DoorSection = ({
         setIsAnimating(false);
         setShouldRenderRoom(false);
         setIsTiltLocked(false);
+        setTagPhase(null);
     }
 
     useEffect(() => {
@@ -150,6 +161,7 @@ const DoorSection = ({
             if (doorRef.current) doorRef.current.rotation.y = 0;
             if (handleRef.current) handleRef.current.rotation.z = 0;
             loadTimeoutRef.current?.();
+            readyOpenDelay.current?.kill();
         }
     }, [isTeleporting, teleportPhase, currentRoom, doorId]);
 
@@ -185,6 +197,16 @@ const DoorSection = ({
         arrowTexture: '/media/images/textures/corridor/strzalka.webp',
         baseboardTexture: '/media/images/textures/corridor/texturadoprogow.webp',
     });
+    // 图纸素材仅在 CPU 合绘时使用，无需单独上传 GPU。
+    const blueprintTexture = useTexture(doorId === 'gallery' ? '/media/images/textures/corridor/doors/gallery-blueprint-inner-v1.png' : dummyTex, undefined, { upload: false });
+    const galleryBlueprint = doorId === 'gallery' ? blueprintTexture : null;
+    const galleryDoorTexture = useGalleryDoorTexture(doorTexture, galleryBlueprint);
+    const galleryPaintedTexture = useGalleryDoorTexture(doorPaintedTexture, isTouch ? null : galleryBlueprint);
+    const annotation = DOOR_ANNOTATIONS[doorId];
+    const annotationArtwork = useTexture(annotation?.artwork ?? dummyTex, undefined, { upload: false });
+    const artwork = annotation?.artwork ? annotationArtwork : null;
+    const annotatedDoorTexture = useDoorArtworkTexture(galleryDoorTexture, artwork, annotation?.paper);
+    const annotatedPaintedTexture = useDoorArtworkTexture(galleryPaintedTexture, isTouch ? null : artwork, annotation?.paper);
 
     const wallTexture = useTextureCopy(originalWallTexture, {
         wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping,
@@ -336,12 +358,14 @@ const DoorSection = ({
     useEffect(() => {
         return () => {
             loadTimeoutRef.current?.();
+            readyOpenDelay.current?.kill();
         };
     }, []);
 
     const closeDoor = useCallback((onDoorClosed) => {
         if (!doorRef.current || !isOpen) return;
         loadTimeoutRef.current?.();
+        setTagPhase(null);
 
         setIsAnimating(true);
 
@@ -414,9 +438,11 @@ const DoorSection = ({
         }
 
         void prefetchRoom(ROOM_LABELS[label]).catch(() => {});
+        beginRoomLoading(doorId);
+        setTagPhase('loading');
 
         // 过渡时重置光标。
-        document.body.style.cursor = "auto";
+        document.body.style.cursor = 'var(--cursor-default)';
 
         setIsAnimating(true);
 
@@ -537,7 +563,7 @@ const DoorSection = ({
                 });
             }
         });
-    }, [camera, side, isOpen, isAnimating, setCameraOverride, isFastTeleport, closeDoor, label, position, reportLoadingError]);
+    }, [camera, side, isOpen, isAnimating, setCameraOverride, isFastTeleport, closeDoor, label, position, reportLoadingError, beginRoomLoading, doorId]);
 
     // 监听待处理的门点击，传送后自动点击。
     useEffect(() => {
@@ -592,12 +618,14 @@ const DoorSection = ({
                 const flyDistance = enterDistance; // 穿过短前厅（3 单位）进入房间。
 
                 // 动画前先计算目标位置，保证飞行路径为直线。
-                const targetX = camera.position.x + direction.x * flyDistance;
-                const targetZ = camera.position.z + direction.z * flyDistance;
+                const entryStart = doorAlignedState.current;
+                const targetX = entryStart.x + direction.x * flyDistance;
+                const targetZ = entryStart.z + direction.z * flyDistance;
 
                 // 步骤 1：沿直线向前移动相机。
                 gsap.to(camera.position, {
                     x: targetX,
+                    y: doorAlignedState.current.y,
                     z: targetZ,
                     duration: flyDuration,
                     ease: fastMode ? 'none' : 'power2.inOut',
@@ -614,6 +642,7 @@ const DoorSection = ({
                         // 标记为已进入。
                         setIsAnimating(false);
                         setIsInsideRoom(true);
+                        setTagPhase(null);
 
                         // 将上下文更新延迟 250 毫秒，
                         // 避免 GSAP 动画最后几帧卡顿。
@@ -643,11 +672,15 @@ const DoorSection = ({
         loadTimeoutRef.current?.();
 
         roomReadyRef.current = true;
+        finishRoomLoading(doorId);
+        setTagPhase('ready');
         performance.mark(`app:room-ready:${ROOM_LABELS[label]}`);
 
-        // 按当前上下文状态决定是否快速开门。
-        openDoor(isFastTeleport);
-    }, [openDoor, isFastTeleport, label]);
+        // 图纸边注轻淡换字，与开门起步衔接。
+        readyOpenDelay.current?.kill();
+        if (isFastTeleport || reducedMotion) openDoor(isFastTeleport);
+        else readyOpenDelay.current = gsap.delayedCall(0.16, () => openDoor(false));
+    }, [openDoor, isFastTeleport, label, finishRoomLoading, doorId, reducedMotion]);
 
     // 退出房间：像倒放视频一样反向执行动画。
     const exitRoom = useCallback(() => {
@@ -787,7 +820,7 @@ const DoorSection = ({
         void prefetchRoom(ROOM_LABELS[label]).catch(() => {});
         if (isOpen || isAnimating) return;
         setIsHovered(true);
-        document.body.style.cursor = "pointer";
+        document.body.style.cursor = 'var(--cursor-pointer)';
 
         if (hoverAudioRef.current && !isHovered) {
             const vol = isMuted ? 0 : DOOR_AUDIO_SETTINGS.hoverVolume * globalVolume;
@@ -845,7 +878,7 @@ const DoorSection = ({
     const handlePointerLeave = () => {
         if (isOpen || isAnimating) return;
         setIsHovered(false);
-        document.body.style.cursor = "auto";
+        document.body.style.cursor = 'var(--cursor-default)';
 
         if (hoverAudioRef.current && hoverAudioRef.current.isPlaying) {
             hoverAudioRef.current.stop();
@@ -897,6 +930,45 @@ const DoorSection = ({
     // 门的旋转轴位于侧边铰链处。
     const doorPivotX = side === 'left' ? -doorWidth / 2 : doorWidth / 2;
     const doorMeshX = side === 'left' ? doorWidth / 2 : -doorWidth / 2;
+    const annotationMatrix = useMemo(() => {
+        if (!annotation) return null;
+        const flip = side === 'right' && label !== '生活手记' ? -1 : 1;
+        const matrix = new THREE.Matrix4().makeRotationZ(annotation.rotation * flip);
+        matrix.setPosition(doorMeshX + (annotation.uv[0] - 0.5) * doorWidth * flip, 1.05 - annotation.uv[1] * doorHeight, 0.006);
+        return matrix;
+    }, [annotation, doorHeight, doorMeshX, doorWidth, label, side]);
+
+    useEffect(() => {
+        if (!annotation || !shouldRenderRoom || tagPhase !== 'loading' || isOpen || isFastTeleport || !doorRef.current) return;
+        const aligned = doorAlignedState.current;
+        const target = new THREE.Vector3(aligned.x, aligned.y, aligned.z);
+        const landscape = size.height < 500 && size.width > size.height;
+        if (size.width < 640 || landscape) {
+            const paper = doorRef.current.localToWorld(new THREE.Vector3().setFromMatrixPosition(annotationMatrix));
+            const top = doorRef.current.localToWorld(new THREE.Vector3(0, annotation.fontSize, 0).applyMatrix4(annotationMatrix));
+            // 用正常对齐视角测量真实投影，横竖屏来回切换时不累积缩放。
+            const probe = camera.clone(false);
+            probe.position.copy(target); probe.updateMatrix();
+            if (camera.parent) probe.matrixWorld.multiplyMatrices(camera.parent.matrixWorld, probe.matrix);
+            else probe.matrixWorld.copy(probe.matrix);
+            probe.matrixWorldInverse.copy(probe.matrixWorld).invert();
+            const bottomScreen = paper.clone().project(probe);
+            const topScreen = top.project(probe);
+            const pixels = Math.hypot((topScreen.x - bottomScreen.x) * size.width / 2, (topScreen.y - bottomScreen.y) * size.height / 2);
+            camera.parent?.worldToLocal(paper);
+            const targetPixels = !landscape && size.height < 760 ? 16 : 16.5;
+            const ratio = THREE.MathUtils.clamp(pixels / targetPixels, 0.35, 1);
+            target.lerp(paper, 1 - ratio);
+            // 矮横屏对准承载文字的原有画面，竖屏保留房门上下文。
+            if (landscape) target.y = paper.y;
+        }
+        const tween = gsap.to(camera.position, {
+            x: target.x, y: target.y, z: target.z,
+            duration: reducedMotion ? 0 : 0.4,
+            ease: 'power2.out', overwrite: true,
+        });
+        return () => tween.kill();
+    }, [annotation, annotationMatrix, camera, isFastTeleport, isOpen, reducedMotion, shouldRenderRoom, size.height, size.width, tagPhase]);
 
     // 把手位置按纹理确定，左侧门的把手在右边。
 
@@ -1141,7 +1213,7 @@ const DoorSection = ({
                         >
                             <planeGeometry args={[doorWidth, doorHeight]} />
                             <meshBasicMaterial color="#e0e0e0"
-                                map={doorPaintedTexture}
+                                map={annotatedPaintedTexture}
                                 transparent={true}
                                 alphaTest={0.5}
                                 roughness={0.8}
@@ -1156,7 +1228,7 @@ const DoorSection = ({
                             <planeGeometry args={[doorWidth, doorHeight]} />
                             <revealMaterial color="#e0e0e0"
                                 ref={doorMaterialRef}
-                                map={doorTexture}
+                                map={annotatedDoorTexture}
                                 transparent={true}
                                 alphaTest={0.1}
                                 roughness={0.8}
@@ -1205,6 +1277,12 @@ const DoorSection = ({
                                 />
                             </mesh>
                         </group>
+                        {annotation && <DoorAnnotation
+                            doorId={doorId}
+                            phase={tagPhase || 'idle'}
+                            matrix={annotationMatrix}
+                            visible={!isFastTeleport && !isInsideRoom}
+                        />}
                     </group>
                 </group>
 

@@ -1,7 +1,7 @@
 import { useAudio, usePerformance, useScene } from './context/contexts';
 import { useState, Suspense, useEffect, useCallback, lazy } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { PerformanceMonitor } from '@react-three/drei';
+import { PerformanceMonitor, useProgress } from '@react-three/drei';
 import Preloader from './components/dom/Preloader';
 import SceneErrorBoundary from './components/dom/SceneErrorBoundary';
 import LoadingFailure from './components/dom/LoadingFailure';
@@ -22,8 +22,18 @@ import { startLoadingTimeout } from './utils/loadingTimeout';
 import { galleryProjects, studioContent } from './data/content';
 import './styles/main.scss';
 import './styles/ReadingTrigger.scss';
+import { WebGLRenderer } from 'three';
+import RoomLoadingNotice from './components/dom/RoomLoadingNotice';
+
+// WebGL 上下文的创建选项保持稳定；可切换的抗锯齿由 AdaptiveQuality 处理。
+const createSceneRenderer = options => {
+  const renderer = new WebGLRenderer({ ...options, antialias: false, alpha: false, powerPreference: 'default', failIfMajorPerformanceCaveat: true });
+  renderer.localClippingEnabled = true;
+  return renderer;
+};
 
 const Experience = lazy(() => import('./components/canvas/Experience'));
+const AdaptiveQuality = lazy(() => import('./components/canvas/AdaptiveQuality'));
 const GlobalOverlay = lazy(() => import('./components/ui/GlobalOverlay'));
 const AboutProfile = lazy(() => import('./components/ui/AboutProfile'));
 const ProjectDetails = lazy(() => import('./components/ui/ProjectDetails'));
@@ -87,6 +97,8 @@ function RoomPanels() {
 function AppContent() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
+  const [entranceRevealing, setEntranceRevealing] = useState(false);
+  const [startupAssets, setStartupAssets] = useState(null);
   const pageVisible = usePageVisibility();
   const { settings, downgradeTier, tier } = usePerformance();
   const { initialRoom, isTeleporting, isInRoom, loadingError, reportLoadingError } = useScene();
@@ -119,6 +131,8 @@ function AppContent() {
   }, [isLoaded, tier, initialRoom, isTeleporting, isInRoom, pageVisible]);
 
   const handleSceneReady = useCallback(() => {
+    const { loaded, total } = useProgress.getState();
+    setStartupAssets({ loaded, total });
     performance.mark('app:scene-ready');
     setSceneReady(true);
   }, []);
@@ -126,6 +140,7 @@ function AppContent() {
     performance.mark('app:entrance-ready');
     setIsLoaded(true);
   }, []);
+  const handleEntranceReveal = useCallback(() => setEntranceRevealing(true), []);
 
   if (loadingError) return <LoadingFailure />;
 
@@ -137,15 +152,16 @@ function AppContent() {
         <Canvas
           frameloop={pageVisible ? 'always' : 'never'}
           camera={{ position: [0, 0.2, 28], fov: 60, near: 0.1, far: 150 }}
-          gl={{ antialias: settings.antialias, alpha: false, powerPreference: settings.powerPreference, localClippingEnabled: true, failIfMajorPerformanceCaveat: true }}
+          gl={createSceneRenderer}
           dpr={settings.dpr}
           shadows={settings.shadows}
         >
           <color attach="background" args={['#fafafa']} />
           <fog attach="fog" args={['#fafafa', 15, 50]} />
           <PerformanceMonitor onDecline={downgradeTier} flipflops={3} onFallback={downgradeTier} />
+          <Suspense fallback={null}><AdaptiveQuality /></Suspense>
           <Suspense fallback={null}>
-            <Experience onSceneReady={handleSceneReady} onError={reportLoadingError} />
+            <Experience onSceneReady={handleSceneReady} onError={reportLoadingError} invitationVisible={entranceRevealing || isLoaded} />
           </Suspense>
         </Canvas>
       </div>
@@ -153,9 +169,10 @@ function AppContent() {
         <NavigationUI />
         <RoomPanels />
         <PaperTransition />
+        <RoomLoadingNotice />
         <ScreenReaderOverlay />
       </>}
-      <Preloader ready={sceneReady} onComplete={handleLoaded} />
+      <Preloader ready={sceneReady} assets={startupAssets} onReveal={handleEntranceReveal} onComplete={handleLoaded} />
     </div>
   </>;
 }

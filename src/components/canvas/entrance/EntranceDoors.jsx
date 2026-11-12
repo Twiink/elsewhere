@@ -1,7 +1,10 @@
 import { useTexture } from '../../../hooks/useMediaTexture';
-import { useAchievements } from '../../../context/contexts';
+import { useAchievements, useScene } from '../../../context/contexts';
 import Text from '../SiteText';
-import { useRef, useState, useEffect } from 'react';
+import DoorLoadingTag from '../DoorLoadingTag';
+import EntranceInvitation from './EntranceInvitation';
+import { useReducedMotion } from '../../../hooks/useReducedMotion';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 
 
@@ -27,6 +30,7 @@ const EntranceDoors = ({
     position = [0, 0, 22],
     onPrepare,
     onComplete,
+    invitationVisible = false,
     corridorHeight = 8, // 较高的墙面。
     corridorWidth = 15 // 较宽的墙面。
 }) => {
@@ -43,9 +47,30 @@ const EntranceDoors = ({
     const groupRef = useRef();
     const [isOpen, setIsOpen] = useState(false);
     const [isAnimating, setIsAnimating] = useState(false);
+    const [tagPhase, setTagPhase] = useState(null);
+    const [tagReadyAt, setTagReadyAt] = useState(0);
+    const openingTimeline = useRef();
+    const loadingCameraZ = useRef(null);
+    const reducedMotion = useReducedMotion();
+    const { beginRoomLoading, finishRoomLoading } = useScene();
     const windowAvatarRef = useRef();
-    const { camera } = useThree();
+    const { camera, size } = useThree();
     const { unlockAchievement } = useAchievements();
+    useEffect(() => () => openingTimeline.current?.kill(), []);
+
+    const entranceZ = position[2];
+    useEffect(() => {
+        if (!isAnimating || isOpen || loadingCameraZ.current === null) return;
+        const landscape = size.height < 500 && size.width > size.height;
+        // 横屏等待时靠近门口，便签在门板内保留可读字号。
+        const targetZ = landscape ? Math.min(loadingCameraZ.current, entranceZ + 3.4) : loadingCameraZ.current;
+        const tween = gsap.to(camera.position, {
+            z: targetZ,
+            duration: reducedMotion ? 0 : 0.45,
+            ease: 'power2.out',
+        });
+        return () => tween.kill();
+    }, [camera, entranceZ, isAnimating, isOpen, reducedMotion, size.height, size.width]);
 
     const [isMobile, setIsMobile] = useState(false);
 
@@ -135,7 +160,7 @@ const EntranceDoors = ({
         }
 
         setIsBugClicked(true);
-        document.body.style.cursor = "auto";
+        document.body.style.cursor = 'var(--cursor-default)';
 
         // 墨水飞溅放大动画。
         if (inkSplashRef.current) {
@@ -254,27 +279,36 @@ const EntranceDoors = ({
 
 
     // 处理点击。
-    const handleClick = async (e) => {
+    const handleClick = useCallback(async (e) => {
         e.stopPropagation();
         if (isOpen || isAnimating) return;
 
+        loadingCameraZ.current = camera.position.z;
         setIsAnimating(true);
+        setTagPhase('loading');
+        const waitingStarted = performance.now();
         playBackgroundMusic();
         document.body.style.cursor = 'progress';
+        beginRoomLoading('corridor');
         await onPrepare?.();
+        finishRoomLoading('corridor');
         if (!groupRef.current) return;
+        setTagReadyAt(performance.now());
+        setTagPhase('ready');
 
         // 过渡开始时立即重置光标。
-        document.body.style.cursor = "auto";
+        document.body.style.cursor = 'var(--cursor-default)';
 
         setIsOpen(true);
         unlockAchievement('corridor_enter');
 
         const tl = gsap.timeline({
+            delay: reducedMotion || performance.now() - waitingStarted < 300 ? 0 : 0.16,
             onComplete: () => {
                 onComplete?.();
             }
         });
+        openingTimeline.current = tl;
 
         // 完全压下把手，模拟真实开门。
         if (leftHandleRef.current) {
@@ -312,12 +346,22 @@ const EntranceDoors = ({
             duration: 1.8,
             ease: 'power2.inOut'
         }, 0.3);
-    };
+    }, [isOpen, isAnimating, onPrepare, onComplete, camera, unlockAchievement, beginRoomLoading, finishRoomLoading, reducedMotion]);
+
+    useEffect(() => {
+        const handleKey = event => {
+            if (event.key !== 'Enter' || event.defaultPrevented || event.repeat) return;
+            if (event.target instanceof Element && event.target.closest('button,a,input,textarea,select,[contenteditable="true"]')) return;
+            void handleClick({ stopPropagation() {} });
+        };
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+    }, [handleClick]);
 
     // 悬停时微开门，提示可交互。
     const handlePointerEnter = () => {
         if (isOpen || isAnimating || isMobile) return;
-        document.body.style.cursor = "pointer";
+        document.body.style.cursor = 'var(--cursor-pointer)';
 
         // 悬停时稍微开门。
         gsap.to(leftDoorRef.current.rotation, {
@@ -392,7 +436,7 @@ const EntranceDoors = ({
 
     const handlePointerLeave = () => {
         if (isOpen || isAnimating || isMobile) return;
-        document.body.style.cursor = "auto";
+        document.body.style.cursor = 'var(--cursor-default)';
 
         // 重新关门。
         gsap.to(leftDoorRef.current.rotation, {
@@ -526,7 +570,7 @@ const EntranceDoors = ({
     // 窗户悬停辅助函数。
     const handleWindowEnter = (e) => {
         e.stopPropagation();
-        document.body.style.cursor = "pointer";
+        document.body.style.cursor = 'var(--cursor-pointer)';
 
         if (windowAvatarRef.current) {
             gsap.to(windowAvatarRef.current.position, {
@@ -546,7 +590,7 @@ const EntranceDoors = ({
 
     const handleWindowLeave = (e) => {
         e.stopPropagation();
-        document.body.style.cursor = "auto";
+        document.body.style.cursor = 'var(--cursor-default)';
 
         if (windowAvatarRef.current) {
             gsap.to(windowAvatarRef.current.position, {
@@ -577,6 +621,8 @@ const EntranceDoors = ({
 
     return (
         <group ref={groupRef} position={[position[0], 0, position[2]]}>
+
+            <EntranceInvitation visible={invitationVisible && !isAnimating} floorY={floorY} />
 
             {/* 入口前方上层的石板路地面。 */}
             {/* 石板路高度：调整 floorY + 0.02，数值越大越高。 */}
@@ -718,6 +764,13 @@ const EntranceDoors = ({
                         />
                     </mesh>
                 </group>
+                {tagPhase && <DoorLoadingTag
+                    phase={tagPhase}
+                    readyAt={tagReadyAt}
+                    position={[doorWidth / 2, -0.65, 0.12]}
+                    sizeMultiplier={1.45}
+                    maxScale={0.9}
+                />}
             </group>
 
             {/* 右门。 */}
@@ -854,8 +907,8 @@ const EntranceDoors = ({
                 <mesh
                     position={[0.38, 0.1, 0.01]}
                     onClick={handleDuckClick}
-                    onPointerEnter={() => { document.body.style.cursor = "pointer"; }}
-                    onPointerLeave={() => { document.body.style.cursor = "auto"; }}
+                    onPointerEnter={() => { document.body.style.cursor = 'var(--cursor-pointer)'; }}
+                    onPointerLeave={() => { document.body.style.cursor = 'var(--cursor-default)'; }}
                 >
                     <planeGeometry args={[0.6, 0.6]} />
                     <meshBasicMaterial color="#e0e0e0" transparent opacity={0} />
@@ -903,8 +956,8 @@ const EntranceDoors = ({
                     ref={bugRef}
                     position={[2.5, floorY + 2.8, 0.16]}
                     onClick={handleBugClick}
-                    onPointerEnter={() => { document.body.style.cursor = "pointer"; }}
-                    onPointerLeave={() => { document.body.style.cursor = "auto"; }}
+                    onPointerEnter={() => { document.body.style.cursor = 'var(--cursor-pointer)'; }}
+                    onPointerLeave={() => { document.body.style.cursor = 'var(--cursor-default)'; }}
                 >
                     <planeGeometry args={[0.4, 0.4]} />
                     <meshBasicMaterial color="#e0e0e0"

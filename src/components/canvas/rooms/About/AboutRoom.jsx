@@ -8,6 +8,8 @@ import { PositionalAudio } from '@react-three/drei';
 import * as THREE from 'three';
 import PaperAirplane from './PaperAirplane';
 import InfiniteSkyManager from './InfiniteSkyManager';
+import AtmosphereParticles from '../../atmosphere/AtmosphereParticles';
+import SceneParallax from '../../atmosphere/SceneParallax';
 
 
 
@@ -251,6 +253,9 @@ const AboutRoom = ({ onReady, isExiting, isWarmup }) => {
 
             {/* 无限天空、云层与故事里程碑。 */}
             <InfiniteSkyManager scrollProgressRef={scrollPosition} />
+            <SceneParallax room="about" strength={0.18}>
+                <AtmosphereParticles kind="firefly" scrollProgressRef={scrollPosition} active={!isExiting && !isTeleporting} />
+            </SceneParallax>
 
             {/* 天空背景。 */}
             <mesh position={[0, 0, -200]}>

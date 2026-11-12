@@ -1,5 +1,5 @@
 import { ACHIEVEMENTS } from '../../data/achievements';
-import { useAchievements, useAudio } from '../../context/contexts';
+import { useAchievements, useAudio, useScene } from '../../context/contexts';
 import React from 'react';
 
 
@@ -9,6 +9,7 @@ import '../../styles/AchievementPopup.scss';
 const AchievementPopup = () => {
     const { activePopup } = useAchievements();
     const { isMuted, toggleMute, setGlobalVolume } = useAudio();
+    const { loadingRoom, hasEntered } = useScene();
 
     if (!activePopup) return null;
 
@@ -20,10 +21,12 @@ const AchievementPopup = () => {
 
     // corridor_enter 的特殊逻辑，用于询问是否开启声音。
     const isSoundPrompt = activePopup.id === 'corridor_enter';
+    // 点门后收起入口引导，给门上的加载便签留出视野。
+    if (isSoundPrompt && (loadingRoom === 'corridor' || hasEntered || isCompleted || isHiding)) return null;
 
     return (
         <div
-            className={`achievement-popup ${isCompleted ? 'completed' : ''} ${isHiding ? 'hiding' : ''} ${isSoundPrompt ? 'interactive' : ''}`}
+            className={`achievement-popup ${isCompleted ? 'completed' : ''} ${isHiding ? 'hiding' : ''} ${isSoundPrompt ? 'interactive achievement-popup--entry-sound' : ''}`}
             style={isSoundPrompt ? { pointerEvents: 'auto' } : {}}
         >
             {/* SVG 边框叠加层。 */}
@@ -59,9 +62,11 @@ const AchievementPopup = () => {
                         <span className="description">{data.label}</span>
                     ) : (
                         <span className="description">
-                            点击门即可进入。当前声音
+                            声音
                             <button
                                 className={`inline-sound-toggle ${!isMuted ? 'on' : 'off'}`}
+                                aria-label={isMuted ? '开启声音' : '关闭声音'}
+                                aria-pressed={!isMuted}
                                 onClick={(e) => {
                                     e.stopPropagation();
 

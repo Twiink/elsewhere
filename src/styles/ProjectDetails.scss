@@ -231,7 +231,7 @@ $notebook-asset-base: '/media/images/textures/gallery/notebook';
         figcaption { margin-top: 0.6rem; font-size: 0.9rem; color: var(--profile-muted); }
     }
     .project-entry-links { display: flex; flex-wrap: wrap; gap: 0 1.2rem; margin-block: 0.4rem; a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-underline-offset: 0.25em; } }
-    .project-detail-tools { padding-block: 0.6rem; border-block: 1px dashed var(--profile-rule); summary { min-height: 44px; cursor: pointer; } .project-detail-entries { padding-top: 0.75rem; } }
+    .project-detail-tools { padding-block: 0.6rem; border-block: 1px dashed var(--profile-rule); summary { min-height: 44px; cursor: var(--cursor-pointer, pointer); } .project-detail-entries { padding-top: 0.75rem; } }
     .project-detail-videos {
         figure { margin: 0; }
         video { display: block; width: auto; max-width: 100%; height: auto; max-height: 60dvh; margin-inline: auto; border-radius: 5px; background: #292824; }

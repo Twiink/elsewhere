@@ -67,7 +67,7 @@ const SocialBarrel = ({ position, rotation = [0, 0, 0], texturePath, label, onCl
 
     const handlePointerOver = () => {
         if (isTouch) return;
-        document.body.style.cursor = 'pointer';
+        document.body.style.cursor = 'var(--cursor-pointer)';
         setHovered(true);
 
         if (materialRef.current) {
@@ -85,7 +85,7 @@ const SocialBarrel = ({ position, rotation = [0, 0, 0], texturePath, label, onCl
 
     const handlePointerOut = () => {
         if (isTouch) return;
-        document.body.style.cursor = 'auto';
+        document.body.style.cursor = 'var(--cursor-default)';
         setHovered(false);
 
         if (materialRef.current) {

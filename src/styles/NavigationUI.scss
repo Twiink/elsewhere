@@ -27,7 +27,7 @@
     padding-top: 8px; // 顶部被隐藏，因此将内容下移。
     background: transparent;
     border: none;
-    cursor: pointer;
+    cursor: var(--cursor-pointer, pointer);
     transition: transform 0.2s ease;
     overflow: visible;
 
@@ -257,7 +257,7 @@
             height: 28px;
             background: transparent;
             border: none;
-            cursor: pointer;
+            cursor: var(--cursor-pointer, pointer);
             transition: transform 0.2s ease, opacity 0.2s ease;
             opacity: 0.6;
 
@@ -310,7 +310,7 @@
     .map-hover-zone {
         position: absolute;
         z-index: 2;
-        cursor: pointer;
+        cursor: var(--cursor-pointer, pointer);
         // 重置按钮默认样式，现使用 button 元素以支持无障碍。
         background: transparent;
         border: none;
@@ -410,7 +410,7 @@
         padding: 0;
         background: none;
         border: none;
-        cursor: pointer;
+        cursor: var(--cursor-pointer, pointer);
         transition: transform 0.2s ease;
         z-index: 2;
 
@@ -535,7 +535,7 @@
             height: 24px;
             background: transparent;
             border: none;
-            cursor: pointer;
+            cursor: var(--cursor-pointer, pointer);
             opacity: 0.6;
             transition: transform 0.2s, opacity 0.2s;
 
@@ -587,7 +587,7 @@
                 background: #ccc;
                 border-radius: 2px;
                 outline: none;
-                cursor: pointer;
+                cursor: var(--cursor-pointer, pointer);
 
                 &::-webkit-slider-thumb {
                     appearance: none;
@@ -595,7 +595,7 @@
                     height: 16px;
                     border-radius: 50%;
                     background: #1a1a1a;
-                    cursor: pointer;
+                    cursor: var(--cursor-pointer, pointer);
                     box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
                 }
 
@@ -604,7 +604,7 @@
                     height: 16px;
                     border-radius: 50%;
                     background: #1a1a1a;
-                    cursor: pointer;
+                    cursor: var(--cursor-pointer, pointer);
                     box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
                     border: none;
                 }

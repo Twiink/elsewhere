@@ -1,6 +1,9 @@
 {
   "version": 1,
   "images": {
+    "textures/corridor/doors/about-smile-margin-v1.png": "/media/images/textures/corridor/doors/about-smile-margin-v1.png",
+    "textures/corridor/doors/contact-letter-margin-v1.png": "/media/images/textures/corridor/doors/contact-letter-margin-v1.png",
+    "textures/corridor/doors/gallery-blueprint-inner-v1.png": "/media/images/textures/corridor/doors/gallery-blueprint-inner-v1.png",
     "content/young-multi-orpetron-site-of-the-day.png": "/media/images/content/young-multi-orpetron-site-of-the-day.webp",
     "content/itom-cssda-special-kudos.png": "/media/images/content/itom-cssda-special-kudos.webp",
     "content/itom-css-winner-site-of-the-day.png": "/media/images/content/itom-css-winner-site-of-the-day.webp",

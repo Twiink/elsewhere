@@ -61,7 +61,7 @@ const AwardButton = ({ onClick, texture, paintedTexture, width, height, position
     const handlePointerOver = () => {
         if (isTouch) return;
         setHovered(true);
-        document.body.style.cursor = 'pointer';
+        document.body.style.cursor = 'var(--cursor-pointer)';
         onHoverChange?.(true);
 
         // 笔刷显现按钮。
@@ -83,7 +83,7 @@ const AwardButton = ({ onClick, texture, paintedTexture, width, height, position
     const handlePointerOut = () => {
         if (isTouch) return;
         setHovered(false);
-        document.body.style.cursor = 'auto';
+        document.body.style.cursor = 'var(--cursor-default)';
         onHoverChange?.(false);
 
         // 反向显现。
@@ -735,9 +735,9 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
     // 光标处理。
     useEffect(() => {
         if (hovered && !isPopping) {
-            document.body.style.cursor = 'pointer';
+            document.body.style.cursor = 'var(--cursor-pointer)';
         } else {
-            document.body.style.cursor = 'auto';
+            document.body.style.cursor = 'var(--cursor-default)';
         }
     }, [hovered, isPopping]);
 

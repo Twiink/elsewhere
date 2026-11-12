@@ -13,6 +13,8 @@ import SocialBarrel from './SocialBarrel';
 
 import { contactInfo, siteInfo } from '../../../../data/content';
 import GalleryClouds from '../Gallery/GalleryClouds';
+import SceneParallax from '../../atmosphere/SceneParallax';
+import { ContactIsland } from '../../atmosphere/SketchScenery';
 
 
 
@@ -343,7 +345,10 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             )}
 
             {/* ☁️ 云层。 */}
+            <SceneParallax room="contact" strength={0.3}>
+            <ContactIsland />
             <GalleryClouds count={45} seed={88} rotationOffset={[0, 1, 0]} />
+            </SceneParallax>
 
             {/* 🌊 海浪图层。 */}
             <group position={[0, -1, -8]}>

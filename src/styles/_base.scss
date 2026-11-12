@@ -8,6 +8,18 @@
 
 
 // CSS 样式重置。
+:root {
+    --cursor-default: auto;
+    --cursor-pointer: pointer;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    :root {
+        --cursor-default: url('/media/images/cursors/cursor-default.webp') 3 3, auto;
+        --cursor-pointer: url('/media/images/cursors/cursor-pointer.webp') 7 3, pointer;
+    }
+}
+
 *,
 *::before,
 *::after {
@@ -37,6 +49,7 @@ html {
 }
 
 body {
+    cursor: var(--cursor-default);
     font-family: $font-primary;
     background-color: #fafafa;
     color: $color-black;
@@ -168,7 +181,7 @@ a {
 button {
     background: none;
     border: none;
-    cursor: pointer;
+    cursor: var(--cursor-pointer, pointer);
     font: inherit;
     color: inherit;
 }

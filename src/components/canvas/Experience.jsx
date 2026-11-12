@@ -28,7 +28,7 @@ const ENTRANCE_DOORS_Z = 22;
  * 2. 点击门后开门，相机穿过入口。
  * 3. 门后是带有 ITOM 标识的无限走廊。
  */
-const Experience = ({ onSceneReady, onError }) => {
+const Experience = ({ onSceneReady, onError, invitationVisible = false }) => {
     // 使用 SceneContext 管理房间状态。
     const { hasEntered, markEntered, enterRoom, isTeleporting, isInRoom } = useScene();
 
@@ -96,6 +96,7 @@ const Experience = ({ onSceneReady, onError }) => {
                     position={[0, 0, ENTRANCE_DOORS_Z]}
                     onPrepare={prepareCorridor}
                     onComplete={handleEntranceComplete}
+                    invitationVisible={invitationVisible}
                 />
             )}
 

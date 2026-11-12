@@ -21,6 +21,9 @@ import { usePaintMaterial } from './usePaintMaterial';
 import { useGalleryProjects } from '../../../../hooks/useContentData';
 import { NOTEBOOK_ASSETS, NOTEBOOK_FEATURE_ICONS, NOTEBOOK_FEATURE_SPRITES } from '../../../../config/projectNotebook';
 import StartupReady from '../../StartupReady';
+import SceneParallax from '../../atmosphere/SceneParallax';
+import AtmosphereParticles from '../../atmosphere/AtmosphereParticles';
+import { SketchCrane } from '../../atmosphere/SketchScenery';
 
 // 复用 Vector3，避免 useFrame 中分配对象。
 const _tempScale = new THREE.Vector3();
@@ -413,6 +416,8 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         return new THREE.TubeGeometry(curve, 64, 0.015, 8, false);
     }, [curve]);
 
+    useEffect(() => () => ropeGeometry.dispose(), [ropeGeometry]);
+
     const floorShape = useMemo(() => {
         const shape = new THREE.Shape();
         shape.moveTo(-1.1, -2.0);
@@ -511,6 +516,10 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 </group>
 
                 {/* 背景景物图层。 */}
+                <SceneParallax room="gallery" strength={0.35}>
+                <SketchCrane position={[5.2, -0.1, -18]} />
+                <SketchCrane position={[-13, -1.1, -24]} scale={0.85} phase={2.3} secondary />
+                <AtmosphereParticles kind="smoke" />
                 {/* 中央房屋。 */}
                 <mesh position={[0, -1, -9]} scale={[1, 1, 1]}>
                     <planeGeometry args={[15, 15 / 2.357]} />
@@ -580,6 +589,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 
                 {/* 上方散布的云层。 */}
                 <GalleryClouds count={65} seed={123} />
+                </SceneParallax>
 
                 {/* 天空盒与环境。 */}
                 <mesh position={[0, 5, -20]}>
@@ -913,13 +923,13 @@ const ProjectCard = memo(forwardRef(({ index, total, project, clothespinTexture,
     // 悬停时改变光标。
     useEffect(() => {
         if (btnHovered && isSelected) {
-            document.body.style.cursor = 'pointer';
+            document.body.style.cursor = 'var(--cursor-pointer)';
         } else if (hovered && !isSelected) {
-            document.body.style.cursor = 'pointer';
+            document.body.style.cursor = 'var(--cursor-pointer)';
         } else {
-            document.body.style.cursor = 'auto';
+            document.body.style.cursor = 'var(--cursor-default)';
         }
-        return () => { document.body.style.cursor = 'auto'; };
+        return () => { document.body.style.cursor = 'var(--cursor-default)'; };
     }, [hovered, isSelected, btnHovered]);
 
     useFrame((state) => {

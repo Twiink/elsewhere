@@ -1,6 +1,7 @@
 import { useAudio } from '../../context/contexts';
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import gsap from 'gsap';
+import { useProgress } from '@react-three/drei';
 
 
 // 可复用 SVG 线条组件，现支持 ref。
@@ -95,8 +96,12 @@ const percentageStyle = {
   overflow: 'visible'
 };
 
-const Preloader = ({ onComplete, ready }) => {
+const Preloader = ({ onComplete, onReveal, ready, assets }) => {
   const [isDone, setIsDone] = useState(false);
+  const liveLoaded = useProgress(state => state.loaded);
+  const liveTotal = useProgress(state => state.total);
+  const loaded = assets?.loaded ?? liveLoaded;
+  const total = assets?.total ?? liveTotal;
 
   const { play } = useAudio();
   // 跟踪音频句柄，以便停止循环。
@@ -105,6 +110,7 @@ const Preloader = ({ onComplete, ready }) => {
 
   // 动画目标使用 ref。
   const containerRef = useRef(null);
+  const statusRef = useRef(null);
   const leftHalfRef = useRef(null);
   const rightHalfRef = useRef(null);
   const pathLeftRef = useRef(null);
@@ -113,7 +119,7 @@ const Preloader = ({ onComplete, ready }) => {
   const textRightRef = useRef(null);
 
   // 视觉进度完全保存在 ref 中，避免每秒 60 次 React 渲染。
-  const targetProgress = ready ? 100 : 85;
+  const targetProgress = ready ? 100 : total > 0 ? (loaded / total) * 100 : 0;
   const displayProgressRef = useRef(0);
   const trackerRef = useRef({ val: 0 });
   const readyRef = useRef(ready);
@@ -181,8 +187,11 @@ const Preloader = ({ onComplete, ready }) => {
 
     exitTimelineRef.current = tl;
 
-    // 1. 撕开前短暂停顿。
-    tl.to({}, { duration: 0.1 });
+    // 撕纸起步时收起平面提示，邀请由石板路上的文字承接。
+    tl.to([statusRef.current, ...containerRef.current.querySelectorAll('.preloader__percentage')], { opacity: 0, duration: 0.12 }, 0);
+    tl.to({}, { duration: 0.1 }, 0);
+    tl.addLabel('tear', 0.1);
+    tl.call(() => onReveal?.(), [], 'tear');
 
     // 2. 撕开纸张。
     tl.to(leftHalfRef.current, {
@@ -204,7 +213,7 @@ const Preloader = ({ onComplete, ready }) => {
       opacity: 0,
       duration: 0.5
     }, '-=0.5');
-  }, [play, onComplete]);
+  }, [play, onComplete, onReveal]);
 
   // ----------------------------------------
   // 平滑加载逻辑。
@@ -297,7 +306,8 @@ const Preloader = ({ onComplete, ready }) => {
   const percentageText = `${Math.round(safeProgress)}%`;
 
   return (
-    <div className="preloader" ref={containerRef}>
+    <div className="preloader" ref={containerRef} role="progressbar" aria-label="加载场景素材" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(targetProgress)} aria-valuetext={total > 0 ? `已加载 ${loaded} / ${total} 项素材` : '正在准备素材'}>
+      <p ref={statusRef} className="preloader__status">{ready ? '准备好了，一起进去看看' : total > 0 && loaded === total ? '素材已就绪，正在铺好画面…' : total > 0 ? `正在收集纸片 · ${loaded} / ${total}` : '正在翻开画纸…'}</p>
       {/* 左半部分。 */}
       <div
         className="preloader__half preloader__half--left"

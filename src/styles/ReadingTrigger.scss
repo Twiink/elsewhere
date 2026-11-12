@@ -10,7 +10,7 @@
     background: #faf9f6 url('/media/images/textures/paper-texture.webp') center / cover;
     color: #222;
     font: 1rem '霞鹜文楷', serif;
-    cursor: pointer;
+    cursor: var(--cursor-pointer, pointer);
 
     &:hover { background-color: #eae7df; }
 }
@@ -44,7 +44,7 @@
         color: inherit;
         font: inherit;
         white-space: nowrap;
-        cursor: pointer;
+        cursor: var(--cursor-pointer, pointer);
         text-underline-offset: 0.4em;
 
         &:hover { text-decoration: underline; }

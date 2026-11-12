@@ -10,27 +10,30 @@ const SETTINGS = {
     dpr: [1, 2], // 最高允许两倍像素密度。
     shadows: true, // 启用阴影。
     antialias: true,
-    powerPreference: "high-performance",
-    physicsStep: 1 / 60,
-    textureQuality: "high",
+    cloudDensity: 1,
+    detailDistance: 80,
+    animationFps: 60,
+    textureAnisotropy: 4,
     particleCount: 1.0, // 粒子数量 100%。
   },
   [TIERS.MEDIUM]: {
     dpr: [1, 1.5], // 移动端最高 1.5 倍，平衡画质与 GPU 填充率。
     shadows: false, // 禁用阴影，提高移动端性能。
     antialias: true,
-    powerPreference: "default",
-    physicsStep: 1 / 60,
-    textureQuality: "medium",
+    cloudDensity: 0.7,
+    detailDistance: 60,
+    animationFps: 40,
+    textureAnisotropy: 2,
     particleCount: 0.6, // 粒子数量 60%。
   },
   [TIERS.LOW]: {
     dpr: [0.8, 1], // 最低 0.8 倍像素密度，避免过度像素化。
     shadows: false, // 完全禁用阴影。
     antialias: false, // 禁用抗锯齿以提高帧率。
-    powerPreference: "low-power",
-    physicsStep: 1 / 45, // 必要时降低物理更新频率。
-    textureQuality: "low",
+    cloudDensity: 0.4,
+    detailDistance: 42,
+    animationFps: 24,
+    textureAnisotropy: 1,
     particleCount: 0.3, // 粒子数量 30%。
   },
 };

@@ -3,6 +3,9 @@ import { useMemo, useRef } from 'react';
 import { useFrame, useThree, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { cloudGeometry } from '../cloudResources';
+import { usePerformance } from '../../../../context/contexts';
+import { useReducedMotion } from '../../../../hooks/useReducedMotion';
+import SceneParallax from '../../atmosphere/SceneParallax';
 
 const CLOUD_ROTATION = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, -Math.PI / 3, 0));
 
@@ -37,12 +40,14 @@ const CLOUD_TEXTURES = [
 ];
 
 const SkyChunk = ({ chunkIndex = 0, seed = 0, scrollProgressRef }) => {
+    const { settings } = usePerformance();
+    const reducedMotion = useReducedMotion();
     const zOffset = -(chunkIndex * CHUNK_LENGTH) - 15;
 
     const clouds = useMemo(() => {
         const items = [];
         const random = seededRandom(seed + chunkIndex * 1000);
-        const cloudCount = 15 + Math.floor(random() * 8); // 显著增加云的数量。
+        const cloudCount = Math.max(6, Math.ceil((15 + Math.floor(random() * 8)) * settings.cloudDensity));
 
         for (let i = 0; i < cloudCount; i++) {
             const x = (random() - 0.5) * CHUNK_WIDTH;
@@ -64,10 +69,10 @@ const SkyChunk = ({ chunkIndex = 0, seed = 0, scrollProgressRef }) => {
         }
 
         return items;
-    }, [chunkIndex, seed, zOffset]);
+    }, [chunkIndex, seed, zOffset, settings.cloudDensity]);
 
     return (
-        <group>
+        <SceneParallax room="about" strength={0.22}>
             {clouds.map((cloud) => (
                 <Cloud
                     key={cloud.id}
@@ -80,9 +85,12 @@ const SkyChunk = ({ chunkIndex = 0, seed = 0, scrollProgressRef }) => {
                     bobAmount={cloud.bobAmount}
                     timeOffset={cloud.timeOffset}
                     scrollProgressRef={scrollProgressRef}
+                    reducedMotion={reducedMotion}
+                    detailDistance={settings.detailDistance}
+                    animationFps={settings.animationFps}
                 />
             ))}
-        </group>
+        </SceneParallax>
     );
 };
 
@@ -96,10 +104,15 @@ const Cloud = ({
     driftAmount = 0.8,
     bobAmount = 0.15,
     timeOffset = 0,
-    scrollProgressRef
+    scrollProgressRef,
+    reducedMotion,
+    detailDistance,
+    animationFps
 }) => {
     const meshRef = useRef();
     const materialRef = useRef();
+    const nextUpdate = useRef(0);
+    const world = useMemo(() => new THREE.Vector3(), []);
     const { camera } = useThree();
 
     // 保存动画基础位置。
@@ -127,8 +140,10 @@ const Cloud = ({
 
     useFrame((state) => {
         if (!meshRef.current) return;
+        if (state.clock.elapsedTime < nextUpdate.current) return;
+        nextUpdate.current = state.clock.elapsedTime + 1 / animationFps;
 
-        const time = state.clock.elapsedTime;
+        const time = reducedMotion ? 0 : state.clock.elapsedTime;
 
         // 硬裁切线，手动计算世界 Z。
         // 世界 Z = 房间位置 -25 + scrollProgress + 云的局部位置。
@@ -136,6 +151,9 @@ const Cloud = ({
         const scrollProgress = scrollProgressRef?.current || 0;
         const cloudLocalZ = basePosition.current[2];
         const worldZ = ROOM_Z + scrollProgress + cloudLocalZ;
+        const distance = world.setFromMatrixPosition(meshRef.current.matrixWorld).distanceTo(camera.position);
+        meshRef.current.visible = worldZ <= CORRIDOR_CLIP_Z && distance < detailDistance;
+        if (!meshRef.current.visible) return;
 
         // 云的避让效果。
         // 靠近相机时向两侧移动，保持中央视野清晰。
@@ -167,7 +185,7 @@ const Cloud = ({
 
         // 云越过裁切线后立即隐藏。
         if (materialRef.current) {
-            materialRef.current.opacity = worldZ > CORRIDOR_CLIP_Z ? 0 : baseOpacity;
+            materialRef.current.opacity = baseOpacity * (1 - THREE.MathUtils.smoothstep(distance, detailDistance * 0.7, detailDistance));
         }
 
         // 广告牌效果：始终朝向相机，再向左旋转 90°。

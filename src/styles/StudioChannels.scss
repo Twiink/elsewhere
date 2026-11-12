@@ -16,6 +16,6 @@
     gap: 0.6rem;
 
     input { flex: 1 1 14rem; min-width: 0; width: 100%; min-height: 44px; padding: 0.45rem 0.6rem; border: 1px solid var(--profile-rule); border-radius: 3px; background: transparent; color: var(--profile-ink); font: inherit; }
-    button { min-height: 44px; padding: 0.4rem 0.7rem; border: 1px solid var(--profile-ink); border-radius: 3px 6px 4px 5px; background: transparent; color: var(--profile-ink); font: inherit; cursor: pointer; }
+    button { min-height: 44px; padding: 0.4rem 0.7rem; border: 1px solid var(--profile-ink); border-radius: 3px 6px 4px 5px; background: transparent; color: var(--profile-ink); font: inherit; cursor: var(--cursor-pointer, pointer); }
     button:hover { background: #e5e0d5; }
 }

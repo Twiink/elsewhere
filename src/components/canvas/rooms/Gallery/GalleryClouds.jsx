@@ -1,149 +1,98 @@
-import { MediaTextureLoader } from '../../../../media/MediaTextureLoader';
 import { useMemo, useRef } from 'react';
 import { useLoader, useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
-import { cloudGeometry } from '../cloudResources';
+import { Object3D, Quaternion, Euler, Vector3 } from 'three';
+import { MediaTextureLoader } from '../../../../media/MediaTextureLoader';
+import { usePerformance } from '../../../../context/contexts';
+import { useReducedMotion } from '../../../../hooks/useReducedMotion';
+import { seededRandom } from '../../../../utils/sceneRandom';
 
-// 可用云纹理。
-const CLOUD_TEXTURES = [
-    '/media/images/textures/clouds/cloud-rounded-bold.webp',
-    '/media/images/textures/clouds/cloud-flat-bottom-bold.webp',
-    '/media/images/textures/clouds/cloud-wide-sketch.webp',
-    '/media/images/textures/clouds/cloud-rounded-sketch.webp',
-    '/media/images/textures/clouds/cloud-tall-sketch.webp',
-    '/media/images/textures/clouds/cloud-puffy-bold.webp',
-    '/media/images/textures/clouds/cloud-horizon-sketch.webp',
-    '/media/images/textures/clouds/cloud-soft-bold.webp',
+const CLOUDS = [
+    ['cloud-rounded-bold', 1.894], ['cloud-flat-bottom-bold', 2.459],
+    ['cloud-wide-sketch', 3.577], ['cloud-rounded-sketch', 1.794],
+    ['cloud-tall-sketch', 1.997], ['cloud-puffy-bold', 1.905],
+    ['cloud-horizon-sketch', 3], ['cloud-soft-bold', 1.875],
 ];
+const URLS = CLOUDS.map(([name]) => `/media/images/textures/clouds/${name}.webp`);
+const DEFAULT_ROTATION = [0, -Math.PI / 3, 0];
 
-/**
- * GalleryClouds 画廊云层组件。
- * 随机分布在画廊上方的云层。
- */
-const GalleryClouds = ({ count = 12, seed = 42, rotationOffset = [0, -Math.PI / 3, 0] }) => {
-    // 移动边界必须与 StaticCloud 一致。
-    const startX = 40;
-    const endX = -40;
-    const totalDistance = startX - endX;
-
-    const clouds = useMemo(() => {
-        const items = [];
-        const random = seededRandom(seed);
-
-        for (let i = 0; i < count; i++) {
-            const y = 6 + random() * 8; // 位于高处。
-            const z = -5 - random() * 30; // 深度变化。
-            const driftSpeed = 0.1 + random() * 0.15;
-
-            // 为各朵云均匀设置偏移，覆盖整个宽度。
-            // 每朵云从不同 X 位置开始。
-            const initialOffset = (i / count) * totalDistance + random() * 3;
-
-            // 计算初始 X，模拟云已在移动。
-            const initialX = startX - (initialOffset % (totalDistance + 10)) + 5;
-
-            items.push({
-                id: i,
-                position: [initialX, y, z],  // 位置已计算。
-                scale: 0.5 + random() * 1.2,
-                opacity: 0.4 + random() * 0.3,
-                textureIndex: Math.floor(random() * CLOUD_TEXTURES.length),
-                driftSpeed: driftSpeed,
-                initialOffset: initialOffset,  // 保存动画偏移。
-            });
-        }
-
-        return items;
-    }, [count, seed, totalDistance]);
-
-    return (
-        <group>
-            {clouds.map((cloud) => (
-                <StaticCloud
-                    key={cloud.id}
-                    position={cloud.position}
-                    scale={cloud.scale}
-                    opacity={cloud.opacity}
-                    textureIndex={cloud.textureIndex}
-                    driftSpeed={cloud.driftSpeed}
-                    initialOffset={cloud.initialOffset}
-                    rotationOffset={rotationOffset}
-                />
-            ))}
-        </group>
-    );
-};
-
-// 持续漂移、始终朝向相机的云组件。
-const StaticCloud = ({ position, scale, opacity, textureIndex, driftSpeed, initialOffset, rotationOffset }) => {
-    const meshRef = useRef();
-    const basePosition = useRef(position);
-
-    // 移动边界。
-    const startX = 40;  // 从右侧开始。
-    const endX = -40;   // 从左侧离开。
-    const totalDistance = startX - endX;
-
-    // 加载指定云纹理。
-    const texture = useLoader(MediaTextureLoader, CLOUD_TEXTURES[textureIndex]);
-
-    // 使用原始宽高比，防止二次幂尺寸转换后拉伸。
-    const cloudAspects = {
-        'cloud-rounded-bold.webp': 1.894,
-        'cloud-flat-bottom-bold.webp': 2.459,
-        'cloud-wide-sketch.webp': 3.577,
-        'cloud-rounded-sketch.webp': 1.794,
-        'cloud-tall-sketch.webp': 1.997,
-        'cloud-puffy-bold.webp': 1.905,
-        'cloud-horizon-sketch.webp': 3,
-        'cloud-soft-bold.webp': 1.875
-    };
-
-    const cloudFile = CLOUD_TEXTURES[textureIndex].split('/').pop();
-    const aspectRatio = cloudAspects[cloudFile] || 1.8;
-    const width = 2.5 * scale;
-    const height = width / aspectRatio;
-    const [rotationX, rotationY, rotationZ] = rotationOffset;
-    const offsetQuaternion = useMemo(() => new THREE.Quaternion().setFromEuler(
-        new THREE.Euler(rotationX, rotationY, rotationZ)
-    ), [rotationX, rotationY, rotationZ]);
-
-    useFrame(({ camera, clock }) => {
-        if (!meshRef.current) return;
-
-        // 从右向左匀速移动并循环。
-        // initialOffset 保证每朵云从不同位置开始。
-        const time = clock.getElapsedTime();
-        const progress = ((time * driftSpeed + initialOffset) % (totalDistance + 10)) - 5;
-        const currentX = startX - progress;
-
-        meshRef.current.position.x = currentX;
-        meshRef.current.position.y = basePosition.current[1];
-        meshRef.current.position.z = basePosition.current[2];
-
-        // 广告牌效果：始终朝向相机，并应用旋转偏移。
-        meshRef.current.quaternion.copy(camera.quaternion).multiply(offsetQuaternion);
+function createCloudPool(count, seed) {
+    const random = seededRandom(seed);
+    const pool = [];
+    for (let index = 0; index < count; index++) pool.push({
+        y: 6 + random() * 8, z: -5 - random() * 30,
+        speed: 0.1 + random() * 0.15, offset: (index / count) * 80 + random() * 3,
+        scale: 0.5 + random() * 1.2, opacity: 0.4 + random() * 0.3,
+        texture: Math.floor(random() * CLOUDS.length), lodRank: (index * 0.61803398875) % 1,
     });
-
-    return (
-        <mesh ref={meshRef} geometry={cloudGeometry} position={position} scale={[width, height, 1]}>
-            <meshBasicMaterial color="#e0e0e0"
-                map={texture}
-                transparent
-                opacity={opacity}
-                depthWrite={false}
-                side={THREE.DoubleSide}
-            />
-        </mesh>
-    );
-};
-
-function seededRandom(seed) {
-    let s = seed;
-    return function () {
-        s = Math.sin(s * 9999) * 10000;
-        return s - Math.floor(s);
-    };
+    return pool;
 }
 
-export default GalleryClouds;
+function addCloudOpacity(shader) {
+    shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nattribute float cloudOpacity; varying float vCloudOpacity;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\nvCloudOpacity = cloudOpacity;');
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vCloudOpacity;')
+        .replace('#include <color_fragment>', '#include <color_fragment>\ndiffuseColor.a *= vCloudOpacity;');
+}
+
+function CloudBatch({ clouds, texture, aspect, capacity, rotation }) {
+    const mesh = useRef();
+    const nextUpdate = useRef(0);
+    const { settings } = usePerformance();
+    const reducedMotion = useReducedMotion();
+    const [rx, ry, rz] = rotation;
+    const offset = useMemo(() => new Quaternion().setFromEuler(new Euler(rx, ry, rz)), [rx, ry, rz]);
+    const dummy = useMemo(() => new Object3D(), []);
+    const world = useMemo(() => new Vector3(), []);
+    const opacity = useMemo(() => new Float32Array(capacity), [capacity]);
+
+    useFrame(({ camera, clock }) => {
+        if (!mesh.current || clock.elapsedTime < nextUpdate.current) return;
+        nextUpdate.current = clock.elapsedTime + 1 / settings.animationFps;
+        const time = reducedMotion ? 0 : clock.elapsedTime;
+        const opacityAttribute = mesh.current.geometry.attributes.cloudOpacity;
+        let visibleCount = 0;
+        dummy.quaternion.copy(camera.quaternion).multiply(offset);
+        for (let i = 0; i < clouds.length; i++) {
+            const cloud = clouds[i];
+            const x = 45 - ((time * cloud.speed + cloud.offset) % 90);
+            dummy.position.set(x, cloud.y, cloud.z);
+            world.copy(dummy.position).applyMatrix4(mesh.current.matrixWorld);
+            const distance = world.distanceTo(camera.position);
+            const far = settings.detailDistance * (0.6 + cloud.lodRank * 0.4);
+            const fade = Math.max(0, Math.min(1, (far - distance) / (far * 0.2)));
+            if (fade < 0.01) continue;
+            const width = 2.5 * cloud.scale;
+            dummy.scale.set(width, width / aspect, 1);
+            dummy.updateMatrix();
+            mesh.current.setMatrixAt(visibleCount, dummy.matrix);
+            opacityAttribute.setX(visibleCount, cloud.opacity * fade);
+            visibleCount++;
+        }
+        mesh.current.count = visibleCount;
+        mesh.current.instanceMatrix.needsUpdate = true;
+        opacityAttribute.needsUpdate = true;
+    });
+
+    return <instancedMesh ref={mesh} name="sketch-cloud-batch" args={[undefined, undefined, capacity]} frustumCulled={false}>
+        <planeGeometry args={[1, 1]}>
+            <instancedBufferAttribute attach="attributes-cloudOpacity" args={[opacity, 1]} />
+        </planeGeometry>
+        <meshBasicMaterial map={texture} color="#e0e0e0" transparent depthWrite={false} onBeforeCompile={addCloudOpacity} />
+    </instancedMesh>;
+}
+
+export default function GalleryClouds({ count = 12, seed = 42, rotationOffset = DEFAULT_ROTATION }) {
+    const { settings } = usePerformance();
+    const textures = useLoader(MediaTextureLoader, URLS);
+    const pool = useMemo(() => createCloudPool(count, seed), [count, seed]);
+    const groups = useMemo(() => {
+        const limit = Math.min(count, Math.max(8, Math.ceil(count * settings.cloudDensity)));
+        // 均匀抽取整片天空，低档也保留左右两侧的云层。
+        const active = Array.from({ length: limit }, (_, index) => pool[Math.floor(index * pool.length / limit)]);
+        return CLOUDS.map((_, index) => active.filter(cloud => cloud.texture === index));
+    }, [pool, count, settings.cloudDensity]);
+    return <group name="sketch-clouds">{groups.map((clouds, index) => clouds.length > 0 && <CloudBatch
+        key={index} clouds={clouds} texture={textures[index]} aspect={CLOUDS[index][1]}
+        capacity={count} rotation={rotationOffset}
+    />)}</group>;
+}

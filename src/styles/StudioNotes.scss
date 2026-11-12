@@ -22,7 +22,7 @@
         background: transparent;
         color: var(--profile-muted);
         font: inherit;
-        cursor: pointer;
+        cursor: var(--cursor-pointer, pointer);
 
         &:hover { color: var(--profile-ink); }
         &[aria-pressed='true'] { color: var(--profile-ink); border-bottom-color: currentColor; }

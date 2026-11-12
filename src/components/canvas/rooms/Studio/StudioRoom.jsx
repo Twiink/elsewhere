@@ -10,6 +10,7 @@ import { PLATFORM_CONFIG } from './contentData';
 
 
 import FloatingCodeParticles from './FloatingCodeParticles';
+import SceneParallax from '../../atmosphere/SceneParallax';
 import { PositionalAudio } from '@react-three/drei';
 
 import { useStudioContent } from '../../../../hooks/useContentData';
@@ -311,7 +312,7 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 
     const handlePointerUp = useCallback(() => {
         isDraggingRef.current = false;
-        document.body.style.cursor = 'auto';
+        document.body.style.cursor = 'var(--cursor-default)';
     }, []);
 
     const handlePointerMove = useCallback((e) => {
@@ -597,10 +598,12 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             </group>
 
             {/* 漂浮代码符号的视差背景。 */}
+            <SceneParallax room="studio" strength={0.4}>
             <FloatingCodeParticles
                 towerRotationRef={particleTowerRotation}
                 fallOffsetRef={particleFallOffset}
             />
+            </SceneParallax>
         </group>
     );
 };
@@ -826,12 +829,12 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
                 e.stopPropagation();
                 isHoveredRef.current = true;
                 updatePaintState();
-                document.body.style.cursor = 'pointer';
+                document.body.style.cursor = 'var(--cursor-pointer)';
             }}
             onPointerOut={() => {
                 isHoveredRef.current = false;
                 updatePaintState();
-                document.body.style.cursor = 'auto';
+                document.body.style.cursor = 'var(--cursor-default)';
             }}
             onPointerUp={(e) => {
                 if (disabled) return;
