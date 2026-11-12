@@ -1,5 +1,5 @@
 import { useTexture } from '../../../../hooks/useMediaTexture';
-import { media } from '../../../../media';
+import { localImagePath, media } from '../../../../media';
 import { useScene, useAchievements, useAudio } from '../../../../context/contexts';
 import Text from '../../SiteText';
 import { useRef, useState, useMemo, useEffect, useCallback, forwardRef, useImperativeHandle, memo } from 'react';
@@ -181,9 +181,9 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             'tailwindlogo', 'wordpresslogo'
         ];
         return names.map(name => {
-            if (!canHover) return `https://media.secknow-ai.com/space/textures/gallery/${name}.png`;
-            if (name === 'csslogo') return `https://media.secknow-ai.com/space/textures/gallery/css3logo_painted.png`;
-            return `https://media.secknow-ai.com/space/textures/gallery/${name}_painted.png`;
+            if (!canHover) return localImagePath(`textures/gallery/${name}.png`);
+            if (name === 'csslogo') return localImagePath('textures/gallery/css3logo_painted.png');
+            return localImagePath(`textures/gallery/${name}_painted.png`);
         });
     }, [canHover]);
     
@@ -195,13 +195,13 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         sprites: NOTEBOOK_FEATURE_SPRITES,
         logos: allLogos,
         environment: [
-            'https://media.secknow-ai.com/space/textures/gallery/floor.png',
-            'https://media.secknow-ai.com/space/textures/gallery/railing.png',
-            'https://media.secknow-ai.com/space/textures/gallery/domki.png',
-            'https://media.secknow-ai.com/space/textures/gallery/miastotlo.png',
-            'https://media.secknow-ai.com/space/textures/gallery/bird_gray.png',
-            'https://media.secknow-ai.com/space/textures/gallery/klamerka.png',
-            'https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png',
+            '/media/images/textures/gallery/floor.webp',
+            '/media/images/textures/gallery/railing.webp',
+            '/media/images/textures/gallery/domki.webp',
+            '/media/images/textures/gallery/miastotlo.webp',
+            '/media/images/textures/gallery/bird_gray.webp',
+            '/media/images/textures/gallery/klamerka.webp',
+            '/media/images/textures/corridor/texturadoprogow.webp',
         ],
     }), [activeProjects, canHover, allLogos]);
     // 最终使用的是下面的颜色/采样副本，由 StartupReady 统一预热。
@@ -266,9 +266,9 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             // 将技术栈标志映射至对应的彩色或普通版本。
             const techStack = projectData.techStack.map(path => {
                 if (!canHover) return path; // 保留普通版本。
-                const name = new URL(path).pathname.split('/').pop().replace('.png', '');
-                if (name === 'csslogo') return 'https://media.secknow-ai.com/space/textures/gallery/css3logo_painted.png';
-                return `https://media.secknow-ai.com/space/textures/gallery/${name}_painted.png`;
+                const name = path.split(/[?#]/, 1)[0].split('/').pop().replace(/\.(?:png|webp)$/i, '');
+                if (name === 'csslogo') return localImagePath('textures/gallery/css3logo_painted.png');
+                return localImagePath(`textures/gallery/${name}_painted.png`);
             });
 
             return {

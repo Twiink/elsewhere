@@ -17,7 +17,7 @@ const EmptyCorridor = ({ camera }) => {
     const [segmentBase, setSegmentBase] = useState(0);
 
     // 加载地面纹理。
-    const floorSource = useTexture('https://media.secknow-ai.com/space/textures/entrance/floor_paper.png?imageMogr2/thumbnail/1024x512');
+    const floorSource = useTexture('/media/images/textures/entrance/floor_paper.webp');
     const floorTexture = useTextureCopy(floorSource, { wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping, repeatX: 6.6, repeatY: 20 });
 
     // 相机进入新分段时才更新分段基准，避免逐帧更新。

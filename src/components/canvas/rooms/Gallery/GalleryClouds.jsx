@@ -6,14 +6,14 @@ import { cloudGeometry } from '../cloudResources';
 
 // 可用云纹理。
 const CLOUD_TEXTURES = [
-    'https://media.secknow-ai.com/space/textures/clouds/1131c3eb-dfae-423f-924b-ff39d8ccd6dc.png',
-    'https://media.secknow-ai.com/space/textures/clouds/254b8ec8-d6f7-4275-956f-7bab65b2ce2d.png',
-    'https://media.secknow-ai.com/space/textures/clouds/2cc88dd1-483c-466d-b07e-f8308c61ccbe.png?imageMogr2/thumbnail/512x128',
-    'https://media.secknow-ai.com/space/textures/clouds/5606fcc0-3252-447d-a58a-7bcbac73229a.png?imageMogr2/thumbnail/512x256',
-    'https://media.secknow-ai.com/space/textures/clouds/7882dc72-3d01-41fb-ac0e-d07b0184ebc1.png?imageMogr2/thumbnail/256x256',
-    'https://media.secknow-ai.com/space/textures/clouds/9b2ca72f-7bd0-473b-ba6e-dd9e0eb79d35.png',
-    'https://media.secknow-ai.com/space/textures/clouds/c83293c6-d90c-4a32-8d9d-5ac9af7e2296.png?imageMogr2/thumbnail/512x128',
-    'https://media.secknow-ai.com/space/textures/clouds/f6e358bc-d27c-41dd-95f4-6787a835c41e.png',
+    '/media/images/textures/clouds/cloud-rounded-bold.webp',
+    '/media/images/textures/clouds/cloud-flat-bottom-bold.webp',
+    '/media/images/textures/clouds/cloud-wide-sketch.webp',
+    '/media/images/textures/clouds/cloud-rounded-sketch.webp',
+    '/media/images/textures/clouds/cloud-tall-sketch.webp',
+    '/media/images/textures/clouds/cloud-puffy-bold.webp',
+    '/media/images/textures/clouds/cloud-horizon-sketch.webp',
+    '/media/images/textures/clouds/cloud-soft-bold.webp',
 ];
 
 /**
@@ -88,19 +88,19 @@ const StaticCloud = ({ position, scale, opacity, textureIndex, driftSpeed, initi
     const texture = useLoader(MediaTextureLoader, CLOUD_TEXTURES[textureIndex]);
 
     // 使用原始宽高比，防止二次幂尺寸转换后拉伸。
-    const legacyCloudAspects = {
-        '1131c3eb-dfae-423f-924b-ff39d8ccd6dc.png': 1.894,
-        '254b8ec8-d6f7-4275-956f-7bab65b2ce2d.png': 2.459,
-        '2cc88dd1-483c-466d-b07e-f8308c61ccbe.png': 3.577,
-        '5606fcc0-3252-447d-a58a-7bcbac73229a.png': 1.794,
-        '7882dc72-3d01-41fb-ac0e-d07b0184ebc1.png': 1.997,
-        '9b2ca72f-7bd0-473b-ba6e-dd9e0eb79d35.png': 1.905,
-        'c83293c6-d90c-4a32-8d9d-5ac9af7e2296.png': 3,
-        'f6e358bc-d27c-41dd-95f4-6787a835c41e.png': 1.875
+    const cloudAspects = {
+        'cloud-rounded-bold.webp': 1.894,
+        'cloud-flat-bottom-bold.webp': 2.459,
+        'cloud-wide-sketch.webp': 3.577,
+        'cloud-rounded-sketch.webp': 1.794,
+        'cloud-tall-sketch.webp': 1.997,
+        'cloud-puffy-bold.webp': 1.905,
+        'cloud-horizon-sketch.webp': 3,
+        'cloud-soft-bold.webp': 1.875
     };
 
-    const cloudFile = new URL(CLOUD_TEXTURES[textureIndex]).pathname.split('/').pop();
-    const aspectRatio = legacyCloudAspects[cloudFile] || 1.8;
+    const cloudFile = CLOUD_TEXTURES[textureIndex].split('/').pop();
+    const aspectRatio = cloudAspects[cloudFile] || 1.8;
     const width = 2.5 * scale;
     const height = width / aspectRatio;
     const [rotationX, rotationY, rotationZ] = rotationOffset;

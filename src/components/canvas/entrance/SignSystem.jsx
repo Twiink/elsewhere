@@ -10,8 +10,8 @@ import { siteInfo } from '../../../data/content';
 const SignSystem = (props) => {
     const groupRef = useRef();
     const [signTexture, mountTexture] = useTexture([
-        'https://media.secknow-ai.com/space/textures/entrance/sign-creative-workshop.png',
-        'https://media.secknow-ai.com/space/textures/entrance/belka.png',
+        '/media/images/textures/entrance/sign-creative-workshop.png',
+        '/media/images/textures/entrance/belka.webp',
     ]);
 
     // 物理参数。

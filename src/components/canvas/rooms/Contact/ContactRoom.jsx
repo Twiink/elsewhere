@@ -107,13 +107,13 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     }, [isExiting, isTeleporting, hidePopup]);
 
     // 加载海面纹理。
-    const seaTexture = useTextureCopy(useTexture("https://media.secknow-ai.com/space/textures/contact/faletopdown.png?imageMogr2/thumbnail/1351x675"), { wrapS: THREE.MirroredRepeatWrapping, wrapT: THREE.MirroredRepeatWrapping, repeatX: 6, repeatY: 4 });
+    const seaTexture = useTextureCopy(useTexture("/media/images/textures/contact/faletopdown.webp"), { wrapS: THREE.MirroredRepeatWrapping, wrapT: THREE.MirroredRepeatWrapping, repeatX: 6, repeatY: 4 });
     // 加载码头纹理。
-    const moloTexture = useTextureCopy(useTexture("https://media.secknow-ai.com/space/textures/contact/molo.png"), { wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping, rotation: Math.PI / 2, centerX: 0.5, centerY: 0.5 });
+    const moloTexture = useTextureCopy(useTexture("/media/images/textures/contact/molo.webp"), { wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping, rotation: Math.PI / 2, centerX: 0.5, centerY: 0.5 });
     // 加载灯塔纹理。
-    const latarniaTexture = useTexture("https://media.secknow-ai.com/space/textures/contact/latarnia.png?imageMogr2/thumbnail/1024x1024");
+    const latarniaTexture = useTexture("/media/images/textures/contact/latarnia.webp");
     // 加载船纹理。
-    const statekTexture = useTexture("https://media.secknow-ai.com/space/textures/contact/statek.png");
+    const statekTexture = useTexture("/media/images/textures/contact/statek.webp");
 
 
     useEffect(() => {
@@ -372,7 +372,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             <SocialBarrel
                 position={isMobile ? [-1.2, 0.5, -10] : [-3, 0.5, -10]}
                 rotation={[0, 0.2, 0]}
-                texturePath="https://media.secknow-ai.com/space/textures/contact/beczka.png?imageMogr2/thumbnail/901x901"
+                texturePath="/media/images/textures/contact/beczka.webp"
                 label="联系方式"
                 onClick={() => openOverlay({ layout: 'contact' })}
                 paintOnBeforeCompile={onBeforeCompile}
@@ -382,7 +382,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             <SocialBarrel
                 position={isMobile ? [-1.5, -0.3, -7] : [-5, -0.3, -8]}
                 rotation={[0, 0.3, 0]}
-                texturePath="https://media.secknow-ai.com/space/textures/contact/beczka.png?imageMogr2/thumbnail/901x901"
+                texturePath="/media/images/textures/contact/beczka.webp"
                 label="GITHUB"
                 onClick={() => window.open(siteInfo.githubUrl, '_blank', 'noopener,noreferrer')}
                 paintOnBeforeCompile={onBeforeCompile}
@@ -391,7 +391,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             <SocialBarrel
                 position={isMobile ? [1.2, 0.5, -10] : [3, 0.5, -10]}
                 rotation={[0, -0.2, 0]}
-                texturePath="https://media.secknow-ai.com/space/textures/contact/beczka.png?imageMogr2/thumbnail/901x901"
+                texturePath="/media/images/textures/contact/beczka.webp"
                 label="微信"
                 onClick={() => openOverlay({ layout: 'contact', target: 'wechat' })}
                 paintOnBeforeCompile={onBeforeCompile}
@@ -400,7 +400,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             <SocialBarrel
                 position={isMobile ? [1.5, -0.3, -7] : [5, -0.3, -8]}
                 rotation={[0, -0.3, 0]}
-                texturePath="https://media.secknow-ai.com/space/textures/contact/beczka.png?imageMogr2/thumbnail/901x901"
+                texturePath="/media/images/textures/contact/beczka.webp"
                 label="邮箱"
                 onClick={() => { window.location.href = `mailto:${contactInfo.email}`; }}
                 paintOnBeforeCompile={onBeforeCompile}
@@ -410,7 +410,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             {contactInfo.showMessageForm && <SocialBarrel
                 position={isMobile ? [0, -0.7, -6] : [0, -0.7, -7]}
                 rotation={[0, 0, 0]}
-                texturePath="https://media.secknow-ai.com/space/textures/contact/beczka.png?imageMogr2/thumbnail/901x901"
+                texturePath="/media/images/textures/contact/beczka.webp"
                 label="写留言"
                 onClick={handleMailSelect}
                 paintOnBeforeCompile={onBeforeCompile}

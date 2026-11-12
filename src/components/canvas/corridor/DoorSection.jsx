@@ -50,18 +50,18 @@ const DOOR_ALIGN_X = 1.2;
 
 // 门纹理映射：标签对应纹理文件。
 const DOOR_TEXTURES = {
-    "作品画廊": 'https://media.secknow-ai.com/space/textures/corridor/doors/drzwiprojekty.png?imageMogr2/thumbnail/512x1024',
-    "生活手记": 'https://media.secknow-ai.com/space/textures/corridor/doors/life-notes-ink-v1.png',
-    "关于我": 'https://media.secknow-ai.com/space/textures/corridor/doors/drzwiabout.png?imageMogr2/thumbnail/512x1024',
-    "联系我": 'https://media.secknow-ai.com/space/textures/corridor/doors/drzwikontakt.png?imageMogr2/thumbnail/512x1024',
+    "作品画廊": '/media/images/textures/corridor/doors/drzwiprojekty.webp',
+    "生活手记": '/media/images/textures/corridor/doors/life-notes-ink-v1.webp',
+    "关于我": '/media/images/textures/corridor/doors/drzwiabout.webp',
+    "联系我": '/media/images/textures/corridor/doors/drzwikontakt.webp',
 };
 
 // 悬停时用笔刷显现的彩色版本。
 const DOOR_PAINTED_TEXTURES = {
-    "作品画廊": 'https://media.secknow-ai.com/space/textures/corridor/doors/drzwiprojekty_painted.png?imageMogr2/thumbnail/880x1761',
-    "生活手记": 'https://media.secknow-ai.com/space/textures/corridor/doors/life-notes-color-v1.png',
-    "关于我": 'https://media.secknow-ai.com/space/textures/corridor/doors/drzwiabout_painted.png?imageMogr2/thumbnail/1024x2048',
-    "联系我": 'https://media.secknow-ai.com/space/textures/corridor/doors/drzwikontakt_painted.png?imageMogr2/thumbnail/880x1761',
+    "作品画廊": '/media/images/textures/corridor/doors/drzwiprojekty_painted.webp',
+    "生活手记": '/media/images/textures/corridor/doors/life-notes-color-v1.webp',
+    "关于我": '/media/images/textures/corridor/doors/drzwiabout_painted.webp',
+    "联系我": '/media/images/textures/corridor/doors/drzwikontakt_painted.webp',
 };
 
 
@@ -175,15 +175,15 @@ const DoorSection = ({
         originalWallTexture, doorTexture, doorPaintedTexture, frameTexture, handleTexture,
         handlePaintedTexture, doorBackTexture, arrowTexture, baseboardTexture,
     } = useTexture({
-        originalWallTexture: 'https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512',
+        originalWallTexture: '/media/images/textures/corridor/wall_texture.webp',
         doorTexture: doorTexturePath,
         doorPaintedTexture: isTouch ? dummyTex : doorPaintedTexturePath,
-        frameTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/ramkasingledoors.png?imageMogr2/thumbnail/512x1024',
-        handleTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/klamkadodrzwi.png?imageMogr2/thumbnail/512x1024',
-        handlePaintedTexture: isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/corridor/doors/klamkadodrzwi_painted.png?imageMogr2/thumbnail/512x1024',
-        doorBackTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/backsingledoors.png?imageMogr2/thumbnail/512x1024',
-        arrowTexture: 'https://media.secknow-ai.com/space/textures/corridor/strzalka.png?imageMogr2/thumbnail/128x64',
-        baseboardTexture: 'https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png',
+        frameTexture: '/media/images/textures/corridor/doors/ramkasingledoors.webp',
+        handleTexture: '/media/images/textures/corridor/doors/klamkadodrzwi.webp',
+        handlePaintedTexture: isTouch ? dummyTex : '/media/images/textures/corridor/doors/klamkadodrzwi_painted.webp',
+        doorBackTexture: '/media/images/textures/corridor/doors/backsingledoors.webp',
+        arrowTexture: '/media/images/textures/corridor/strzalka.webp',
+        baseboardTexture: '/media/images/textures/corridor/texturadoprogow.webp',
     });
 
     const wallTexture = useTextureCopy(originalWallTexture, {
@@ -901,7 +901,7 @@ const DoorSection = ({
     // 把手位置按纹理确定，左侧门的把手在右边。
 
     // 标牌纹理映射，现统一使用空白标牌纹理。
-    const signTextureUrl = 'https://media.secknow-ai.com/space/textures/corridor/pustatabliczka.png?imageMogr2/thumbnail/2048x1024';
+    const signTextureUrl = '/media/images/textures/corridor/pustatabliczka.webp';
     const signTexture = useTexture(signTextureUrl);
 
     return (

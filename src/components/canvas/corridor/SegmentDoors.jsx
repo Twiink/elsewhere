@@ -50,15 +50,15 @@ const SegmentDoors = ({
         frameTexture, doorLeftTexture, doorRightTexture, handleLeftTexture, handleRightTexture,
         doorBackTexture, edgeTexture, wallSource, baseboardTexSrc,
     } = useTexture({
-        frameTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/frame_sketch.png?imageMogr2/thumbnail/512x512',
-        doorLeftTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/doorrleft.png?imageMogr2/thumbnail/256x512',
-        doorRightTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/dorright.png?imageMogr2/thumbnail/256x512',
-        handleLeftTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/handle_left_sketch.png?imageMogr2/thumbnail/256x512',
-        handleRightTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/handle_right_sketch.png?imageMogr2/thumbnail/256x512',
-        doorBackTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/door_back.png?imageMogr2/thumbnail/256x512',
-        edgeTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/pien.png?imageMogr2/thumbnail/32x256',
-        wallSource: 'https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512',
-        baseboardTexSrc: 'https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png',
+        frameTexture: '/media/images/textures/corridor/doors/frame_sketch.webp',
+        doorLeftTexture: '/media/images/textures/corridor/doors/doorrleft.webp',
+        doorRightTexture: '/media/images/textures/corridor/doors/dorright.webp',
+        handleLeftTexture: '/media/images/textures/corridor/doors/handle_left_sketch.webp',
+        handleRightTexture: '/media/images/textures/corridor/doors/handle_right_sketch.webp',
+        doorBackTexture: '/media/images/textures/corridor/doors/door_back.webp',
+        edgeTexture: '/media/images/textures/corridor/doors/pien.webp',
+        wallSource: '/media/images/textures/corridor/wall_texture.webp',
+        baseboardTexSrc: '/media/images/textures/corridor/texturadoprogow.webp',
     });
     const wallTexture = useTextureCopy(wallSource, { wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping });
 
@@ -172,9 +172,9 @@ const SegmentDoors = ({
     });
 
     // 墙面装饰。
-    const whileTrueTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/decorations/while_true_loop.png?imageMogr2/thumbnail/1249x624');
-    const coffeeTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/decorations/coffee_debug.png?imageMogr2/thumbnail/1761x880');
-    const ideaTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/decorations/idea_process.png?imageMogr2/thumbnail/604x1208');
+    const whileTrueTexture = useTexture('/media/images/textures/corridor/decorations/while_true_loop.webp');
+    const coffeeTexture = useTexture('/media/images/textures/corridor/decorations/coffee_debug.webp');
+    const ideaTexture = useTexture('/media/images/textures/corridor/decorations/idea_process.webp');
 
     return (
         <group position={[position[0], 0, position[2]]}>

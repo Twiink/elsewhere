@@ -143,10 +143,10 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
     // =============================================
     // 地面片段纹理：手绘木板。
     const [floorTexture, baseboardTexture, wallTexture, ceilingSource] = useTexture([
-        'https://media.secknow-ai.com/space/textures/corridor/kawalekpodlogi.png?imageMogr2/thumbnail/1024x1024',
-        'https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png',
-        'https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512',
-        'https://media.secknow-ai.com/space/textures/corridor/ceiling_texture.png?imageMogr2/thumbnail/1024x512',
+        '/media/images/textures/corridor/kawalekpodlogi.webp',
+        '/media/images/textures/corridor/texturadoprogow.webp',
+        '/media/images/textures/corridor/wall_texture.webp',
+        '/media/images/textures/corridor/ceiling_texture.webp',
     ]);
     const ceilingTexture = useTextureCopy(ceilingSource, { wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping, repeatX: 7 / 2, repeatY: 10 / 2 });
     const leftSideTexture = useTextureCopy(floorTexture, { repeatY: 1 / 5 });

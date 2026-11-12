@@ -40,10 +40,10 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
 
     // 加载走廊纹理。
     const [floorTexSrc, wallTexSrc, ceilingTexSrc, bbTexSrc] = useTexture([
-        'https://media.secknow-ai.com/space/textures/corridor/kawalekpodlogi.png?imageMogr2/thumbnail/1024x1024',
-        'https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512',
-        'https://media.secknow-ai.com/space/textures/corridor/ceiling_texture.png?imageMogr2/thumbnail/1024x512',
-        'https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png',
+        '/media/images/textures/corridor/kawalekpodlogi.webp',
+        '/media/images/textures/corridor/wall_texture.webp',
+        '/media/images/textures/corridor/ceiling_texture.webp',
+        '/media/images/textures/corridor/texturadoprogow.webp',
     ]);
 
     // 缓存小走廊的纹理材质。

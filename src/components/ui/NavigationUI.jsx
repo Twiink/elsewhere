@@ -324,13 +324,13 @@ const NavigationUI = () => {
                         </div>
                         <div className="map-container">
                             {/* 地图背景图片。 */}
-                            <img src="https://media.secknow-ai.com/space/images/map.png" alt="作品集地图" className="map-image" />
+                            <img src="/media/images/ui/map.webp" alt="作品集地图" className="map-image" />
 
                             {/* 地图彩色叠加层。 */}
-                            <img ref={aboutMapRef} src="https://media.secknow-ai.com/space/images/map_about_painted.png" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(10% 20%, 10% 20%, 10% 55%, 10% 55%)' }} />
-                            <img ref={galleryMapRef} src="https://media.secknow-ai.com/space/images/map_gallery_painted.png" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(10% 57%, 10% 57%, 10% 92%, 10% 92%)' }} />
-                            <img ref={contactMapRef} src="https://media.secknow-ai.com/space/images/map_contact_painted.png" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(95% 10%, 95% 10%, 95% 35%, 95% 35%)' }} />
-                            <img ref={studioMapRef} src="https://media.secknow-ai.com/space/images/map_studio_painted.png" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(85% 41%, 85% 41%, 85% 81%, 85% 81%)' }} />
+                            <img ref={aboutMapRef} src="/media/images/ui/map_about_painted.webp" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(10% 20%, 10% 20%, 10% 55%, 10% 55%)' }} />
+                            <img ref={galleryMapRef} src="/media/images/ui/map_gallery_painted.webp" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(10% 57%, 10% 57%, 10% 92%, 10% 92%)' }} />
+                            <img ref={contactMapRef} src="/media/images/ui/map_contact_painted.webp" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(95% 10%, 95% 10%, 95% 35%, 95% 35%)' }} />
+                            <img ref={studioMapRef} src="/media/images/ui/map_studio_painted.webp" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(85% 41%, 85% 41%, 85% 81%, 85% 81%)' }} />
 
                             {/* 四个悬停区域覆盖地图。 */}
                             <button
@@ -391,7 +391,7 @@ const NavigationUI = () => {
                                     onMouseLeave={() => setHoveredRoom(null)}
                                     title={room.label}
                                 >
-                                    <img src="https://media.secknow-ai.com/space/images/pin-slot.png" alt="" className="slot-image" />
+                                    <img src="/media/images/ui/pin-slot.webp" alt="" className="slot-image" />
                                 </button>
                             ))}
 
@@ -413,7 +413,7 @@ const NavigationUI = () => {
                                         }%`
                                 }}
                             >
-                                <img src="https://media.secknow-ai.com/space/images/pin.png" alt="你在这里" className="pin-image" />
+                                <img src="/media/images/ui/pin.webp" alt="你在这里" className="pin-image" />
                             </div>
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-const NOTEBOOK_ASSET_BASE = 'https://media.secknow-ai.com/space/textures/gallery/notebook';
+const NOTEBOOK_ASSET_BASE = '/media/images/textures/gallery/notebook';
 
 export const NOTEBOOK_ASSETS = {
     paper: `${NOTEBOOK_ASSET_BASE}/paper.png`,

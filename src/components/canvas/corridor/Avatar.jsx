@@ -24,7 +24,7 @@ const Avatar = ({ position = [10, -20, 30], height = 2.3 }) => {
     const targetDodgeX = useRef(0);
     const worldPosVec = useRef(new THREE.Vector3());
 
-    const texture = useTexture('https://media.secknow-ai.com/space/textures/twiink/waving-ink.png');
+    const texture = useTexture('/media/images/textures/twiink/waving-ink.webp');
     const width = height * texture.image.width / texture.image.height;
 
     // 主动画循环。

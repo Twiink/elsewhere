@@ -23,10 +23,10 @@ const Doodles = () => {
 
     // 加载全部速写纹理。
     const textures = useTexture({
-        paperBall: 'https://media.secknow-ai.com/space/textures/corridor/decorations/paper_ball.png',
-        paperAirplane: 'https://media.secknow-ai.com/space/textures/corridor/decorations/paper_airplane.png',
-        pencil: 'https://media.secknow-ai.com/space/textures/corridor/decorations/pencil.png',
-        coffeeCup: 'https://media.secknow-ai.com/space/textures/corridor/decorations/coffee_cup.png',
+        paperBall: '/media/images/textures/corridor/decorations/paper_ball.webp',
+        paperAirplane: '/media/images/textures/corridor/decorations/paper_airplane.webp',
+        pencil: '/media/images/textures/corridor/decorations/pencil.webp',
+        coffeeCup: '/media/images/textures/corridor/decorations/coffee_cup.webp',
     });
 
     // 设置所有纹理的色彩空间。

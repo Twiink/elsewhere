@@ -1,11 +1,11 @@
-$notebook-asset-base: 'https://media.secknow-ai.com/space/textures/gallery/notebook';
+$notebook-asset-base: '/media/images/textures/gallery/notebook';
 
 .project-details-dialog {
     --profile-ink: #3c382f;
     --profile-muted: #655f51;
     --profile-rule: #cbbfa9;
-    --notebook-paper: url('https://media.secknow-ai.com/space/textures/gallery/notebook/paper.png');
-    --notebook-button: url('https://media.secknow-ai.com/space/textures/gallery/notebook/button.png');
+    --notebook-paper: url('/media/images/textures/gallery/notebook/paper.png');
+    --notebook-button: url('/media/images/textures/gallery/notebook/button.png');
     position: fixed;
     inset: 0;
     margin: auto;

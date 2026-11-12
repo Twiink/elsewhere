@@ -338,18 +338,18 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
         flowerTexture, lampGrilleTexture, lampSideTexture, woodTexture, tableTopTexture,
         cabinetFrontTexture, cabinetRestTexture,
     } = useTexture({
-        frameTexture: 'https://media.secknow-ai.com/space/textures/corridor/ramkanazdjecieduza.png?imageMogr2/thumbnail/2048x1024',
-        framePaintedTexture: 'https://media.secknow-ai.com/space/textures/corridor/ramkanazdjecieduza_painted.png?imageMogr2/thumbnail/2048x1024',
-        standingFrameTexture: 'https://media.secknow-ai.com/space/textures/corridor/ramkanazdjeciemala.png?imageMogr2/thumbnail/512x1024',
-        treeTexture: 'https://media.secknow-ai.com/space/textures/corridor/drzewkowdoniczce.png?imageMogr2/thumbnail/1024x2048',
-        grateTexture: 'https://media.secknow-ai.com/space/textures/corridor/kratkawentylacyjna.png?imageMogr2/thumbnail/2048x1024',
-        flowerTexture: 'https://media.secknow-ai.com/space/textures/corridor/kwiatekwdoniczce.png?imageMogr2/thumbnail/128x256',
-        lampGrilleTexture: 'https://media.secknow-ai.com/space/textures/corridor/kratanalampy.png?imageMogr2/thumbnail/1515x757',
-        lampSideTexture: 'https://media.secknow-ai.com/space/textures/corridor/bokilampy.png?imageMogr2/thumbnail/1024x64',
-        woodTexture: 'https://media.secknow-ai.com/space/textures/corridor/texturadrewnadonozekbiurka.png?imageMogr2/thumbnail/2048x128',
-        tableTopTexture: 'https://media.secknow-ai.com/space/textures/corridor/gorastolika.png?imageMogr2/thumbnail/2048x512',
-        cabinetFrontTexture: 'https://media.secknow-ai.com/space/textures/corridor/szafkaprzod.png?imageMogr2/thumbnail/1024x1024',
-        cabinetRestTexture: 'https://media.secknow-ai.com/space/textures/corridor/szafkaprzodgora.png?imageMogr2/thumbnail/512x1024',
+        frameTexture: '/media/images/textures/corridor/ramkanazdjecieduza.webp',
+        framePaintedTexture: '/media/images/textures/corridor/ramkanazdjecieduza_painted.webp',
+        standingFrameTexture: '/media/images/textures/corridor/ramkanazdjeciemala.webp',
+        treeTexture: '/media/images/textures/corridor/drzewkowdoniczce.webp',
+        grateTexture: '/media/images/textures/corridor/kratkawentylacyjna.webp',
+        flowerTexture: '/media/images/textures/corridor/kwiatekwdoniczce.webp',
+        lampGrilleTexture: '/media/images/textures/corridor/kratanalampy.webp',
+        lampSideTexture: '/media/images/textures/corridor/bokilampy.webp',
+        woodTexture: '/media/images/textures/corridor/texturadrewnadonozekbiurka.webp',
+        tableTopTexture: '/media/images/textures/corridor/gorastolika.webp',
+        cabinetFrontTexture: '/media/images/textures/corridor/szafkaprzod.webp',
+        cabinetRestTexture: '/media/images/textures/corridor/szafkaprzodgora.webp',
     });
 
     const lights = useMemo(() => {
@@ -387,7 +387,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
             y: 0.3,                  // 墙面高度。
             id: 'frame-1',
             // 纸飞机与星星，沿用网站图标。
-            image: 'https://media.secknow-ai.com/space/textures/twiink/site-icon-airplane-v1-512.png?imageMogr2/thumbnail/512x512',
+            image: '/media/images/textures/twiink/site-icon-airplane-v1-512.png',
             imageWidth: 0.95,
             imageHeight: 0.95,
             offsetFromWall: 0.1, // 向走廊中心移动 0.1 单位。
@@ -399,7 +399,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
             height: 2.5 / 1.785,
             y: 0.2,
             id: 'frame-2',
-            image: 'https://media.secknow-ai.com/space/textures/corridor/rysuneknaobrazek3.png?imageMogr2/thumbnail/716x358',
+            image: '/media/images/textures/corridor/rysuneknaobrazek3.webp',
             imageWidth: 1.7,
             imageHeight: 1,
             offsetFromWall: 0.1
@@ -411,7 +411,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
             height: 2.6,
             y: 0.25,
             id: 'frame-3',
-            image: 'https://media.secknow-ai.com/space/content/corridor/bouquet-hands.png?imageMogr2/thumbnail/1536x2048',
+            image: '/media/images/content/corridor/bouquet-hands.webp',
             imageWidth: 1.65,
             imageHeight: 2.2,
             offsetFromWall: 0.1,
@@ -424,7 +424,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
             height: 2.6,
             y: 0.35,
             id: 'frame-4',
-            image: 'https://media.secknow-ai.com/space/content/corridor/hanfu-photo.jpg?imageMogr2/thumbnail/1365x2048',
+            image: '/media/images/content/corridor/hanfu-photo.webp',
             imageWidth: 2.2 * 2 / 3,
             imageHeight: 2.2,
             offsetFromWall: 0.1,

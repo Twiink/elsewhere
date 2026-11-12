@@ -4,12 +4,11 @@ import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
 import subsetFont from 'subset-font';
 import { create as readFont } from 'fontkit';
-import { createMediaRuntime } from '../src/media/imageRuntime.js';
 
 export const PUBLISH_PATHS = [
   'start/index.html', 'start/style.css', 'start/script.js',
   'scripts/resume-download.js',
-  '_headers', '_redirects', 'robots.txt', 'sitemap.xml',
+  'robots.txt', 'sitemap.xml',
 ];
 export const FONT_FILES = {
   scene: 'media/fonts/LXGWWenKaiLite-site.woff',
@@ -18,8 +17,6 @@ export const FONT_FILES = {
 };
 
 const readMediaManifest = async root => JSON.parse(await readFile(resolve(root, 'public/media/manifest.json'), 'utf8'));
-const mediaScript = manifest => `;(${createMediaRuntime.toString()})(${JSON.stringify(manifest)}).install();\n`;
-
 async function walk(path) {
   const entries = await readdir(path, { withFileTypes: true });
   return (await Promise.all(entries.map(entry => {
@@ -112,14 +109,6 @@ export function publishAssets() {
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const path = req.url?.split('?')[0];
-        if (path === '/scripts/media-fallback.js') {
-          try {
-            res.setHeader('Content-Type', 'text/javascript; charset=utf-8');
-            res.setHeader('Cache-Control', 'no-cache');
-            res.end(mediaScript(await readMediaManifest(root)));
-          } catch (error) { next(error); }
-          return;
-        }
         const format = path === `/${FONT_FILES.scene}` ? 'woff' : path === `/${FONT_FILES.dom}` ? 'woff2' : null;
         if (!format && path !== '/media/fonts/site-font.css') return next();
         try {
@@ -154,14 +143,13 @@ export function publishAssets() {
       for (const { file, name } of await getPublishFiles(root)) {
         this.emitFile({ type: 'asset', fileName: name, source: await readFile(file) });
       }
-      this.emitFile({ type: 'asset', fileName: 'scripts/media-fallback.js', source: mediaScript(await readMediaManifest(root)) });
       this.emitFile({ type: 'asset', fileName: FONT_FILES.scene, source: data.buffers.woff });
       this.emitFile({ type: 'asset', fileName: FONT_FILES.dom, source: data.buffers.woff2 });
       this.emitFile({ type: 'asset', fileName: 'media/fonts/site-font.css', source: data.css });
       this.emitFile({ type: 'asset', fileName: 'media/fonts/site-font-coverage.json', source: JSON.stringify({ characters: data.characters, unavailable: data.unavailable }) });
     },
     async writeBundle(_options, bundle) {
-      const required = [...(await getPublishFiles(root)).map(item => item.name), ...Object.values(FONT_FILES), 'scripts/media-fallback.js', 'media/fonts/site-font.css', 'media/fonts/site-font-coverage.json', 'index.html', 'llms.txt'];
+      const required = [...(await getPublishFiles(root)).map(item => item.name), ...Object.values(FONT_FILES), 'media/fonts/site-font.css', 'media/fonts/site-font-coverage.json', 'index.html', 'llms.txt'];
       for (const name of required) {
         if (!bundle[name]) this.error(`发布文件缺失：${name}`);
       }

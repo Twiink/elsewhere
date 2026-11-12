@@ -174,9 +174,9 @@ JSON 使用英文双引号和英文逗号，不支持注释或最后一项后的
 
 发布前运行 `npm run lint` 和 `npm run build`，再通过 `npm run preview` 查看生产构建的页面与交互。构建会校验发布文件清单与四个房间的独立加载边界，并输出完整产物、入口与走廊共享依赖的 gzip 总量、首次中文字体体积。
 
-调整素材清单或加载逻辑后，运行 `npm run test:media` 检查 CDN 首选、超时与错误回退、并发请求以及本地文件完整性。目录约定见 `public/media/README.md`。
+素材目录约定见 `public/media/README.md`。
 
-默认构建输出通用静态文件。`npm run build:compressed` 额外生成 `.gz` 与 `.br`，需要托管服务根据 `Accept-Encoding` 返回对应文件并设置 `Content-Encoding`。`public/_headers` 提供哈希资源长期缓存、固定名称字体与脚本重新验证的 Pages 规则；其他托管环境可采用相同策略。
+默认构建输出通用静态文件。`npm run build:compressed` 额外生成 `.gz` 与 `.br`，需要托管服务根据 `Accept-Encoding` 返回对应文件并设置 `Content-Encoding`。静态托管的缓存、默认首页和路由回退在腾讯云 COS/CDN 控制台配置。
 
 ## 外部服务
 

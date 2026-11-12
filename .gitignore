@@ -31,6 +31,10 @@ dist-ssr
 # 本地素材制作归档：原件、草稿、来源记录和生成历史
 /assets/
 
+# 本地产品与设计文档
+/PRODUCT.md
+/DESIGN.md
+
 # 发布目录中的备份、试验图与生成元数据
 /public/**/backups/
 /public/media/images/textures/**/*_ORIGINAL.*

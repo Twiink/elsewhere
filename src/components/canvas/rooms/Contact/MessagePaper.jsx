@@ -230,8 +230,8 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend }) => {
     }, [email, subject, message]);
 
     // 加载纹理。
-    const paperTexture = useTexture('https://media.secknow-ai.com/space/textures/contact/paper_form.png');
-    const buttonTexture = useTexture('https://media.secknow-ai.com/space/textures/contact/send_button.png?imageMogr2/thumbnail/256x64');
+    const paperTexture = useTexture('/media/images/textures/contact/paper_form.webp');
+    const buttonTexture = useTexture('/media/images/textures/contact/send_button.webp');
 
     // 配置纹理。
     useEffect(() => {
