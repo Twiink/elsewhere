@@ -24,6 +24,7 @@ import './styles/main.scss';
 import './styles/ReadingTrigger.scss';
 import { WebGLRenderer } from 'three';
 import RoomLoadingNotice from './components/dom/RoomLoadingNotice';
+import PaperPlaneCursor from './components/dom/PaperPlaneCursor';
 
 // WebGL 上下文的创建选项保持稳定；可切换的抗锯齿由 AdaptiveQuality 处理。
 const createSceneRenderer = options => {
@@ -145,6 +146,7 @@ function AppContent() {
   if (loadingError) return <LoadingFailure />;
 
   return <>
+    <PaperPlaneCursor />
     <DocumentMetaBridge />
     <GlobalAudioEnabler />
     <div className="app">

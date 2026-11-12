@@ -40,7 +40,7 @@ const InteractiveTextField = ({
 }) => {
     const textRef = useRef();
     const [hovered, setHovered] = useState(false);
-    useCursor(hovered);
+    useCursor(hovered, 'text', 'var(--cursor-default)');
 
     // 动画目标。
     // 悬停时沿 Y 轴轻抬，并绕 Z 轴轻晃。
@@ -97,7 +97,7 @@ const InteractiveTextField = ({
 const SmoothButton = ({ texture, onClick, position, size, text, fontPath }) => {
     const groupRef = useRef();
     const [hovered, setHovered] = useState(false);
-    useCursor(hovered);
+    useCursor(hovered, 'var(--cursor-pointer)', 'var(--cursor-default)');
 
     // 动画目标，与 InteractiveTextField 风格一致。
     const targetY = hovered ? position[1] + 0.007 : position[1];

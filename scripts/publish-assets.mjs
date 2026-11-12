@@ -8,6 +8,7 @@ import { create as readFont } from 'fontkit';
 export const PUBLISH_PATHS = [
   'start/index.html', 'start/style.css', 'start/script.js',
   'scripts/resume-download.js',
+  'scripts/paper-plane-cursor.js', 'scripts/paper-plane-cursor.css',
   'robots.txt', 'sitemap.xml',
 ];
 export const FONT_FILES = {

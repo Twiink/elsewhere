@@ -7,19 +7,7 @@
 @use 'mixins' as *;
 
 
-// CSS 样式重置。
-:root {
-    --cursor-default: auto;
-    --cursor-pointer: pointer;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    :root {
-        --cursor-default: url('/media/images/cursors/cursor-default.webp') 3 3, auto;
-        --cursor-pointer: url('/media/images/cursors/cursor-pointer.webp') 7 3, pointer;
-    }
-}
-
+// CSS 样式重置；共享光标样式由页面入口加载。
 *,
 *::before,
 *::after {

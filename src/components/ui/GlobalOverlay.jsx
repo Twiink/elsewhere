@@ -297,7 +297,7 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                                         border: '2px solid #1a1a1a',
                                         boxShadow: '4px 4px 0px rgba(0,0,0,0.1)',
                                         transition: 'transform 0.2s',
-                                        cursor: 'pointer',
+                                        cursor: 'var(--cursor-pointer)',
                                         borderRadius: '2px 255px 3px 255px / 255px 5px 225px 3px'
                                     }}
                                         onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}

@@ -293,7 +293,7 @@
     "OFL": "/media/fonts/start/OFL.txt"
   },
   "cursors": {
-    "cursor-pointer": "/media/images/cursors/cursor-pointer.webp",
-    "cursor-default": "/media/images/cursors/cursor-default.webp"
+    "cursor-pointer": "/media/images/cursors/paper-plane-pointer.png",
+    "cursor-default": "/media/images/cursors/paper-plane-default.png"
   }
 }
