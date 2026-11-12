@@ -46,18 +46,23 @@ const SegmentDoors = ({
 
     // 加载纹理。
     // 注意：用户在 corridor/doors/ 中指定了具体文件名。
-    const frameTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/frame_sketch.png?imageMogr2/thumbnail/512x512');
-    const doorLeftTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/doorrleft.png?imageMogr2/thumbnail/256x512');
-    const doorRightTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/dorright.png?imageMogr2/thumbnail/256x512');
-    const handleLeftTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/handle_left_sketch.png?imageMogr2/thumbnail/256x512');
-    const handleRightTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/handle_right_sketch.png?imageMogr2/thumbnail/256x512');
-    const doorBackTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/door_back.png?imageMogr2/thumbnail/256x512');
-    const edgeTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/pien.png?imageMogr2/thumbnail/32x256');
-    const wallSource = useTexture('https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512');
+    const {
+        frameTexture, doorLeftTexture, doorRightTexture, handleLeftTexture, handleRightTexture,
+        doorBackTexture, edgeTexture, wallSource, baseboardTexSrc,
+    } = useTexture({
+        frameTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/frame_sketch.png?imageMogr2/thumbnail/512x512',
+        doorLeftTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/doorrleft.png?imageMogr2/thumbnail/256x512',
+        doorRightTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/dorright.png?imageMogr2/thumbnail/256x512',
+        handleLeftTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/handle_left_sketch.png?imageMogr2/thumbnail/256x512',
+        handleRightTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/handle_right_sketch.png?imageMogr2/thumbnail/256x512',
+        doorBackTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/door_back.png?imageMogr2/thumbnail/256x512',
+        edgeTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/pien.png?imageMogr2/thumbnail/32x256',
+        wallSource: 'https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512',
+        baseboardTexSrc: 'https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png',
+    });
     const wallTexture = useTextureCopy(wallSource, { wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping });
 
     // 踢脚线纹理，1582×94 像素。
-    const baseboardTexSrc = useTexture('https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png');
     const NATURAL_TILE_W = (1582 / 94) * 0.15; // 每次自然平铺约 2.524 单位。
 
     // 来自 EntranceDoors 的尺寸。

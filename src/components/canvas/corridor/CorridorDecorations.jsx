@@ -33,9 +33,7 @@ const tempQuat = new THREE.Quaternion();
 const CABIN_SKETCH_URL = '/media/fonts/LXGWWenKaiLite-site.woff';
 
 const PictureContent = ({ imagePath, imagePaintedPath, width, height, isPainted }) => {
-    const texture = useTexture(imagePath);
-    // 没有彩色路径时不渲染，但仍无条件调用 Hook，以遵守 Hook 规则。
-    const paintedTexture = useTexture(imagePaintedPath || imagePath);
+    const [texture, paintedTexture] = useTexture([imagePath, imagePaintedPath || imagePath]);
 
     const materialRef = useRef();
 
@@ -335,21 +333,24 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
     // =============================================
     // 装饰纹理。
     // =============================================
-    const frameTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/ramkanazdjecieduza.png?imageMogr2/thumbnail/2048x1024');
-    const framePaintedTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/ramkanazdjecieduza_painted.png?imageMogr2/thumbnail/2048x1024');
-    const standingFrameTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/ramkanazdjeciemala.png?imageMogr2/thumbnail/512x1024');
-    const treeTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/drzewkowdoniczce.png?imageMogr2/thumbnail/1024x2048');
-    const grateTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/kratkawentylacyjna.png?imageMogr2/thumbnail/2048x1024');
-    const flowerTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/kwiatekwdoniczce.png?imageMogr2/thumbnail/128x256');
-
-    // 顶灯：光源点。
-    // 灯具纹理。
-    const lampGrilleTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/kratanalampy.png?imageMogr2/thumbnail/1515x757');
-    // lampGrilleTexture.wrapS = lampGrilleTexture.wrapT = THREE.RepeatWrapping; 
-    // lampGrilleTexture.repeat.set(1, 1);
-
-    const lampSideTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/bokilampy.png?imageMogr2/thumbnail/1024x64');
-    // 调整长边 UV。
+    const {
+        frameTexture, framePaintedTexture, standingFrameTexture, treeTexture, grateTexture,
+        flowerTexture, lampGrilleTexture, lampSideTexture, woodTexture, tableTopTexture,
+        cabinetFrontTexture, cabinetRestTexture,
+    } = useTexture({
+        frameTexture: 'https://media.secknow-ai.com/space/textures/corridor/ramkanazdjecieduza.png?imageMogr2/thumbnail/2048x1024',
+        framePaintedTexture: 'https://media.secknow-ai.com/space/textures/corridor/ramkanazdjecieduza_painted.png?imageMogr2/thumbnail/2048x1024',
+        standingFrameTexture: 'https://media.secknow-ai.com/space/textures/corridor/ramkanazdjeciemala.png?imageMogr2/thumbnail/512x1024',
+        treeTexture: 'https://media.secknow-ai.com/space/textures/corridor/drzewkowdoniczce.png?imageMogr2/thumbnail/1024x2048',
+        grateTexture: 'https://media.secknow-ai.com/space/textures/corridor/kratkawentylacyjna.png?imageMogr2/thumbnail/2048x1024',
+        flowerTexture: 'https://media.secknow-ai.com/space/textures/corridor/kwiatekwdoniczce.png?imageMogr2/thumbnail/128x256',
+        lampGrilleTexture: 'https://media.secknow-ai.com/space/textures/corridor/kratanalampy.png?imageMogr2/thumbnail/1515x757',
+        lampSideTexture: 'https://media.secknow-ai.com/space/textures/corridor/bokilampy.png?imageMogr2/thumbnail/1024x64',
+        woodTexture: 'https://media.secknow-ai.com/space/textures/corridor/texturadrewnadonozekbiurka.png?imageMogr2/thumbnail/2048x128',
+        tableTopTexture: 'https://media.secknow-ai.com/space/textures/corridor/gorastolika.png?imageMogr2/thumbnail/2048x512',
+        cabinetFrontTexture: 'https://media.secknow-ai.com/space/textures/corridor/szafkaprzod.png?imageMogr2/thumbnail/1024x1024',
+        cabinetRestTexture: 'https://media.secknow-ai.com/space/textures/corridor/szafkaprzodgora.png?imageMogr2/thumbnail/512x1024',
+    });
 
     const lights = useMemo(() => {
         const items = [];
@@ -430,16 +431,6 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
             fitToView: true,
         },
     ], [zOffset]);
-
-    // =============================================
-    // 桌子。
-    // =============================================
-    const woodTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/texturadrewnadonozekbiurka.png?imageMogr2/thumbnail/2048x128');
-    const tableTopTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/gorastolika.png?imageMogr2/thumbnail/2048x512');
-
-    // 柜子纹理。
-    const cabinetFrontTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/szafkaprzod.png?imageMogr2/thumbnail/1024x1024');
-    const cabinetRestTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/szafkaprzodgora.png?imageMogr2/thumbnail/512x1024');
 
     // 克隆桌腿纹理后旋转，使横向纹理变为竖向。
     const legTexture = useMemo(() => {

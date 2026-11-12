@@ -164,31 +164,34 @@ const DoorSection = ({
     // 动态倾斜状态。
     const currentTilt = useRef(0);
 
-    // 加载墙面纹理。
-    const originalWallTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512');
+    // 按门标签加载对应纹理。
+    const doorTexturePath = DOOR_TEXTURES[label] || DOOR_TEXTURES["作品画廊"];
+
+    const isTouch = isTouchDevice();
+    const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+    const doorPaintedTexturePath = DOOR_PAINTED_TEXTURES[label] || DOOR_PAINTED_TEXTURES["作品画廊"];
+    const {
+        originalWallTexture, doorTexture, doorPaintedTexture, frameTexture, handleTexture,
+        handlePaintedTexture, doorBackTexture, arrowTexture, baseboardTexture,
+    } = useTexture({
+        originalWallTexture: 'https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512',
+        doorTexture: doorTexturePath,
+        doorPaintedTexture: isTouch ? dummyTex : doorPaintedTexturePath,
+        frameTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/ramkasingledoors.png?imageMogr2/thumbnail/512x1024',
+        handleTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/klamkadodrzwi.png?imageMogr2/thumbnail/512x1024',
+        handlePaintedTexture: isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/corridor/doors/klamkadodrzwi_painted.png?imageMogr2/thumbnail/512x1024',
+        doorBackTexture: 'https://media.secknow-ai.com/space/textures/corridor/doors/backsingledoors.png?imageMogr2/thumbnail/512x1024',
+        arrowTexture: 'https://media.secknow-ai.com/space/textures/corridor/strzalka.png?imageMogr2/thumbnail/128x64',
+        baseboardTexture: 'https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png',
+    });
 
     const wallTexture = useTextureCopy(originalWallTexture, {
         wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping,
         repeatX: 0.5, repeatY: 0.5, offsetX: 0.5, offsetY: 0.5,
     });
 
-    // 按门标签加载对应纹理。
-    const doorTexturePath = DOOR_TEXTURES[label] || DOOR_TEXTURES["作品画廊"];
-    const doorTexture = useTexture(doorTexturePath);
-
-    const isTouch = isTouchDevice();
-    const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-
-    const doorPaintedTexturePath = DOOR_PAINTED_TEXTURES[label] || DOOR_PAINTED_TEXTURES["作品画廊"];
-    const doorPaintedTexture = useTexture(isTouch ? dummyTex : doorPaintedTexturePath);
-    const frameTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/ramkasingledoors.png?imageMogr2/thumbnail/512x1024');
-    const handleTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/klamkadodrzwi.png?imageMogr2/thumbnail/512x1024');
-    const handlePaintedTexture = useTexture(isTouch ? dummyTex : 'https://media.secknow-ai.com/space/textures/corridor/doors/klamkadodrzwi_painted.png?imageMogr2/thumbnail/512x1024');
-    const doorBackTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/doors/backsingledoors.png?imageMogr2/thumbnail/512x1024');
-    const arrowTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/strzalka.png?imageMogr2/thumbnail/128x64');
-
     // 门区域的踢脚线纹理：1582×94 像素，比例 16.83:1。
-    const baseboardTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png');
     const doorBoardWidth = (WALL_LENGTH - 1.1) / 2;
     const naturalTileWidth = (1582 / 94) * 0.15;
     const doorBbTexLeft = useTextureCopy(baseboardTexture, {

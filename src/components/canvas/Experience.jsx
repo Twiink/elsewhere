@@ -1,14 +1,16 @@
 import { useScene } from '../../context/contexts';
-import { useCallback } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { useThree } from '@react-three/fiber';
 
-import InfiniteCorridorManager from './corridor/InfiniteCorridorManager';
 import EntranceDoors from './entrance/EntranceDoors';
 import EmptyCorridor from './entrance/EmptyCorridor';
-import TeleportRoom from './corridor/TeleportRoom';
 import StartupReady from './StartupReady';
 import useInfiniteCamera from '../../hooks/useInfiniteCamera';
 import SignSystem from './entrance/SignSystem';
+import { startLoadingTimeout } from '../../utils/loadingTimeout';
+import { registerPreparationRenderer } from '../../utils/renderPreparation';
+
+const CorridorScene = lazy(() => import('./corridor/CorridorScene'));
 
 
 // 位置关系：
@@ -30,7 +32,33 @@ const Experience = ({ onSceneReady, onError }) => {
     // 使用 SceneContext 管理房间状态。
     const { hasEntered, markEntered, enterRoom, isTeleporting, isInRoom } = useScene();
 
-    const { camera } = useThree();
+    const { camera, gl } = useThree();
+    useEffect(() => registerPreparationRenderer(gl), [gl]);
+    const [entranceReady, setEntranceReady] = useState(false);
+    const [corridorReady, setCorridorReady] = useState(false);
+    const [corridorReadiness] = useState(() => {
+        let resolve;
+        const promise = new Promise(complete => { resolve = complete; });
+        return { promise, resolve };
+    });
+
+    const handleSceneReady = useCallback(() => {
+        setEntranceReady(true);
+        onSceneReady();
+    }, [onSceneReady]);
+
+    const handleCorridorReady = useCallback(() => {
+        performance.mark('app:corridor-ready');
+        setCorridorReady(true);
+        corridorReadiness.resolve();
+    }, [corridorReadiness]);
+
+    const prepareCorridor = useCallback(() => corridorReadiness.promise, [corridorReadiness]);
+
+    useEffect(() => {
+        if (!entranceReady || corridorReady) return;
+        return startLoadingTimeout(onError);
+    }, [entranceReady, corridorReady, onError]);
 
     // 相机控制：进入后才启用滚动与视差。
     // 传送期间禁用，避免滚动干扰。
@@ -55,7 +83,7 @@ const Experience = ({ onSceneReady, onError }) => {
 
     return (
         <>
-            <StartupReady onReady={onSceneReady} onError={onError} />
+            <StartupReady onReady={handleSceneReady} onError={onError} />
 
             {/* 空走廊：为入口阶段提供环境。 */}
             {!hasEntered && (
@@ -66,6 +94,7 @@ const Experience = ({ onSceneReady, onError }) => {
             {!hasEntered && (
                 <EntranceDoors
                     position={[0, 0, ENTRANCE_DOORS_Z]}
+                    onPrepare={prepareCorridor}
                     onComplete={handleEntranceComplete}
                 />
             )}
@@ -75,16 +104,17 @@ const Experience = ({ onSceneReady, onError }) => {
                 <SignSystem position={[0, 0, ENTRANCE_DOORS_Z]} />
             )}
 
-            {/* 无限走廊：入口阶段隐藏第 -1 段的 SegmentDoors。 */}
-            <InfiniteCorridorManager
-                onDoorEnter={handleDoorEnter}
-                hideDoorsForSegments={hasEntered ? [] : [-1]} // 进入前隐藏第 -1 段的门。
-                clipSegmentNeg1={!hasEntered} // 进入前裁切第 -1 段的画面。
-                setCameraOverride={setCameraOverride}
-            />
-
-            {/* 传送房间：传送时直接渲染目标房间。 */}
-            <TeleportRoom />
+            {entranceReady && (
+                <Suspense fallback={null}>
+                    <CorridorScene
+                        onDoorEnter={handleDoorEnter}
+                        hasEntered={hasEntered}
+                        setCameraOverride={setCameraOverride}
+                        onReady={handleCorridorReady}
+                        onError={onError}
+                    />
+                </Suspense>
+            )}
         </>
     );
 };

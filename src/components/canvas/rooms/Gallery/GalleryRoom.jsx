@@ -2,7 +2,7 @@ import { useTexture } from '../../../../hooks/useMediaTexture';
 import { media } from '../../../../media';
 import { useScene, useAchievements, useAudio } from '../../../../context/contexts';
 import Text from '../../SiteText';
-import { useRef, useState, useMemo, useEffect, forwardRef, useImperativeHandle, memo } from 'react';
+import { useRef, useState, useMemo, useEffect, useCallback, forwardRef, useImperativeHandle, memo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Float, PositionalAudio } from '@react-three/drei';
 
@@ -20,6 +20,7 @@ import { useTextureCopy } from '../../../../hooks/useTextureCopy';
 import { usePaintMaterial } from './usePaintMaterial';
 import { useGalleryProjects } from '../../../../hooks/useContentData';
 import { NOTEBOOK_ASSETS, NOTEBOOK_FEATURE_ICONS, NOTEBOOK_FEATURE_SPRITES } from '../../../../config/projectNotebook';
+import StartupReady from '../../StartupReady';
 
 // 复用 Vector3，避免 useFrame 中分配对象。
 const _tempScale = new THREE.Vector3();
@@ -55,7 +56,7 @@ const BIRD_HEIGHT = 0.35;
 const RIGHT_CROP_AMOUNT = 0.2;
 
 const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
-    const { overlayContent, isTeleporting } = useScene();
+    const { overlayContent, isTeleporting, reportLoadingError } = useScene();
     const { showTutorial, unlockAchievement, hidePopup } = useAchievements();
     const { globalVolume, isMuted } = useAudio();
     const effectiveVolume = isMuted ? 0 : AUDIO_SETTINGS.volume * globalVolume;
@@ -72,6 +73,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     const currentScroll = useRef(0);
     const [selectedCard, setSelectedCard] = useState(null);
     const [globalIsAnimating, setGlobalIsAnimating] = useState(false);
+    const [isPrepared, setIsPrepared] = useState(false);
     const cardRefs = useRef([]);
 
     useEffect(() => {
@@ -94,7 +96,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 
     useEffect(() => {
         // 房间正式显示，即门打开且用户进入时。
-        if (showRoom && !isWarmup) {
+        if (showRoom && !isWarmup && isPrepared) {
             if (wasTeleportedRef.current || isTeleporting) {
                 // 通过地图传送时跳过上色过渡。
                 setPaintProgress(1);
@@ -110,7 +112,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             // 预热时立即显现；不展示时隐藏。
             setPaintProgress(1);
         }
-    }, [showRoom, isWarmup, isTeleporting, animatePaint, resetPaint, setPaintProgress]);
+    }, [showRoom, isWarmup, isPrepared, isTeleporting, animatePaint, resetPaint, setPaintProgress]);
 
     const handleCardClick = async (clickedIndex) => {
         if (globalIsAnimating || isTransitioning) return;
@@ -138,28 +140,16 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         }
     };
 
-    // 跟踪是否已发出就绪信号。
-    const hasSignaledReady = useRef(false);
-    const frameCount = useRef(0);
-    const FRAMES_TO_WAIT = 5;
+    const handlePrepared = useCallback(() => {
+        setIsPrepared(true);
+        onReady?.();
+        // 等待 DoorSection 的飞入动画结束后再显示教程。
+        setTimeout(() => {
+            if (!isWarmup) showTutorial('gallery_inspect');
+        }, 2000);
+    }, [onReady, isWarmup, showTutorial]);
 
-    useFrame(() => {
-        // 每帧更新房间原点，让上色着色器获得正确位置。
-        // 只需一次 getWorldPosition，开销小，但对远处分块很关键。
-        updateRoomOrigin(groupRef);
-
-        if (hasSignaledReady.current) return;
-        frameCount.current++;
-        if (frameCount.current >= FRAMES_TO_WAIT) {
-            hasSignaledReady.current = true;
-            onReady?.();
-
-            // 等待 DoorSection 的 1.5 秒飞入动画结束后再显示教程。
-            setTimeout(() => {
-                if (!isWarmup) showTutorial('gallery_inspect');
-            }, 2000);
-        }
-    });
+    useFrame(() => updateRoomOrigin(groupRef));
 
     // 配置。
     const BALCONY_WIDTH = 5;
@@ -182,17 +172,6 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         return () => mq.removeEventListener('change', handleHoverChange);
     }, []);
 
-    // 将全部项目正面纹理加载为扁平数组。
-    const textureUrls = activeProjects.map(p => p.front);
-    const projectTextures = useTexture(textureUrls);
-
-    // 仅桌面端加载彩色纹理，移动端或触摸设备回退至正面图。
-    const paintedUrls = activeProjects.map(p => (canHover && p.painted) ? p.painted : p.front);
-    const paintedTextures = useTexture(paintedUrls);
-
-    const [backTextureRaw, illustrationRaw, iconsRaw, buttonRaw] = useTexture(Object.values(NOTEBOOK_ASSETS));
-    const featureSpriteRaws = useTexture(NOTEBOOK_FEATURE_SPRITES);
-
     // 预加载技术栈标志，避免首次翻面卡顿。
     // 采用相同条件：桌面端彩色，触摸设备普通图。
     const allLogos = useMemo(() => {
@@ -208,7 +187,40 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         });
     }, [canHover]);
     
-    useTexture(allLogos);
+    // 所有独立纹理在同一次加载中发起，避免各组 Suspense 依次等待。
+    const textureGroups = useMemo(() => ({
+        projects: activeProjects.map(project => project.front),
+        painted: activeProjects.map(project => canHover && project.painted ? project.painted : project.front),
+        notebook: Object.values(NOTEBOOK_ASSETS),
+        sprites: NOTEBOOK_FEATURE_SPRITES,
+        logos: allLogos,
+        environment: [
+            'https://media.secknow-ai.com/space/textures/gallery/floor.png',
+            'https://media.secknow-ai.com/space/textures/gallery/railing.png',
+            'https://media.secknow-ai.com/space/textures/gallery/domki.png',
+            'https://media.secknow-ai.com/space/textures/gallery/miastotlo.png',
+            'https://media.secknow-ai.com/space/textures/gallery/bird_gray.png',
+            'https://media.secknow-ai.com/space/textures/gallery/klamerka.png',
+            'https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png',
+        ],
+    }), [activeProjects, canHover, allLogos]);
+    // 最终使用的是下面的颜色/采样副本，由 StartupReady 统一预热。
+    const allTextures = useTexture(Object.values(textureGroups).flat(), undefined, { upload: false });
+    const loaded = useMemo(() => {
+        let offset = 0;
+        return Object.fromEntries(Object.entries(textureGroups).map(([key, urls]) => {
+            const group = allTextures.slice(offset, offset + urls.length);
+            offset += urls.length;
+            return [key, group];
+        }));
+    }, [textureGroups, allTextures]);
+    const {
+        projects: projectTextures,
+        painted: paintedTextures,
+        notebook: [backTextureRaw, illustrationRaw, iconsRaw, buttonRaw],
+        sprites: featureSpriteRaws,
+        environment: [floorSource, railingSource, housesTexture, cityTexture, birdTexture, clothespinTexture, thresholdTexture],
+    } = loaded;
 
     const colorTextures = useMemo(() => new Map(
         [...new Set([...projectTextures, ...paintedTextures, backTextureRaw, illustrationRaw, iconsRaw, buttonRaw, ...featureSpriteRaws])].map(source => {
@@ -341,15 +353,8 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     });
 
     // 几何体与材质。
-    const floorSource = useTexture('https://media.secknow-ai.com/space/textures/gallery/floor.png');
     const floorTexture = useTextureCopy(floorSource, { wrapS: THREE.MirroredRepeatWrapping, wrapT: THREE.MirroredRepeatWrapping, repeatX: 0.5, repeatY: 0.5 * 1.835 });
-    const railingSource = useTexture('https://media.secknow-ai.com/space/textures/gallery/railing.png');
     const railingTexture = useTextureCopy(railingSource, { wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping, repeatX: 7 });
-    const housesTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/domki.png');
-    const cityTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/miastotlo.png');
-    const birdTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/bird_gray.png');
-    const clothespinTexture = useTexture('https://media.secknow-ai.com/space/textures/gallery/klamerka.png');
-    const thresholdTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png');
 
     const materials = useMemo(() => {
         const floorMat = new THREE.MeshBasicMaterial({
@@ -419,7 +424,8 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     }, []);
 
     return (
-        <group ref={groupRef}>
+        <group ref={groupRef} visible={isPrepared}>
+            <StartupReady root={groupRef} onReady={handlePrepared} onError={reportLoadingError} />
             {!isWarmup && (
                 <PositionalAudio
                     ref={audioRef}

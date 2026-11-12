@@ -9,8 +9,10 @@ import { siteInfo } from '../../../data/content';
 
 const SignSystem = (props) => {
     const groupRef = useRef();
-    const signTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/sign-creative-workshop.png');
-    const mountTexture = useTexture('https://media.secknow-ai.com/space/textures/entrance/belka.png');
+    const [signTexture, mountTexture] = useTexture([
+        'https://media.secknow-ai.com/space/textures/entrance/sign-creative-workshop.png',
+        'https://media.secknow-ai.com/space/textures/entrance/belka.png',
+    ]);
 
     // 物理参数。
     const [timeOffset] = useState(() => Math.random() * 100);

@@ -1,20 +1,22 @@
-import { useEffect, useLayoutEffect, useMemo } from 'react';
+import { useLayoutEffect, useMemo } from 'react';
 import { useLoader, useThree } from '@react-three/fiber';
-import { MediaTextureLoader } from '../media/MediaTextureLoader';
+import { MediaTextureLoader, getRendererTextureLoader, preloadMediaTextures, clearMediaTextures } from '../media/MediaTextureLoader';
+import { getPreparationRenderers } from '../utils/renderPreparation';
 
 // 保留 useTexture 的单图、数组、命名对象及预加载接口，共用带回退的加载器。
-export function useTexture(input, onLoad) {
+export function useTexture(input, onLoad, { upload = true } = {}) {
     const renderer = useThree(state => state.gl);
     const keyed = input !== null && typeof input === 'object' && !Array.isArray(input);
-    const textures = useLoader(MediaTextureLoader, keyed ? Object.values(input) : input);
+    const textures = useLoader(upload ? getRendererTextureLoader(renderer) : MediaTextureLoader, keyed ? Object.values(input) : input);
     useLayoutEffect(() => { onLoad?.(textures); }, [onLoad, textures]);
-    useEffect(() => {
-        if (renderer.initTexture) {
-            for (const texture of Array.isArray(textures) ? textures : [textures]) renderer.initTexture(texture);
-        }
-    }, [renderer, textures]);
     return useMemo(() => keyed ? Object.fromEntries(Object.keys(input).map((key, index) => [key, textures[index]])) : textures, [input, keyed, textures]);
 }
 
-useTexture.preload = input => useLoader.preload(MediaTextureLoader, input);
-useTexture.clear = input => useLoader.clear(MediaTextureLoader, input);
+const urlsFor = input => typeof input === 'string' ? [input] : Object.values(input);
+useTexture.preload = input => { void preloadMediaTextures(urlsFor(input)).catch(() => {}); };
+useTexture.clear = input => {
+    const urls = urlsFor(input);
+    clearMediaTextures(urls);
+    useLoader.clear(MediaTextureLoader, urls);
+    for (const renderer of getPreparationRenderers()) useLoader.clear(getRendererTextureLoader(renderer), urls);
+};

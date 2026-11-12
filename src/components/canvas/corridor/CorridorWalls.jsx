@@ -142,17 +142,12 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
     // 地面设置。
     // =============================================
     // 地面片段纹理：手绘木板。
-    const floorTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/kawalekpodlogi.png?imageMogr2/thumbnail/1024x1024');
-
-    // 踢脚线纹理。
-    // 图片尺寸：1582×94 像素，宽高比 16.83:1。
-    const baseboardTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png');
-
-    // 加载墙面纹理。
-    const wallTexture = useTexture('https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512');
-
-    // 加载天花板纹理。
-    const ceilingSource = useTexture('https://media.secknow-ai.com/space/textures/corridor/ceiling_texture.png?imageMogr2/thumbnail/1024x512');
+    const [floorTexture, baseboardTexture, wallTexture, ceilingSource] = useTexture([
+        'https://media.secknow-ai.com/space/textures/corridor/kawalekpodlogi.png?imageMogr2/thumbnail/1024x1024',
+        'https://media.secknow-ai.com/space/textures/corridor/texturadoprogow.png',
+        'https://media.secknow-ai.com/space/textures/corridor/wall_texture.png?imageMogr2/thumbnail/1024x512',
+        'https://media.secknow-ai.com/space/textures/corridor/ceiling_texture.png?imageMogr2/thumbnail/1024x512',
+    ]);
     const ceilingTexture = useTextureCopy(ceilingSource, { wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping, repeatX: 7 / 2, repeatY: 10 / 2 });
     const leftSideTexture = useTextureCopy(floorTexture, { repeatY: 1 / 5 });
     const rightSideTexture = useTextureCopy(floorTexture, { repeatY: 1 / 5, offsetY: 4 / 5 });

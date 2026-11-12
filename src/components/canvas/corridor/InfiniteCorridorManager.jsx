@@ -62,6 +62,7 @@ const InfiniteCorridorManager = ({
     // 不预挂载第 -1 段，避免与入口门重叠。
     // 相机到达入口时动态挂载，该段位于相机后方，卡顿不可见。
     const [activeSegments, setActiveSegments] = useState([0, 1]);
+    const previousSegment = useRef(null);
 
     // 计算相机当前所在分段。
     const getSegmentFromZ = useCallback((z) => {
@@ -71,6 +72,8 @@ const InfiniteCorridorManager = ({
     // 根据相机位置更新活动分段。
     useFrame(() => {
         const currentSegment = getSegmentFromZ(camera.position.z);
+        if (previousSegment.current === currentSegment) return;
+        previousSegment.current = currentSegment;
 
         // 渲染前一段、当前段和下一段。
         const shouldBeActive = [
@@ -79,13 +82,7 @@ const InfiniteCorridorManager = ({
             currentSegment + 1
         ];
 
-        // 检查是否需要更新。
-        const needsUpdate = shouldBeActive.some(seg => !activeSegments.includes(seg)) ||
-            activeSegments.some(seg => !shouldBeActive.includes(seg));
-
-        if (needsUpdate) {
-            setActiveSegments(shouldBeActive);
-        }
+        setActiveSegments(shouldBeActive);
     });
 
     return (

@@ -2,6 +2,9 @@ import { MediaTextureLoader } from '../../../../media/MediaTextureLoader';
 import { useMemo, useRef } from 'react';
 import { useFrame, useThree, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
+import { cloudGeometry } from '../cloudResources';
+
+const CLOUD_ROTATION = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, -Math.PI / 3, 0));
 
 /**
  * SkyChunk 天空分块组件。
@@ -168,14 +171,11 @@ const Cloud = ({
         }
 
         // 广告牌效果：始终朝向相机，再向左旋转 90°。
-        const offsetRotation = new THREE.Euler(0, -Math.PI / 3, 0);
-        const offsetQuaternion = new THREE.Quaternion().setFromEuler(offsetRotation);
-        meshRef.current.quaternion.copy(camera.quaternion).multiply(offsetQuaternion);
+        meshRef.current.quaternion.copy(camera.quaternion).multiply(CLOUD_ROTATION);
     });
 
     return (
-        <mesh ref={meshRef} position={position}>
-            <planeGeometry args={[width, height]} />
+        <mesh ref={meshRef} geometry={cloudGeometry} position={position} scale={[width, height, 1]}>
             <meshBasicMaterial color="#e0e0e0"
                 ref={materialRef}
                 map={texture}

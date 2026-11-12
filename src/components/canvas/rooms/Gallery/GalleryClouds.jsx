@@ -2,6 +2,7 @@ import { MediaTextureLoader } from '../../../../media/MediaTextureLoader';
 import { useMemo, useRef } from 'react';
 import { useLoader, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { cloudGeometry } from '../cloudResources';
 
 // 可用云纹理。
 const CLOUD_TEXTURES = [
@@ -102,6 +103,10 @@ const StaticCloud = ({ position, scale, opacity, textureIndex, driftSpeed, initi
     const aspectRatio = legacyCloudAspects[cloudFile] || 1.8;
     const width = 2.5 * scale;
     const height = width / aspectRatio;
+    const [rotationX, rotationY, rotationZ] = rotationOffset;
+    const offsetQuaternion = useMemo(() => new THREE.Quaternion().setFromEuler(
+        new THREE.Euler(rotationX, rotationY, rotationZ)
+    ), [rotationX, rotationY, rotationZ]);
 
     useFrame(({ camera, clock }) => {
         if (!meshRef.current) return;
@@ -117,14 +122,11 @@ const StaticCloud = ({ position, scale, opacity, textureIndex, driftSpeed, initi
         meshRef.current.position.z = basePosition.current[2];
 
         // 广告牌效果：始终朝向相机，并应用旋转偏移。
-        const offsetRotation = new THREE.Euler(rotationOffset[0], rotationOffset[1], rotationOffset[2]);
-        const offsetQuaternion = new THREE.Quaternion().setFromEuler(offsetRotation);
         meshRef.current.quaternion.copy(camera.quaternion).multiply(offsetQuaternion);
     });
 
     return (
-        <mesh ref={meshRef} position={position}>
-            <planeGeometry args={[width, height]} />
+        <mesh ref={meshRef} geometry={cloudGeometry} position={position} scale={[width, height, 1]}>
             <meshBasicMaterial color="#e0e0e0"
                 map={texture}
                 transparent
