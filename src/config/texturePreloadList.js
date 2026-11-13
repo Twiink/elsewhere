@@ -54,6 +54,7 @@ export const CORRIDOR_TEXTURES = [
     '/media/images/textures/corridor/doors/pien.webp',
     // 侧面单门。
     '/media/images/textures/corridor/doors/ramkasingledoors.webp',
+    '/media/images/textures/corridor/doors/404-room-walk-v1.webp',
     '/media/images/textures/corridor/doors/klamkadodrzwi.webp',
     '/media/images/textures/corridor/doors/backsingledoors.webp',
     '/media/images/textures/corridor/doors/drzwiprojekty.webp',

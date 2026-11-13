@@ -1,4 +1,5 @@
-import { useScene, useAudio, useAchievements } from '../../context/contexts';
+import { useScene, useAudio, useAchievements, useSecrets } from '../../context/contexts';
+import { SECRETS } from '../../data/secrets';
 import { useState, useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
@@ -25,6 +26,7 @@ const NavigationUI = () => {
     const { currentRoom, isInRoom, requestExit, hasEntered, teleportTo, isTeleporting } = useScene();
     const { isMuted, globalVolume, setGlobalVolume } = useAudio();
     const { showTutorial } = useAchievements();
+    const { discovered } = useSecrets();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [hoveredRoom, setHoveredRoom] = useState(null);
     const [isExiting, setIsExiting] = useState(false); // 跟踪返回按钮点击状态。
@@ -267,14 +269,16 @@ const NavigationUI = () => {
                     <button
                         className={`nav-btn achievements-btn ${isAchievementsOpen ? 'open' : ''}`}
                         onClick={() => setIsAchievementsOpen(!isAchievementsOpen)}
-                        aria-label="探索成就"
+                        aria-label={`探索成就与秘密，已发现 ${discovered.length} / ${SECRETS.length}`}
                         aria-expanded={isAchievementsOpen}
+                        aria-controls="exploration-panel"
                     >
                         <svg viewBox="0 0 24 24" className="icon-trophy">
                             <path d="M8 21h8M12 17v4M7 4h10M5 4h14v5a7 7 0 0 1-7 7 7 7 0 0 1-7-7z" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             <path d="M5 9H3V6h2" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             <path d="M19 9h2V6h-2" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
+                        <span className="secret-count" aria-hidden="true">{discovered.length}/{SECRETS.length}</span>
                     </button>
                 </div>
             )}

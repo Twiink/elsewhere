@@ -1,6 +1,7 @@
 {
   "version": 1,
   "images": {
+    "textures/corridor/doors/404-room-walk-v1.webp": "/media/images/textures/corridor/doors/404-room-walk-v1.webp",
     "textures/corridor/doors/about-smile-margin-v1.png": "/media/images/textures/corridor/doors/about-smile-margin-v1.png",
     "textures/corridor/doors/contact-letter-margin-v1.png": "/media/images/textures/corridor/doors/contact-letter-margin-v1.png",
     "textures/corridor/doors/gallery-blueprint-inner-v1.png": "/media/images/textures/corridor/doors/gallery-blueprint-inner-v1.png",

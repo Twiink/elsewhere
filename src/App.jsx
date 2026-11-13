@@ -13,6 +13,7 @@ import { PerformanceProvider } from './context/PerformanceContext';
 import { canPrefetchRooms } from './utils/performance';
 import { SceneProvider } from './context/SceneContext';
 import { AchievementsProvider } from './context/AchievementsContext';
+import { SecretsProvider } from './context/SecretsContext';
 import NavigationUI from './components/ui/NavigationUI';
 import ScreenReaderOverlay from './components/ui/ScreenReaderOverlay';
 import { useDocumentMeta } from './hooks/useDocumentMeta';
@@ -184,7 +185,9 @@ export default function App() {
     <PerformanceProvider>
       <AudioProvider>
         <AchievementsProvider>
-          <SceneProvider><AppContent /></SceneProvider>
+          <SecretsProvider>
+            <SceneProvider><AppContent /></SceneProvider>
+          </SecretsProvider>
         </AchievementsProvider>
       </AudioProvider>
     </PerformanceProvider>

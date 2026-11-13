@@ -11,6 +11,7 @@ import Avatar from './Avatar';
 import HeroText from './HeroText';
 import Doodles from './Doodles';
 import CorridorDecorations from './CorridorDecorations';
+import SecretDoor from './SecretDoor';
 
 /**
  * CorridorSegment 走廊分段组件。
@@ -177,6 +178,11 @@ const CorridorSegment = ({
                 zClip={zClip}
                 setCameraOverride={setCameraOverride}
             />
+
+            {/* 联系我之后的左侧空墙，接近尽头时才会发现。 */}
+            {!hideSegmentDoors && zOffset - 69 <= zClip && (
+                <SecretDoor position={[-WALL_X_OUTER + 0.015, -0.33, zOffset - 69]} rotation={[0, Math.PI / 2, 0]} setCameraOverride={setCameraOverride} />
+            )}
 
             {/* 分段尽头的门，入口阶段隐藏。 */}
             {!hideSegmentDoors && (

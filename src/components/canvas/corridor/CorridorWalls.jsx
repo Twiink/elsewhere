@@ -149,8 +149,9 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
         '/media/images/textures/corridor/ceiling_texture.webp',
     ]);
     const ceilingTexture = useTextureCopy(ceilingSource, { wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping, repeatX: 7 / 2, repeatY: 10 / 2 });
-    const leftSideTexture = useTextureCopy(floorTexture, { repeatY: 1 / 5 });
-    const rightSideTexture = useTextureCopy(floorTexture, { repeatY: 1 / 5, offsetY: 4 / 5 });
+    // 从中间纹理的两侧边缘镜像延展，让木纹在条带交界处连续。
+    const leftSideTexture = useTextureCopy(floorTexture, { wrapT: THREE.MirroredRepeatWrapping, repeatY: 1 / 5, offsetY: 1 });
+    const rightSideTexture = useTextureCopy(floorTexture, { wrapT: THREE.MirroredRepeatWrapping, repeatY: 1 / 5, offsetY: -1 / 5 });
 
     // 按裁切条件计算有效几何体。
     // 只渲染 Math.min(zStart, zClip) 至 zStart - length 之间的区域。
@@ -317,8 +318,8 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
                 地面砖块。
                 =============================================
                 每块砖是带 kawalekpodlogi.png 纹理的平面。
-                隔一块旋转 180° 并镜像，
-                使相邻纹理自然衔接。
+                隔一块沿长度方向镜像，
+                让相邻拼块使用纹理的同一条边衔接。
                 
                 可手动调整的设置：
                 - TILE_LENGTH：单块地砖长度，单位为 3D 单位。
@@ -348,7 +349,7 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
                         <mesh
                             key={`floor-center-${tileZ.toFixed(1)}`}
                             position={[0, floorY, tileZ]}
-                            rotation={[-Math.PI / 2, 0, Math.PI / 2 + (isMirrored ? Math.PI : 0)]}
+                            rotation={[-Math.PI / 2, 0, Math.PI / 2]}
                             scale={[isMirrored ? -1 : 1, 1, 1]}
                         >
                             <planeGeometry args={[TILE_LENGTH, CENTER_WIDTH]} />
@@ -366,7 +367,7 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
                         <mesh
                             key={`floor-left-${tileZ.toFixed(1)}`}
                             position={[-(CENTER_WIDTH / 2 + SIDE_WIDTH / 2), floorY, tileZ]}
-                            rotation={[-Math.PI / 2, 0, Math.PI / 2 + (isMirrored ? Math.PI : 0)]}
+                            rotation={[-Math.PI / 2, 0, Math.PI / 2]}
                             scale={[isMirrored ? -1 : 1, 1, 1]}
                         >
                             <planeGeometry args={[TILE_LENGTH, SIDE_WIDTH]} />
@@ -384,7 +385,7 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
                         <mesh
                             key={`floor-right-${tileZ.toFixed(1)}`}
                             position={[(CENTER_WIDTH / 2 + SIDE_WIDTH / 2), floorY, tileZ]}
-                            rotation={[-Math.PI / 2, 0, Math.PI / 2 + (isMirrored ? Math.PI : 0)]}
+                            rotation={[-Math.PI / 2, 0, Math.PI / 2]}
                             scale={[isMirrored ? -1 : 1, 1, 1]}
                         >
                             <planeGeometry args={[TILE_LENGTH, SIDE_WIDTH]} />

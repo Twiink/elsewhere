@@ -88,6 +88,23 @@
     }
 }
 
+.nav-btn.achievements-btn {
+    flex-direction: column;
+    gap: 1px;
+    padding-top: 5px;
+
+    .icon-trophy { width: 20px; height: 20px; }
+
+    .secret-count {
+        color: #514b40;
+        font-family: '霞鹜文楷', serif;
+        font-size: 11px;
+        line-height: 1.2;
+        letter-spacing: 0.03em;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
 // 返回按钮。
 .back-btn {
     position: fixed;

@@ -60,6 +60,7 @@ body {
     position: absolute;
     inset: 0;
     z-index: 1;
+    touch-action: none;
 }
 
 // 界面覆盖层。

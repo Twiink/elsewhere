@@ -14,6 +14,7 @@ const DOOR_POSITIONS = [
     { z: -32, side: 'right' },
     { z: -48, side: 'left' },
     { z: -62, side: 'right' },
+    { z: -69, side: 'left', startDistance: 8, peakDistance: 5, glanceScale: 4 },
 ];
 
 /**
@@ -55,6 +56,7 @@ const useInfiniteCamera = ({
 
     // 相机接管为 true 时，由 DoorSection 等外部代码控制。
     const cameraOverride = useRef(false);
+    const releaseDirection = useRef(new THREE.Vector3());
     // 重新启用后跳过首帧，防止相机跳变。
     const skipFrameAfterEnable = useRef(false);
     // 平滑混合计数器，表示从保存旋转过渡的剩余帧数。
@@ -79,16 +81,19 @@ const useInfiniteCamera = ({
         for (const door of DOOR_POSITIONS) {
             const doorGlobalZ = zOffset + door.z;
             const dist = z - doorGlobalZ;
+            const startDistance = door.startDistance ?? START_DIST;
+            const peakDistance = door.peakDistance ?? PEAK_DIST;
 
             let strength = 0;
-            if (dist > PEAK_DIST && dist < START_DIST) {
-                strength = (START_DIST - dist) / (START_DIST - PEAK_DIST);
-            } else if (dist <= PEAK_DIST && dist > END_DIST) {
-                strength = (dist - END_DIST) / (PEAK_DIST - END_DIST);
+            if (dist > peakDistance && dist < startDistance) {
+                strength = (startDistance - dist) / (startDistance - peakDistance);
+            } else if (dist <= peakDistance && dist > END_DIST) {
+                strength = (dist - END_DIST) / (peakDistance - END_DIST);
             }
 
             if (strength > 0) {
-                const easedStrength = strength * (2 - strength);
+                // 贴在侧墙上的彩蛋靠近后再侧看，让手机竖屏也能看到整扇门。
+                const easedStrength = strength * (2 - strength) * (door.glanceScale ?? 1);
                 const dir = door.side === 'left' ? -1 : 1;
                 if (easedStrength > bestStrength) {
                     bestStrength = easedStrength;
@@ -294,6 +299,7 @@ const useInfiniteCamera = ({
         const scrollObserver = Observer.create({
             target: window,
             type: "wheel,touch,pointer",
+            ignoreCheck: event => event.target instanceof Element && Boolean(event.target.closest('.achievements-panel')),
             onWheel: (e) => {
                 handleWheel(e.event);
             },
@@ -452,18 +458,11 @@ const useInfiniteCamera = ({
             // 状态差异会导致跳变。
             // 修正：有差异时按实际姿态初始化 glanceOffset。
 
-            // 1. 由当前实际旋转推导等效侧看值。
-            // rotation.y≈视差 + 侧看×3 + 滑动×4。
-            // 假定视差已在上方同步，滑动为 0。
-            // 因此 currentRotationY≈parallax.x×0.3 + glance×3。
-            // glance≈(currentRotationY - parallax.x×0.3)/3。
-
-            // 注意：使用相机的实际旋转。
-            // lookAt 逻辑并非单纯的旋转相加，
-            // 但小角度下此近似足以避免跳变。
-            const currentRotationY = camera.rotation.y;
-            const parallaxContribution = parallax.current.x * 0.3;
-            const derivedGlance = (currentRotationY - parallaxContribution) / 3;
+            // lookAt 的目标位于前方 10 单位，按实际朝向还原其 X，避免大角度查看后跳动。
+            const direction = camera.getWorldDirection(releaseDirection.current);
+            const derivedGlance = direction.z < -0.1
+                ? (camera.position.x - direction.x / direction.z * 10 - parallax.current.x * 0.3) / 3
+                : initialGlance;
 
             // 2. 检查差异。
             const diff = Math.abs(derivedGlance - initialGlance);
