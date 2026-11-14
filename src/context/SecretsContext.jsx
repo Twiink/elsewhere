@@ -17,6 +17,17 @@ function readProgress() {
 export function SecretsProvider({ children }) {
     const [discovered, setDiscovered] = useState(readProgress);
     const discoveredRef = useRef(discovered);
+    const [draftPhase, setDraftPhase] = useState(null);
+    const [codeControllerOpen, setCodeControllerOpen] = useState(false);
+    const [codeProgress, setCodeProgress] = useState(0);
+    const openDraftRoom = useCallback(() => {
+        setCodeControllerOpen(false);
+        setCodeProgress(0);
+        setDraftPhase(phase => phase || 'loading');
+    }, []);
+    const closeDraftRoom = useCallback(() => {
+        setDraftPhase(phase => phase === 'loading' ? null : phase ? 'closing' : null);
+    }, []);
 
     const discoverSecret = useCallback(id => {
         if (!secretIds.has(id) || discoveredRef.current.includes(id)) return;
@@ -33,6 +44,8 @@ export function SecretsProvider({ children }) {
         }
     }, [discovered]);
 
-    const value = useMemo(() => ({ discovered, discoverSecret }), [discovered, discoverSecret]);
+    const value = useMemo(() => ({ discovered, discoverSecret, draftPhase, setDraftPhase, openDraftRoom, closeDraftRoom,
+        codeControllerOpen, setCodeControllerOpen, codeProgress, setCodeProgress }),
+    [discovered, discoverSecret, draftPhase, openDraftRoom, closeDraftRoom, codeControllerOpen, codeProgress]);
     return <SecretsContext.Provider value={value}>{children}</SecretsContext.Provider>;
 }

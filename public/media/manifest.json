@@ -266,7 +266,16 @@
     "textures/twiink/site-icon-airplane-v1-64.png": "/media/images/textures/twiink/site-icon-airplane-v1-64.png",
     "textures/twiink/start-bouquet.png": "/media/images/textures/twiink/start-bouquet.png",
     "textures/twiink/waving-ink.png": "/media/images/textures/twiink/waving-ink.webp",
-    "textures/twiink/window-ink.png": "/media/images/textures/twiink/window-ink.webp"
+    "textures/twiink/window-ink.png": "/media/images/textures/twiink/window-ink.webp",
+    "textures/draft/plane-v1.webp": "/media/images/textures/draft/plane-v1.webp",
+    "textures/draft/room-v1.webp": "/media/images/textures/draft/room-v1.webp",
+    "textures/draft/pencil-v1.webp": "/media/images/textures/draft/pencil-v1.webp",
+    "textures/draft/notebook-v1.webp": "/media/images/textures/draft/notebook-v1.webp",
+    "textures/draft/paper-ball-v1.webp": "/media/images/textures/draft/paper-ball-v1.webp",
+    "textures/draft/mug-v1.webp": "/media/images/textures/draft/mug-v1.webp",
+    "textures/draft/chair-v1.webp": "/media/images/textures/draft/chair-v1.webp",
+    "textures/twiink/cloud-wink-v1.webp": "/media/images/textures/twiink/cloud-wink-v1.webp",
+    "textures/twiink/cloud-surprise-v1.webp": "/media/images/textures/twiink/cloud-surprise-v1.webp"
   },
   "audio": {
     "wind": "/media/audio/szumwiatru.mp3",

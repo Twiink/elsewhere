@@ -1,5 +1,5 @@
 import { ACHIEVEMENTS } from '../../data/achievements';
-import { useAchievements, useSecrets } from '../../context/contexts';
+import { useAchievements, useSecrets, useScene } from '../../context/contexts';
 import { SECRETS } from '../../data/secrets';
 import React from 'react';
 
@@ -7,7 +7,8 @@ import '../../styles/AchievementsPanel.scss';
 
 const AchievementsPanel = ({ isOpen, onClose }) => {
     const { completed } = useAchievements();
-    const { discovered } = useSecrets();
+    const { discovered, setCodeControllerOpen } = useSecrets();
+    const { hasEntered, isInRoom, isTeleporting } = useScene();
 
     return (
         <div id="exploration-panel" className={`achievements-panel ${isOpen ? 'open' : ''}`} inert={!isOpen ? true : undefined} onWheel={event => event.stopPropagation()} onTouchMove={event => event.stopPropagation()} onKeyDown={event => {
@@ -34,7 +35,7 @@ const AchievementsPanel = ({ isOpen, onClose }) => {
                             <h4 id="secrets-heading">小秘密</h4>
                             <span className="secrets-progress">已发现 {discovered.length} / {SECRETS.length}</span>
                         </div>
-                        <p className="secrets-intro">藏在走廊里的几处小惊喜。</p>
+                        <p className="secrets-intro">藏在走廊与云间的几处小惊喜。</p>
                         <ul className="secrets-list">
                             {SECRETS.map(secret => {
                                 const found = discovered.includes(secret.id);
@@ -50,6 +51,7 @@ const AchievementsPanel = ({ isOpen, onClose }) => {
                                 </li>;
                             })}
                         </ul>
+                        {hasEntered && !isInRoom && !isTeleporting && <button className="konami-notebook-entry" type="button" onClick={() => { onClose(); setCodeControllerOpen(true); }}>试试这串暗号 <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" aria-hidden="true"><path d="M5 19L19 5M5 5H19V19" /></svg></button>}
                     </section>
                     <section aria-labelledby="achievements-heading">
                         <div className="notebook-section-heading">

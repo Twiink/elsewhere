@@ -15,6 +15,7 @@ import '../../shaders/RevealBasicMaterial'; // 注册 BasicMaterial 的笔刷显
 import { isTouchDevice } from '../../../../utils/deviceDetect';
 import { siteInfo, personalProfile } from '../../../../data/content';
 import { getSkillLabels, formatProfileDate } from '../../../../data/profile.js';
+import AvatarExpressions from './AvatarExpressions';
 
 // 复用 Vector3，避免事件处理时分配对象。
 const _tempVec3 = new THREE.Vector3();
@@ -286,6 +287,7 @@ const InfiniteSkyManager = ({ scrollProgressRef }) => {
  * 元素靠近相机时向两侧散开。
  */
 const IntroMilestone = ({ z, scrollProgressRef }) => {
+    const [portraitFocused, setPortraitFocused] = useState(false);
     // 加载人物纹理。
     const avatarTexture = useLoader(MediaTextureLoader, '/media/images/textures/twiink/cloud-ink.webp');
 
@@ -351,7 +353,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
         if (brandRef.current) {
             brandRef.current.position.x = spreadFactor * maxSpread * 0.6;
         }
-        if (avatarRef.current) {
+        if (avatarRef.current && !portraitFocused) {
             // 人物漂浮并向上散开。
             avatarRef.current.position.y = baseY + Math.sin(time * 0.8) * 0.15 + spreadFactor * 3;
             avatarRef.current.position.x = -spreadFactor * maxSpread * 0.3;
@@ -369,6 +371,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
             {/* 姓名主标题，向左散开。 */}
             <Text
                 ref={titleRef}
+                visible={!portraitFocused}
                 position={[0, 5, 0.1]}
                 fontSize={0.8}
                 color="#1a1a1a"
@@ -382,6 +385,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
             {/* 品牌副标题，向右散开。 */}
             <Text
                 ref={brandRef}
+                visible={!portraitFocused}
                 position={[0, 4.3, 0.1]}
                 fontSize={0.45}
                 color="#4a4a4a"
@@ -393,20 +397,14 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
             </Text>
 
             {/* 云上人物漂浮并向左上散开。 */}
-            <mesh ref={avatarRef} position={[0, baseY, 0]}>
-                <planeGeometry args={[avatarWidth, avatarHeight]} />
-                <meshBasicMaterial color="#e0e0e0"
-                    map={avatarTexture}
-                    transparent
-                    alphaTest={0.1}
-                    side={THREE.DoubleSide}
-                    depthWrite={false}
-                />
-            </mesh>
+            <group ref={avatarRef} position={[0, baseY, 0]}>
+                <AvatarExpressions texture={avatarTexture} width={avatarWidth} height={avatarHeight} onFocusChange={setPortraitFocused} />
+            </group>
 
             {/* 座右铭第一行，向右散开。 */}
             <Text
                 ref={motto1Ref}
+                visible={!portraitFocused}
                 maxWidth={7}
                 textAlign="center"
                 position={[0, 0, 0.1]}
@@ -423,6 +421,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
             {/* 座右铭第二行，向左散开。 */}
             <Text
                 ref={motto2Ref}
+                visible={!portraitFocused}
                 maxWidth={7}
                 textAlign="center"
                 position={[0, -0.8, 0]}

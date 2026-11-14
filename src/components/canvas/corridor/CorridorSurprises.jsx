@@ -10,7 +10,7 @@ import { SECRET_IDS } from '../../../data/secrets';
 import '../../../styles/CorridorSurprises.scss';
 
 // 三维点击区域保留至少 44px；原生按钮在键盘聚焦时显示。
-export const SurpriseTarget = ({ name, label, hint, annotation, message, showCaption = true, hintDistance = 0, attentionRef, width, height, position, onActivate, expanded, children }) => {
+export const SurpriseTarget = ({ name, label, hint, annotation, message, showCaption = true, hintDistance = 0, attentionRef, room = null, maxDepth = 12, width, height, position, onActivate, expanded, children }) => {
     const root = useRef();
     const hitArea = useRef();
     const touch = useRef(null);
@@ -22,8 +22,9 @@ export const SurpriseTarget = ({ name, label, hint, annotation, message, showCap
     const [hovered, setHovered] = useState(false);
     const [focused, setFocused] = useState(false);
     const activity = useContext(CorridorActivityContext);
-    const { hasEntered, isInRoom, isTeleporting, loadingRoom, overlayContent } = useScene();
-    const enabled = hasEntered && !isInRoom && !isTeleporting && !loadingRoom && !overlayContent;
+    const { hasEntered, isInRoom, currentRoom, isTeleporting, loadingRoom, overlayContent } = useScene();
+    const { draftPhase } = useSecrets();
+    const enabled = hasEntered && (room ? currentRoom === room : !isInRoom) && !isTeleporting && !loadingRoom && !overlayContent && !draftPhase;
     const [projection] = useState(() => ({ point: new Vector3(), rotation: new Quaternion() }));
 
     useCursor(hovered && inView && enabled, 'var(--cursor-pointer)', 'var(--cursor-default)');
@@ -41,7 +42,7 @@ export const SurpriseTarget = ({ name, label, hint, annotation, message, showCap
         hitArea.current.position.set(0, 0, 0.08).applyQuaternion(hitArea.current.quaternion);
 
         projection.point.applyMatrix4(camera.projectionMatrix);
-        const visible = Boolean(enabled && (!activity || activity.current) && depth > 0 && depth < 12
+        const visible = Boolean(enabled && (room || !activity || activity.current) && depth > 0 && depth < maxDepth
             && Math.abs(projection.point.x) < 1 && Math.abs(projection.point.y) < 1);
         if (visible !== inViewRef.current) {
             inViewRef.current = visible;
@@ -73,7 +74,10 @@ export const SurpriseTarget = ({ name, label, hint, annotation, message, showCap
                 name={`${name}-target`}
                 position={[0, 0, 0.06]}
                 onClick={event => {
-                    if (performance.now() - lastTouch.current < 700) return;
+                    if (performance.now() - lastTouch.current < 700) {
+                        if (enabled && inViewRef.current) event.stopPropagation();
+                        return;
+                    }
                     activate(event);
                 }}
                 onPointerDown={event => {

@@ -1,0 +1,34 @@
+.about-portrait-view {
+    position: absolute; inset: 0; font-family: '霞鹜文楷', serif; color: #514b40; pointer-events: none;
+
+    header { position: absolute; top: 10%; left: 50%; transform: translateX(-50%); text-align: center; }
+    h2 { font-size: 30px; font-weight: 400; line-height: 1.3; margin: 0; }
+    header p { margin: 3px 0 0; font-size: 19px; color: #655f51; white-space: nowrap; }
+    .about-portrait-state { position: absolute; top: 34%; left: calc(50% + 185px); transform: rotate(-4deg); font-size: 18px; margin: 0; }
+    .about-portrait-state span { display: block; margin-top: 5px; font-size: 14px; }
+    .about-portrait-bottom { position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%); width: min(540px, calc(100vw - 40px)); text-align: center; }
+    .about-portrait-bottom p { font-size: 16px; line-height: 1.6; margin: 0 0 17px; }
+    button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #b6aa94; border-radius: 5px 3px 7px 2px; background: #f8f5eb; min-height: 44px; padding: 8px 15px; color: inherit; font: inherit; pointer-events: auto; cursor: var(--cursor-pointer); }
+    button:hover { background: #f6dfac; }
+    button:focus-visible { outline: 2px solid #78603b; outline-offset: 4px; }
+    svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+}
+.corridor-surprise--portrait .corridor-surprise-annotation {
+    --annotation-angle: -4deg;
+    top: -54px; left: 70px; font-size: 15px;
+    .corridor-surprise-leader { width: 45px; height: 45px; top: 2px; left: -42px; }
+}
+@media (max-width: 639px) {
+    .about-portrait-view header { top: max(16%, 112px); }
+    .about-portrait-view h2 { font-size: 27px; }
+    .about-portrait-view .about-portrait-state { top: 68%; left: 50%; transform: translateX(-50%) rotate(-3deg); text-align: center; width: max-content; }
+    .about-portrait-view .about-portrait-bottom { bottom: 4%; }
+    .about-portrait-view .about-portrait-bottom p { font-size: 14px; margin-bottom: 12px; }
+    .corridor-surprise--portrait .corridor-surprise-annotation { top: -57px; left: 18px; }
+}
+@media (max-height: 550px) {
+    .about-portrait-view header { top: 7%; left: 18%; }
+    .about-portrait-view .about-portrait-bottom { bottom: 5%; left: 80%; width: 28%; }
+    .about-portrait-view .about-portrait-state { top: 30%; left: 70%; }
+    .about-portrait-view .about-portrait-bottom p { font-size: 13px; }
+}

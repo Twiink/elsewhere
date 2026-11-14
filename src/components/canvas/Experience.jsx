@@ -1,4 +1,4 @@
-import { useScene } from '../../context/contexts';
+import { useScene, useSecrets } from '../../context/contexts';
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { useThree } from '@react-three/fiber';
 
@@ -11,6 +11,7 @@ import { startLoadingTimeout } from '../../utils/loadingTimeout';
 import { registerPreparationRenderer } from '../../utils/renderPreparation';
 
 const CorridorScene = lazy(() => import('./corridor/CorridorScene'));
+const DraftPortal = lazy(() => import('./corridor/DraftPortal'));
 
 
 // 位置关系：
@@ -31,6 +32,7 @@ const ENTRANCE_DOORS_Z = 22;
 const Experience = ({ onSceneReady, onError, invitationVisible = false }) => {
     // 使用 SceneContext 管理房间状态。
     const { hasEntered, markEntered, enterRoom, isTeleporting, isInRoom } = useScene();
+    const { draftPhase, codeControllerOpen } = useSecrets();
 
     const { camera, gl } = useThree();
     useEffect(() => registerPreparationRenderer(gl), [gl]);
@@ -67,8 +69,8 @@ const Experience = ({ onSceneReady, onError, invitationVisible = false }) => {
         scrollSpeed: 0.025,
         parallaxIntensity: 0.4,
         smoothing: 0.06,
-        scrollEnabled: hasEntered && !isTeleporting && !isInRoom,
-        parallaxEnabled: hasEntered && !isTeleporting && !isInRoom
+        scrollEnabled: hasEntered && !isTeleporting && !isInRoom && !draftPhase && !codeControllerOpen,
+        parallaxEnabled: hasEntered && !isTeleporting && !isInRoom && !draftPhase && !codeControllerOpen
     });
 
     // 处理入口动画完成事件。
@@ -83,6 +85,7 @@ const Experience = ({ onSceneReady, onError, invitationVisible = false }) => {
 
     return (
         <>
+            {draftPhase && draftPhase !== 'loading' && <Suspense fallback={null}><DraftPortal setCameraOverride={setCameraOverride} /></Suspense>}
             <StartupReady onReady={handleSceneReady} onError={onError} />
 
             {/* 空走廊：为入口阶段提供环境。 */}

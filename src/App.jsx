@@ -1,4 +1,4 @@
-import { useAudio, usePerformance, useScene } from './context/contexts';
+import { useAudio, usePerformance, useScene, useSecrets } from './context/contexts';
 import { useState, Suspense, useEffect, useCallback, lazy } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { PerformanceMonitor, useProgress } from '@react-three/drei';
@@ -26,6 +26,7 @@ import './styles/ReadingTrigger.scss';
 import { WebGLRenderer } from 'three';
 import RoomLoadingNotice from './components/dom/RoomLoadingNotice';
 import PaperPlaneCursor from './components/dom/PaperPlaneCursor';
+import SecretControls from './components/ui/SecretControls';
 
 // WebGL 上下文的创建选项保持稳定；可切换的抗锯齿由 AdaptiveQuality 处理。
 const createSceneRenderer = options => {
@@ -41,6 +42,7 @@ const AboutProfile = lazy(() => import('./components/ui/AboutProfile'));
 const ProjectDetails = lazy(() => import('./components/ui/ProjectDetails'));
 const StudioNotes = lazy(() => import('./components/ui/StudioNotes'));
 const ContactDetails = lazy(() => import('./components/ui/ContactDetails'));
+const DraftRoom = lazy(() => import('./components/ui/DraftRoom'));
 const PANELS = { about: AboutProfile, gallery: ProjectDetails, studio: StudioNotes, contact: ContactDetails };
 const PANEL_ROOMS = { profile: 'about', project: 'gallery', studio: 'studio', contact: 'contact' };
 
@@ -97,6 +99,7 @@ function RoomPanels() {
 }
 
 function AppContent() {
+  const { draftPhase } = useSecrets();
   const [isLoaded, setIsLoaded] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
   const [entranceRevealing, setEntranceRevealing] = useState(false);
@@ -170,6 +173,8 @@ function AppContent() {
       </div>
       {isLoaded && <>
         <NavigationUI />
+        <SecretControls />
+        {draftPhase && <Suspense fallback={<div className="draft-loading" role="status">在翻开草稿间……</div>}><DraftRoom /></Suspense>}
         <RoomPanels />
         <PaperTransition />
         <RoomLoadingNotice />

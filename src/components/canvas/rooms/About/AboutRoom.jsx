@@ -69,6 +69,15 @@ const AboutRoom = ({ onReady, isExiting, isWarmup }) => {
     // 平滑后的飞行效果值。
     const currentBank = useRef(0);
     const currentPitch = useRef(0);
+    const portraitFocused = useRef(false);
+    useEffect(() => {
+        const change = event => {
+            portraitFocused.current = event.detail;
+            if (event.detail) scrollVelocity.current = 0;
+        };
+        window.addEventListener('aboutPortraitFocus', change);
+        return () => window.removeEventListener('aboutPortraitFocus', change);
+    }, []);
 
     // 整个房间的引用，用于管理视锥裁剪。
     const roomRef = useRef();
@@ -117,7 +126,7 @@ const AboutRoom = ({ onReady, isExiting, isWarmup }) => {
 
         // 传送期间停止全部相机控制。
         // 传送期间由 TeleportRoom 管理相机位置与旋转。
-        if (isTeleporting) {
+        if (isTeleporting || portraitFocused.current) {
             return;
         }
 
@@ -193,7 +202,7 @@ const AboutRoom = ({ onReady, isExiting, isWarmup }) => {
     // 处理桌面端滚轮。
     useEffect(() => {
         const handleWheel = (e) => {
-            if (overlayRef.current) return; // 遮罩打开时禁止滚动。
+            if (overlayRef.current || portraitFocused.current) return; // 查看时暂停飞行。
             scrollVelocity.current += e.deltaY * 0.002;
         };
 
@@ -211,7 +220,7 @@ const AboutRoom = ({ onReady, isExiting, isWarmup }) => {
         };
 
         const handleTouchMove = (e) => {
-            if (overlayRef.current) return; // 遮罩打开时禁止滚动。
+            if (overlayRef.current || portraitFocused.current) return; // 查看时暂停飞行。
             if (e.touches.length === 1) {
                 const deltaY = lastTouchY.current - e.touches[0].clientY;
                 lastTouchY.current = e.touches[0].clientY;
