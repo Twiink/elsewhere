@@ -9,30 +9,36 @@ function cubic(points, t) {
 const FLIGHT_CURVES = [
     [[1167.5, 377.8], [1250, 316], [1220, 185], [1085, 185]],
     [[1085, 185], [925, 185], [840, 330], [896, 414]],
-    [[896, 414], [956, 505], [1100, 475], [1167.5, 377.8]],
-    [[1167.5, 377.8], [1250, 270], [1340, 310], [1435, 276]],
-    [[1435, 276], [1472, 263], [1505, 243], [1550, 216]],
+    [[896, 414], [952, 498], [1085, 439.6], [1167.5, 377.8]],
+    [[1167.5, 377.8], [1233.5, 328.36], [1320, 265], [1395, 210]],
 ];
 
-// Arc length keeps the airplane moving steadily through the three loop curves.
 function sampleCurves(curves) {
     const samples = [];
     let distance = 0;
-    for (const points of curves) {
-        for (let i = 0; i <= 60; i++) {
-            const point = cubic(points, i / 60);
+    for (const [segment, points] of curves.entries()) {
+        for (let step = segment ? 1 : 0; step <= 100; step++) {
+            const progress = step / 100;
+            const point = cubic(points, progress);
             const previous = samples.at(-1);
             if (previous) distance += Math.hypot(point[0] - previous.x, point[1] - previous.y);
-            const next = cubic(points, Math.min(1, i / 60 + 0.001));
-            const before = cubic(points, Math.max(0, i / 60 - 0.001));
-            samples.push({ x: point[0], y: point[1], angle: Math.atan2(next[1] - before[1], next[0] - before[0]), distance });
+            const tangent = [0, 1].map(axis => 3 * (1 - progress) ** 2 * (points[1][axis] - points[0][axis])
+                + 6 * (1 - progress) * progress * (points[2][axis] - points[1][axis])
+                + 3 * progress ** 2 * (points[3][axis] - points[2][axis]));
+            let angle = Math.atan2(tangent[1], tangent[0]);
+            if (previous) angle += Math.round((previous.angle - angle) / (2 * Math.PI)) * 2 * Math.PI;
+            samples.push({ x: point[0], y: point[1], angle, distance, segment });
         }
     }
     return { samples, distance };
 }
 
-const LOOP = sampleCurves(FLIGHT_CURVES.slice(0, 3));
-const EXIT = sampleCurves(FLIGHT_CURVES.slice(3));
+const FLIGHT = sampleCurves(FLIGHT_CURVES);
+
+function smoothRange(start, end, value) {
+    const progress = Math.max(0, Math.min(1, (value - start) / (end - start)));
+    return progress * progress * progress * (progress * (progress * 6 - 15) + 10);
+}
 
 function along(path, progress) {
     const distance = path.distance * Math.max(0, Math.min(1, progress));
@@ -40,13 +46,18 @@ function along(path, progress) {
     const end = path.samples[Math.max(0, index)];
     const start = path.samples[Math.max(0, index - 1)];
     const t = end.distance === start.distance ? 0 : (distance - start.distance) / (end.distance - start.distance);
-    return { x: mix(start.x, end.x, t), y: mix(start.y, end.y, t), angle: end.angle * 180 / Math.PI + 36.9 };
+    return { x: mix(start.x, end.x, t), y: mix(start.y, end.y, t),
+        angle: (mix(start.angle, end.angle, t) - path.samples[0].angle) * 180 / Math.PI,
+        exiting: end.segment >= 3 };
 }
 
 export function planeFlightAt(progress) {
-    const exiting = progress > 0.66;
-    const t = exiting ? (progress - 0.66) / 0.34 : progress / 0.66;
-    return { ...along(exiting ? EXIT : LOOP, t), scale: exiting ? 1 - 0.9 * Math.sin(Math.min(1, t) * Math.PI / 2) : 1, exiting };
+    const time = Math.max(0, Math.min(1, progress));
+    const pose = along(FLIGHT, time * time * (3 - 2 * time));
+    const depth = pose.exiting ? smoothRange(1230, 1415, pose.x) : 0;
+    return { ...pose, scale: 1 - 0.925 * depth, opacity: 1 - smoothRange(0.86, 1, time),
+        occlusion: pose.exiting ? smoothRange(1315, 1385, pose.x) : 0,
+        follow: smoothRange(0.56, 0.85, time) };
 }
 
 const SPINE = [[247, 31], [253, 76], [250, 144], [266, 188]];

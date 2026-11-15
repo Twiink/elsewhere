@@ -1,5 +1,5 @@
 import { ACHIEVEMENTS } from '../../data/achievements';
-import { useAchievements, useAudio, useScene } from '../../context/contexts';
+import { useAchievements, useAudio, useScene, useSecrets } from '../../context/contexts';
 import React from 'react';
 
 
@@ -10,6 +10,7 @@ const AchievementPopup = () => {
     const { activePopup } = useAchievements();
     const { isMuted, toggleMute, setGlobalVolume } = useAudio();
     const { loadingRoom, hasEntered } = useScene();
+    const { draftPhase } = useSecrets();
 
     if (!activePopup) return null;
 
@@ -22,7 +23,7 @@ const AchievementPopup = () => {
     // corridor_enter 的特殊逻辑，用于询问是否开启声音。
     const isSoundPrompt = activePopup.id === 'corridor_enter';
     // 点门后收起入口引导，给门上的加载便签留出视野。
-    if (isSoundPrompt && (loadingRoom === 'corridor' || hasEntered || isCompleted || isHiding)) return null;
+    if (draftPhase || (isSoundPrompt && (loadingRoom === 'corridor' || hasEntered || isCompleted || isHiding))) return null;
 
     return (
         <div

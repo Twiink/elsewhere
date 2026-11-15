@@ -10,6 +10,7 @@ export default function DraftRoom() {
     const { draftPhase, setDraftPhase, closeDraftRoom, discoverSecret } = useSecrets();
     const dialog = useRef();
     const viewport = useRef();
+    const flightScrollStart = useRef(0);
     const trigger = useRef(document.activeElement);
     const [error, setError] = useState(false);
     const [attempt, setAttempt] = useState(0);
@@ -42,23 +43,27 @@ export default function DraftRoom() {
 
     const activate = useCallback(id => {
         setActions(previous => ({ ...previous, ...(id === 'notebook' ? { pencil: 0 } : {}), [id]: (previous[id] || 0) + 1 }));
-        if (id === 'plane') setPlanePhase('flying');
+        if (id === 'plane') {
+            flightScrollStart.current = viewport.current.scrollLeft;
+            setPlanePhase('flying');
+        }
         setMessage(DRAFT_ACTIONS.find(item => item.id === id).message);
     }, []);
     const finishFlight = useCallback(() => {
         setPlanePhase('away');
         setMessage('纸飞机从窗边飞远了。');
     }, []);
-    const followWindow = useCallback(() => {
+    const followWindow = useCallback(progress => {
         const area = viewport.current;
-        if (area.scrollWidth > area.clientWidth) area.scrollTo({ left: area.scrollWidth - area.clientWidth, behavior: 'smooth' });
+        const target = area.scrollWidth - area.clientWidth;
+        if (target > 0) area.scrollLeft = flightScrollStart.current + (target - flightScrollStart.current) * progress;
     }, []);
 
     return <>
         {(draftPhase === 'loading' || draftPhase === 'opening') && <div className="draft-loading" role="status">
             <span>{error ? '这页草稿暂时没翻开。' : draftPhase === 'opening' ? '暗号对上了，墙纸在翻开……' : '在找那间小草稿间……'}</span>
             {error && <button type="button" onClick={() => { setError(false); setAttempt(value => value + 1); }}>再翻一次</button>}
-            <button type="button" onClick={closeDraftRoom}>回到走廊</button>
+            <button type="button" className="draft-return" onClick={closeDraftRoom}><svg viewBox="0 0 32 28" aria-hidden="true"><path d="M27 7C17 4 7 9 7 18M3 13L7 19L13 14" /><path className="draft-return-swish" d="M15 24C20 25 25 24 29 21" /></svg><span>回到走廊</span></button>
         </div>}
         <dialog ref={dialog} className={`draft-room${draftPhase === 'closing' ? ' is-closing' : ''}`} aria-labelledby="draft-room-title" onCancel={event => { event.preventDefault(); closeDraftRoom(); }}>
             <div ref={viewport} className="draft-room-viewport" tabIndex={0} aria-label="草稿间场景，窄屏可左右滑动" onKeyDown={event => event.stopPropagation()}>
@@ -82,7 +87,7 @@ export default function DraftRoom() {
             </div>
             <footer className="draft-room-footer">
                 <div><div className="draft-feedback"><p role="status" key={message}>{message}</p>{planePhase === 'away' && <button type="button" className="draft-plane-again" onClick={() => activate('plane')}>再放一架</button>}</div><span className="draft-pan-hint">左右拖一拖，看看窗边。</span></div>
-                <button type="button" className="draft-return" onClick={closeDraftRoom}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12H4M10 6L4 12L10 18" /></svg>回到走廊</button>
+                <button type="button" className="draft-return" onClick={closeDraftRoom}><svg viewBox="0 0 32 28" aria-hidden="true"><path d="M27 7C17 4 7 9 7 18M3 13L7 19L13 14" /><path className="draft-return-swish" d="M15 24C20 25 25 24 29 21" /></svg><span>回到走廊</span></button>
             </footer>
         </dialog>
     </>;
