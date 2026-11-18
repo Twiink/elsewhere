@@ -9,7 +9,6 @@ export const WORLD_ART = {
     waving: '/media/images/textures/moonlight/waving-watercolor-v1.webp',
     cloud: '/media/images/textures/moonlight/cloud-watercolor-v1.webp',
     window: '/media/images/textures/moonlight/window-bouquet-v1.webp',
-    flowers: '/media/images/textures/moonlight/floral-corner-v1.webp',
     tree: '/media/images/textures/moonlight/tree-watercolor-v1.webp',
     planter: '/media/images/textures/moonlight/planter-watercolor-v1.webp',
     windowRoom: '/media/images/textures/moonlight/window-interior-v1.webp',

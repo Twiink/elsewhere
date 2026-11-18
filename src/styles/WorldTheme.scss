@@ -119,22 +119,6 @@ html[data-world-theme='moonlight'] .achievement-popup.achievement-popup--moonlit
 }
 .entrance-announcement { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 
-.world-floral-frame {
-    position: fixed;
-    inset: 0;
-    z-index: 4;
-    pointer-events: none;
-    &::before, &::after {
-        content: '';
-        position: absolute;
-        width: min(24vw, 320px);
-        height: min(28vw, 370px);
-        background: url('/media/images/textures/moonlight/floral-corner-v1.webp') top left / contain no-repeat;
-    }
-    &::before { top: -20px; left: -20px; }
-    &::after { bottom: -35px; right: -25px; rotate: 180deg; }
-}
-
 @media (prefers-reduced-motion: reduce) {
     .world-theme-toggle { transition: none; }
 }

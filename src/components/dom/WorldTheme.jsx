@@ -28,9 +28,7 @@ export function WorldThemeButton() {
 
 export default function WorldTheme() {
     const { hasEntered } = useScene();
-    const { theme } = useWorldTheme();
-    return <>
-        {!hasEntered && <div className="world-entry-controls"><WorldThemeButton /></div>}
-        {hasEntered && theme === 'moonlight' && <div className="world-floral-frame" aria-hidden="true" />}
-    </>;
+    if (hasEntered) return null;
+
+    return <div className="world-entry-controls"><WorldThemeButton /></div>;
 }
