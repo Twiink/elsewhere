@@ -1,7 +1,6 @@
 import { useTexture } from '../../../hooks/useMediaTexture';
 import { useAchievements, useScene, useWorldTheme } from '../../../context/contexts';
 import Text from '../SiteText';
-import DoorLoadingTag from '../DoorLoadingTag';
 import EntranceInvitation from './EntranceInvitation';
 import CourtyardFloor from './CourtyardFloor';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
@@ -53,32 +52,15 @@ const EntranceDoors = ({
     const groupRef = useRef();
     const [isOpen, setIsOpen] = useState(false);
     const [isAnimating, setIsAnimating] = useState(false);
-    const [tagPhase, setTagPhase] = useState(null);
-    const [tagReadyAt, setTagReadyAt] = useState(0);
     const openingTimeline = useRef();
-    const loadingCameraZ = useRef(null);
     const reducedMotion = useReducedMotion();
     const { beginRoomLoading, finishRoomLoading } = useScene();
-    const { theme, setEntrancePhase } = useWorldTheme();
+    const { theme, entrancePhase, setEntrancePhase } = useWorldTheme();
     const moonlight = theme === 'moonlight';
     const windowAvatarRef = useRef();
-    const { camera, size } = useThree();
+    const { camera } = useThree();
     const { unlockAchievement } = useAchievements();
     useEffect(() => () => openingTimeline.current?.kill(), []);
-
-    const entranceZ = position[2];
-    useEffect(() => {
-        if (!isAnimating || isOpen || loadingCameraZ.current === null) return;
-        const landscape = size.height < 500 && size.width > size.height;
-        // 横屏等待时靠近门口，便签在门板内保留可读字号。
-        const targetZ = landscape ? Math.min(loadingCameraZ.current, entranceZ + 3.4) : loadingCameraZ.current;
-        const tween = gsap.to(camera.position, {
-            z: targetZ,
-            duration: reducedMotion ? 0 : 0.45,
-            ease: 'power2.out',
-        });
-        return () => tween.kill();
-    }, [camera, entranceZ, isAnimating, isOpen, reducedMotion, size.height, size.width]);
 
     const [isMobile, setIsMobile] = useState(false);
 
@@ -298,19 +280,14 @@ const EntranceDoors = ({
         e.stopPropagation();
         if (isOpen || isAnimating) return;
 
-        loadingCameraZ.current = camera.position.z;
         setIsAnimating(true);
         setEntrancePhase('loading');
-        setTagPhase('loading');
-        const waitingStarted = performance.now();
         playBackgroundMusic();
         document.body.style.cursor = 'progress';
         beginRoomLoading('corridor');
         await onPrepare?.();
         finishRoomLoading('corridor');
         if (!groupRef.current) return;
-        setTagReadyAt(performance.now());
-        setTagPhase('ready');
 
         // 过渡开始时立即重置光标。
         document.body.style.cursor = 'var(--cursor-default)';
@@ -320,7 +297,6 @@ const EntranceDoors = ({
         unlockAchievement('corridor_enter');
 
         const tl = gsap.timeline({
-            delay: reducedMotion || performance.now() - waitingStarted < 300 ? 0 : 0.16,
             onComplete: () => {
                 onComplete?.();
             }
@@ -660,7 +636,11 @@ const EntranceDoors = ({
         <group ref={groupRef} name="entrance-doors" position={[position[0], 0, position[2]]}>
             <CourtyardFloor floorY={floorY} facadeZ={facadeZ} />
             <MoonlitWindow />
-            <EntranceInvitation visible={invitationVisible && !isAnimating} floorY={floorY} />
+            <EntranceInvitation
+                visible={invitationVisible && !isAnimating}
+                loading={entrancePhase === 'loading'}
+                floorY={floorY}
+            />
 
             {/* 入口前方上层的石板路地面。 */}
             {/* 石板路高度：调整 floorY + 0.02，数值越大越高。 */}
@@ -811,13 +791,6 @@ const EntranceDoors = ({
                     </mesh>
                     </group>
                 </group>
-                {tagPhase && <DoorLoadingTag
-                    phase={tagPhase}
-                    readyAt={tagReadyAt}
-                    position={[doorWidth / 2, -0.65, 0.12]}
-                    sizeMultiplier={1.45}
-                    maxScale={0.9}
-                />}
             </group>
 
             {/* 右门。 */}
