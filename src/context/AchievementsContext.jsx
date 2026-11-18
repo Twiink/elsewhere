@@ -12,7 +12,7 @@ export const AchievementsProvider = ({ children }) => {
             const saved = localStorage.getItem('itom_achievements');
             if (saved) {
                 const parsed = JSON.parse(saved);
-                // 加入集合，但忽略 corridor_enter，让入口提示始终出现。
+                // 入口成就在每次访问时重新记录。
                 const filtered = parsed.filter(id => id !== 'corridor_enter');
                 return filtered;
             }

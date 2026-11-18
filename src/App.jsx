@@ -8,7 +8,6 @@ import LoadingFailure from './components/dom/LoadingFailure';
 import PaperTransition from './components/dom/PaperTransition';
 import { usePageVisibility } from './hooks/usePageVisibility';
 import { AudioProvider } from './context/AudioManager';
-import { initAudio } from './utils/audioManager';
 import { PerformanceProvider } from './context/PerformanceContext';
 import { canPrefetchRooms } from './utils/performance';
 import { SceneProvider } from './context/SceneContext';
@@ -53,10 +52,9 @@ const PANEL_ROOMS = { profile: 'about', project: 'gallery', studio: 'studio', co
 function GlobalAudioEnabler() {
   const { enableAudio } = useAudio();
   useEffect(() => {
-    const handleInteraction = () => { enableAudio(); initAudio(); };
     const events = ['click', 'touchstart', 'keydown'];
-    events.forEach(name => window.addEventListener(name, handleInteraction, { once: true }));
-    return () => events.forEach(name => window.removeEventListener(name, handleInteraction));
+    events.forEach(name => window.addEventListener(name, enableAudio, { capture: true, once: true }));
+    return () => events.forEach(name => window.removeEventListener(name, enableAudio, true));
   }, [enableAudio]);
   return null;
 }

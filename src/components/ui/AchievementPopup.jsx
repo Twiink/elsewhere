@@ -1,19 +1,13 @@
 import { ACHIEVEMENTS } from '../../data/achievements';
-import { useAchievements, useAudio, useScene, useSecrets, useWorldTheme } from '../../context/contexts';
-import React from 'react';
-
-
-import { toggleMute as toggleBgmMute, getIsMuted as getBgmMuted, setMusicVolume } from '../../utils/audioManager';
+import { useAchievements, useSecrets, useWorldTheme } from '../../context/contexts';
 import '../../styles/AchievementPopup.scss';
 
 const AchievementPopup = () => {
     const { activePopup } = useAchievements();
     const { theme } = useWorldTheme();
-    const { isMuted, toggleMute, setGlobalVolume } = useAudio();
-    const { loadingRoom, hasEntered } = useScene();
     const { draftPhase } = useSecrets();
 
-    if (!activePopup) return null;
+    if (!activePopup || activePopup.id === 'corridor_enter' || draftPhase) return null;
 
     const data = ACHIEVEMENTS[activePopup.id];
     if (!data) return null;
@@ -21,16 +15,11 @@ const AchievementPopup = () => {
     const isCompleted = activePopup.status === 'completed';
     const isHiding = activePopup.status === 'hiding';
 
-    // corridor_enter 的特殊逻辑，用于询问是否开启声音。
-    const isSoundPrompt = activePopup.id === 'corridor_enter';
     const isMoonlitScrollHint = theme === 'moonlight' && activePopup.id === 'corridor_explore' && !isCompleted;
-    // 点门后收起入口引导，给门上的加载便签留出视野。
-    if (draftPhase || (isSoundPrompt && (loadingRoom === 'corridor' || hasEntered || isCompleted || isHiding))) return null;
 
     return (
         <div
-            className={`achievement-popup ${isMoonlitScrollHint ? 'achievement-popup--moonlit-scroll' : ''} ${isCompleted ? 'completed' : ''} ${isHiding ? 'hiding' : ''} ${isSoundPrompt ? 'interactive achievement-popup--entry-sound' : ''}`}
-            style={isSoundPrompt ? { pointerEvents: 'auto' } : {}}
+            className={`achievement-popup ${isMoonlitScrollHint ? 'achievement-popup--moonlit-scroll' : ''} ${isCompleted ? 'completed' : ''} ${isHiding ? 'hiding' : ''}`}
         >
             {/* SVG 边框叠加层。 */}
             <svg
@@ -49,54 +38,16 @@ const AchievementPopup = () => {
                 />
             </svg>
             <div className="popup-content">
-                {!isSoundPrompt && (
-                    <div className={`checkbox ${isCompleted ? 'checked' : ''}`}>
-                        {isCompleted && (
-                            <svg viewBox="0 0 24 24" className="checkmark">
-                                <path d="M5 13l4 4L19 7" fill="none" stroke="#1a1a1a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                        )}
-                    </div>
-                )}
-                <div className="text-content" style={isSoundPrompt ? { alignItems: 'center', textAlign: 'center' } : {}}>
-                    <span className="title">{isMoonlitScrollHint ? '滚动探索' : data.title}</span>
-
-                    {!isSoundPrompt ? (
-                        <span className="description">{isMoonlitScrollHint ? <svg viewBox="0 0 24 18" aria-hidden="true"><path d="M4 3l8 6 8-6M4 10l8 6 8-6" /></svg> : data.label}</span>
-                    ) : (
-                        <span className="description">
-                            <button
-                                className={`nav-btn inline-sound-toggle ${!isMuted ? 'on' : 'off'}`}
-                                aria-label={isMuted ? '开启声音' : '关闭声音'}
-                                aria-pressed={!isMuted}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-
-                                    const willMute = !isMuted;
-
-                                    // 1. 同步音频引擎与工具的静音标记。
-                                    if (isMuted !== willMute) toggleMute();
-                                    if (getBgmMuted() !== willMute) toggleBgmMute();
-
-                                    // 2. 同时将音量条降至零，
-                                    // 使菜单与入口处的设置保持同步。
-                                    if (willMute) {
-                                        setGlobalVolume(0);
-                                        setMusicVolume(0);
-                                    } else {
-                                        setGlobalVolume(1.0); // 音效音量 100%。
-                                        setMusicVolume(0.3);  // 背景音乐音量 30%。
-                                    }
-                                }}
-                            >
-                                <svg viewBox="0 0 28 28" aria-hidden="true">
-                                    <path d="M5 11H9L14 7V21L9 17H5Z" />
-                                    {isMuted ? <path d="M19 11L24 17M24 11L19 17" /> : <><path d="M18 10Q23 14 18 18" /><path d="M21 6Q29 14 21 22" /></>}
-                                </svg>
-                                <span>声音</span>
-                            </button>
-                        </span>
+                <div className={`checkbox ${isCompleted ? 'checked' : ''}`}>
+                    {isCompleted && (
+                        <svg viewBox="0 0 24 24" className="checkmark">
+                            <path d="M5 13l4 4L19 7" fill="none" stroke="#1a1a1a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
                     )}
+                </div>
+                <div className="text-content">
+                    <span className="title">{isMoonlitScrollHint ? '滚动探索' : data.title}</span>
+                    <span className="description">{isMoonlitScrollHint ? <svg viewBox="0 0 24 18" aria-hidden="true"><path d="M4 3l8 6 8-6M4 10l8 6 8-6" /></svg> : data.label}</span>
                 </div>
 
             </div>

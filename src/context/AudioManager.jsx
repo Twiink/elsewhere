@@ -1,19 +1,22 @@
 import { media } from '../media';
 import { AudioContext } from './contexts';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { applyBackgroundMusicSettings, initAudio, playBackgroundMusic } from '../utils/audioManager';
 import { readStorage, writeStorage } from '../utils/storage';
 
-export const AudioProvider = ({ children }) => {
-    // 持久保存静音偏好。
-    const [isMuted, setIsMuted] = useState(() => {
-        const saved = readStorage('audio_muted');
-        return saved === 'true';
-    });
+function parseVolume(saved, fallback) {
+    const volume = parseFloat(saved);
+    return Number.isFinite(volume) ? Math.max(0, Math.min(1, volume)) : fallback;
+}
 
-    // 持久保存音量偏好，范围 0.0 至 1.0。
+export const AudioProvider = ({ children }) => {
+    const [isMuted, setIsMuted] = useState(() => readStorage('audio_muted') === 'true');
+    const [musicVolume, setMusicVolume] = useState(() => parseVolume(readStorage('audio_music_volume'), 0.3));
     const [globalVolume, setGlobalVolume] = useState(() => {
         const saved = readStorage('audio_volume');
-        return saved !== null ? parseFloat(saved) : 0.5;
+        // 旧版静音时会把音效音量写成 0，此时恢复默认滑块值，保留静音状态。
+        if (isMuted && saved === '0' && readStorage('audio_music_volume') === null) return 0.5;
+        return parseVolume(saved, 0.5);
     });
 
     const [audioEnabled, setAudioEnabled] = useState(false);
@@ -39,32 +42,36 @@ export const AudioProvider = ({ children }) => {
 
     }, [isMuted, globalVolume]);
 
-    const toggleMute = () => setIsMuted(prev => !prev);
+    useEffect(() => {
+        writeStorage('audio_music_volume', musicVolume);
+        if (audioEnabled) initAudio();
+        applyBackgroundMusicSettings(musicVolume, isMuted);
+    }, [audioEnabled, isMuted, musicVolume]);
 
-    // 增强设置函数：手动将滑块拖至 0 以上时自动取消静音。
-    const enhancedSetGlobalVolume = useCallback((vol) => {
-        if (typeof vol === 'function') {
-            setGlobalVolume(prev => {
-                const newVol = vol(prev);
-                if (newVol > 0) setIsMuted(false);
-                return newVol;
-            });
-        } else {
-            setGlobalVolume(vol);
-            if (vol > 0) setIsMuted(false);
+    const toggleMute = () => {
+        const muted = !isMuted;
+        applyBackgroundMusicSettings(musicVolume, muted);
+        setIsMuted(muted);
+        if (!muted && musicVolume > 0) playBackgroundMusic();
+    };
+
+    const changeMusicVolume = (volume) => {
+        setMusicVolume(volume);
+        if (volume > 0) {
+            applyBackgroundMusicSettings(volume, false);
+            setIsMuted(false);
+            playBackgroundMusic();
         }
+    };
+
+    const changeEffectsVolume = useCallback((volume) => {
+        setGlobalVolume(volume);
+        if (volume > 0) setIsMuted(false);
     }, []);
 
-    // 首次交互时调用。
     const enableAudio = useCallback(() => {
-        if (!audioEnabled) {
-            // 可创建占位上下文，或设置已尝试解锁的标记。
-            // WebAudio 通常需要恢复上下文，
-            // HTML5 Audio 则通常只需一次用户交互，
-            // 即可让文档后续播放获得许可。
-            setAudioEnabled(true);
-        }
-    }, [audioEnabled]);
+        setAudioEnabled(true);
+    }, []);
 
     const play = useCallback((soundName, { loop = false, volume = 1.0 } = {}) => {
         if (!audioEnabled) return { stop() {} };
@@ -136,8 +143,10 @@ export const AudioProvider = ({ children }) => {
         <AudioContext.Provider value={{
             isMuted,
             toggleMute,
+            musicVolume,
+            setMusicVolume: changeMusicVolume,
             globalVolume,
-            setGlobalVolume: enhancedSetGlobalVolume,
+            setGlobalVolume: changeEffectsVolume,
             play,
             enableAudio,
             audioEnabled

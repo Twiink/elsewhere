@@ -17,23 +17,20 @@
     &:disabled { cursor: progress; }
 }
 
-.app .achievement-popup.achievement-popup--entry-sound { top: 0; right: max(86px, calc(env(safe-area-inset-right) + 62px)); padding: 0; }
-.app .achievement-popup.achievement-popup--entry-sound .text-content .description .inline-sound-toggle {
+.app .nav-controls.nav-controls--entry, .app .audio-panel--entry {
+    right: max(86px, calc(env(safe-area-inset-right) + 62px));
+}
+
+.nav-controls--entry .audio-btn {
     flex-direction: column;
     gap: 1px;
-    width: 50px;
-    height: 55px;
-    min-width: 0;
     padding: 5px 0 0;
     color: #1a1a1a;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
     font-family: '霞鹜文楷', serif;
     font-size: 11px;
+    font-weight: 700;
     line-height: 1.2;
     svg { width: 20px; height: 20px; }
-    &:focus-visible { outline: 3px solid #38234d; outline-offset: 4px; }
 }
 
 html[data-world-theme='moonlight'] {
@@ -89,8 +86,9 @@ html[data-world-theme='moonlight'] .achievement-popup.achievement-popup--moonlit
     .app .nav-controls { right: max(12px, env(safe-area-inset-right)); gap: 4px; }
     .app .nav-controls .nav-btn { width: 44px; }
     .app .back-btn { left: 12px; width: 44px; }
-    .app .achievement-popup.achievement-popup--entry-sound { right: max(60px, calc(env(safe-area-inset-right) + 48px)); }
-    .app .achievement-popup.achievement-popup--entry-sound .text-content .description .inline-sound-toggle { width: 44px; }
+    .app .nav-controls.nav-controls--entry, .app .audio-panel--entry {
+        right: max(60px, calc(env(safe-area-inset-right) + 48px));
+    }
 }
 
 

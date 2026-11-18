@@ -8,6 +8,8 @@ export const WorldThemeContext = createContext(null);
 export const AudioContext = createContext({
   isMuted: false,
   toggleMute() {},
+  musicVolume: 0.3,
+  setMusicVolume() {},
   play() {},
   enableAudio() {},
   audioEnabled: false,

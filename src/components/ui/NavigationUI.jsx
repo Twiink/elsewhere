@@ -1,10 +1,7 @@
-import { useScene, useAudio, useAchievements, useSecrets } from '../../context/contexts';
+import { useScene, useAudio, useAchievements, useSecrets, useWorldTheme } from '../../context/contexts';
 import { SECRETS } from '../../data/secrets';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import gsap from 'gsap';
-
-
-import { setMusicVolume, getMusicVolume } from '../../utils/audioManager';
 
 import AchievementPopup from './AchievementPopup';
 import AchievementsPanel from './AchievementsPanel';
@@ -25,9 +22,10 @@ const PIN_START_POSITION = { x: 50.5, y: 97 };
 
 const NavigationUI = () => {
     const { currentRoom, isInRoom, requestExit, hasEntered, teleportTo, isTeleporting } = useScene();
-    const { isMuted, globalVolume, setGlobalVolume } = useAudio();
+    const { isMuted, toggleMute, musicVolume, setMusicVolume, globalVolume, setGlobalVolume } = useAudio();
     const { showTutorial } = useAchievements();
-    const { discovered } = useSecrets();
+    const { discovered, draftPhase } = useSecrets();
+    const { entrancePhase } = useWorldTheme();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [hoveredRoom, setHoveredRoom] = useState(null);
     const [isExiting, setIsExiting] = useState(false); // 跟踪返回按钮点击状态。
@@ -35,12 +33,15 @@ const NavigationUI = () => {
     // 音频控制状态。
     const [isAudioMenuOpen, setIsAudioMenuOpen] = useState(false);
     const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
-    const [bgmVol, setBgmVol] = useState(getMusicVolume);
     const [isUIHidden, setIsUIHidden] = useState(false);
+    const isEntering = !hasEntered && entrancePhase !== 'idle';
+    const showAudioSettings = hasEntered || (!isEntering && !draftPhase);
 
     // 焦点管理引用。
     const mapPanelRef = useRef();
     const mapCloseRef = useRef();
+    const audioButtonRef = useRef();
+    const audioCloseRef = useRef();
 
     useEffect(() => {
         const handleInspectChange = (e) => {
@@ -111,34 +112,16 @@ const NavigationUI = () => {
     }, [hoveredRoom, currentRoom]);
 
     useEffect(() => {
-
-        const handleMusicVolumeChange = (e) => {
-            setBgmVol(e.detail);
-        };
-        window.addEventListener('musicVolumeChanged', handleMusicVolumeChange);
-
-        return () => window.removeEventListener('musicVolumeChanged', handleMusicVolumeChange);
-    }, []);
-
-    const handleBgmChange = (val) => {
-        setBgmVol(val);
-        setMusicVolume(val);
-    };
-
-    // 进入前显示入口提示，进入后显示探索提示。
-    useEffect(() => {
-        if (!hasEntered && !isTeleporting) {
-            showTutorial('corridor_enter');
-        } else if (hasEntered && !isTeleporting && !isInRoom) {
+        if (hasEntered && !isTeleporting && !isInRoom) {
             showTutorial('corridor_explore');
         }
     }, [hasEntered, isTeleporting, isInRoom, showTutorial]);
 
     // 房间与传送状态变化时同步调整菜单，避免先渲染过期菜单。
-    const [previousNavigation, setPreviousNavigation] = useState({ isInRoom, isTeleporting });
-    if (previousNavigation.isInRoom !== isInRoom || previousNavigation.isTeleporting !== isTeleporting) {
-        setPreviousNavigation({ isInRoom, isTeleporting });
-        if (isInRoom || isTeleporting) {
+    const [previousNavigation, setPreviousNavigation] = useState({ isInRoom, isTeleporting, isEntering });
+    if (previousNavigation.isInRoom !== isInRoom || previousNavigation.isTeleporting !== isTeleporting || previousNavigation.isEntering !== isEntering) {
+        setPreviousNavigation({ isInRoom, isTeleporting, isEntering });
+        if (isInRoom || isTeleporting || isEntering) {
             setIsMenuOpen(false);
             setIsAudioMenuOpen(false);
             setIsAchievementsOpen(false);
@@ -154,18 +137,27 @@ const NavigationUI = () => {
         }
     }, [isMenuOpen]);
 
+    useEffect(() => {
+        if (isAudioMenuOpen) audioCloseRef.current?.focus({ preventScroll: true });
+    }, [isAudioMenuOpen]);
+
+    const closeAudioMenu = useCallback(() => {
+        setIsAudioMenuOpen(false);
+        audioButtonRef.current?.focus({ preventScroll: true });
+    }, []);
+
     // 全局 Esc 处理，关闭已打开的面板。
     useEffect(() => {
         const handleEscape = (e) => {
             if (e.key === 'Escape') {
                 if (isMenuOpen) setIsMenuOpen(false);
-                if (isAudioMenuOpen) setIsAudioMenuOpen(false);
+                if (isAudioMenuOpen) closeAudioMenu();
                 if (isAchievementsOpen) setIsAchievementsOpen(false);
             }
         };
         window.addEventListener('keydown', handleEscape);
         return () => window.removeEventListener('keydown', handleEscape);
-    }, [isMenuOpen, isAudioMenuOpen, isAchievementsOpen]);
+    }, [isMenuOpen, isAudioMenuOpen, isAchievementsOpen, closeAudioMenu]);
 
     // 地图面板焦点循环处理。
     const handleMapKeyDown = (e) => {
@@ -229,11 +221,9 @@ const NavigationUI = () => {
                 </button>
             )}
 
-            {/* 右侧控制按钮，进入后才显示。 */}
-            {hasEntered && (
-                <div className={`nav-controls ${isMenuOpen || isAudioMenuOpen ? 'menu-open' : ''} ${isUIHidden ? 'ui-hidden' : ''}`}>
-                    {/* 菜单按钮。 */}
-                    <button
+            {showAudioSettings && (
+                <div className={`nav-controls ${hasEntered ? '' : 'nav-controls--entry'} ${isMenuOpen || isAudioMenuOpen ? 'menu-open' : ''} ${isUIHidden ? 'ui-hidden' : ''}`}>
+                    {hasEntered && <button
                         className={`nav-btn hamburger-btn ${isMenuOpen ? 'open' : ''}`}
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         aria-label="展开或收起菜单"
@@ -244,44 +234,49 @@ const NavigationUI = () => {
                             <span></span>
                             <span></span>
                         </div>
-                    </button>
-                    {/* 音频切换按钮。 */}
+                    </button>}
                     <button
+                        type="button"
                         className={`nav-btn audio-btn ${isAudioMenuOpen ? 'open' : ''}`}
-                        onClick={() => setIsAudioMenuOpen(!isAudioMenuOpen)}
+                        ref={audioButtonRef}
+                        onClick={() => setIsAudioMenuOpen(true)}
                         aria-label="声音设置"
+                        aria-controls="audio-settings-panel"
                         aria-expanded={isAudioMenuOpen}
+                        tabIndex={isAudioMenuOpen ? -1 : undefined}
                     >
-                        {isMuted ? (
-                            <svg viewBox="0 0 24 24" className="icon-audio">
+                        {isMuted || (musicVolume === 0 && globalVolume === 0) ? (
+                            <svg viewBox="0 0 24 24" className="icon-audio" aria-hidden="true">
                                 <path d="M11 5L6 9H2v6h4l5 4V5z" />
                                 <line x1="23" y1="9" x2="17" y2="15" />
                                 <line x1="17" y1="9" x2="23" y2="15" />
                             </svg>
                         ) : (
-                            <svg viewBox="0 0 24 24" className="icon-audio">
+                            <svg viewBox="0 0 24 24" className="icon-audio" aria-hidden="true">
                                 <path d="M11 5L6 9H2v6h4l5 4V5z" />
                                 <path d="M15 9a5 5 0 0 1 0 6" />
                                 <path d="M18 5a9 9 0 0 1 0 14" />
                             </svg>
                         )}
+                        {!hasEntered && <span aria-hidden="true">声音</span>}
                     </button>
-                    {/* 成就切换按钮。 */}
-                    <button
-                        className={`nav-btn achievements-btn ${isAchievementsOpen ? 'open' : ''}`}
-                        onClick={() => setIsAchievementsOpen(!isAchievementsOpen)}
-                        aria-label={`探索成就与秘密，已发现 ${discovered.length} / ${SECRETS.length}`}
-                        aria-expanded={isAchievementsOpen}
-                        aria-controls="exploration-panel"
-                    >
-                        <svg viewBox="0 0 24 24" className="icon-trophy">
-                            <path d="M8 21h8M12 17v4M7 4h10M5 4h14v5a7 7 0 0 1-7 7 7 7 0 0 1-7-7z" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M5 9H3V6h2" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M19 9h2V6h-2" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        <span className="secret-count" aria-hidden="true">{discovered.length}/{SECRETS.length}</span>
-                    </button>
-                    <WorldThemeButton />
+                    {hasEntered && <>
+                        <button
+                            className={`nav-btn achievements-btn ${isAchievementsOpen ? 'open' : ''}`}
+                            onClick={() => setIsAchievementsOpen(!isAchievementsOpen)}
+                            aria-label={`探索成就与秘密，已发现 ${discovered.length} / ${SECRETS.length}`}
+                            aria-expanded={isAchievementsOpen}
+                            aria-controls="exploration-panel"
+                        >
+                            <svg viewBox="0 0 24 24" className="icon-trophy">
+                                <path d="M8 21h8M12 17v4M7 4h10M5 4h14v5a7 7 0 0 1-7 7 7 7 0 0 1-7-7z" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <path d="M5 9H3V6h2" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <path d="M19 9h2V6h-2" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            <span className="secret-count" aria-hidden="true">{discovered.length}/{SECRETS.length}</span>
+                        </button>
+                        <WorldThemeButton />
+                    </>}
                 </div>
             )}
 
@@ -427,14 +422,16 @@ const NavigationUI = () => {
             )}
 
             {/* 音频面板从按钮下方展开。 */}
-            {hasEntered && (
-                <div className={`audio-panel ${isAudioMenuOpen ? 'open' : ''}`} inert={!isAudioMenuOpen ? true : undefined}>
+            {showAudioSettings && (
+                <div id="audio-settings-panel" className={`audio-panel ${hasEntered ? '' : 'audio-panel--entry'} ${isAudioMenuOpen ? 'open' : ''}`} inert={!isAudioMenuOpen}>
                     <div className="audio-card">
                         <div className="audio-header">
                             <h3>声音设置</h3>
                             <button
+                                type="button"
                                 className="close-btn"
-                                onClick={() => setIsAudioMenuOpen(false)}
+                                ref={audioCloseRef}
+                                onClick={closeAudioMenu}
                                 aria-label="关闭声音设置"
                             >
                                 <svg viewBox="0 0 24 24">
@@ -446,16 +443,16 @@ const NavigationUI = () => {
                             <div className="slider-group">
                                 <div className="slider-label">
                                     <span>音乐</span>
-                                    <span>{Math.round(bgmVol * 100)}%</span>
+                                    <span>{Math.round(musicVolume * 100)}%</span>
                                 </div>
                                 <input
                                     type="range"
                                     min="0" max="1" step="0.01"
-                                    value={bgmVol}
-                                    onChange={(e) => handleBgmChange(parseFloat(e.target.value))}
+                                    value={musicVolume}
+                                    onChange={(e) => setMusicVolume(parseFloat(e.target.value))}
                                     className="paper-slider"
                                     aria-label="音乐音量"
-                                    aria-valuetext={`${Math.round(bgmVol * 100)}%`}
+                                    aria-valuetext={`${Math.round(musicVolume * 100)}%`}
                                 />
                             </div>
                             <div className="slider-group">
@@ -474,6 +471,9 @@ const NavigationUI = () => {
                                 />
                             </div>
                         </div>
+                        <button type="button" className="audio-mute-btn" onClick={toggleMute}>
+                            {isMuted ? '取消静音' : '全部静音'}
+                        </button>
                     </div>
                 </div>
             )}
@@ -485,12 +485,12 @@ const NavigationUI = () => {
             />
 
             {/* 点击遮罩关闭菜单。 */}
-            {(isMenuOpen || isAudioMenuOpen || isAchievementsOpen) && (
+            {(isMenuOpen || (showAudioSettings && isAudioMenuOpen) || isAchievementsOpen) && (
                 <div
                     className="menu-overlay"
                     onClick={() => {
                         setIsMenuOpen(false);
-                        setIsAudioMenuOpen(false);
+                        if (isAudioMenuOpen) closeAudioMenu();
                         setIsAchievementsOpen(false);
                     }}
                 />

@@ -101,36 +101,6 @@
             font-size: 13px;
             color: #444;
             line-height: 1.4;
-
-            .inline-sound-toggle {
-                background: none;
-                border: none;
-                padding: 0;
-                margin-left: 4px;
-                font-family: '霞鹜文楷', 'Patrick Hand', cursive, sans-serif;
-                font-size: 13px;
-                font-weight: 700;
-                cursor: var(--cursor-pointer, pointer);
-                text-decoration: underline;
-                text-decoration-style: dashed;
-                text-underline-offset: 3px;
-                transition: opacity 0.2s ease, transform 0.2s ease;
-                display: inline-flex;
-                align-items: center;
-
-                &.on {
-                    color: #1a1a1a;
-                }
-
-                &.off {
-                    color: #888;
-                }
-
-                &:hover {
-                    opacity: 0.7;
-                    transform: scale(1.05);
-                }
-            }
         }
     }
 
@@ -191,29 +161,5 @@
                 font-size: 12px;
             }
         }
-    }
-}
-
-// 入口只保留角落里的声音开关，石板邀请承接进门指引。
-.achievement-popup.achievement-popup--entry-sound {
-    top: max(12px, env(safe-area-inset-top));
-    right: max(16px, env(safe-area-inset-right));
-    bottom: auto;
-    left: auto;
-    padding: 0 10px;
-    background: transparent;
-    clip-path: none;
-    filter: none;
-    animation: none;
-    transform: none;
-    opacity: 1;
-
-    &::before, .popup-border, .title { display: none; }
-    .text-content .description { font-size: 14px; color: #484744; white-space: nowrap; }
-    .text-content .description .inline-sound-toggle {
-        min-height: 44px;
-        font-size: 14px;
-        &.off { color: #55534e; }
-        &:focus-visible { outline: 2px dashed #55534e; outline-offset: 3px; }
     }
 }
