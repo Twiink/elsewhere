@@ -31,6 +31,22 @@ npm run lint
 npm run build:compressed
 ```
 
+## 昼夜外观与动效维护
+
+主站每次打开和刷新默认白天，右上纸签显示切换目标“夜晚”或“白天”。`WorldThemeProvider` 管理本次访问的外观；切换重播原有开场并回到入口，音频设置、成就与秘密发现记录继续保留。
+
+昼夜共用同一套三维布局、门轴、门洞、角色位置、装饰尺寸与命中区域。`Experience`、`EntranceDoors` 与 `SignSystem` 管理共同入口；每扇入口门为 0.94 × 2.4 场景单位，窗户、人物、猫眼、悬挂鼠标、花盆与招牌沿用同一坐标和互动。
+
+走廊使用共同的 `CorridorWalls`、`DoorSection`、`CorridorDecorations` 与前厅。`src/config/corridorLayout.js` 统一走廊尺寸和四门定义：画廊（左，relativeZ=-18）、生活手记（右，-32）、关于我（左，-48）、联系我（右，-62）。房门显示、地图传送与自动侧看读取同一配置；开门、进入与返回使用同一相机路径。手机与桌面也遵循该布局。
+
+夜间视觉以已批准的庭院、走廊与四房间设计稿为依据，适配到原始白天的空间结构。入口复用蓝紫砖墙、月云、彩绘木门、黄铜把手、花角木牌和暖窗内景；走廊复用六格水彩字母、花牌、四门图集、花角门框与暖壁灯。装饰层与动画锚点共同挂载，由外观控制可见材质；门位、门洞与路线继续共用。`WorldAppearance` 保留原 alpha 和动画，在颜色阶段绘制夜色；真实照片、视频和原有阅读内容继续保留。
+
+走廊墙面使用已确认的 `corridor-brick-watercolor-v2.webp` 蓝灰水彩砖墙，顶面使用 `ceiling-pearl-watercolor-v1.webp` 浅米灰蓝水彩。两张发布纹理与获批 PNG 原稿的 RGBA 像素一致；墙面等比例取样，副标题使用深棕墨色。落地绿植沿用 `corridor-plant-watercolor-v1.webp` 的独立彩绘。原稿与提示词见 `assets/texture-previews/wall-ceiling-2026-11-17/preview.json`，接入和检查记录见 `.impeccable/review/wall-ceiling-approved/`。
+
+水彩门框通过纹理采样去掉两侧透明留白，覆盖共用门洞，踢脚线按门口预留宽度接到门边。夜间门的纸签使用 `getDoorAnnotation` 与共用加载状态，显示各房间的等待提示和“请进”；纸签、文字和门前视角读取同一组坐标。门框与加载提示的修复记录见 `.impeccable/review/door-wall-fixes/`。
+
+当前夜间视觉与布局验证记录位于 `.impeccable/review/night-artwork/`，基础布局记录位于 `theme-layout/`；素材来源和历史视觉记录位于 `.impeccable/review/fidelity/`、`fidelity-rebuild/` 与 `fidelity-finish/`。调整外观时同时检查两个主题的模型几何、交互区域、门前视角与返回路径，并同步 `PRODUCT.md` 和 `DESIGN.md`。
+
 ## Git 跟踪范围
 
 仓库跟踪源码、内容数据、发布素材、依赖锁文件和共享配置。

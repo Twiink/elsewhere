@@ -8,6 +8,7 @@ import { setMusicVolume, getMusicVolume } from '../../utils/audioManager';
 
 import AchievementPopup from './AchievementPopup';
 import AchievementsPanel from './AchievementsPanel';
+import { WorldThemeButton } from '../dom/WorldTheme';
 import '../../styles/NavigationUI.scss';
 
 // 地图房间数据，位置以地图图片的百分比表示。
@@ -280,6 +281,7 @@ const NavigationUI = () => {
                         </svg>
                         <span className="secret-count" aria-hidden="true">{discovered.length}/{SECRETS.length}</span>
                     </button>
+                    <WorldThemeButton />
                 </div>
             )}
 

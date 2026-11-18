@@ -1,8 +1,9 @@
 import { useTexture } from '../../../hooks/useMediaTexture';
-import { useAchievements, useScene } from '../../../context/contexts';
+import { useAchievements, useScene, useWorldTheme } from '../../../context/contexts';
 import Text from '../SiteText';
 import DoorLoadingTag from '../DoorLoadingTag';
 import EntranceInvitation from './EntranceInvitation';
+import CourtyardFloor from './CourtyardFloor';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
@@ -14,6 +15,11 @@ import '../shaders/RevealMaterial'; // 注册使用透明度丢弃的显现着�
 import { playBackgroundMusic } from '../../../utils/audioManager';
 
 import { isTouchDevice } from '../../../utils/deviceDetect';
+import { DUCK_QUOTES } from '../../../data/entranceInteractions';
+import { useTextureCopy } from '../../../hooks/useTextureCopy';
+import { FIDELITY_ART } from '../../../config/fidelityArtwork';
+import MoonlitWindow from '../MoonlitWindow';
+import EntranceHardware from './EntranceHardware';
 
 // 使用本地中文字体。
 const FONT_URL = '/media/fonts/LXGWWenKaiLite-site.woff';
@@ -24,7 +30,7 @@ const FONT_URL = '/media/fonts/LXGWWenKaiLite-site.woff';
  * EntranceDoors：走廊的三维入口组件。
  * 
  * 门打开后，相机穿过入口。
- * EmptyCorridor 提供周围的走廊环境。
+ * CourtyardFloor 将入口外的地面接到墙脚。
  */
 const EntranceDoors = ({
     position = [0, 0, 22],
@@ -53,6 +59,8 @@ const EntranceDoors = ({
     const loadingCameraZ = useRef(null);
     const reducedMotion = useReducedMotion();
     const { beginRoomLoading, finishRoomLoading } = useScene();
+    const { theme, setEntrancePhase } = useWorldTheme();
+    const moonlight = theme === 'moonlight';
     const windowAvatarRef = useRef();
     const { camera, size } = useThree();
     const { unlockAchievement } = useAchievements();
@@ -83,7 +91,8 @@ const EntranceDoors = ({
     const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
     const {
-        frameTexture, doorLeftTexture, doorRightTexture, doorRightPaintedTexture, doorLeftPaintedTexture,
+        frameTexture, doorLeftTexture: dayDoorLeftTexture, doorRightTexture: dayDoorRightTexture,
+        doorRightPaintedTexture: dayDoorRightPaintedTexture, doorLeftPaintedTexture: dayDoorLeftPaintedTexture,
         handleLeftTexture, handleLeftPaintedTexture, handleRightTexture, handleRightPaintedTexture,
         doorBackTexture, edgeTexture, bricksTexture, stonePathTexture, catFrontBodyTexture,
         windowSketchTexture, avatarWindowTexture, treeTexture, mouseTexture, potTexture,
@@ -113,6 +122,14 @@ const EntranceDoors = ({
         speechBubbleTexture: '/media/images/textures/entrance/speech_bubble.webp',
     });
 
+    const leafAtlas = useTexture(moonlight ? FIDELITY_ART.entranceDoors : dummyTex);
+    const nightLeft = useTextureCopy(leafAtlas, { colorSpace: THREE.SRGBColorSpace, repeatX: 0.483, repeatY: 0.89, offsetX: 0.016, offsetY: 0.055 });
+    const nightRight = useTextureCopy(leafAtlas, { colorSpace: THREE.SRGBColorSpace, repeatX: 0.483, repeatY: 0.89, offsetX: 0.501, offsetY: 0.055 });
+    const doorLeftTexture = moonlight ? nightLeft : dayDoorLeftTexture;
+    const doorRightTexture = moonlight ? nightRight : dayDoorRightTexture;
+    const doorLeftPaintedTexture = moonlight ? nightLeft : dayDoorLeftPaintedTexture;
+    const doorRightPaintedTexture = moonlight ? nightRight : dayDoorRightPaintedTexture;
+
     // 猫的引用。
     const leftPupilRef = useRef();
     const rightPupilRef = useRef();
@@ -131,20 +148,16 @@ const EntranceDoors = ({
     const [isDuckSpeaking, setIsDuckSpeaking] = useState(false);
     const [duckQuote, setDuckQuote] = useState('');
     const speechBubbleRef = useRef();
+    const interactionActions = useRef({});
 
-    // 橡皮鸭调试语录。
-    const duckQuotes = [
-        "试试 console.log() 吧？",
-        "清理过缓存了吗？",
-        "在我电脑上明明能运行！🤷",
-        "试过关闭后重新启动吗？",
-        "会不会是 CSS 的问题？",
-        "看看是不是少了分号！",
-        "仔细看过报错信息了吗？",
-        "试试去 Stack Overflow 找找？",
-        "电源插好了吗？",
-        "生产环境运行正常！🚀",
-    ];
+    useEffect(() => {
+        const interact = event => {
+            const { type, active } = event.detail;
+            interactionActions.current[type]?.(active);
+        };
+        window.addEventListener('entranceInteract', interact);
+        return () => window.removeEventListener('entranceInteract', interact);
+    }, []);
 
     // 处理程序错误图案点击。
     const handleBugClick = (e) => {
@@ -216,9 +229,10 @@ const EntranceDoors = ({
         if (isDuckSpeaking) return; // 已经在说话。
 
         // 随机选择语录。
-        const randomQuote = duckQuotes[Math.floor(Math.random() * duckQuotes.length)];
+        const randomQuote = DUCK_QUOTES[Math.floor(Math.random() * DUCK_QUOTES.length)];
         setDuckQuote(randomQuote);
         setIsDuckSpeaking(true);
+        window.dispatchEvent(new CustomEvent('entranceReaction', { detail: { type: 'duck', message: randomQuote } }));
 
         // 对话气泡缩放进入动画。
         if (speechBubbleRef.current) {
@@ -256,6 +270,7 @@ const EntranceDoors = ({
     // 门尺寸按纹理比例 332×848 计算，约为 1:2.55。
     // 门尺寸按纹理比例 332×848 计算，约为 1:2.55。
     const doorWidth = 0.94;
+    const doorOffsetX = 0;
     const doorHeight = 2.4;
     const doorOpeningWidth = doorWidth * 2; // 两扇门合计。
     const wallThickness = 0.07;
@@ -285,6 +300,7 @@ const EntranceDoors = ({
 
         loadingCameraZ.current = camera.position.z;
         setIsAnimating(true);
+        setEntrancePhase('loading');
         setTagPhase('loading');
         const waitingStarted = performance.now();
         playBackgroundMusic();
@@ -300,6 +316,7 @@ const EntranceDoors = ({
         document.body.style.cursor = 'var(--cursor-default)';
 
         setIsOpen(true);
+        setEntrancePhase('opening');
         unlockAchievement('corridor_enter');
 
         const tl = gsap.timeline({
@@ -346,7 +363,8 @@ const EntranceDoors = ({
             duration: 1.8,
             ease: 'power2.inOut'
         }, 0.3);
-    }, [isOpen, isAnimating, onPrepare, onComplete, camera, unlockAchievement, beginRoomLoading, finishRoomLoading, reducedMotion]);
+        if (reducedMotion) tl.timeScale(1000);
+    }, [isOpen, isAnimating, onPrepare, onComplete, camera, unlockAchievement, beginRoomLoading, finishRoomLoading, reducedMotion, setEntrancePhase]);
 
     useEffect(() => {
         const handleKey = event => {
@@ -355,12 +373,15 @@ const EntranceDoors = ({
             void handleClick({ stopPropagation() {} });
         };
         window.addEventListener('keydown', handleKey);
-        return () => window.removeEventListener('keydown', handleKey);
+        const request = () => void handleClick({ stopPropagation() {} });
+        window.addEventListener('entranceRequest', request);
+        return () => { window.removeEventListener('keydown', handleKey); window.removeEventListener('entranceRequest', request); };
     }, [handleClick]);
 
     // 悬停时微开门，提示可交互。
     const handlePointerEnter = () => {
         if (isOpen || isAnimating || isMobile) return;
+        if (!leftDoorRef.current || !rightDoorRef.current) return;
         document.body.style.cursor = 'var(--cursor-pointer)';
 
         // 悬停时稍微开门。
@@ -436,6 +457,8 @@ const EntranceDoors = ({
 
     const handlePointerLeave = () => {
         if (isOpen || isAnimating || isMobile) return;
+        // 外观切换卸载旧入口后，R3F 仍可能派发最后一次移出事件。
+        if (!leftDoorRef.current || !rightDoorRef.current) return;
         document.body.style.cursor = 'var(--cursor-default)';
 
         // 重新关门。
@@ -526,15 +549,17 @@ const EntranceDoors = ({
         // 简单映射。
         const targetX = x * MAX_EYE_MOVEMENT * 2;
         const targetY = y * MAX_EYE_MOVEMENT * 2;
+        const leftCenter = [-0.075, 0.28];
+        const rightCenter = [0.043, 0.28];
 
         // 将当前瞳孔位置平滑插值至目标。
         // 左眼原位置：[-0.063, 0.27]。
-        leftPupilRef.current.position.x = THREE.MathUtils.lerp(leftPupilRef.current.position.x, -0.075 + targetX, 0.1);
-        leftPupilRef.current.position.y = THREE.MathUtils.lerp(leftPupilRef.current.position.y, 0.28 + targetY, 0.1);
+        leftPupilRef.current.position.x = THREE.MathUtils.lerp(leftPupilRef.current.position.x, leftCenter[0] + targetX, 0.1);
+        leftPupilRef.current.position.y = THREE.MathUtils.lerp(leftPupilRef.current.position.y, leftCenter[1] + targetY, 0.1);
 
         // 右眼原位置：[0.0615, 0.27]。
-        rightPupilRef.current.position.x = THREE.MathUtils.lerp(rightPupilRef.current.position.x, 0.043 + targetX, 0.1);
-        rightPupilRef.current.position.y = THREE.MathUtils.lerp(rightPupilRef.current.position.y, 0.28 + targetY, 0.1);
+        rightPupilRef.current.position.x = THREE.MathUtils.lerp(rightPupilRef.current.position.x, rightCenter[0] + targetX, 0.1);
+        rightPupilRef.current.position.y = THREE.MathUtils.lerp(rightPupilRef.current.position.y, rightCenter[1] + targetY, 0.1);
     });
 
     // 悬挂鼠标摆动动画。
@@ -571,6 +596,7 @@ const EntranceDoors = ({
     const handleWindowEnter = (e) => {
         e.stopPropagation();
         document.body.style.cursor = 'var(--cursor-pointer)';
+        window.dispatchEvent(new CustomEvent('entranceReaction', { detail: { type: 'window', active: true } }));
 
         if (windowAvatarRef.current) {
             gsap.to(windowAvatarRef.current.position, {
@@ -591,6 +617,7 @@ const EntranceDoors = ({
     const handleWindowLeave = (e) => {
         e.stopPropagation();
         document.body.style.cursor = 'var(--cursor-default)';
+        window.dispatchEvent(new CustomEvent('entranceReaction', { detail: { type: 'window', active: false } }));
 
         if (windowAvatarRef.current) {
             gsap.to(windowAvatarRef.current.position, {
@@ -608,10 +635,20 @@ const EntranceDoors = ({
         }
     };
 
+    useEffect(() => {
+        const event = { stopPropagation() {} };
+        interactionActions.current = {
+            window: active => (active ? handleWindowEnter : handleWindowLeave)(event),
+            door: active => (active ? handlePointerEnter : handlePointerLeave)(event),
+            duck: () => handleDuckClick(event),
+            bug: () => handleBugClick(event),
+        };
+    });
+
     // 门框中心 Y，与门对齐。
     const frameCenterY = doorBottomY + frameHeight / 2;
 
-    const facadeYOffset = -1.65;
+    const facadeZ = 0.15;
 
 
     const pathWidth = frameWidth + 0.4;
@@ -620,8 +657,9 @@ const EntranceDoors = ({
     const pathLength = 5.62;
 
     return (
-        <group ref={groupRef} position={[position[0], 0, position[2]]}>
-
+        <group ref={groupRef} name="entrance-doors" position={[position[0], 0, position[2]]}>
+            <CourtyardFloor floorY={floorY} facadeZ={facadeZ} />
+            <MoonlitWindow />
             <EntranceInvitation visible={invitationVisible && !isAnimating} floorY={floorY} />
 
             {/* 入口前方上层的石板路地面。 */}
@@ -639,30 +677,25 @@ const EntranceDoors = ({
 
 
             {/* 左侧墙面板。 */}
-            <mesh position={[-(doorOpeningWidth / 2 + sideWallWidth / 2), wallCenterY, 0]}>
+            <mesh position={[-(doorOpeningWidth / 2 + sideWallWidth / 2), wallCenterY, 0]} userData={{ worldSurface: 'wall' }}>
                 <boxGeometry args={[sideWallWidth, corridorHeight, wallThickness]} />
                 <meshBasicMaterial color="#e0e0e0" roughness={0.95} />
             </mesh>
 
             {/* 右侧墙面板。 */}
-            <mesh position={[(doorOpeningWidth / 2 + sideWallWidth / 2), wallCenterY, 0]}>
+            <mesh position={[(doorOpeningWidth / 2 + sideWallWidth / 2), wallCenterY, 0]} userData={{ worldSurface: 'wall' }}>
                 <boxGeometry args={[sideWallWidth, corridorHeight, wallThickness]} />
                 <meshBasicMaterial color="#e0e0e0" roughness={0.95} />
             </mesh>
 
             {/* 顶部墙面板。 */}
-            <mesh position={[0, topWallCenterY, 0]}>
+            <mesh position={[0, topWallCenterY, 0]} userData={{ worldSurface: 'wall' }}>
                 <boxGeometry args={[doorOpeningWidth, topWallHeight, wallThickness]} />
                 <meshBasicMaterial color="#e0e0e0" roughness={0.95} />
             </mesh>
 
             {/* 砖墙立面。 */}
-            {/* 
-                图片纹理调节：
-                1. args={[宽度, 高度]}：图片尺寸。
-                2. facadeYOffset：上下偏移，如 -1 下移、1 上移。
-            */}
-            <mesh position={[0, wallCenterY + facadeYOffset + 1.65, 0.15]}>
+            <mesh position={[0, wallCenterY, facadeZ]}>
                 {/* 修改 args={[宽度, 高度]} 中的数值，例如 7、8。 */}
                 <planeGeometry args={[16., 8]} />
                 <meshBasicMaterial color="#e0e0e0"
@@ -686,7 +719,17 @@ const EntranceDoors = ({
             </mesh>
 
             {/* 左门。 */}
-            <group ref={leftDoorRef} position={[-doorWidth, doorCenterY, 0]}>
+            {!isOpen && <mesh
+                position={[doorOffsetX, doorCenterY, 0.14]}
+                onClick={handleClick}
+                onPointerEnter={handlePointerEnter}
+                onPointerLeave={handlePointerLeave}
+            >
+                {/* 补齐双扇门之间的点击空隙，点门中央也能进入。 */}
+                <planeGeometry args={[0.12, doorHeight]} />
+                <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+            </mesh>}
+            <group ref={leftDoorRef} position={[-doorWidth + doorOffsetX, doorCenterY, 0]}>
                 {/* 带边缘纹理的实体三维门体。 */}
                 <mesh
                     position={[doorWidth / 2, 0, 0.06]}
@@ -703,7 +746,7 @@ const EntranceDoors = ({
                     <mesh position={[doorWidth / 2, 0, 0.088]}>
                         <planeGeometry args={[doorWidth, doorHeight]} />
                         <meshBasicMaterial color="#e0e0e0"
-                            map={doorLeftPaintedTexture}
+                            map={doorLeftPaintedTexture} toneMapped={!moonlight}
                             transparent={true}
                             alphaTest={0.5}
                             roughness={0.8}
@@ -714,7 +757,7 @@ const EntranceDoors = ({
                 {/* 左门的前方速写叠加层，使用笔刷显现。 */}
                 <mesh position={[doorWidth / 2, 0, 0.09]}>
                     <planeGeometry args={[doorWidth, doorHeight]} />
-                    <revealMaterial color="#e0e0e0"
+                    <revealMaterial color={moonlight ? '#f1e7dc' : '#e0e0e0'} toneMapped={!moonlight}
                         ref={leftDoorMaterialRef}
                         map={doorLeftTexture}
                         transparent={true}
@@ -724,6 +767,7 @@ const EntranceDoors = ({
                         uProgress={0.0}
                     />
                 </mesh>
+
 
                 {/* 镜像背面纹理平面。 */}
                 <mesh position={[doorWidth / 2, 0, 0.03]} rotation={[0, Math.PI, 0]} scale={[-1, 1, 1]}>
@@ -739,6 +783,8 @@ const EntranceDoors = ({
 
                 {/* 把手动画层，以螺丝中心为轴；332×848 纹理中的 (292,459)。 */}
                 <group ref={leftHandleRef} position={[doorWidth / 2 + 0.357, -0.099, 0.10]}>
+                    <group visible={moonlight}><EntranceHardware /></group>
+                    <group visible={!moonlight}>
                     {/* 彩色把手位于后方，悬停前隐藏。 */}
                     {!isMobile && (
                         <mesh ref={leftHandlePaintedRef} position={[-0.357, 0.09, -0.001]} visible={false}>
@@ -763,6 +809,7 @@ const EntranceDoors = ({
                             uProgress={0.0}
                         />
                     </mesh>
+                    </group>
                 </group>
                 {tagPhase && <DoorLoadingTag
                     phase={tagPhase}
@@ -774,7 +821,7 @@ const EntranceDoors = ({
             </group>
 
             {/* 右门。 */}
-            <group ref={rightDoorRef} position={[doorWidth, doorCenterY, 0]}>
+            <group ref={rightDoorRef} position={[doorWidth + doorOffsetX, doorCenterY, 0]}>
                 {/* 带边缘纹理的实体三维门体。 */}
                 <mesh
                     position={[-doorWidth / 2, 0, 0.06]}
@@ -791,7 +838,7 @@ const EntranceDoors = ({
                     <mesh position={[-doorWidth / 2, 0, 0.088]}>
                         <planeGeometry args={[doorWidth, doorHeight]} />
                         <meshBasicMaterial color="#e0e0e0"
-                            map={doorRightPaintedTexture}
+                            map={doorRightPaintedTexture} toneMapped={!moonlight}
                             transparent={true}
                             alphaTest={0.5}
                             roughness={0.8}
@@ -802,7 +849,7 @@ const EntranceDoors = ({
                 {/* 前方速写叠加层通过笔刷丢弃露出底层彩色图。 */}
                 <mesh position={[-doorWidth / 2, 0, 0.09]}>
                     <planeGeometry args={[doorWidth, doorHeight]} />
-                    <revealMaterial color="#e0e0e0"
+                    <revealMaterial color={moonlight ? '#f1e7dc' : '#e0e0e0'} toneMapped={!moonlight}
                         ref={rightDoorMaterialRef}
                         map={doorRightTexture}
                         transparent={true}
@@ -826,6 +873,8 @@ const EntranceDoors = ({
 
                 {/* 把手动画层，以螺丝中心为轴；332×848 纹理中的 (40,459)。 */}
                 <group ref={rightHandleRef} position={[-doorWidth / 2 - 0.357, -0.099, 0.10]}>
+                    <group visible={moonlight}><EntranceHardware mirror /></group>
+                    <group visible={!moonlight}>
                     {/* 彩色把手位于后方，悬停前隐藏。 */}
                     {!isMobile && (
                         <mesh ref={rightHandlePaintedRef} position={[0.357, 0.09, -0.001]} visible={false}>
@@ -850,6 +899,7 @@ const EntranceDoors = ({
                             uProgress={0.0}
                         />
                     </mesh>
+                    </group>
                 </group>
             </group>
 
@@ -1000,11 +1050,6 @@ const EntranceDoors = ({
             >
                 问题已修复！
             </Text>
-
-
-
-
-
             {/* 左侧树与悬挂鼠标。 */}
             <group position={[-2.9, floorY + 2.7, 1]}>
                 {/* 树。 */}
@@ -1070,7 +1115,6 @@ const EntranceDoors = ({
                     <meshBasicMaterial color="black" />
                 </mesh>
             </group>
-
         </group>
     );
 };

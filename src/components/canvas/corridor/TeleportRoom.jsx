@@ -1,16 +1,8 @@
 import { useScene } from '../../../context/contexts';
+import { corridorDoorZ } from '../../../config/corridorLayout';
 import { memo, useEffect, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 
-
-// 门位置：第 0 段的全局 Z。
-// 计算：10（起点 Z）+ 相对 Z + 2（门偏移）。
-const DOOR_POSITIONS_Z = {
-    'gallery': -6,   // 10 - 18 + 2
-    'studio': -20,   // 10 - 32 + 2
-    'about': -36,    // 10 - 48 + 2
-    'contact': -50   // 10 - 62 + 2
-};
 
 /**
  * TeleportRoom 传送房间组件。
@@ -37,7 +29,7 @@ const TeleportRoom = memo(() => {
     // 进入 teleporting 阶段时定位相机。
     useEffect(() => {
         if (teleportPhase === 'teleporting' && teleportTarget && !hasPositioned.current) {
-            const doorZ = DOOR_POSITIONS_Z[teleportTarget];
+            const doorZ = corridorDoorZ(teleportTarget);
 
             if (doorZ !== undefined) {
                 // 相机位于门前 8 单位，即 +Z 方向。

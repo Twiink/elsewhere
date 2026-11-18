@@ -1,17 +1,18 @@
 import { media } from '../media';
 import { AudioContext } from './contexts';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { readStorage, writeStorage } from '../utils/storage';
 
 export const AudioProvider = ({ children }) => {
     // 持久保存静音偏好。
     const [isMuted, setIsMuted] = useState(() => {
-        const saved = localStorage.getItem('audio_muted');
+        const saved = readStorage('audio_muted');
         return saved === 'true';
     });
 
     // 持久保存音量偏好，范围 0.0 至 1.0。
     const [globalVolume, setGlobalVolume] = useState(() => {
-        const saved = localStorage.getItem('audio_volume');
+        const saved = readStorage('audio_volume');
         return saved !== null ? parseFloat(saved) : 0.5;
     });
 
@@ -21,8 +22,8 @@ export const AudioProvider = ({ children }) => {
     const activeSounds = useRef({});
 
     useEffect(() => {
-        localStorage.setItem('audio_muted', isMuted);
-        localStorage.setItem('audio_volume', globalVolume);
+        writeStorage('audio_muted', isMuted);
+        writeStorage('audio_volume', globalVolume);
 
         // 更新全部活动声音。
         Object.values(activeSounds.current).forEach(audio => {

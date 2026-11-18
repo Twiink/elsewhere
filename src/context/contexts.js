@@ -4,6 +4,7 @@ export const PerformanceContext = createContext(null);
 export const SceneContext = createContext(null);
 export const AchievementsContext = createContext();
 export const SecretsContext = createContext();
+export const WorldThemeContext = createContext(null);
 export const AudioContext = createContext({
   isMuted: false,
   toggleMute() {},
@@ -29,3 +30,4 @@ export function useScene() {
 export const useAudio = () => useContext(AudioContext);
 export const useAchievements = () => useContext(AchievementsContext);
 export const useSecrets = () => useContext(SecretsContext);
+export const useWorldTheme = () => useContext(WorldThemeContext);

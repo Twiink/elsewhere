@@ -1,4 +1,4 @@
-import { useAudio, usePerformance, useScene, useSecrets } from './context/contexts';
+import { useAudio, usePerformance, useScene, useSecrets, useWorldTheme } from './context/contexts';
 import { useState, Suspense, useEffect, useCallback, lazy } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { PerformanceMonitor, useProgress } from '@react-three/drei';
@@ -27,6 +27,9 @@ import { WebGLRenderer } from 'three';
 import RoomLoadingNotice from './components/dom/RoomLoadingNotice';
 import PaperPlaneCursor from './components/dom/PaperPlaneCursor';
 import SecretControls from './components/ui/SecretControls';
+import { WorldThemeProvider } from './context/WorldThemeContext';
+import WorldTheme from './components/dom/WorldTheme';
+import EntranceInteractions from './components/dom/EntranceInteractions';
 
 // WebGL 上下文的创建选项保持稳定；可切换的抗锯齿由 AdaptiveQuality 处理。
 const createSceneRenderer = options => {
@@ -36,6 +39,7 @@ const createSceneRenderer = options => {
 };
 
 const Experience = lazy(() => import('./components/canvas/Experience'));
+const WorldAppearance = lazy(() => import('./components/canvas/WorldAppearance'));
 const AdaptiveQuality = lazy(() => import('./components/canvas/AdaptiveQuality'));
 const GlobalOverlay = lazy(() => import('./components/ui/GlobalOverlay'));
 const AboutProfile = lazy(() => import('./components/ui/AboutProfile'));
@@ -100,6 +104,7 @@ function RoomPanels() {
 
 function AppContent() {
   const { draftPhase } = useSecrets();
+  const { theme } = useWorldTheme();
   const [isLoaded, setIsLoaded] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
   const [entranceRevealing, setEntranceRevealing] = useState(false);
@@ -154,6 +159,7 @@ function AppContent() {
     <DocumentMetaBridge />
     <GlobalAudioEnabler />
     <div className="app">
+      <WorldTheme />
       <div className="canvas-wrapper">
         <Canvas
           frameloop={pageVisible ? 'always' : 'never'}
@@ -167,11 +173,13 @@ function AppContent() {
           <PerformanceMonitor onDecline={downgradeTier} flipflops={3} onFallback={downgradeTier} />
           <Suspense fallback={null}><AdaptiveQuality /></Suspense>
           <Suspense fallback={null}>
+            {theme === 'moonlight' && <WorldAppearance />}
             <Experience onSceneReady={handleSceneReady} onError={reportLoadingError} invitationVisible={entranceRevealing || isLoaded} />
           </Suspense>
         </Canvas>
       </div>
       {isLoaded && <>
+        <EntranceInteractions />
         <NavigationUI />
         <SecretControls />
         {draftPhase && <Suspense fallback={<div className="draft-loading" role="status">在翻开草稿间……</div>}><DraftRoom /></Suspense>}
@@ -185,16 +193,21 @@ function AppContent() {
   </>;
 }
 
+function EntranceSession() {
+  const { entranceRevision } = useWorldTheme();
+  return <SceneProvider key={entranceRevision}><AppContent /></SceneProvider>;
+}
+
 export default function App() {
   return <SceneErrorBoundary>
-    <PerformanceProvider>
+    <WorldThemeProvider><PerformanceProvider>
       <AudioProvider>
         <AchievementsProvider>
           <SecretsProvider>
-            <SceneProvider><AppContent /></SceneProvider>
+            <EntranceSession />
           </SecretsProvider>
         </AchievementsProvider>
       </AudioProvider>
-    </PerformanceProvider>
+    </PerformanceProvider></WorldThemeProvider>
   </SceneErrorBoundary>;
 }

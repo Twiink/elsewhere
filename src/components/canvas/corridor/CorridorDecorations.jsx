@@ -10,6 +10,7 @@ import gsap from 'gsap';
 import '../shaders/RevealMaterial';
 import { isTouchDevice } from '../../../utils/deviceDetect';
 import { HiddenFrameCorner } from './CorridorSurprises';
+import { useWorldTheme } from '../../../context/contexts';
 /**
  * CorridorDecorations：走廊装饰。
  * 
@@ -33,7 +34,7 @@ const tempQuat = new THREE.Quaternion();
 
 const CABIN_SKETCH_URL = '/media/fonts/LXGWWenKaiLite-site.woff';
 
-const PictureContent = ({ imagePath, imagePaintedPath, width, height, isPainted }) => {
+const PictureContent = ({ imagePath, imagePaintedPath, width, height, isPainted, isNight }) => {
     const [texture, paintedTexture] = useTexture([imagePath, imagePaintedPath || imagePath]);
 
     const materialRef = useRef();
@@ -41,7 +42,7 @@ const PictureContent = ({ imagePath, imagePaintedPath, width, height, isPainted 
     useEffect(() => {
         if (!materialRef.current || !imagePaintedPath) return;
 
-        if (isPainted) {
+        if (isPainted || isNight) {
             gsap.to(materialRef.current, {
                 uProgress: 1.0,
                 duration: 0.8,
@@ -56,26 +57,28 @@ const PictureContent = ({ imagePath, imagePaintedPath, width, height, isPainted 
                 overwrite: true
             });
         }
-    }, [isPainted, imagePaintedPath]);
+    }, [isPainted, imagePaintedPath, isNight]);
 
     return (
         <group position={[0, 0, 0.01]}> {/* 略微位于画框前方。 */}
             {imagePaintedPath && (
                 <mesh position={[0, 0, -0.001]}>
                     <planeGeometry args={[width, height]} />
-                    <meshBasicMaterial color="#e0e0e0"
+                    <meshBasicMaterial color={isNight ? '#ffffff' : '#e0e0e0'}
                         map={paintedTexture}
                         transparent={true}
                         alphaTest={0.5}
                         side={THREE.DoubleSide}
                         roughness={0.9}
+                        toneMapped={!isNight}
+                        userData={{ worldPreserveColor: isNight }}
                     />
                 </mesh>
             )}
             <mesh position={[0, 0, 0]}>
                 <planeGeometry args={[width, height]} />
                 {imagePaintedPath ? (
-                    <revealMaterial color="#e0e0e0"
+                    <revealMaterial color={isNight ? '#ffffff' : '#e0e0e0'}
                         ref={materialRef}
                         map={texture}
                         transparent={true}
@@ -83,14 +86,17 @@ const PictureContent = ({ imagePath, imagePaintedPath, width, height, isPainted 
                         side={THREE.DoubleSide}
                         roughness={0.9}
                         uProgress={0.0}
+                        toneMapped={!isNight}
                     />
                 ) : (
-                    <meshBasicMaterial color="#e0e0e0"
+                    <meshBasicMaterial color={isNight ? '#ffffff' : '#e0e0e0'}
                         map={texture}
                         transparent={true}
                         alphaTest={0.1} // 关键：修复透明效果，去除背景。
                         side={THREE.DoubleSide}
                         roughness={0.5}
+                        toneMapped={!isNight}
+                        userData={{ worldPreserveColor: isNight }}
                     />
                 )}
             </mesh>
@@ -100,6 +106,8 @@ const PictureContent = ({ imagePath, imagePaintedPath, width, height, isPainted 
 
 const InspectableFrame = ({ frame, wallX, frameTexture, framePaintedTexture, CABIN_SKETCH_URL, setCameraOverride }) => {
     const { camera, viewport } = useThree();
+    const { theme } = useWorldTheme();
+    const isNight = theme === 'moonlight';
     const groupRef = useRef();
     const frameMaterialRef = useRef();
     const framePaintedRef = useRef();
@@ -108,14 +116,14 @@ const InspectableFrame = ({ frame, wallX, frameTexture, framePaintedTexture, CAB
 
     // 保存墙面上的原始位置与旋转。
     const originalPos = useMemo(() => new THREE.Vector3(
-        frame.side === 'left' ? -wallX + (frame.offsetFromWall || 0) : wallX - (frame.offsetFromWall || 0),
+        frame.x ?? (frame.side === 'left' ? -wallX + (frame.offsetFromWall || 0) : wallX - (frame.offsetFromWall || 0)),
         frame.y,
         frame.z
     ), [frame, wallX]);
 
     const originalRot = useMemo(() => new THREE.Euler(
-        0, frame.side === 'left' ? Math.PI / 2 : -Math.PI / 2, 0
-    ), [frame.side]);
+        0, frame.rotationY ?? (frame.side === 'left' ? Math.PI / 2 : -Math.PI / 2), 0
+    ), [frame.side, frame.rotationY]);
 
     const [isHovered, setIsHovered] = useState(false);
     const [isInspected, setIsInspected] = useState(false);
@@ -269,12 +277,14 @@ const InspectableFrame = ({ frame, wallX, frameTexture, framePaintedTexture, CAB
             {!isTouch && (
                 <mesh ref={framePaintedRef} position={[0, 0, -0.001]} scale={[0.98, 0.98, 1]}>
                     <planeGeometry args={[frame.width, frame.height]} />
-                    <meshBasicMaterial color="#e0e0e0"
+                    <meshBasicMaterial color={isNight ? '#fff4e2' : '#e0e0e0'}
                         map={framePaintedTexture}
                         transparent={true}
                         alphaTest={0.5}
                         side={THREE.DoubleSide}
                         roughness={0.9}
+                        toneMapped={!isNight}
+                        userData={{ worldPreserveColor: isNight }}
                     />
                 </mesh>
             )}
@@ -282,14 +292,15 @@ const InspectableFrame = ({ frame, wallX, frameTexture, framePaintedTexture, CAB
             {/* 速写画框叠加层，位于前方。 */}
             <mesh position={[0, 0, 0]}>
                 <planeGeometry args={[frame.width, frame.height]} />
-                <revealMaterial color="#e0e0e0"
+                <revealMaterial color={isNight ? '#fff4e2' : '#e0e0e0'}
                     ref={frameMaterialRef}
-                    map={frameTexture}
+                    map={isNight ? framePaintedTexture : frameTexture}
                     transparent={true}
                     alphaTest={0.1}
                     side={THREE.DoubleSide}
                     roughness={0.9}
                     uProgress={0.0}
+                    toneMapped={!isNight}
                 />
             </mesh>
 
@@ -301,6 +312,7 @@ const InspectableFrame = ({ frame, wallX, frameTexture, framePaintedTexture, CAB
                     width={frame.imageWidth || frame.width * 0.7}
                     height={frame.imageHeight || frame.height * 0.7}
                     isPainted={isHovered || isInspected}
+                    isNight={isNight}
                 />
             )}
 
@@ -329,7 +341,7 @@ const InspectableFrame = ({ frame, wallX, frameTexture, framePaintedTexture, CAB
 };
 
 const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corridorHeight = 3.5, zClip = 100000, setCameraOverride }) => {
-
+    const { theme } = useWorldTheme();
     const wallX = corridorWidth / 2 - 0.01;
     const floorY = -corridorHeight / 2;
     const ceilingY = corridorHeight / 2;
@@ -456,6 +468,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
         x: -wallX + 0.42,         // 靠近左墙，距离为 depth/2 加少量间隙。
     }), [zOffset, wallX]);
 
+
     return (
         <group>
             {/* 顶灯。 */}
@@ -463,7 +476,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
                 // 在循环内配置纹理，确保平铺模式正确。
 
                 return (
-                    <group key={`light-${i}`} position={[0, ceilingY, light.z]}>
+                    <group key={`light-${i}`} position={[0, ceilingY, light.z]} visible={theme !== 'moonlight'}>
                         {/* 灯壳：细长的三维长方体。 */}
                         {/* 主体。 */}
                         <mesh position={[0, -0.03, 0]}>

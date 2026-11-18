@@ -1,4 +1,5 @@
 import { media } from '../media';
+import { readStorage } from './storage';
 /**
  * 简单的全局背景音乐管理器。
  */
@@ -12,7 +13,7 @@ export const initAudio = () => {
     if (typeof window === 'undefined') return;
 
     // 从 localStorage 同步静音状态，与 AudioManager 上下文使用同一键。
-    const savedMuted = localStorage.getItem('audio_muted');
+    const savedMuted = readStorage('audio_muted');
     isMuted = savedMuted === 'true';
 
     if (!bgMusicAudio) {

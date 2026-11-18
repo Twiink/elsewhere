@@ -5,13 +5,7 @@ import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 import { useTextureCopy } from '../../../hooks/useTextureCopy';
-
-// 导入常量，以匹配 CorridorSegment 的逻辑。
-// 实际项目中可将这些常量放入共享配置。
-// 此处暂时复制数值，避免循环依赖或复杂导入。
-const WALL_X_OUTER = 3.5;
-const WALL_X_INNER = 1.7;
-// 注意：DOOR_Z_SPAN = 4，来自 CorridorSegment。
+import { WALL_X_OUTER, WALL_X_INNER, CORRIDOR_HEIGHT } from '../../../config/corridorLayout';
 
 /**
  * DoorWallSegment：向相机倾斜的动态墙段。
@@ -136,7 +130,7 @@ const FillerWall = ({ seg, wallTexture, baseboardTexture, corridorHeight }) => {
  * @param {number} zClip - 可选 Z 裁切值，隐藏 Z > zClip 的几何体。
  */
 const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 100000 }) => {
-    const corridorHeight = 3.5;
+    const corridorHeight = CORRIDOR_HEIGHT;
 
     // =============================================
     // 地面设置。

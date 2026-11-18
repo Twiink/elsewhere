@@ -1,5 +1,5 @@
 import { ACHIEVEMENTS } from '../../data/achievements';
-import { useAchievements, useAudio, useScene, useSecrets } from '../../context/contexts';
+import { useAchievements, useAudio, useScene, useSecrets, useWorldTheme } from '../../context/contexts';
 import React from 'react';
 
 
@@ -8,6 +8,7 @@ import '../../styles/AchievementPopup.scss';
 
 const AchievementPopup = () => {
     const { activePopup } = useAchievements();
+    const { theme } = useWorldTheme();
     const { isMuted, toggleMute, setGlobalVolume } = useAudio();
     const { loadingRoom, hasEntered } = useScene();
     const { draftPhase } = useSecrets();
@@ -22,12 +23,13 @@ const AchievementPopup = () => {
 
     // corridor_enter 的特殊逻辑，用于询问是否开启声音。
     const isSoundPrompt = activePopup.id === 'corridor_enter';
+    const isMoonlitScrollHint = theme === 'moonlight' && activePopup.id === 'corridor_explore' && !isCompleted;
     // 点门后收起入口引导，给门上的加载便签留出视野。
     if (draftPhase || (isSoundPrompt && (loadingRoom === 'corridor' || hasEntered || isCompleted || isHiding))) return null;
 
     return (
         <div
-            className={`achievement-popup ${isCompleted ? 'completed' : ''} ${isHiding ? 'hiding' : ''} ${isSoundPrompt ? 'interactive achievement-popup--entry-sound' : ''}`}
+            className={`achievement-popup ${isMoonlitScrollHint ? 'achievement-popup--moonlit-scroll' : ''} ${isCompleted ? 'completed' : ''} ${isHiding ? 'hiding' : ''} ${isSoundPrompt ? 'interactive achievement-popup--entry-sound' : ''}`}
             style={isSoundPrompt ? { pointerEvents: 'auto' } : {}}
         >
             {/* SVG 边框叠加层。 */}
@@ -57,15 +59,14 @@ const AchievementPopup = () => {
                     </div>
                 )}
                 <div className="text-content" style={isSoundPrompt ? { alignItems: 'center', textAlign: 'center' } : {}}>
-                    <span className="title">{data.title}</span>
+                    <span className="title">{isMoonlitScrollHint ? '滚动探索' : data.title}</span>
 
                     {!isSoundPrompt ? (
-                        <span className="description">{data.label}</span>
+                        <span className="description">{isMoonlitScrollHint ? <svg viewBox="0 0 24 18" aria-hidden="true"><path d="M4 3l8 6 8-6M4 10l8 6 8-6" /></svg> : data.label}</span>
                     ) : (
                         <span className="description">
-                            声音
                             <button
-                                className={`inline-sound-toggle ${!isMuted ? 'on' : 'off'}`}
+                                className={`nav-btn inline-sound-toggle ${!isMuted ? 'on' : 'off'}`}
                                 aria-label={isMuted ? '开启声音' : '关闭声音'}
                                 aria-pressed={!isMuted}
                                 onClick={(e) => {
@@ -88,7 +89,11 @@ const AchievementPopup = () => {
                                     }
                                 }}
                             >
-                                {!isMuted ? " [🔊 已开启]" : " [🔇 已关闭]"}
+                                <svg viewBox="0 0 28 28" aria-hidden="true">
+                                    <path d="M5 11H9L14 7V21L9 17H5Z" />
+                                    {isMuted ? <path d="M19 11L24 17M24 11L19 17" /> : <><path d="M18 10Q23 14 18 18" /><path d="M21 6Q29 14 21 22" /></>}
+                                </svg>
+                                <span>声音</span>
                             </button>
                         </span>
                     )}

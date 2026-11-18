@@ -1,6 +1,6 @@
 import { useTexture } from '../../../../hooks/useMediaTexture';
 import { localImagePath, media } from '../../../../media';
-import { useScene, useAchievements, useAudio } from '../../../../context/contexts';
+import { useScene, useAchievements, useAudio, useWorldTheme } from '../../../../context/contexts';
 import Text from '../../SiteText';
 import { useRef, useState, useMemo, useEffect, useCallback, forwardRef, useImperativeHandle, memo } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -71,6 +71,8 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
         }
     }, [effectiveVolume]);
 
+    const { theme } = useWorldTheme();
+    const moonlight = theme === 'moonlight';
     const groupRef = useRef();
     const targetScroll = useRef(0);
     const currentScroll = useRef(0);
@@ -193,7 +195,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     // 所有独立纹理在同一次加载中发起，避免各组 Suspense 依次等待。
     const textureGroups = useMemo(() => ({
         projects: activeProjects.map(project => project.front),
-        painted: activeProjects.map(project => canHover && project.painted ? project.painted : project.front),
+        painted: activeProjects.map(project => (canHover || moonlight) && project.painted ? project.painted : project.front),
         notebook: Object.values(NOTEBOOK_ASSETS),
         sprites: NOTEBOOK_FEATURE_SPRITES,
         logos: allLogos,
@@ -206,7 +208,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
             '/media/images/textures/gallery/klamerka.webp',
             '/media/images/textures/corridor/texturadoprogow.webp',
         ],
-    }), [activeProjects, canHover, allLogos]);
+    }), [activeProjects, canHover, allLogos, moonlight]);
     // 最终使用的是下面的颜色/采样副本，由 StartupReady 统一预热。
     const allTextures = useTexture(Object.values(textureGroups).flat(), undefined, { upload: false });
     const loaded = useMemo(() => {
@@ -278,7 +280,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 ...projectData,
                 index: projectIndex,
                 frontTexture: frontTex,
-                paintedTexture: (paintedTex !== frontTex && canHover) ? paintedTex : null,
+                paintedTexture: (paintedTex !== frontTex && (canHover || moonlight)) ? paintedTex : null,
                 backTexture: colorTextures.get(backTextureRaw),
                 buttonTexture: colorTextures.get(buttonRaw),
                 cardIllustrationTexture: cardIllustrations[projectIndex],
@@ -286,7 +288,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                 techStack: techStack
             };
         });
-    }, [activeProjects, projectTextures, paintedTextures, canHover, backTextureRaw, colorTextures, buttonRaw, cardIllustrations, notebookIcons]);
+    }, [activeProjects, projectTextures, paintedTextures, canHover, moonlight, backTextureRaw, colorTextures, buttonRaw, cardIllustrations, notebookIcons]);
 
     // 滚动到指定项目索引的函数。
     const scrollToIndex = (index, onComplete) => {

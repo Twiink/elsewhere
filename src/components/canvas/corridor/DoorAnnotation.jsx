@@ -1,12 +1,13 @@
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { BufferGeometry, Float32BufferAttribute, MathUtils } from 'three';
+import { useWorldTheme } from '../../../context/contexts';
 import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
 import Text from '../SiteText';
-import { DOOR_ANNOTATIONS } from '../../../config/doorAnnotations';
+import { getDoorAnnotation } from '../../../config/doorAnnotations';
 
 const CHARACTERS = '进来看看布展中…请进翻翻手记整理认识一下准备聊';
-const INK = '#454440';
+const INK = { paper: '#454440', moonlight: '#533a31' };
 
 function lineGeometry(points) {
     const geometry = new BufferGeometry();
@@ -15,7 +16,9 @@ function lineGeometry(points) {
 }
 
 export default function DoorAnnotation({ doorId, phase = 'idle', matrix, visible = true }) {
-    const config = DOOR_ANNOTATIONS[doorId];
+    const { theme } = useWorldTheme();
+    const config = getDoorAnnotation(doorId, theme);
+    const ink = INK[theme];
     const idleText = useRef();
     const loadingText = useRef();
     const readyText = useRef();
@@ -51,15 +54,15 @@ export default function DoorAnnotation({ doorId, phase = 'idle', matrix, visible
 
     return <group name={`${doorId}-door-annotation`} matrix={matrix} matrixAutoUpdate={false} visible={visible} userData={{ phase, doorId }}>
         <Suspense fallback={null}>
-            <Text ref={idleText} renderOrder={2} characters={CHARACTERS} fontSize={config.fontSize} scale={[config.textScaleX ?? 1, 1, 1]} color={INK} anchorX="center" anchorY="middle" position={[config.textX ?? -0.05, 0, 0]} material-transparent material-opacity={0.94} material-depthWrite={false} material-toneMapped={false}>{config.idle}</Text>
-            <Text ref={loadingText} renderOrder={2} characters={CHARACTERS} fontSize={config.fontSize} scale={[config.textScaleX ?? 1, 1, 1]} color={INK} anchorX="center" anchorY="middle" position={[config.textX ?? -0.05, 0, 0]} material-transparent material-opacity={0} material-depthWrite={false} material-toneMapped={false}>{config.loading}</Text>
-            <Text ref={readyText} renderOrder={2} characters={CHARACTERS} fontSize={config.fontSize} scale={[config.textScaleX ?? 1, 1, 1]} color={INK} anchorX="center" anchorY="middle" position={[config.readyX ?? -0.025, 0, 0]} material-transparent material-opacity={0} material-depthWrite={false} material-toneMapped={false}>请进</Text>
+            <Text ref={idleText} renderOrder={2} characters={CHARACTERS} fontSize={config.fontSize} scale={[config.textScaleX ?? 1, 1, 1]} color={ink} anchorX="center" anchorY="middle" position={[config.textX ?? -0.05, 0, 0]} material-transparent material-opacity={0.94} material-depthWrite={false} material-toneMapped={false}>{config.idle}</Text>
+            <Text ref={loadingText} renderOrder={2} characters={CHARACTERS} fontSize={config.fontSize} scale={[config.textScaleX ?? 1, 1, 1]} color={ink} anchorX="center" anchorY="middle" position={[config.textX ?? -0.05, 0, 0]} material-transparent material-opacity={0} material-depthWrite={false} material-toneMapped={false}>{config.loading}</Text>
+            <Text ref={readyText} renderOrder={2} characters={CHARACTERS} fontSize={config.fontSize} scale={[config.textScaleX ?? 1, 1, 1]} color={ink} anchorX="center" anchorY="middle" position={[config.readyX ?? -0.025, 0, 0]} material-transparent material-opacity={0} material-depthWrite={false} material-toneMapped={false}>请进</Text>
         </Suspense>
         <line name={`${doorId}-annotation-stroke`} geometry={drawings.stroke} position={[config.strokeX ?? 0.15, config.strokeY ?? -0.003, 0]} scale={config.strokeScale ?? 1} renderOrder={2}>
-            <lineBasicMaterial ref={strokeMaterial} color={INK} transparent opacity={0.66} depthWrite={false} toneMapped={false} />
+            <lineBasicMaterial ref={strokeMaterial} color={ink} transparent opacity={0.66} depthWrite={false} toneMapped={false} />
         </line>
         <line name={`${doorId}-annotation-arrow`} geometry={drawings.arrow} position={[config.arrowX ?? 0.08, -0.003, 0]} scale={config.arrowScale ?? 1} renderOrder={2}>
-            <lineBasicMaterial ref={arrowMaterial} color={INK} transparent opacity={0} depthWrite={false} toneMapped={false} />
+            <lineBasicMaterial ref={arrowMaterial} color={ink} transparent opacity={0} depthWrite={false} toneMapped={false} />
         </line>
     </group>;
 }

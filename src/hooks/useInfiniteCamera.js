@@ -6,14 +6,12 @@ import { Observer } from 'gsap/all';
 gsap.registerPlugin(Observer);
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { CORRIDOR_DOORS } from '../config/corridorLayout';
 
 
 // 用于自动侧看的门位置。
 const DOOR_POSITIONS = [
-    { z: -18, side: 'left' },
-    { z: -32, side: 'right' },
-    { z: -48, side: 'left' },
-    { z: -62, side: 'right' },
+    ...CORRIDOR_DOORS.map(door => ({ z: door.relativeZ, side: door.side })),
     { z: -69, side: 'left', startDistance: 8, peakDistance: 5, glanceScale: 4 },
 ];
 

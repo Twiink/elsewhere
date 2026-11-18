@@ -33,8 +33,8 @@ const NATURAL_TILE_W = (1582 / 94) * 0.15;
  * 缓存房间几何体，减少重复渲染并提升性能。
  * 包含过渡走廊和尽头的大房间。
  */
-const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
-    const { corridorWidth, corridorHeight, corridorDepth, roomWidth, roomHeight, roomDepth } = ROOM_CONFIG;
+const RoomInterior = memo(({ label, showRoom, onReady, isExiting, corridorWidth = ROOM_CONFIG.corridorWidth, corridorHeight = ROOM_CONFIG.corridorHeight }) => {
+    const { corridorDepth, roomWidth, roomHeight, roomDepth } = ROOM_CONFIG;
     const halfDepth = corridorDepth / 2;
     const roomZ = -corridorDepth - roomDepth / 2;
 

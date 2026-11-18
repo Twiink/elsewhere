@@ -1,5 +1,6 @@
 import { useTexture } from '../../../hooks/useMediaTexture';
-import { usePerformance } from '../../../context/contexts';
+import { usePerformance, useWorldTheme } from '../../../context/contexts';
+import { useTextureCopy } from '../../../hooks/useTextureCopy';
 import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
 import { useRef } from 'react';
 import { useThree } from '@react-three/fiber';
@@ -24,9 +25,11 @@ const Doodles = () => {
     const { tier } = usePerformance();
     const isLowTier = tier === 'LOW';
     const isNarrow = useThree(state => state.size.width < 640);
+    const { theme } = useWorldTheme();
+    const isMoonlight = theme === 'moonlight';
 
     // 加载全部速写纹理。
-    const textures = useTexture({
+    const originalTextures = useTexture({
         paperBall: '/media/images/textures/corridor/decorations/paper_ball.webp',
         paperAirplane: '/media/images/textures/corridor/decorations/paper_airplane.webp',
         pencil: '/media/images/textures/corridor/decorations/pencil.webp',
@@ -34,16 +37,23 @@ const Doodles = () => {
     });
 
     // 设置所有纹理的色彩空间。
-    Object.values(textures).forEach(tex => {
+    Object.values(originalTextures).forEach(tex => {
         tex.colorSpace = THREE.SRGBColorSpace;
     });
+    const atlas = useTexture(isMoonlight ? '/media/images/textures/moonlight/fidelity/doodles-atlas-v2.webp' : '/media/images/textures/corridor/decorations/paper_ball.webp');
+    const paperBall = useTextureCopy(atlas, { colorSpace: THREE.SRGBColorSpace, repeatX: 0.5, repeatY: 0.5, offsetX: 0, offsetY: 0.5 });
+    const paperAirplane = useTextureCopy(atlas, { colorSpace: THREE.SRGBColorSpace, repeatX: 0.5, repeatY: 0.5, offsetX: 0.5, offsetY: 0.5 });
+    const pencil = useTextureCopy(atlas, { colorSpace: THREE.SRGBColorSpace, repeatX: 0.5, repeatY: 0.5, offsetX: 0, offsetY: 0 });
+    const coffeeCup = useTextureCopy(atlas, { colorSpace: THREE.SRGBColorSpace, repeatX: 0.5, repeatY: 0.5, offsetX: 0.5, offsetY: 0 });
+    const textures = isMoonlight ? { paperBall, paperAirplane, pencil, coffeeCup } : originalTextures;
 
     return (
-        <group ref={groupRef}>
+        <group ref={groupRef} name="corridor-doodles">
             {/* 放大的纸飞机，位于头顶。 */}
-            <PaperPlaneTrick position={[0.5, 0.8, 0.3]} width={0.55 * textures.paperAirplane.image.width / textures.paperAirplane.image.height} height={0.55}>
+            <PaperPlaneTrick position={[0.5, 0.8, 0.3]} width={0.55 * originalTextures.paperAirplane.image.width / originalTextures.paperAirplane.image.height} height={0.55}>
                 <SketchElement
                     texture={textures.paperAirplane}
+                    aspectRatio={originalTextures.paperAirplane.image.width / originalTextures.paperAirplane.image.height}
                     position={[0, 0, 0]}
                     scale={0.55}
                     rotationSpeed={0.15}
@@ -55,6 +65,7 @@ const Doodles = () => {
             {/* 放大的纸团，位于“创意开发者”文字左下方。 */}
             <SketchElement
                 texture={textures.paperBall}
+                aspectRatio={originalTextures.paperBall.image.width / originalTextures.paperBall.image.height}
                 position={[-0.9, -0.7, 0.4]}
                 scale={0.4}
                 rotationSpeed={0.4}
@@ -65,6 +76,7 @@ const Doodles = () => {
             {/* 第二个大纸团，位于左上方。 */}
             <SketchElement
                 texture={textures.paperBall}
+                aspectRatio={originalTextures.paperBall.image.width / originalTextures.paperBall.image.height}
                 position={[-1.3, 0.5, -0.2]}
                 scale={0.3}
                 rotationSpeed={-0.3}
@@ -75,6 +87,7 @@ const Doodles = () => {
             {/* 放大的铅笔，位于“创意开发者”文字下方。 */}
             <SketchElement
                 texture={textures.pencil}
+                aspectRatio={originalTextures.pencil.image.width / originalTextures.pencil.image.height}
                 position={[0.7, -0.8, 0.5]}
                 scale={0.5}
                 rotationSpeed={0.1}
@@ -84,9 +97,10 @@ const Doodles = () => {
             />
 
             {/* 放大的咖啡杯，位于右上方。 */}
-            <CoffeeSteam position={isNarrow ? [0.65, 0.55, -0.1] : [1.2, 0.6, -0.1]} width={0.35 * textures.coffeeCup.image.width / textures.coffeeCup.image.height} height={0.35}>
+            <CoffeeSteam position={isNarrow ? [0.65, 0.55, -0.1] : [1.2, 0.6, -0.1]} width={0.35 * originalTextures.coffeeCup.image.width / originalTextures.coffeeCup.image.height} height={0.35}>
                 <SketchElement
                     texture={textures.coffeeCup}
+                    aspectRatio={originalTextures.coffeeCup.image.width / originalTextures.coffeeCup.image.height}
                     position={[0, 0, 0]}
                     scale={0.35}
                     rotationSpeed={0.05}
@@ -125,6 +139,7 @@ const Doodles = () => {
  */
 const SketchElement = ({
     texture,
+    aspectRatio = texture.image ? texture.image.width / texture.image.height : 1,
     position,
     scale = 0.3,
     rotationSpeed = 0.1,
@@ -134,7 +149,6 @@ const SketchElement = ({
 }) => {
     const ref = useRef();
     const reducedMotion = useReducedMotion();
-    const aspectRatio = texture.image ? texture.image.width / texture.image.height : 1;
     const dimensions = { width: scale * aspectRatio, height: scale };
 
     useFrame((state) => {

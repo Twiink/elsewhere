@@ -1,0 +1,140 @@
+
+.world-entry-controls {
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    right: max(24px, env(safe-area-inset-right));
+}
+
+.nav-btn.world-theme-toggle {
+    flex-direction: column;
+    gap: 1px;
+    padding-top: 5px;
+    color: #1a1a1a;
+    svg { width: 20px; height: 20px; }
+    span { font-family: '霞鹜文楷', serif; font-size: 11px; line-height: 1.2; }
+    &:focus-visible { outline: 3px solid #38234d; outline-offset: 4px; }
+    &:disabled { cursor: progress; }
+}
+
+.app .achievement-popup.achievement-popup--entry-sound { top: 0; right: max(86px, calc(env(safe-area-inset-right) + 62px)); padding: 0; }
+.app .achievement-popup.achievement-popup--entry-sound .text-content .description .inline-sound-toggle {
+    flex-direction: column;
+    gap: 1px;
+    width: 50px;
+    height: 55px;
+    min-width: 0;
+    padding: 5px 0 0;
+    color: #1a1a1a;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font-family: '霞鹜文楷', serif;
+    font-size: 11px;
+    line-height: 1.2;
+    svg { width: 20px; height: 20px; }
+    &:focus-visible { outline: 3px solid #38234d; outline-offset: 4px; }
+}
+
+html[data-world-theme='moonlight'] {
+    background: #8589a5;
+    body { background-color: #8589a5; color: #211e33; }
+    .nav-btn { color: #6a4637; }
+    .nav-btn svg { stroke: #6a4637; }
+    .nav-btn::before { background: #f6e6cb url('/media/images/textures/paper-texture.webp') center / cover; background-blend-mode: multiply; }
+    .scroll-hint__text, .scroll-hint__arrow { color: #28263f; }
+    .preloader__half { background-color: #a9a6bc !important; background-blend-mode: multiply; }
+    .preloader__status { color: #493e62; }
+    .preloader__percentage { color: #493e62 !important; }
+    .map-panel, .audio-panel, .achievements-card { background-color: #f2e5d4; color: #443e50; background-blend-mode: multiply; }
+    .about-profile-trigger, .studio-notes-trigger { background-color: #f8e8d0; color: #57425b; border-color: #bba5a8; box-shadow: 0 4px 16px rgb(36 29 63 / 15%); }
+    .about-profile-dialog { background-color: #f5eddf; border-color: #b4a2ac; --profile-ink: #3e3846; --profile-muted: #65566c; --profile-rule: #c8b8bf; }
+    .about-profile-paper { background-color: #f5ecdf; background-blend-mode: multiply; }
+    .project-details-dialog { --profile-ink: #3e3846; --profile-muted: #65566c; --profile-rule: #c8b8bf; }
+    dialog::backdrop { background: rgb(32 35 62 / 62%); }
+    .project-tabs button { background-color: #e7dce7; border-color: #bda8bc; color: #59465c; }
+    .project-tabs button[aria-current] { background-color: #f1d7b2; color: #58412f; }
+    .project-chapters a[aria-current], .about-profile-nav a:hover, .about-profile-nav a:focus-visible { background-color: #ead9d9; color: #59415b; }
+    ::selection { background: #e1bbca; color: #362b48; }
+}
+
+html[data-world-theme='moonlight'] .achievement-popup.achievement-popup--moonlit-scroll {
+    width: 270px;
+    min-height: 90px;
+    bottom: 22px;
+    padding: 17px 30px 14px;
+    background: url('/media/images/textures/moonlight/fidelity/scroll-ribbon.webp') center / 100% 100% no-repeat;
+    clip-path: none;
+    &::before, .popup-border, .checkbox { display: none; }
+    .popup-content { width: 100%; justify-content: center; }
+    .text-content { align-items: center; }
+    .title { color: #674631; font-size: 19px; letter-spacing: 2px; }
+    .description svg { width: 24px; height: 18px; fill: none; stroke: #674631; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+    html[data-world-theme='moonlight'] .achievement-popup.achievement-popup--moonlit-scroll {
+        width: 164px;
+        min-height: 54px;
+        bottom: 5px;
+        padding: 9px 19px 8px;
+        .title { font-size: 13px; letter-spacing: 1px; }
+        .description svg { width: 16px; height: 12px; }
+    }
+}
+
+@media (max-width: 600px) {
+    .world-entry-controls { right: max(12px, env(safe-area-inset-right)); }
+    .world-entry-controls .nav-btn { width: 44px; }
+    .app .nav-controls { right: max(12px, env(safe-area-inset-right)); gap: 4px; }
+    .app .nav-controls .nav-btn { width: 44px; }
+    .app .back-btn { left: 12px; width: 44px; }
+    .app .achievement-popup.achievement-popup--entry-sound { right: max(60px, calc(env(safe-area-inset-right) + 48px)); }
+    .app .achievement-popup.achievement-popup--entry-sound .text-content .description .inline-sound-toggle { width: 44px; }
+}
+
+
+.entrance-keyboard-controls {
+    position: fixed;
+    z-index: 110;
+    left: 50%;
+    bottom: 16px;
+    translate: -50% calc(100% + 32px);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    width: min(720px, calc(100% - 24px));
+    pointer-events: none;
+    &:focus-within { translate: -50% 0; pointer-events: auto; }
+    button {
+        min-height: 44px;
+        padding: 8px 14px;
+        border: 1px solid #bba5a8;
+        background: #f8e8d0 url('/media/images/textures/paper-texture.webp') center / cover;
+        color: #443e50;
+        font-size: 14px;
+        &:focus-visible { outline: 3px solid #38234d; outline-offset: 3px; }
+    }
+}
+.entrance-announcement { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+.world-floral-frame {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    &::before, &::after {
+        content: '';
+        position: absolute;
+        width: min(24vw, 320px);
+        height: min(28vw, 370px);
+        background: url('/media/images/textures/moonlight/floral-corner-v1.webp') top left / contain no-repeat;
+    }
+    &::before { top: -20px; left: -20px; }
+    &::after { bottom: -35px; right: -25px; rotate: 180deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .world-theme-toggle { transition: none; }
+}

@@ -8,6 +8,8 @@ export function createTextureCache(loadImage) {
         get(url) {
             if (!entries.has(url)) {
                 const texture = new Texture();
+                texture.name = url;
+                texture.userData.sourceUrl = url;
                 const promise = Promise.resolve().then(() => loadImage(url)).then(image => {
                     texture.image = image;
                     texture.needsUpdate = true;

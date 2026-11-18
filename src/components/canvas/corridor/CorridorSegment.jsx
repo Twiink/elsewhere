@@ -2,7 +2,6 @@ import Text from '../SiteText';
 import { useMemo, memo } from 'react';
 
 import { useThree } from '@react-three/fiber';
-import * as THREE from 'three';
 
 import CorridorWalls from './CorridorWalls';
 import DoorSection from './DoorSection';
@@ -12,6 +11,7 @@ import HeroText from './HeroText';
 import Doodles from './Doodles';
 import CorridorDecorations from './CorridorDecorations';
 import SecretDoor from './SecretDoor';
+import { CORRIDOR_DOORS, SEGMENT_LENGTH, CORRIDOR_START_Z, WALL_X_OUTER, WALL_X_INNER, DOOR_Z_SPAN } from '../../../config/corridorLayout';
 
 /**
  * CorridorSegment 走廊分段组件。
@@ -22,16 +22,6 @@ import SecretDoor from './SecretDoor';
  * 每段长度：80 单位。
  * 位置由 segmentIndex × segmentLength 决定。
  */
-const SEGMENT_LENGTH = 80;
-
-// 锯齿形几何常量，与 CorridorWalls 的逻辑保持一致。
-const WALL_X_OUTER = 3.5;
-const WALL_X_INNER = 1.7;
-const DOOR_Z_SPAN = 4;
-// 墙面相对于走廊轴的角度。
-const WALL_ANGLE = Math.atan2(WALL_X_OUTER - WALL_X_INNER, DOOR_Z_SPAN);
-
-
 const CorridorSegment = ({
     segmentIndex = 0,
     onDoorEnter,
@@ -39,78 +29,22 @@ const CorridorSegment = ({
     zClip = 100000, // 裁切平面，只渲染 Z < zClip 的内容。
     setCameraOverride // 接管相机控制的函数。
 }) => {
-    const isNarrow = useThree(state => state.size.width < 640);
+    const size = useThree(state => state.size);
+    const isNarrow = size.width < 640;
 
     // 按分段索引计算 Z 偏移。
     // 第 0 段从 Z=10 延伸至 Z=-70。
-    const zOffset = 10 - (segmentIndex * SEGMENT_LENGTH);
+    const zOffset = CORRIDOR_START_Z - (segmentIndex * SEGMENT_LENGTH);
 
     // 当前分段内的门位置，相对于分段起点。
-    const doors = useMemo(() => {
-        const doorDefs = [
-            {
-                id: `gallery-${segmentIndex}`,
-                roomId: 'gallery',
-                relativeZ: -18,
-                side: 'left',
-                label: "作品画廊",
-                icon: '◈',
-                color: '#f5efe6'
-            },
-            {
-                id: `studio-${segmentIndex}`,
-                roomId: 'studio',
-                relativeZ: -32,
-                side: 'right',
-                label: "生活手记",
-                icon: '▶',
-                color: '#e6f5ef'
-            },
-            {
-                id: `about-${segmentIndex}`,
-                roomId: 'about',
-                relativeZ: -48,
-                side: 'left',
-                label: "关于我",
-                icon: '★',
-                color: '#efe6f5',
-                enterDistance: 25 // 深入房间，云层位于远处。
-            },
-            {
-                id: `connect-${segmentIndex}`,
-                roomId: 'contact',
-                relativeZ: -62,
-                side: 'right',
-                label: "联系我",
-                icon: '✉',
-                color: '#f5e6e6'
-            },
-        ];
-
-        return doorDefs.map(def => {
-            // 计算锯齿形墙面对应的位置与旋转。
-            const xBase = (WALL_X_OUTER + WALL_X_INNER) / 2; // 倾斜墙面的中点。
-            const xPos = def.side === 'left' ? -xBase : xBase;
-
-            // 旋转：
-            // 左墙原法线为 (1,0,0)，Y 轴旋转 90°；现在向相机（+Z）倾斜。
-            // 顺时针旋转 WALL_ANGLE。
-            // 右墙原法线为 (-1,0,0)，Y 轴旋转 -90°；现在向相机（+Z）倾斜。
-            // 逆时针旋转 WALL_ANGLE。
-
-            const baseRot = def.side === 'left' ? Math.PI / 2 : -Math.PI / 2;
-            const rotOffset = def.side === 'left' ? -WALL_ANGLE : WALL_ANGLE;
-
-            return {
-                ...def,
-                x: xPos,
-                rotation: baseRot + rotOffset
-            };
-        });
-    }, [segmentIndex]);
+    const doors = useMemo(() => CORRIDOR_DOORS.map(door => ({
+        ...door,
+        id: `${door.roomId}-${segmentIndex}`,
+        x: (door.side === 'left' ? -1 : 1) * (WALL_X_OUTER + WALL_X_INNER) / 2,
+    })), [segmentIndex]);
 
     return (
-        <group position={[0, 0, 0]}>
+        <group name={`corridor-segment-${segmentIndex}`} position={[0, 0, 0]}>
             {/* 走廊墙面。 */}
             {/* 传入门位置，让墙面正确生成缺口与角度。 */}
             <CorridorWalls

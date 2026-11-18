@@ -25,3 +25,16 @@ export const DOOR_ANNOTATIONS = {
         paper: [[0.408, 0.325], [0.643, 0.326], [0.765, 0.382], [0.576, 0.412]],
     },
 };
+
+// 墨迹贴在平整的木横梁上。关于我的门使用底部横梁，避开蕾丝。
+const MOONLIGHT_ANNOTATIONS = Object.fromEntries(Object.entries(DOOR_ANNOTATIONS).map(([id, config]) => [id, {
+    ...config,
+    uv: [0.5, id === 'about' ? 0.937 : 0.515], rotation: 0, fontSize: 0.095,
+    textX: -0.035, textScaleX: 1, readyX: -0.025,
+    strokeX: 0.19, strokeY: -0.003, strokeScale: 0.65,
+    arrowX: 0.08, arrowScale: 0.8,
+}]));
+
+export function getDoorAnnotation(doorId, theme = 'paper') {
+    return (theme === 'moonlight' ? MOONLIGHT_ANNOTATIONS : DOOR_ANNOTATIONS)[doorId];
+}

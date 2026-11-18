@@ -1,6 +1,6 @@
 import { useTexture } from '../../../hooks/useMediaTexture';
 import { media } from '../../../media';
-import { useScene, useAudio } from '../../../context/contexts';
+import { useScene, useAudio, useWorldTheme } from '../../../context/contexts';
 import { prefetchRoom, ROOM_LABELS } from '../../../config/roomResources';
 import { startLoadingTimeout } from '../../../utils/loadingTimeout';
 import { useActiveFrame as useFrame } from '../../../hooks/useActiveFrame';
@@ -13,22 +13,20 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import RoomInterior from './RoomInterior';
 import DoorAnnotation from './DoorAnnotation';
-import { DOOR_ANNOTATIONS } from '../../../config/doorAnnotations';
+import { getDoorAnnotation } from '../../../config/doorAnnotations';
 import { useGalleryDoorTexture } from '../../../hooks/useGalleryDoorTexture';
 import { useDoorArtworkTexture } from '../../../hooks/useDoorArtworkTexture';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
 import { useTextureCopy } from '../../../hooks/useTextureCopy';
+import { WALL_X_OUTER, DOOR_Z_SPAN, CORRIDOR_HEIGHT, WALL_LENGTH, BASE_WALL_ANGLE } from '../../../config/corridorLayout';
+import { FIDELITY_ART } from '../../../config/fidelityArtwork';
+import { MOONLIT_DOOR_COLUMNS } from './moonlitCorridor';
+import WatercolorSconce, { WatercolorHandle } from './WatercolorSconce';
 import '../shaders/RevealMaterial'; // 注册使用透明度丢弃的显现着色器。
 
 
 
 import { isTouchDevice } from '../../../utils/deviceDetect';
-
-// 来自 CorridorSegment 的常量。
-const WALL_X_OUTER = 3.5;
-const WALL_X_INNER = 1.7;
-const DOOR_Z_SPAN = 4;
-const CORRIDOR_HEIGHT = 3.5;
 
 const DOOR_AUDIO_SETTINGS = {
     hoverVolume: 0.8, // 悬停门时播放的 uchyleniedrzwi 音量。
@@ -38,12 +36,6 @@ const DOOR_AUDIO_SETTINGS = {
     rolloff: 2,       // 声音随距离指数衰减的速度。
     closeDelay: 0.5   // 关门音效播放前的等待秒数。
 };
-
-// 计算锯齿形墙面几何。
-const WALL_DX = WALL_X_OUTER - WALL_X_INNER; // 1.8
-const WALL_DZ = DOOR_Z_SPAN; // 4
-const WALL_LENGTH = Math.sqrt(WALL_DX * WALL_DX + WALL_DZ * WALL_DZ);
-const BASE_WALL_ANGLE = Math.atan2(WALL_DX, WALL_DZ); // 锯齿角度约 24°。
 
 // 相机对齐门时的注视角度，可调节以修正对齐。
 // Math.PI × 0.33 约为 60°。
@@ -86,7 +78,7 @@ const DoorSection = ({
     onEnter,
     enterDistance = 8, // 默认穿行距离。
     setCameraOverride, // 从相机 Hook 接管控制的函数。
-    segmentIndex
+    segmentIndex,
 }) => {
     const groupRef = useRef(); // 执行倾斜的主组。
     const doorRef = useRef();
@@ -107,6 +99,10 @@ const DoorSection = ({
     const readyOpenDelay = useRef(null);
     const reducedMotion = useReducedMotion();
     const { camera, size } = useThree();
+    const { theme } = useWorldTheme();
+    const isMoonlight = theme === 'moonlight';
+    const sectionWidth = WALL_LENGTH;
+    const corridorHeight = CORRIDOR_HEIGHT;
     const loadTimeoutRef = useRef(null);
     const roomReadyRef = useRef(false);
 
@@ -184,37 +180,48 @@ const DoorSection = ({
 
     const doorPaintedTexturePath = DOOR_PAINTED_TEXTURES[label] || DOOR_PAINTED_TEXTURES["作品画廊"];
     const {
-        originalWallTexture, doorTexture, doorPaintedTexture, frameTexture, handleTexture,
+        originalWallTexture, doorTexture, doorPaintedTexture, frameSource, handleTexture,
         handlePaintedTexture, doorBackTexture, arrowTexture, baseboardTexture,
     } = useTexture({
         originalWallTexture: '/media/images/textures/corridor/wall_texture.webp',
         doorTexture: doorTexturePath,
-        doorPaintedTexture: isTouch ? dummyTex : doorPaintedTexturePath,
-        frameTexture: '/media/images/textures/corridor/doors/ramkasingledoors.webp',
+        doorPaintedTexture: isTouch && !isMoonlight ? dummyTex : doorPaintedTexturePath,
+        frameSource: isMoonlight ? FIDELITY_ART.frame : '/media/images/textures/corridor/doors/ramkasingledoors.webp',
         handleTexture: '/media/images/textures/corridor/doors/klamkadodrzwi.webp',
         handlePaintedTexture: isTouch ? dummyTex : '/media/images/textures/corridor/doors/klamkadodrzwi_painted.webp',
         doorBackTexture: '/media/images/textures/corridor/doors/backsingledoors.webp',
         arrowTexture: '/media/images/textures/corridor/strzalka.webp',
         baseboardTexture: '/media/images/textures/corridor/texturadoprogow.webp',
     });
+    // 水彩门框的木边位于图宽约 12%–88%，去掉透明留白后覆盖共同门洞。
+    const frameTexture = useTextureCopy(frameSource, {
+        repeatX: isMoonlight ? 0.84 : 1,
+        offsetX: isMoonlight ? 0.08 : 0,
+    });
+    const atlas = useTexture(isMoonlight ? FIDELITY_ART.doors : dummyTex);
+    const paintedDoor = useTextureCopy(atlas, {
+        colorSpace: THREE.SRGBColorSpace,
+        repeatX: 0.25, offsetX: (MOONLIT_DOOR_COLUMNS[doorId] ?? 0) * 0.25,
+    });
     // 图纸素材仅在 CPU 合绘时使用，无需单独上传 GPU。
     const blueprintTexture = useTexture(doorId === 'gallery' ? '/media/images/textures/corridor/doors/gallery-blueprint-inner-v1.png' : dummyTex, undefined, { upload: false });
-    const galleryBlueprint = doorId === 'gallery' ? blueprintTexture : null;
-    const galleryDoorTexture = useGalleryDoorTexture(doorTexture, galleryBlueprint);
-    const galleryPaintedTexture = useGalleryDoorTexture(doorPaintedTexture, isTouch ? null : galleryBlueprint);
-    const annotation = DOOR_ANNOTATIONS[doorId];
+    const galleryBlueprint = !isMoonlight && doorId === 'gallery' ? blueprintTexture : null;
+    const galleryDoorTexture = useGalleryDoorTexture(isMoonlight ? paintedDoor : doorTexture, galleryBlueprint);
+    const galleryPaintedTexture = useGalleryDoorTexture(isMoonlight ? paintedDoor : doorPaintedTexture, isTouch ? null : galleryBlueprint);
+    const annotation = getDoorAnnotation(doorId, theme);
     const annotationArtwork = useTexture(annotation?.artwork ?? dummyTex, undefined, { upload: false });
-    const artwork = annotation?.artwork ? annotationArtwork : null;
+    const artwork = !isMoonlight && annotation?.artwork ? annotationArtwork : null;
     const annotatedDoorTexture = useDoorArtworkTexture(galleryDoorTexture, artwork, annotation?.paper);
     const annotatedPaintedTexture = useDoorArtworkTexture(galleryPaintedTexture, isTouch ? null : artwork, annotation?.paper);
-
     const wallTexture = useTextureCopy(originalWallTexture, {
         wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping,
+        colorSpace: isMoonlight ? THREE.SRGBColorSpace : originalWallTexture.colorSpace,
         repeatX: 0.5, repeatY: 0.5, offsetX: 0.5, offsetY: 0.5,
     });
 
     // 门区域的踢脚线纹理：1582×94 像素，比例 16.83:1。
-    const doorBoardWidth = (WALL_LENGTH - 1.1) / 2;
+    const doorBoardWidth = (sectionWidth - 1.1) / 2;
+    const doorBoardOffset = (sectionWidth + 1.1) / 4;
     const naturalTileWidth = (1582 / 94) * 0.15;
     const doorBbTexLeft = useTextureCopy(baseboardTexture, {
         wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping,
@@ -238,20 +245,21 @@ const DoorSection = ({
     // 门洞尺寸必须位于墙内。
     const holeWidth = doorWidth - 0.03;
     const holeHeight = doorHeight - 0.1;
-    const holeOffsetY = -0.55; // 与门组的 Y 偏移一致。
+    const holeOffsetY = -0.55;
 
     // 创建带门洞的墙面几何体。
     const wallWithHoleGeometry = useMemo(() => {
         // 创建墙面形状。
         const wallShape = new THREE.Shape();
-        const halfW = WALL_LENGTH / 2;
-        const halfH = CORRIDOR_HEIGHT / 2;
+        const halfW = sectionWidth / 2;
+        const halfH = corridorHeight / 2;
+        const centerY = 0;
 
-        wallShape.moveTo(-halfW, -halfH);
-        wallShape.lineTo(halfW, -halfH);
-        wallShape.lineTo(halfW, halfH);
-        wallShape.lineTo(-halfW, halfH);
-        wallShape.lineTo(-halfW, -halfH);
+        wallShape.moveTo(-halfW, centerY - halfH);
+        wallShape.lineTo(halfW, centerY - halfH);
+        wallShape.lineTo(halfW, centerY + halfH);
+        wallShape.lineTo(-halfW, centerY + halfH);
+        wallShape.lineTo(-halfW, centerY - halfH);
 
         // 创建门洞。
         const holePath = new THREE.Path();
@@ -269,15 +277,15 @@ const DoorSection = ({
         wallShape.holes.push(holePath);
 
         return new THREE.ShapeGeometry(wallShape);
-    }, [holeWidth, holeHeight, holeOffsetY]);
+    }, [holeWidth, holeHeight, holeOffsetY, sectionWidth, corridorHeight]);
 
     useEffect(() => () => wallWithHoleGeometry.dispose(), [wallWithHoleGeometry]);
     useEffect(() => () => handleHideDelayRef.current?.kill(), []);
 
     // 倾斜参数。
     const BASE_ROTATION = Math.PI / 2; // 90°，侧墙朝向。
-    const BASE_TILT = 0.02;   // 额外朝相机倾斜约 1°。
-    const MAX_TILT = BASE_WALL_ANGLE + 0.1; // 锯齿角加额外角度，总倾角约 27°。
+    const BASE_TILT = 0.02;
+    const MAX_TILT = BASE_WALL_ANGLE + 0.1;
     const TILT_START = 15;    // 相机距离 15 单位时开始倾斜。
     const TILT_PEAK = 3;      // 距离 3 单位时达到最大倾角。
 
@@ -286,8 +294,8 @@ const DoorSection = ({
 
     // 墙面相对旋转轴的偏移，由轴向内延伸。
     const wallOffsetX = side === 'left'
-        ? WALL_LENGTH / 2
-        : -WALL_LENGTH / 2;
+        ? sectionWidth / 2
+        : -sectionWidth / 2;
 
     // 强制编译着色器：加载阶段让彩色版本渲染两帧，再隐藏。
     const compileFramesRef = useRef(0);
@@ -510,8 +518,8 @@ const DoorSection = ({
         }
 
         const worldTargetRotationY = side === 'left'
-            ? DOOR_LOOK_ANGLE   // 目标世界角度。
-            : -DOOR_LOOK_ANGLE; // 目标世界角度。
+            ? DOOR_LOOK_ANGLE
+            : -DOOR_LOOK_ANGLE;
 
         // 补偿父级摇摆，使局部旋转保持一致。
         const targetRotationY = worldTargetRotationY - parentRotationY;
@@ -974,18 +982,18 @@ const DoorSection = ({
 
     // 标牌纹理映射，现统一使用空白标牌纹理。
     const signTextureUrl = '/media/images/textures/corridor/pustatabliczka.webp';
-    const signTexture = useTexture(signTextureUrl);
+    const signTexture = useTexture(isMoonlight ? FIDELITY_ART.sign : signTextureUrl);
 
     return (
         // 外组位于墙外边缘的旋转轴处。
         <group position={[pivotX, position[1], position[2]]}>
             {/* 可旋转内组，包含墙面与门。 */}
-            <group ref={groupRef}>
+            <group ref={groupRef} name={`door-bay-${roomId}-${segmentIndex}`}>
+                <WatercolorSconce position={[wallOffsetX + (side === 'left' ? -0.95 : 0.95), 1.25, 0.08]} visible={isMoonlight} />
                 {/* 带门洞的墙段。 */}
                 <mesh position={[wallOffsetX, 0, 0]} geometry={wallWithHoleGeometry}>
-                    <meshBasicMaterial color="#e0e0e0" map={wallTexture} roughness={1} metalness={0} side={THREE.DoubleSide} />
+                    <meshBasicMaterial color="#e0e0e0" map={wallTexture} side={THREE.DoubleSide} />
                 </mesh>
-
                 {/* 箭头装饰。 */}
                 {/* 指向门的左侧箭头。 */}
                 {/* ===================================================
@@ -1034,7 +1042,7 @@ const DoorSection = ({
                 </mesh>
 
                 {/* 门左侧踢脚线。 */}
-                <mesh position={[wallOffsetX - 1.4, -CORRIDOR_HEIGHT / 2 + 0.075, 0.02]}>
+                <mesh position={[wallOffsetX - doorBoardOffset, -CORRIDOR_HEIGHT / 2 + 0.075, 0.02]}>
                     <planeGeometry args={[doorBoardWidth, 0.15]} />
                     <meshBasicMaterial color="#e0e0e0"
                         map={doorBbTexLeft}
@@ -1044,7 +1052,7 @@ const DoorSection = ({
                 </mesh>
 
                 {/* 门右侧踢脚线。 */}
-                <mesh position={[wallOffsetX + 1.4, -CORRIDOR_HEIGHT / 2 + 0.075, 0.02]}>
+                <mesh position={[wallOffsetX + doorBoardOffset, -CORRIDOR_HEIGHT / 2 + 0.075, 0.02]}>
                     <planeGeometry args={[doorBoardWidth, 0.15]} />
                     <meshBasicMaterial color="#e0e0e0"
                         map={doorBbTexRight}
@@ -1087,7 +1095,7 @@ const DoorSection = ({
                         <mesh>
                             {/* 按矩形宽高比调整标牌尺寸。 */}
                             <planeGeometry args={[1.3, 0.65]} />
-                            <meshBasicMaterial color="#e0e0e0"
+                            <meshBasicMaterial color={isMoonlight ? '#ffffff' : '#e0e0e0'} toneMapped={!isMoonlight}
                                 map={signTexture}
                                 transparent={true}
                                 alphaTest={0.1}
@@ -1174,7 +1182,7 @@ const DoorSection = ({
                     {/* 移至 Z=0.04，位于踢脚线 Z=0.02 前方，遮住门洞边缘。 */}
                     <mesh position={[0, -0.1, 0.04]} scale={[side === 'right' ? -1 : 1, 1, 1]}>
                         <planeGeometry args={[frameWidth, frameHeight]} />
-                        <meshBasicMaterial color="#e0e0e0"
+                        <meshBasicMaterial color={isMoonlight ? '#fff4e2' : '#e0e0e0'} toneMapped={!isMoonlight}
                             map={frameTexture}
                             transparent={true}
                             alphaTest={0.1}
@@ -1183,7 +1191,6 @@ const DoorSection = ({
                     </mesh>
 
                     {/* 门内走廊与房间。 */}
-                    {/* 始终渲染走廊，通过 showRoom 延迟加载大房间。 */}
                     <RoomInterior
                         label={label}
                         showRoom={shouldRenderRoom}
@@ -1212,7 +1219,7 @@ const DoorSection = ({
                             scale={[(side === 'right' && label !== "生活手记") ? -1 : 1, 1, 1]}
                         >
                             <planeGeometry args={[doorWidth, doorHeight]} />
-                            <meshBasicMaterial color="#e0e0e0"
+                            <meshBasicMaterial color={isMoonlight ? '#fff5e5' : '#e0e0e0'} toneMapped={!isMoonlight}
                                 map={annotatedPaintedTexture}
                                 transparent={true}
                                 alphaTest={0.5}
@@ -1226,7 +1233,7 @@ const DoorSection = ({
                             scale={[(side === 'right' && label !== "生活手记") ? -1 : 1, 1, 1]}
                         >
                             <planeGeometry args={[doorWidth, doorHeight]} />
-                            <revealMaterial color="#e0e0e0"
+                            <revealMaterial color={isMoonlight ? '#e9dfe2' : '#e0e0e0'} toneMapped={!isMoonlight}
                                 ref={doorMaterialRef}
                                 map={annotatedDoorTexture}
                                 transparent={true}
@@ -1253,7 +1260,9 @@ const DoorSection = ({
                         </mesh>
 
                         {/* 把手层以螺丝位置为旋转轴。 */}
-                        <group ref={handleRef} position={[doorMeshX + (side === 'left' ? 0.45 : -0.45), -0.29, 0.03]}>
+                        <group ref={handleRef} position={[doorMeshX + (side === 'left' ? 1 : -1) * 0.45, -0.29, 0.03]}>
+                            <group visible={isMoonlight}><WatercolorHandle side={side} /></group>
+                            <group visible={!isMoonlight}>
                             {/* 后方彩色把手，两帧后隐藏。 */}
                             <mesh ref={handlePaintedRef} position={[side === 'left' ? -0.50 : 0.50, 0.14, -0.001]} scale={[side === 'right' ? -1 : 1, 1, 1]}>
                                 <planeGeometry args={[doorWidth, doorHeight]} />
@@ -1276,6 +1285,7 @@ const DoorSection = ({
                                     uProgress={0.0}
                                 />
                             </mesh>
+                            </group>
                         </group>
                         {annotation && <DoorAnnotation
                             doorId={doorId}

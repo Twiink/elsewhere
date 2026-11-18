@@ -1,6 +1,6 @@
 import { MediaTextureLoader } from '../../../../media/MediaTextureLoader';
 import { media } from '../../../../media';
-import { useScene, useAchievements, useAudio } from '../../../../context/contexts';
+import { useScene, useAchievements, useAudio, useWorldTheme } from '../../../../context/contexts';
 import { useRef, useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useFrame, useThree, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -613,6 +613,7 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 // 双盒结构：彩色盒位于后方，带 revealMaterial 的速写盒位于前方。
 // ===========================================
 const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled, paintOnBeforeCompile, paintUniforms }) => {
+    const { theme } = useWorldTheme();
     // 父级 useFrame 通过 meshRef 直接更新 position.y。
     const paintedBoxRef = useRef();
     const hideDelayRef = useRef();
@@ -643,7 +644,7 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
     const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
     // 确定彩色正面纹理地址。
-    const paintedFrontTextureUrl = isTouch ? dummyTex : (item.paintedFrontTexture || (
+    const paintedFrontTextureUrl = isTouch && theme !== 'moonlight' ? dummyTex : (item.paintedFrontTexture || (
         isBlogMonitor ? '/media/images/textures/studio/monitor_front_painted.webp' :
             isTvMonitor ? '/media/images/textures/studio/tv_front_painted.webp' :
                 '/media/images/textures/studio/phone_front_painted.webp'
@@ -862,6 +863,7 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
                                 ref={matRefs[i]}
                                 attach={`material-${i}`}
                                 map={face.sketch}
+                                userData={{ worldUnderpainting: i === 4 ? face.painted : undefined }}
                                 transparent={true}
                                 alphaTest={0.1}
                                 paintUniforms={paintUniforms}

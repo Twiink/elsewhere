@@ -5,11 +5,38 @@ import { useThree } from '@react-three/fiber';
 
 import * as THREE from 'three';
 import { siteInfo } from '../../../data/content';
+import { useWorldTheme } from '../../../context/contexts';
+import { useTexture } from '../../../hooks/useMediaTexture';
+import { useTextureCopy } from '../../../hooks/useTextureCopy';
+import { FIDELITY_ART } from '../../../config/fidelityArtwork';
 
 // 品牌字母使用原有字体，中文使用自动生成的 WOFF 子集。
 const RUBIK_SCRIBBLE_URL = '/media/fonts/RubikScribble-Regular.ttf';
 const CABIN_SKETCH_URL = '/media/fonts/LXGWWenKaiLite-site.woff';
+const EMPTY_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
+function TitleLetter({ letter, index, objectRef, night }) {
+    const map = useTextureCopy(useTexture(night ? FIDELITY_ART.title : EMPTY_IMAGE), {
+        colorSpace: THREE.SRGBColorSpace, repeatX: 1 / 3, repeatY: 0.5,
+        offsetX: (index % 3) / 3, offsetY: index < 3 ? 0.5 : 0,
+    });
+    return <group ref={objectRef} position={[letter.baseX, 0.2, 0]}>
+        <Text visible={!night} fontSize={0.74} font={RUBIK_SCRIBBLE_URL} color="#ffffff" outlineWidth={0.012} outlineColor="#1a1a1a" anchorX="center" anchorY="middle" letterSpacing={0}>{letter.char}</Text>
+        <mesh name={`watercolor-letter-${index}`} visible={night} position={[0, 0, 0.01]} raycast={() => null}>
+            <planeGeometry args={[0.68, 0.8]} />
+            <meshBasicMaterial map={map} transparent alphaTest={0.4} depthWrite={false} toneMapped={false} userData={{ worldPreserveColor: true }} />
+        </mesh>
+    </group>;
+}
+
+function TaglinePaper({ night }) {
+    const narrow = useThree(state => state.size.width < 640);
+    const map = useTextureCopy(useTexture(night ? FIDELITY_ART.tagline : EMPTY_IMAGE), { colorSpace: THREE.SRGBColorSpace });
+    return <mesh name="tagline-watercolor-paper" visible={night} position={[0, 0.105, -0.02]} raycast={() => null}>
+        <planeGeometry args={[narrow ? 2.6 : 2.85, 0.8]} />
+        <meshBasicMaterial map={map} transparent alphaTest={0.1} depthWrite={false} toneMapped={false} userData={{ worldPreserveColor: true }} />
+    </mesh>;
+}
 /**
  * HeroText：使用手绘字体的标题组件。
  * 
@@ -25,6 +52,8 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
     const letterRefs = useRef([]);
     const taglineRefs = useRef([]);
     const { camera } = useThree();
+    const { theme } = useWorldTheme();
+    const isMoonlight = theme === 'moonlight';
 
     // 按屏幕宽度连续缩放，不使用断点。
     const [scale, setScale] = useState(1);
@@ -130,35 +159,26 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
     });
 
     return (
-        <group ref={groupRef} position={position} scale={[scale, scale, 1]}>
+        <group ref={groupRef} name="corridor-hero" position={position} scale={[scale, scale, 1]}>
             {/* 昵称字母：保留手绘字体与拆分动画。 */}
-            {letters.map((letter, i) => (
-                <Text
+            {letters.map((letter, i) => <TitleLetter
                     key={`${i}-${letter.char}`}
-                    ref={(el) => (letterRefs.current[i] = el)}
-                    position={[letter.baseX, 0.2, 0]}
-                    fontSize={0.74}
-                    font={RUBIK_SCRIBBLE_URL}
-                    color="#ffffff"
-                    outlineWidth={0.012}
-                    outlineColor="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    letterSpacing={0}
-                >
-                    {letter.char}
-                </Text>
-            ))}
+                    letter={letter} index={i} night={isMoonlight}
+                    objectRef={(el) => (letterRefs.current[i] = el)}
+                />
+            )}
 
             {/* 标语词语：本地中文字体与淡入动画。 */}
-            {taglineWords.map((word, i) => (
-                <Text
+            {taglineWords.map((word, i) => <group
                     key={word.text}
                     ref={(el) => (taglineRefs.current[i] = el)}
                     position={[word.baseX, word.baseY, 0.3]}
+                >
+                {i === 1 && <TaglinePaper night={isMoonlight} />}
+                <Text
                     fontSize={word.fontSize}
                     font={CABIN_SKETCH_URL}
-                    color="#555555"
+                    color={isMoonlight ? '#604033' : '#555555'}
                     anchorX="center"
                     anchorY="middle"
                     maxWidth={2.5}
@@ -167,13 +187,14 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
                 >
                     {word.text}
                 </Text>
-            ))}
+                </group>
+            )}
 
             {/* 标题周围的小涂鸦。 */}
-            <SmallStar position={[-1.2, 0.55, 0]} scale={0.07} />
-            <SmallStar position={[1.25, 0.45, 0]} scale={0.05} />
-            <SmallStar position={[-1.0, -0.6, 0]} scale={0.04} />
-            <SmallStar position={[1.1, -0.55, 0]} scale={0.035} />
+            <SmallStar position={[-1.2, 0.55, 0]} scale={0.07} color={isMoonlight ? '#f6d7a2' : '#333'} />
+            <SmallStar position={[1.25, 0.45, 0]} scale={0.05} color={isMoonlight ? '#f6d7a2' : '#333'} />
+            <SmallStar position={[-1.0, -0.6, 0]} scale={0.04} color={isMoonlight ? '#f6d7a2' : '#333'} />
+            <SmallStar position={[1.1, -0.55, 0]} scale={0.035} color={isMoonlight ? '#f6d7a2' : '#333'} />
         </group>
     );
 };
@@ -185,13 +206,13 @@ const easeOutQuad = (t) => t * (2 - t);
  * 静态小星星装饰，避免 useFrame 开销。
  * 父组件 HeroText 已处理全部动画。
  */
-const SmallStar = ({ position, scale = 0.1 }) => {
+const SmallStar = ({ position, scale = 0.1, color = '#333' }) => {
     return (
         <group position={position} scale={scale}>
             {[0, 1, 2, 3].map((i) => (
                 <mesh key={i} rotation={[0, 0, (i * Math.PI) / 4]}>
                     <planeGeometry args={[1, 0.12]} />
-                    <meshBasicMaterial color="#333" transparent opacity={0.6} side={2} />
+                    <meshBasicMaterial color={color} transparent opacity={color === '#333' ? 0.6 : 0.8} side={2} />
                 </mesh>
             ))}
         </group>

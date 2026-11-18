@@ -1,6 +1,7 @@
 import { forwardRef, useMemo, useRef, useImperativeHandle } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
+import { useWorldTheme } from '../../../../context/contexts';
 
 /**
  * PaperMaterial 纸张材质。
@@ -12,6 +13,8 @@ import { useFrame } from '@react-three/fiber';
  */
 const PaperMaterial = forwardRef(({ color = '#e0e0e0', roughness = 0.6, map, side = THREE.DoubleSide, paintProgress, roomOrigin, ...props }, ref) => {
     const materialRef = useRef();
+    const { theme } = useWorldTheme();
+    const materialData = useMemo(() => ({ worldPreserveColor: true }), []);
 
     // 着色器注入逻辑。
     const onBeforeCompile = useMemo(() => (shader) => {
@@ -22,6 +25,7 @@ const PaperMaterial = forwardRef(({ color = '#e0e0e0', roughness = 0.6, map, sid
         shader.uniforms.mapBack = { value: null }; // 背面纹理。
         shader.uniforms.mapPainted = { value: null }; // 彩色纹理。
         shader.uniforms.uProgress = { value: 0.0 }; // 显现进度。
+        shader.uniforms.uNightSkin = { value: Number(theme === 'moonlight') };
         shader.uniforms.uPaintProgress = paintProgress || { value: 1.0 };
         shader.uniforms.uRoomOrigin = roomOrigin || { value: new THREE.Vector3(0, 0, 0) };
 
@@ -58,6 +62,7 @@ const PaperMaterial = forwardRef(({ color = '#e0e0e0', roughness = 0.6, map, sid
             uniform sampler2D mapBack;
             uniform sampler2D mapPainted;
             uniform float uProgress;
+            uniform float uNightSkin;
             uniform float uPaintProgress;
             uniform vec3 uRoomOrigin;
             varying vec3 vWorldPositionColor;
@@ -82,6 +87,7 @@ const PaperMaterial = forwardRef(({ color = '#e0e0e0', roughness = 0.6, map, sid
             `
             #ifdef USE_MAP
                 vec4 texColor = texture2D( map, vMapUv );
+                if (gl_FrontFacing && uNightSkin > 0.5) texColor.rgb = mix(texColor.rgb, texture2D(mapPainted, vMapUv).rgb, 0.62);
 
                 // 新增笔刷显现逻辑
                 if (gl_FrontFacing && uProgress > 0.001) {
@@ -178,7 +184,7 @@ const PaperMaterial = forwardRef(({ color = '#e0e0e0', roughness = 0.6, map, sid
         if (props.mapPainted && shader.uniforms.mapPainted) {
             shader.uniforms.mapPainted.value = props.mapPainted;
         }
-    }, [props.mapBack, props.mapPainted, paintProgress, roomOrigin]);
+    }, [props.mapBack, props.mapPainted, paintProgress, roomOrigin, theme]);
 
     useImperativeHandle(ref, () => ({
         // bend 的读取与设置接口。
@@ -235,6 +241,7 @@ const PaperMaterial = forwardRef(({ color = '#e0e0e0', roughness = 0.6, map, sid
             roughness={roughness}
             side={side}
             onBeforeCompile={onBeforeCompile}
+            userData={materialData}
             needsUpdate={true}
             {...props}
         />

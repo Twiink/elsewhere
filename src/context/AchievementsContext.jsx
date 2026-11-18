@@ -1,5 +1,6 @@
 import { AchievementsContext } from './contexts';
 import { ACHIEVEMENTS } from '../data/achievements';
+import { writeStorage } from '../utils/storage';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { captureEvent } from '../utils/analytics';
 
@@ -83,7 +84,7 @@ export const AchievementsProvider = ({ children }) => {
     // 已完成成就变化时保存至 localStorage。
     useEffect(() => {
         const toSave = completed.filter(id => id !== 'corridor_enter');
-        localStorage.setItem('itom_achievements', JSON.stringify(toSave));
+        writeStorage('itom_achievements', JSON.stringify(toSave));
     }, [completed]);
 
     const showTutorial = useCallback((id) => {
@@ -106,7 +107,7 @@ export const AchievementsProvider = ({ children }) => {
                 const updated = [...prev, id];
                 // 保存到本地时排除 corridor_enter。
                 const toSave = updated.filter(item => item !== 'corridor_enter');
-                localStorage.setItem('itom_achievements', JSON.stringify(toSave));
+                writeStorage('itom_achievements', JSON.stringify(toSave));
                 return updated;
             });
 

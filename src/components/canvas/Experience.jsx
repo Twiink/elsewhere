@@ -1,9 +1,8 @@
-import { useScene, useSecrets } from '../../context/contexts';
+import { useScene, useSecrets, useWorldTheme } from '../../context/contexts';
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { useThree } from '@react-three/fiber';
 
 import EntranceDoors from './entrance/EntranceDoors';
-import EmptyCorridor from './entrance/EmptyCorridor';
 import StartupReady from './StartupReady';
 import useInfiniteCamera from '../../hooks/useInfiniteCamera';
 import SignSystem from './entrance/SignSystem';
@@ -33,8 +32,9 @@ const Experience = ({ onSceneReady, onError, invitationVisible = false }) => {
     // 使用 SceneContext 管理房间状态。
     const { hasEntered, markEntered, enterRoom, isTeleporting, isInRoom } = useScene();
     const { draftPhase, codeControllerOpen } = useSecrets();
+    const { setEntrancePhase } = useWorldTheme();
 
-    const { camera, gl } = useThree();
+    const { gl } = useThree();
     useEffect(() => registerPreparationRenderer(gl), [gl]);
     const [entranceReady, setEntranceReady] = useState(false);
     const [corridorReady, setCorridorReady] = useState(false);
@@ -76,7 +76,8 @@ const Experience = ({ onSceneReady, onError, invitationVisible = false }) => {
     // 处理入口动画完成事件。
     const handleEntranceComplete = useCallback(() => {
         markEntered();
-    }, [markEntered]);
+        setEntrancePhase('idle');
+    }, [markEntered, setEntrancePhase]);
 
     // 处理从走廊进入房间的事件。
     const handleDoorEnter = useCallback((doorId) => {
@@ -88,15 +89,11 @@ const Experience = ({ onSceneReady, onError, invitationVisible = false }) => {
             {draftPhase && draftPhase !== 'loading' && <Suspense fallback={null}><DraftPortal setCameraOverride={setCameraOverride} /></Suspense>}
             <StartupReady onReady={handleSceneReady} onError={onError} />
 
-            {/* 空走廊：为入口阶段提供环境。 */}
-            {!hasEntered && (
-                <EmptyCorridor camera={camera} />
-            )}
-
+            <group name="entrance-layout" position={[0, 0.2, 0]}>
             {/* 入口门：进入前可见。 */}
             {!hasEntered && (
                 <EntranceDoors
-                    position={[0, 0, ENTRANCE_DOORS_Z]}
+                    position={[0, -0.2, ENTRANCE_DOORS_Z]}
                     onPrepare={prepareCorridor}
                     onComplete={handleEntranceComplete}
                     invitationVisible={invitationVisible}
@@ -105,8 +102,9 @@ const Experience = ({ onSceneReady, onError, invitationVisible = false }) => {
 
             {/* 单独使用 SignSystem，避免片段嵌套问题。 */}
             {!hasEntered && (
-                <SignSystem position={[0, 0, ENTRANCE_DOORS_Z]} />
+            <SignSystem position={[0, -0.2, ENTRANCE_DOORS_Z]} />
             )}
+            </group>
 
             {entranceReady && (
                 <Suspense fallback={null}>

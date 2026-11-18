@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-11T03:37:43.199Z",
-  "title": "Design System: Twiink's Space · 画廊项目手记",
+  "generatedAt": "2026-11-17T02:41:35.912Z",
+  "title": "Design System: Twiink's Space · 月色纸庭与项目手记",
   "extensions": {
     "colorMeta": {
       "honey-bookmark": {
@@ -43,6 +43,446 @@
       "focus-ink": {
         "role": "neutral",
         "displayName": "焦点墨色"
+      },
+      "world-control-ink": {
+        "role": "neutral",
+        "displayName": "纸签石墨"
+      },
+      "world-focus-ink": {
+        "role": "neutral",
+        "displayName": "深紫焦点"
+      },
+      "world-control-shadow": {
+        "role": "neutral",
+        "displayName": "纸签投影色"
+      },
+      "moonlight-bg": {
+        "role": "secondary",
+        "displayName": "雾蓝月色底"
+      },
+      "moonlight-ink": {
+        "role": "neutral",
+        "displayName": "月色基础墨"
+      },
+      "moonlight-nav-ink": {
+        "role": "neutral",
+        "displayName": "夜间暖棕导航墨"
+      },
+      "moonlight-hint-ink": {
+        "role": "neutral",
+        "displayName": "深蓝滚动提示"
+      },
+      "moonlight-preloader": {
+        "role": "secondary",
+        "displayName": "灰紫加载纸"
+      },
+      "moonlight-preloader-ink": {
+        "role": "neutral",
+        "displayName": "加载状态墨"
+      },
+      "moonlight-panel": {
+        "role": "neutral",
+        "displayName": "暖纸面板"
+      },
+      "moonlight-panel-ink": {
+        "role": "neutral",
+        "displayName": "面板深墨"
+      },
+      "moonlight-reader-trigger": {
+        "role": "neutral",
+        "displayName": "阅读入口暖纸"
+      },
+      "moonlight-reader-trigger-ink": {
+        "role": "neutral",
+        "displayName": "阅读入口紫墨"
+      },
+      "moonlight-reader-trigger-rule": {
+        "role": "neutral",
+        "displayName": "阅读入口灰粉边"
+      },
+      "moonlight-reader-trigger-shadow": {
+        "role": "neutral",
+        "displayName": "阅读入口投影色"
+      },
+      "moonlight-profile-dialog": {
+        "role": "neutral",
+        "displayName": "资料模态暖纸"
+      },
+      "moonlight-profile-dialog-rule": {
+        "role": "neutral",
+        "displayName": "资料模态灰粉边"
+      },
+      "moonlight-profile-paper": {
+        "role": "neutral",
+        "displayName": "资料内页暖纸"
+      },
+      "moonlight-reader-ink": {
+        "role": "neutral",
+        "displayName": "阅读深墨"
+      },
+      "moonlight-reader-muted": {
+        "role": "neutral",
+        "displayName": "阅读辅助墨"
+      },
+      "moonlight-reader-rule": {
+        "role": "neutral",
+        "displayName": "阅读灰粉线"
+      },
+      "moonlight-dialog-backdrop": {
+        "role": "neutral",
+        "displayName": "月色模态遮罩"
+      },
+      "moonlight-tab": {
+        "role": "secondary",
+        "displayName": "灰粉纸签"
+      },
+      "moonlight-tab-rule": {
+        "role": "secondary",
+        "displayName": "灰粉纸签边"
+      },
+      "moonlight-tab-ink": {
+        "role": "secondary",
+        "displayName": "灰粉纸签墨"
+      },
+      "moonlight-current-tab": {
+        "role": "secondary",
+        "displayName": "当前杏色纸签"
+      },
+      "moonlight-current-tab-ink": {
+        "role": "secondary",
+        "displayName": "当前纸签棕墨"
+      },
+      "moonlight-selection": {
+        "role": "secondary",
+        "displayName": "玫瑰文本选区"
+      },
+      "moonlight-selection-ink": {
+        "role": "secondary",
+        "displayName": "选区深墨"
+      },
+      "paper-world-bg": {
+        "role": "neutral",
+        "displayName": "浅色场景底"
+      },
+      "moonlight-current-chapter": {
+        "role": "secondary",
+        "displayName": "灰粉目录状态"
+      },
+      "moonlight-current-chapter-ink": {
+        "role": "secondary",
+        "displayName": "目录状态紫墨"
+      },
+      "world-wall-paper": {
+        "role": "neutral",
+        "displayName": "三维 · wall-paper"
+      },
+      "world-wall-accent": {
+        "role": "neutral",
+        "displayName": "三维 · wall-accent"
+      },
+      "world-wall-ink": {
+        "role": "neutral",
+        "displayName": "三维 · wall-ink"
+      },
+      "world-ceiling-paper": {
+        "role": "neutral",
+        "displayName": "三维 · ceiling-paper"
+      },
+      "world-ceiling-accent": {
+        "role": "neutral",
+        "displayName": "三维 · ceiling-accent"
+      },
+      "world-ceiling-ink": {
+        "role": "neutral",
+        "displayName": "三维 · ceiling-ink"
+      },
+      "world-wood-paper": {
+        "role": "neutral",
+        "displayName": "三维 · wood-paper"
+      },
+      "world-wood-accent": {
+        "role": "neutral",
+        "displayName": "三维 · wood-accent"
+      },
+      "world-wood-ink": {
+        "role": "neutral",
+        "displayName": "三维 · wood-ink"
+      },
+      "world-frame-paper": {
+        "role": "neutral",
+        "displayName": "三维 · frame-paper"
+      },
+      "world-frame-accent": {
+        "role": "neutral",
+        "displayName": "三维 · frame-accent"
+      },
+      "world-frame-ink": {
+        "role": "neutral",
+        "displayName": "三维 · frame-ink"
+      },
+      "world-paper-paper": {
+        "role": "neutral",
+        "displayName": "三维 · paper-paper"
+      },
+      "world-paper-accent": {
+        "role": "neutral",
+        "displayName": "三维 · paper-accent"
+      },
+      "world-paper-ink": {
+        "role": "neutral",
+        "displayName": "三维 · paper-ink"
+      },
+      "world-window-paper": {
+        "role": "neutral",
+        "displayName": "三维 · window-paper"
+      },
+      "world-window-accent": {
+        "role": "neutral",
+        "displayName": "三维 · window-accent"
+      },
+      "world-window-ink": {
+        "role": "neutral",
+        "displayName": "三维 · window-ink"
+      },
+      "world-stone-paper": {
+        "role": "neutral",
+        "displayName": "三维 · stone-paper"
+      },
+      "world-stone-accent": {
+        "role": "neutral",
+        "displayName": "三维 · stone-accent"
+      },
+      "world-stone-ink": {
+        "role": "neutral",
+        "displayName": "三维 · stone-ink"
+      },
+      "world-foliage-paper": {
+        "role": "neutral",
+        "displayName": "三维 · foliage-paper"
+      },
+      "world-foliage-accent": {
+        "role": "neutral",
+        "displayName": "三维 · foliage-accent"
+      },
+      "world-foliage-ink": {
+        "role": "neutral",
+        "displayName": "三维 · foliage-ink"
+      },
+      "world-tree-paper": {
+        "role": "neutral",
+        "displayName": "三维 · tree-paper"
+      },
+      "world-tree-accent": {
+        "role": "neutral",
+        "displayName": "三维 · tree-accent"
+      },
+      "world-tree-ink": {
+        "role": "neutral",
+        "displayName": "三维 · tree-ink"
+      },
+      "world-cloud-paper": {
+        "role": "neutral",
+        "displayName": "三维 · cloud-paper"
+      },
+      "world-cloud-accent": {
+        "role": "neutral",
+        "displayName": "三维 · cloud-accent"
+      },
+      "world-cloud-ink": {
+        "role": "neutral",
+        "displayName": "三维 · cloud-ink"
+      },
+      "world-sea-paper": {
+        "role": "neutral",
+        "displayName": "三维 · sea-paper"
+      },
+      "world-sea-accent": {
+        "role": "neutral",
+        "displayName": "三维 · sea-accent"
+      },
+      "world-sea-ink": {
+        "role": "neutral",
+        "displayName": "三维 · sea-ink"
+      },
+      "world-skyline-paper": {
+        "role": "neutral",
+        "displayName": "三维 · skyline-paper"
+      },
+      "world-skyline-accent": {
+        "role": "neutral",
+        "displayName": "三维 · skyline-accent"
+      },
+      "world-skyline-ink": {
+        "role": "neutral",
+        "displayName": "三维 · skyline-ink"
+      },
+      "world-portrait-paper": {
+        "role": "neutral",
+        "displayName": "三维 · portrait-paper"
+      },
+      "world-portrait-accent": {
+        "role": "neutral",
+        "displayName": "三维 · portrait-accent"
+      },
+      "world-portrait-ink": {
+        "role": "neutral",
+        "displayName": "三维 · portrait-ink"
+      },
+      "world-scene-text": {
+        "role": "neutral",
+        "displayName": "三维 · scene-text"
+      },
+      "world-fog": {
+        "role": "neutral",
+        "displayName": "三维 · fog"
+      },
+      "moonlight-nav-paper": {
+        "role": "secondary",
+        "displayName": "夜间导航暖纸"
+      },
+      "moonlight-scroll-ink": {
+        "role": "neutral",
+        "displayName": "卷边提示棕墨"
+      },
+      "courtyard-pupil-ink": {
+        "role": "neutral",
+        "displayName": "猫眼深墨"
+      },
+      "courtyard-dialogue-ink": {
+        "role": "neutral",
+        "displayName": "鸭子语录墨"
+      },
+      "courtyard-door-paper": {
+        "role": "neutral",
+        "displayName": "入口门叶显现色"
+      },
+      "courtyard-door-note-ink": {
+        "role": "neutral",
+        "displayName": "请进文字墨"
+      },
+      "courtyard-hardware-paper": {
+        "role": "neutral",
+        "displayName": "入口把手显现色"
+      },
+      "courtyard-sign-caption": {
+        "role": "neutral",
+        "displayName": "入口招牌副字"
+      },
+      "courtyard-sign-heading": {
+        "role": "neutral",
+        "displayName": "工坊招牌主字"
+      },
+      "corridor-floor-tint": {
+        "role": "neutral",
+        "displayName": "旧木地板乘色"
+      },
+      "corridor-wall-tint": {
+        "role": "neutral",
+        "displayName": "壳层墙面乘色"
+      },
+      "corridor-baseboard-tint": {
+        "role": "neutral",
+        "displayName": "连接墙踢脚线乘色"
+      },
+      "corridor-vault-tint": {
+        "role": "neutral",
+        "displayName": "壳层拱冠乘色"
+      },
+      "corridor-rib-tint": {
+        "role": "neutral",
+        "displayName": "木肋正面乘色"
+      },
+      "corridor-rib-ink": {
+        "role": "neutral",
+        "displayName": "木肋侧面乘色"
+      },
+      "corridor-brass-base": {
+        "role": "neutral",
+        "displayName": "黄铜暗底"
+      },
+      "corridor-brass-glow": {
+        "role": "neutral",
+        "displayName": "黄铜反光"
+      },
+      "corridor-brass-body": {
+        "role": "neutral",
+        "displayName": "黄铜主体"
+      },
+      "corridor-brass-highlight": {
+        "role": "neutral",
+        "displayName": "黄铜高光"
+      },
+      "corridor-brass-keyhole": {
+        "role": "neutral",
+        "displayName": "钥匙孔暗部"
+      },
+      "corridor-room-label": {
+        "role": "neutral",
+        "displayName": "房门吊牌墨"
+      },
+      "corridor-door-frame": {
+        "role": "neutral",
+        "displayName": "奶油门框乘色"
+      },
+      "corridor-door-color": {
+        "role": "neutral",
+        "displayName": "门叶彩色层"
+      },
+      "corridor-door-reveal": {
+        "role": "neutral",
+        "displayName": "门叶显现层"
+      },
+      "corridor-title-caption": {
+        "role": "neutral",
+        "displayName": "标题副行奶油色"
+      },
+      "corridor-tagline-ink": {
+        "role": "neutral",
+        "displayName": "标语木牌墨"
+      },
+      "corridor-title-stars": {
+        "role": "neutral",
+        "displayName": "标题星芒色"
+      },
+      "corridor-floor-paper": {
+        "role": "neutral",
+        "displayName": "地板混合纸色"
+      },
+      "corridor-plaque-chain": {
+        "role": "neutral",
+        "displayName": "门牌链环"
+      },
+      "corridor-contact-shadow": {
+        "role": "neutral",
+        "displayName": "沿路接地阴影"
+      },
+      "corridor-end-shadow": {
+        "role": "neutral",
+        "displayName": "尽头壁龛阴影"
+      },
+      "world-ground-paper": {
+        "role": "neutral",
+        "displayName": "庭院地面 · paper"
+      },
+      "world-ground-accent": {
+        "role": "neutral",
+        "displayName": "庭院地面 · accent"
+      },
+      "world-ground-ink": {
+        "role": "neutral",
+        "displayName": "庭院地面 · ink"
+      },
+      "corridor-note-paper": {
+        "role": "neutral",
+        "displayName": "房门提示纸面"
+      },
+      "corridor-note-ink": {
+        "role": "neutral",
+        "displayName": "房门提示墨色"
+      },
+      "corridor-note-edge": {
+        "role": "neutral",
+        "displayName": "房门提示细边"
       }
     },
     "typographyMeta": {
@@ -65,6 +505,22 @@
       "label": {
         "displayName": "项目书签",
         "purpose": "顶部八个项目的纸签文字。"
+      },
+      "world-control-label": {
+        "displayName": "外观纸签文字",
+        "purpose": "右上外观纸签，与既有霞鹜文楷统一。"
+      },
+      "world-sound-label": {
+        "displayName": "声音纸签文字",
+        "purpose": "入口声音纸签的11px文楷标签，沿用700字重。"
+      },
+      "entrance-keyboard": {
+        "displayName": "入口键盘按钮",
+        "purpose": "Tab 聚焦后显示的14px原生操作条，沿用基础正文字体栈。"
+      },
+      "moonlight-scroll-title": {
+        "displayName": "卷边探索提示",
+        "purpose": "夜间走廊探索成就达成前显示的19px文楷提示，字距2px。"
       }
     },
     "shadows": [
@@ -72,6 +528,16 @@
         "name": "notebook-lift",
         "value": "drop-shadow(0 12px 20px rgb(64 49 28 / 17%))",
         "purpose": "笔记本整体的 filter 投影，沿水彩纸透明轮廓托起阅读页。"
+      },
+      {
+        "name": "world-control-lift",
+        "value": "0 3px 10px rgba(0, 0, 0, 0.1)",
+        "purpose": "共用导航纸签的柔和投影。"
+      },
+      {
+        "name": "moonlight-reader-trigger-lift",
+        "value": "0 4px 16px rgb(36 29 63 / 15%)",
+        "purpose": "月色下的关于和生活手记阅读入口。"
       }
     ],
     "motion": [
@@ -84,6 +550,31 @@
         "name": "bookmark-chapter-state",
         "value": "160ms ease",
         "purpose": "项目书签与章节链接的颜色状态过渡；减少动态分支取消过渡。"
+      },
+      {
+        "name": "world-control-state",
+        "value": "200ms ease",
+        "purpose": "外观纸签沿用导航按钮悬停上移 2px。"
+      },
+      {
+        "name": "shared-door-open",
+        "value": "0.9s power2.out",
+        "purpose": "昼夜共用原有门扇旋转，角度为 ±π×0.55。"
+      },
+      {
+        "name": "shared-camera-entry",
+        "value": "1.8s power2.inOut",
+        "purpose": "原有相机前进；减少动态时整体时间线以 timeScale(1000) 完成。"
+      },
+      {
+        "name": "shared-brush-reveal",
+        "value": "0.8s power2.out / 0.5s power2.out",
+        "purpose": "保留原有门板悬停上色与移开恢复。"
+      },
+      {
+        "name": "shared-window-peek",
+        "value": "0.5s back.out(1.7) / 0.4s power2.in",
+        "purpose": "昼夜沿用同一个三维人物的探出与收回。"
       }
     ],
     "breakpoints": [
@@ -103,8 +594,239 @@
         "name": "notebook-container",
         "value": "1100px",
         "container": "project-notebook"
+      },
+      {
+        "name": "world-controls-compact",
+        "value": "600px"
       }
-    ]
+    ],
+    "worldMaterials": {
+      "source": "src/config/worldAppearance.js",
+      "palettes": {
+        "wall": [
+          "#929bbc",
+          "#7786aa",
+          "#52536f"
+        ],
+        "ceiling": [
+          "#727da6",
+          "#656d97",
+          "#454762"
+        ],
+        "wood": [
+          "#f2dec3",
+          "#d9bdb4",
+          "#80615b"
+        ],
+        "frame": [
+          "#f7e6ce",
+          "#e3c5b0",
+          "#79605a"
+        ],
+        "paper": [
+          "#f6ead8",
+          "#e8cfbf",
+          "#59464d"
+        ],
+        "window": [
+          "#ffe3b3",
+          "#e5bd95",
+          "#82645c"
+        ],
+        "stone": [
+          "#ddd0c6",
+          "#b9adbd",
+          "#82718a"
+        ],
+        "foliage": [
+          "#b8c2a2",
+          "#8d9f93",
+          "#59645f"
+        ],
+        "tree": [
+          "#b8c2a2",
+          "#dfc7b2",
+          "#605c61"
+        ],
+        "cloud": [
+          "#f5e6e5",
+          "#c7c5df",
+          "#9b90ad"
+        ],
+        "sea": [
+          "#a1b0d0",
+          "#788fb8",
+          "#596f99"
+        ],
+        "skyline": [
+          "#b8bad2",
+          "#92a0bf",
+          "#69728e"
+        ],
+        "portrait": [
+          "#f3dfd2",
+          "#e4c2cd",
+          "#5b4559"
+        ],
+        "ground": [
+          "#ada9ae",
+          "#b8ab98",
+          "#797b86"
+        ]
+      },
+      "shader": "src/utils/worldMaterialShader.js",
+      "galleryUnderpainting": 0.62,
+      "studioUnderpainting": 0.72,
+      "dedicatedArtwork": "批准稿的木门图集、花角门框、水彩字母、花牌、暖窗、月云与壁灯；共用模型和交互锚点。",
+      "motionParity": "昼夜共用动画引用、命中区域与相机路径。",
+      "corridorShell": {
+        "source": "src/components/canvas/corridor/CorridorWalls.jsx",
+        "layout": "src/config/corridorLayout.js",
+        "themeInvariant": true
+      },
+      "toneMapping": "水彩覆盖材质使用 toneMapped=false，卸载时恢复原值；真实媒体保留原色。",
+      "corridorWallArtwork": "public/media/images/textures/moonlight/corridor-brick-watercolor-v2.webp",
+      "corridorPlantArtwork": "public/media/images/textures/moonlight/corridor-plant-watercolor-v1.webp",
+      "corridorCeilingArtwork": "public/media/images/textures/moonlight/ceiling-pearl-watercolor-v1.webp",
+      "corridorSurfaceRepeat": [
+        1,
+        1
+      ],
+      "corridorTitleCaption": "#604033"
+    },
+    "sceneLayouts": {
+      "source": "src/config/corridorLayout.js",
+      "themeInvariant": "以原始白天布局为准，共用门位、空间尺寸、命中区和相机路径；夜间以专用水彩图像和灯饰适配这套结构。",
+      "courtyard": {
+        "doorWidth": 0.94,
+        "doorHeight": 2.4,
+        "floorY": -1.75,
+        "entranceZ": 22,
+        "source": "src/components/canvas/entrance/EntranceDoors.jsx"
+      },
+      "corridor": {
+        "halfWidth": 3.5,
+        "height": 3.5,
+        "segmentLength": 80,
+        "doorHeight": 2.5,
+        "frameSize": [
+          1.25,
+          2.5
+        ],
+        "doors": [
+          {
+            "roomId": "gallery",
+            "relativeZ": -18,
+            "side": "left"
+          },
+          {
+            "roomId": "studio",
+            "relativeZ": -32,
+            "side": "right"
+          },
+          {
+            "roomId": "about",
+            "relativeZ": -48,
+            "side": "left"
+          },
+          {
+            "roomId": "contact",
+            "relativeZ": -62,
+            "side": "right"
+          }
+        ],
+        "frameSampling": {
+          "nightU": [
+            0.08,
+            0.92
+          ],
+          "reason": "按木框可见范围配准共用门洞"
+        },
+        "nightDoorNote": {
+          "source": "src/config/doorAnnotations.js / getDoorAnnotation",
+          "uv": [
+            0.5,
+            0.7
+          ],
+          "fontSize": 0.1,
+          "paper": "#fff0d6",
+          "ink": "#454440",
+          "edge": "#b19674",
+          "state": "共用真实加载与就绪状态"
+        }
+      },
+      "title": {
+        "source": "src/components/canvas/corridor/HeroText.jsx",
+        "letterFontSize": 0.74,
+        "scaleRange": [
+          0.65,
+          1
+        ],
+        "subtitleFontSize": 0.26,
+        "taglineFontSize": 0.12,
+        "nightArtwork": "src/config/fidelityArtwork.js / title-letter-atlas.webp",
+        "letterPlane": [
+          0.68,
+          0.8
+        ],
+        "taglinePaper": [
+          2.85,
+          0.8
+        ],
+        "narrowTaglinePaperWidth": 2.6
+      }
+    },
+    "fidelityArtwork": {
+      "directory": "public/media/images/textures/moonlight/",
+      "rasterCount": 42,
+      "generator": "built-in imagegen",
+      "alphaPolicy": "各图透明范围以来源记录为准；透明活动层按实际深度与取样格使用。",
+      "records": [
+        ".impeccable/review/fidelity/entrance-assets.json",
+        ".impeccable/review/fidelity/detail-assets.json",
+        ".impeccable/review/fidelity/corridor-assets.json",
+        ".impeccable/review/fidelity/additional-assets.json",
+        ".impeccable/review/fidelity/refinement-assets.json",
+        ".impeccable/review/fidelity-rebuild/provenance.json",
+        ".impeccable/review/fidelity-rebuild/rebuild-assets.json",
+        ".impeccable/review/door-wall-fixes/assets.json",
+        ".impeccable/review/wall-ceiling-approved/assets.json"
+      ],
+      "restorationDirectory": "public/media/images/textures/moonlight/fidelity/",
+      "restorationRasterCount": 22,
+      "newRastersThisPass": 2,
+      "currentArchitectureAssets": [
+        "WORLD_ART",
+        "WORLD_PALETTES",
+        "EntranceDoors 彩色门图",
+        "DoorSection 彩色门图"
+      ]
+    },
+    "restorationEvidence": {
+      "directory": ".impeccable/review/night-artwork/",
+      "approvedReferences": [
+        ".impeccable/review/fidelity-rebuild/courtyard-approved.png",
+        ".impeccable/review/fidelity-rebuild/corridor-approved.png",
+        ".impeccable/mocks/moonlight-rooms-interior-v1.png"
+      ],
+      "layoutAuthority": "原始白天布局，用户本次明确选择",
+      "status": "23项布局、素材与交互检查，6项昼夜画面差异检查，以及10项生产复测均通过；Lint与构建通过，用户视觉验收待完成。",
+      "captureRecord": ".impeccable/review/night-artwork/checks.json",
+      "productionRecord": ".impeccable/review/night-artwork/production-checks.json"
+    },
+    "doorWallFixes": {
+      "directory": ".impeccable/review/door-wall-fixes/",
+      "record": ".impeccable/review/door-wall-fixes/verification.json",
+      "status": "36项定向与生产检查通过；Lint、构建、素材 RGBA 与发布文件一致性检查通过；用户视觉验收待完成。"
+    },
+    "approvedWallCeiling": {
+      "date": "2026-11-18",
+      "directory": ".impeccable/review/wall-ceiling-approved/",
+      "approval": "用户先看原稿，回复“可以”后接入",
+      "sourcePreview": "assets/texture-previews/wall-ceiling-2026-11-17/preview.json",
+      "verification": ".impeccable/review/wall-ceiling-approved/verification.json",
+      "status": "已接入并查看桌面与手机截图；10项生产检查、模型对照、Lint与构建通过；最终视觉验收待用户确认。"
+    }
   },
   "components": [
     {
@@ -162,18 +884,58 @@
       "description": "宽面板保留双栏；窄面板下，云端PNG封面小图与标题并排，章节和正文各占下方整行。",
       "html": "<div class=\"ds-context\"><div class=\"ds-project-notebook\" style=\"height:min(720px,80vh)\"><article class=\"ds-project-notebook-sheet\"><figure class=\"ds-project-notebook-cover\"><img src=\"https://media.secknow-ai.com/space/textures/gallery/notebook/puffwar-cover.png\" alt=\"泡芙大作战项目插画\" decoding=\"async\"></figure><div class=\"ds-project-reading-sheet\"><header class=\"ds-project-notebook-heading\"><h2>泡芙大作战 PuffWar 乐园</h2><p>一个和线下游乐园搭着一起玩的微信小程序。</p></header><nav class=\"ds-project-chapters\" aria-label=\"项目介绍目录\"><a href=\"#project-story\" aria-current=\"location\">项目介绍</a><a href=\"#project-photos\">现场照片</a><a href=\"#project-contributions\">我做了什么</a><a href=\"#project-entry\">打开小程序</a></nav><div class=\"ds-project-details-body\" tabindex=\"0\" aria-label=\"项目介绍正文\"><p>平时去线下乐园，大多就是到处逛逛、玩玩项目。做「泡芙大作战 PuffWar 乐园」的时候，我们想让逛乐园这件事更像在打一场真人的闯关游戏。</p><h3>在乐园里</h3></div></div></article></div></div>",
       "css": ".ds-context {\n  --profile-ink: #3c382f;\n  --profile-muted: #655f51;\n  --profile-rule: #cbbfa9;\n  --notebook-paper: url('https://media.secknow-ai.com/space/textures/gallery/notebook/paper.png');\n  --notebook-button: url('https://media.secknow-ai.com/space/textures/gallery/notebook/button.png');\n  color: var(--profile-ink);\n  font-family: \"霞鹜文楷\", serif;\n}.ds-context button {\n  background: none;\n  border: none;\n  cursor: pointer;\n  font: inherit;\n  color: inherit;\n}.ds-context a {\n    color: inherit;\n    text-decoration: none;\n}.ds-context :focus-visible {\n  outline: 2px solid #78603b;\n  outline-offset: 3px;\n}.ds-context ::selection {\n  background: #f4dca5;\n  color: #322f29;\n}\n\n.ds-project-notebook {\n  container: project-notebook/inline-size;\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  filter: drop-shadow(0 12px 20px rgba(64, 49, 28, 0.17));\n}\n\n.ds-project-notebook-sheet {\n  position: relative;\n  display: grid;\n  grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr);\n  flex: 1;\n  min-height: 0;\n  gap: 32px;\n  padding: 25px 24px 27px;\n  border: 20px solid transparent;\n  border-image: var(--notebook-paper) 48 fill stretch;\n  margin-top: -2px;\n}\n\n.ds-project-notebook-cover {\n  position: relative;\n  min-width: 0;\n  min-height: 0;\n  max-height: 680px;\n  margin: 0;\n  overflow: hidden;\n  border-radius: 7px 11px 6px 9px;\n}\n\n.ds-project-notebook-cover img {\n  position: absolute;\n  inset: auto 0 0;\n  display: block;\n  width: 100%;\n  height: 135%;\n  object-fit: cover;\n  object-position: center bottom;\n}\n\n.ds-project-reading-sheet {\n  display: flex;\n  flex-direction: column;\n  min-width: 0;\n  min-height: 0;\n}\n\n.ds-project-notebook-heading {\n  flex-shrink: 0;\n  padding: 4px 16px 0 0;\n}\n\n.ds-project-notebook-heading h2 {\n  position: relative;\n  isolation: isolate;\n  width: fit-content;\n  max-width: 100%;\n  margin: 0;\n  font-size: clamp(1.5rem, 2.45vw, 2.25rem);\n  font-weight: 600;\n  line-height: 1.4;\n  text-wrap: balance;\n}\n\n.ds-project-notebook-heading h2::after {\n  content: \"\";\n  position: absolute;\n  z-index: -1;\n  left: 0;\n  bottom: 0.02em;\n  width: min(13em, 72%);\n  height: 0.17em;\n  background: #efd191;\n  border-radius: 45% 21% 40% 18%;\n  transform: rotate(-0.6deg);\n}\n\n.ds-project-notebook-heading p {\n  margin: 0.9rem 0 1.4rem;\n  font-size: 1.13rem;\n  line-height: 1.7;\n  text-wrap: pretty;\n}\n\n.ds-project-chapters {\n  display: flex;\n  flex-shrink: 0;\n  gap: 0.55rem;\n  padding: 0.2rem 3px 0.45rem;\n  overflow-x: auto;\n  overscroll-behavior-x: contain;\n  scroll-padding-inline: 3px;\n}\n\n.ds-project-chapters a {\n  display: inline-flex;\n  flex: 1 0 auto;\n  align-items: center;\n  justify-content: center;\n  min-height: 44px;\n  padding: 0.3rem 0.65rem;\n  border: 1px solid #bfb29a;\n  border-radius: 6px 9px 5px 7px;\n  font-size: 0.98rem;\n  color: var(--profile-ink);\n  white-space: nowrap;\n  text-decoration: none;\n  background: rgba(255, 253, 246, 0.4);\n  transition: background-color 160ms ease;\n}\n\n.ds-project-chapters a:hover {\n  background: #f5ead4;\n}\n\n.ds-project-chapters a[aria-current] {\n  background: #f6dfac var(--notebook-button) center/100% 100%;\n  background-blend-mode: multiply;\n  border-color: #ad956b;\n}\n\n.ds-project-details-body {\n  flex: 1;\n  min-height: 0;\n  padding: 1.35rem 0.45rem 1.4rem 0;\n  overflow-y: auto;\n  overscroll-behavior: contain;\n  scroll-padding-top: 1rem;\n  font-size: 1.04rem;\n  line-height: 1.85;\n}\n\n.ds-project-details-body p {\n  margin: 0 0 0.9rem;\n  overflow-wrap: anywhere;\n}\n\n.ds-project-details-body h3 {\n  width: fit-content;\n  margin: 0 0 0.9rem;\n  padding: 0.05rem 0.45rem;\n  font-size: 1.4rem;\n  font-weight: 600;\n  line-height: 1.45;\n  background: #e5e9cf;\n  border-radius: 7px 3px 9px 4px;\n}\n\n.ds-project-details-body h4 {\n  margin: 0 0 0.3rem;\n  font-size: 1.1rem;\n  line-height: 1.5;\n  font-weight: 600;\n}\n\n@media (max-width: 1024px) {\n  .ds-project-notebook-sheet {\n    grid-template-columns: minmax(0, 0.3fr) minmax(0, 0.7fr);\n    gap: 22px;\n    padding: 20px 14px;\n    border-width: 15px;\n  }\n  .ds-project-notebook-heading h2 {\n    font-size: 1.75rem;\n  }\n}\n\n@container project-notebook (max-width: 1100px) {\n  .ds-project-notebook-sheet {\n    grid-template-columns: clamp(84px, 18cqi, 152px) minmax(0, 1fr);\n    grid-template-rows: auto auto minmax(0, 1fr);\n    gap: 0 24px;\n  }\n  .ds-project-notebook-cover {\n    grid-area: 1/1;\n    align-self: center;\n    width: 100%;\n    max-height: none;\n    aspect-ratio: 1;\n  }\n  .ds-project-reading-sheet {\n    display: contents;\n  }\n  .ds-project-notebook-heading {\n    grid-area: 1/2;\n    align-self: center;\n    padding: 4px 32px 0 0;\n  }\n  .ds-project-notebook-heading h2 {\n    font-size: 1.75rem;\n  }\n  .ds-project-notebook-heading p {\n    margin: 0.65rem 0 0;\n  }\n  .ds-project-chapters {\n    grid-area: 2/1/auto/-1;\n    min-width: 0;\n    margin-top: 1rem;\n  }\n  .ds-project-details-body {\n    grid-area: 3/1/auto/-1;\n    min-width: 0;\n  }\n}\n\n@media (max-width: 700px) {\n  .ds-project-notebook-sheet {\n    column-gap: 14px;\n    padding: 18px 12px 10px;\n    border-width: 12px;\n  }\n  .ds-project-notebook-heading {\n    padding: 0 20px 0 0;\n  }\n  .ds-project-notebook-heading h2 {\n    font-size: 1.55rem;\n    line-height: 1.35;\n  }\n  .ds-project-notebook-heading p {\n    margin: 0.65rem 0 0.85rem;\n    font-size: 1rem;\n    line-height: 1.6;\n  }\n  .ds-project-chapters {\n    gap: 0.4rem;\n    margin-top: 0.85rem;\n    padding-bottom: 0.4rem;\n  }\n  .ds-project-chapters a {\n    font-size: 0.95rem;\n    padding-inline: 0.6rem;\n  }\n  .ds-project-details-body {\n    padding-top: 1rem;\n    font-size: 1rem;\n  }\n}\n\n@media (max-height: 600px) {\n  .ds-project-notebook-sheet {\n    padding-block: 10px;\n    border-block-width: 10px;\n  }\n  .ds-project-notebook-heading h2 {\n    font-size: 1.4rem;\n    line-height: 1.3;\n  }\n  .ds-project-notebook-heading p {\n    margin: 0.4rem 0 0.5rem;\n    font-size: 1rem;\n    line-height: 1.5;\n  }\n  .ds-project-chapters {\n    margin-top: 0.6rem;\n  }\n  .ds-project-details-body {\n    padding-top: 0.6rem;\n  }\n  @container project-notebook (max-width: 1100px) {\n    .ds-project-notebook-sheet {\n      grid-template-columns: clamp(56px, 12cqi, 80px) minmax(0, 1fr);\n      column-gap: 14px;\n    }\n    .ds-project-notebook-cover {\n      align-self: start;\n    }\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .ds-project-chapters a {\n    transition: none;\n  }\n}"
+    },
+    {
+      "name": "外观撕边纸签",
+      "kind": "button",
+      "refersTo": "world-theme-control",
+      "description": "夜间暖纸与棕色图标的外观切换纸签；切换时重播入口。",
+      "html": "<button class=\"ds-world-theme\" type=\"button\" aria-label=\"切换到白天，重新展开入口\" aria-pressed=\"true\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5\"/></svg><span>白天</span></button>",
+      "css": ".ds-world-theme{position:relative;isolation:isolate;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:50px;height:55px;gap:1px;padding:5px 0 0;border:0;border-radius:0;background:transparent;color:#6a4637;font-family:'霞鹜文楷',serif;font-size:11px;line-height:1.2;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:transform .2s ease;cursor:pointer}.ds-world-theme::before,.ds-world-theme::after{content:'';position:absolute;inset:0;z-index:-1}.ds-world-theme::before{background:#f6e6cb url('/media/images/textures/paper-texture.webp') center/cover;background-blend-mode:multiply;clip-path:polygon(0% 0%,100% 0%,98% 10%,100% 20%,97% 35%,100% 50%,98% 65%,100% 80%,97% 90%,100% 100%,90% 97%,80% 100%,70% 96%,60% 100%,50% 97%,40% 100%,30% 96%,20% 100%,10% 97%,0% 100%,2% 90%,0% 80%,3% 65%,0% 50%,2% 35%,0% 20%,3% 10%)}.ds-world-theme::after{background:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 55' preserveAspectRatio='none'%3E%3Cpath d='M0 0 L50 0 L49 5.5 L50 11 L48.5 19 L50 27.5 L49 36 L50 44 L48.5 49.5 L50 55 L45 54 L40 55 L35 53 L30 55 L25 54 L20 55 L15 53 L10 55 L5 54 L0 55 L1 49.5 L0 44 L1.5 36 L0 27.5 L1 19 L0 11 L1.5 5.5 L0 0 Z' fill='none' stroke='%231a1a1a' stroke-width='1.5'/%3E%3C/svg%3E\") center/100% 100%}.ds-world-theme svg{width:20px;height:20px;fill:none;stroke:#6a4637;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.ds-world-theme:hover{transform:translateY(-2px)}.ds-world-theme:focus-visible{outline:3px solid #38234d;outline-offset:4px}@media(max-width:600px){.ds-world-theme{width:44px}}@media(prefers-reduced-motion:reduce){.ds-world-theme{transition:none}}"
+    },
+    {
+      "name": "入口声音纸签",
+      "kind": "button",
+      "refersTo": "world-sound-control",
+      "description": "夜间暖纸与棕色图标的入口声音纸签；与原有音频设置同步。",
+      "html": "<button class=\"ds-world-sound\" type=\"button\" aria-label=\"关闭声音\" aria-pressed=\"true\"><svg viewBox=\"0 0 28 28\" aria-hidden=\"true\"><path d=\"M5 11H9L14 7V21L9 17H5Z\"/><path d=\"M18 10Q23 14 18 18\"/><path d=\"M21 6Q29 14 21 22\"/></svg><span>声音</span></button>",
+      "css": ".ds-world-sound{position:relative;isolation:isolate;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:50px;height:55px;gap:1px;padding:5px 0 0;border:0;border-radius:0;background:transparent;color:#6a4637;font-family:'霞鹜文楷',serif;font-size:11px;line-height:1.2;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:transform .2s ease;cursor:pointer}.ds-world-sound::before,.ds-world-sound::after{content:'';position:absolute;inset:0;z-index:-1}.ds-world-sound::before{background:#f6e6cb url('/media/images/textures/paper-texture.webp') center/cover;background-blend-mode:multiply;clip-path:polygon(0% 0%,100% 0%,98% 10%,100% 20%,97% 35%,100% 50%,98% 65%,100% 80%,97% 90%,100% 100%,90% 97%,80% 100%,70% 96%,60% 100%,50% 97%,40% 100%,30% 96%,20% 100%,10% 97%,0% 100%,2% 90%,0% 80%,3% 65%,0% 50%,2% 35%,0% 20%,3% 10%)}.ds-world-sound::after{background:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 55' preserveAspectRatio='none'%3E%3Cpath d='M0 0 L50 0 L49 5.5 L50 11 L48.5 19 L50 27.5 L49 36 L50 44 L48.5 49.5 L50 55 L45 54 L40 55 L35 53 L30 55 L25 54 L20 55 L15 53 L10 55 L5 54 L0 55 L1 49.5 L0 44 L1.5 36 L0 27.5 L1 19 L0 11 L1.5 5.5 L0 0 Z' fill='none' stroke='%231a1a1a' stroke-width='1.5'/%3E%3C/svg%3E\") center/100% 100%}.ds-world-sound svg{width:20px;height:20px;fill:none;stroke:#6a4637;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.ds-world-sound:hover{transform:translateY(-2px)}.ds-world-sound:focus-visible{outline:3px solid #38234d;outline-offset:4px}@media(max-width:600px){.ds-world-sound{width:44px}}@media(prefers-reduced-motion:reduce){.ds-world-sound{transition:none}}.ds-world-sound{font-weight:700}"
+    },
+    {
+      "name": "入口键盘操作条",
+      "kind": "nav",
+      "refersTo": "entrance-keyboard-control",
+      "description": "Tab 可达的原生入口操作，调用原有三维门板、窗口、鸭子与修复事件。",
+      "html": "<nav class=\"ds-entrance-controls\" aria-label=\"庭院互动\"><button type=\"button\">打开木门，进入创意工坊</button><button type=\"button\" aria-expanded=\"false\">窗边打个招呼</button><button type=\"button\">问问窗台下的橡皮鸭</button><button type=\"button\">修复墙上的小虫</button></nav>",
+      "css": ".ds-entrance-controls{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;width:min(720px,100%);font-family:\"霞鹜文楷\",serif}.ds-entrance-controls button{min-height:44px;padding:8px 14px;border:1px solid #bba5a8;background:#f8e8d0 url(\"/media/images/textures/paper-texture.webp\") center/cover;color:#443e50;font:inherit;font-size:14px}.ds-entrance-controls button:focus-visible{outline:3px solid #38234d;outline-offset:3px}"
+    },
+    {
+      "name": "卷边探索提示",
+      "kind": "custom",
+      "refersTo": "moonlight-scroll-ribbon",
+      "description": "夜间走廊探索成就达成前显示的卷边水彩纸带，保留原生文字与下箭头。",
+      "html": "<div class=\"ds-scroll-ribbon\"><span>滚动探索</span><svg viewBox=\"0 0 24 18\" aria-hidden=\"true\"><path d=\"M4 3l8 6 8-6M4 10l8 6 8-6\"/></svg></div>",
+      "css": ".ds-scroll-ribbon{display:flex;flex-direction:column;align-items:center;justify-content:center;width:270px;min-height:90px;padding:17px 30px 14px;background:url('/media/images/textures/moonlight/fidelity/scroll-ribbon.webp') center/100% 100% no-repeat;color:#674631}.ds-scroll-ribbon span{font-family:'霞鹜文楷','Patrick Hand',cursive,sans-serif;font-size:19px;font-weight:700;letter-spacing:2px;margin-bottom:2px}.ds-scroll-ribbon svg{width:24px;height:18px;fill:none;stroke:#674631;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}"
     }
   ],
   "narrative": {
-    "northStar": "淡彩项目手记",
-    "overview": "把项目当作一本可以翻开的手记：水彩纸边承接插画与真实照片，石墨手写保持亲近的阅读语气，蜂蜜色标出当前选择与标题重点，浅绿托住正文的章节标题。纸张的细微不规则和柔和投影提供触感，连续文字保持清楚、舒展。\n\n本记录只适用于画廊项目纸背和项目详情。三维纸背先介绍项目，再通过“查看项目”进入完整阅读；详情展开封面、正文与真实媒体。入口页及生活手记、关于、联系等房间各有现有实现，本记录不将这套版式扩展为它们的采用状态。",
+    "northStar": "月色纸庭与淡彩项目手记",
+    "overview": "把项目当作一本可以翻开的手记：水彩纸边承接插画与真实照片，石墨手写保持亲近的阅读语气，蜂蜜色标出当前选择与标题重点，浅绿托住正文的章节标题。纸张的细微不规则和柔和投影提供触感，连续文字保持清楚、舒展。\n\n“月色纸庭”在共用的入口、走廊和房间模型上呈现水彩材质。昼夜使用相同的空间尺寸、门位、装饰位置、角色坐标、命中区域和相机路径；夜间以批准稿中的月云、蓝紫砖墙、厚木门、暖窗、黄铜把手、水彩字母、花牌与壁灯形成独立的水彩视觉。切换继续重播原有开场，进入、阅读与返回保持原有操作。\n\n“淡彩项目手记”继续限定于画廊项目纸背和项目详情。三维纸背先介绍项目，再通过“查看项目”进入完整阅读；详情展开封面、正文与真实媒体。阅读版式仍按各自组件组织，照片与视频保留原色。",
     "keyCharacteristics": [
       "水彩纸边与轻微不规则轮廓承载内容。",
       "石墨手写、蜂蜜色重点和浅绿章节标题形成阅读层次。",
       "八项目纸书签连接封面与可滚动阅读列。",
-      "三维翻纸与完整项目详情共享项目内容和水彩素材。"
+      "双门、窗户、人物与猫眼共用坐标、几何和互动引用。",
+      "画廊、生活手记、关于我、联系我依次沿同一走廊展开。",
+      "默认白天；切换重播撕纸开场，原有动画引用和真实内容继续工作。",
+      "夜间复用批准稿的水彩字母、花牌、木门、暖窗、月云与壁灯，适配原始白天门位与路线。"
     ],
     "rules": [
+      {
+        "name": "The 月色分层 Rule",
+        "body": "专用水彩层保留各自的透明边缘与颜料颜色，通用材质覆盖用于其余指定物件；阅读面板以暖纸和深墨保持可读，真实照片与视频沿用素材原色。",
+        "section": "colors"
+      },
       {
         "name": "The 蜂蜜标记 Rule",
         "body": "蜂蜜色用于当前项目、当前章节与标题下划线，浅绿用于正文章节标题，石墨文字承担连续阅读。",
@@ -188,14 +950,22 @@
         "name": "The 可滚动阅读 Rule",
         "body": "隐藏的是滚动条；项目书签、章节目录和正文分别保留各自的滚动方向及键盘入口。",
         "section": "layout"
+      },
+      {
+        "name": "The 物件对齐 Rule",
+        "body": "昼夜共用空间布局、模型尺寸、门洞、动画轴与命中区域。外观变更使用材质、纹理和颜色；场景、地图传送和相机侧看使用同一房门配置。",
+        "section": "layout"
       }
     ],
     "dos": [
-      "**Do** 将这套淡彩手记规则限定于画廊项目纸背与项目详情。",
+      "**Do** 将淡彩手记版式限定于画廊项目纸背与项目详情，将月色入口和整站色彩覆盖按各自范围维护。",
       "**Do** 保留八项目的真实文字、照片、视频及小程序或网站入口。",
       "**Do** 让宽屏封面与阅读列并排，窄面板改为顶部封面小图与标题，下方正文占满宽度。",
       "**Do** 保留可滚动正文、可见键盘焦点和项目详情已有的减少动态分支。",
-      "**Do** 使用现有水彩素材，并让三维纸背内容跟随纸面弯曲。"
+      "**Do** 使用现有水彩素材，并让三维纸背内容跟随纸面弯曲。",
+      "**Do** 将原有动画引用与处理函数接到对应可见物件，并使用共用几何与门位维护命中区域。",
+      "**Do** 保留文楷文字、水彩透明边缘、可见键盘焦点与原有减少动态分支。",
+      "**Do** 让专用彩绘层保留真实 alpha、笔触与颜色，阅读照片与视频保持原色。"
     ],
     "donts": [
       "**Don't** 将这套画廊版式记为入口或其他房间已经采用的整站规范。",
