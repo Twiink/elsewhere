@@ -989,7 +989,7 @@ const DoorSection = ({
         <group position={[pivotX, position[1], position[2]]}>
             {/* 可旋转内组，包含墙面与门。 */}
             <group ref={groupRef} name={`door-bay-${roomId}-${segmentIndex}`}>
-                <WatercolorSconce position={[wallOffsetX + (side === 'left' ? -0.95 : 0.95), 1.25, 0.08]} visible={isMoonlight} />
+                {isMoonlight && <WatercolorSconce position={[wallOffsetX + (side === 'left' ? -0.95 : 0.95), 1.25, 0.08]} />}
                 {/* 带门洞的墙段。 */}
                 <mesh position={[wallOffsetX, 0, 0]} geometry={wallWithHoleGeometry}>
                     <meshBasicMaterial color="#e0e0e0" map={wallTexture} side={THREE.DoubleSide} />

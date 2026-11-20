@@ -1,9 +1,10 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { FramebufferTexture, LinearFilter, NoBlending, ShaderMaterial, UniformsUtils } from 'three';
 import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 import { usePerformance, useScene } from '../../context/contexts';
+import { prepareTextureQuality, registerPreparationRenderer } from '../../utils/renderPreparation';
 
 function SceneAntialias() {
     const { gl, scene, camera, size, viewport } = useThree();
@@ -41,24 +42,16 @@ function SceneAntialias() {
     return null;
 }
 
-export default function AdaptiveQuality() {
+export default function AdaptiveQuality({ children }) {
     const { settings } = usePerformance();
-    const { currentRoom, hasEntered } = useScene();
+    const { reportLoadingError } = useScene();
     const { scene, gl } = useThree();
-    useEffect(() => {
-        const anisotropy = Math.min(settings.textureAnisotropy, gl.capabilities.getMaxAnisotropy());
-        const adjust = object => {
-            for (const material of [object.material].flat()) {
-                if (!material) continue;
-                for (const value of Object.values(material)) {
-                    if (value?.isTexture && value.anisotropy !== anisotropy) {
-                        value.anisotropy = anisotropy;
-                        value.needsUpdate = true;
-                    }
-                }
-            }
-        };
-        scene.traverse(adjust);
-    }, [scene, gl, settings.textureAnisotropy, currentRoom, hasEntered]);
-    return settings.antialias ? <SceneAntialias /> : null;
+    useLayoutEffect(() => registerPreparationRenderer(gl), [gl]);
+    useLayoutEffect(() => {
+        void prepareTextureQuality(gl, scene, settings.textureAnisotropy).catch(reportLoadingError);
+    }, [scene, gl, settings.textureAnisotropy, reportLoadingError]);
+    return <>
+        {settings.antialias && <SceneAntialias />}
+        {children}
+    </>;
 }

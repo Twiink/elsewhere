@@ -177,10 +177,13 @@ function AppContent() {
           <color attach="background" args={['#fafafa']} />
           <fog attach="fog" args={['#fafafa', 15, 50]} />
           <PerformanceMonitor onDecline={downgradeTier} flipflops={3} onFallback={downgradeTier} />
-          <Suspense fallback={null}><AdaptiveQuality /></Suspense>
           <Suspense fallback={null}>
-            {theme === 'moonlight' && <WorldAppearance />}
-            <Experience onSceneReady={handleSceneReady} onError={reportLoadingError} invitationVisible={entranceRevealing || isLoaded} />
+            <AdaptiveQuality>
+              <Suspense fallback={null}>
+                {theme === 'moonlight' && <WorldAppearance />}
+                <Experience onSceneReady={handleSceneReady} onError={reportLoadingError} invitationVisible={entranceRevealing || isLoaded} />
+              </Suspense>
+            </AdaptiveQuality>
           </Suspense>
         </Canvas>
       </div>

@@ -5,8 +5,28 @@ const renderers = new WeakMap();
 const activeRenderers = new Set();
 
 function stateFor(renderer) {
-    if (!renderers.has(renderer)) renderers.set(renderer, { queue: createFrameQueue(), textures: new WeakMap() });
+    if (!renderers.has(renderer)) renderers.set(renderer, { queue: createFrameQueue(), textures: new WeakMap(), anisotropy: 1 });
     return renderers.get(renderer);
+}
+
+function collectTextures(object, textures) {
+    for (const material of [object.material].flat()) {
+        if (!material) continue;
+        Object.values(material).forEach(value => { if (value?.isTexture) textures.add(value); });
+        for (const uniforms of [material.uniforms, material.userData?.shader?.uniforms]) {
+            Object.values(uniforms ?? {}).forEach(uniform => {
+                if (uniform.value?.isTexture) textures.add(uniform.value);
+            });
+        }
+    }
+}
+
+export function prepareTextureQuality(renderer, root, anisotropy) {
+    stateFor(renderer).anisotropy = Math.min(anisotropy, renderer.capabilities.getMaxAnisotropy());
+    const textures = new Set();
+    root.traverse(object => collectTextures(object, textures));
+    // 档位变化也通过准备队列逐张更新，避免下一帧集中重新上传。
+    return Promise.all([...textures].map(texture => prepareTexture(renderer, texture)));
 }
 
 export function registerPreparationRenderer(renderer) {
@@ -21,15 +41,24 @@ export function getPreparationRenderers() {
 export function prepareTexture(renderer, texture, priority = 0) {
     const state = stateFor(renderer);
     const cached = state.textures.get(texture);
-    if (cached?.version === texture.version) {
+    if (cached && (!cached.ready || (cached.version === texture.version && cached.anisotropy === state.anisotropy))) {
         if (priority === 0) cached.job.prioritize();
         return cached.job.promise;
     }
     let record;
     const job = state.queue.enqueue(() => {
-        if (state.textures.get(texture) === record) renderer.initTexture(texture);
+        if (state.textures.get(texture) !== record) return;
+        // 首次上传就采用最终采样参数；入场后无需再改写已预热的纹理。
+        if (texture.anisotropy !== state.anisotropy) {
+            texture.anisotropy = state.anisotropy;
+            texture.needsUpdate = true;
+        }
+        renderer.initTexture(texture);
+        record.version = texture.version;
+        record.anisotropy = state.anisotropy;
+        record.ready = true;
     }, priority);
-    record = { version: texture.version, job };
+    record = { ready: false, job };
     state.textures.set(texture, record);
     const disposed = () => { state.textures.delete(texture); texture.removeEventListener('dispose', disposed); };
     texture.addEventListener('dispose', disposed);
@@ -50,13 +79,7 @@ export async function prepareScene(renderer, root, camera, scene, isActive = () 
     root.traverse(object => {
         if (!(object.isMesh || object.isPoints || object.isLine || object.isSprite)) return;
         objects.push(object);
-        for (const material of [object.material].flat()) {
-            if (!material) continue;
-            Object.values(material).forEach(value => { if (value?.isTexture) textures.add(value); });
-            Object.values(material.uniforms ?? {}).forEach(uniform => {
-                if (uniform.value?.isTexture) textures.add(uniform.value);
-            });
-        }
+        collectTextures(object, textures);
     });
     await Promise.all([...textures].map(texture => prepareTexture(renderer, texture)));
     if (!isActive()) return;

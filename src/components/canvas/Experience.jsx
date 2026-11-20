@@ -1,13 +1,11 @@
 import { useScene, useSecrets, useWorldTheme } from '../../context/contexts';
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
-import { useThree } from '@react-three/fiber';
 
 import EntranceDoors from './entrance/EntranceDoors';
 import StartupReady from './StartupReady';
 import useInfiniteCamera from '../../hooks/useInfiniteCamera';
 import SignSystem from './entrance/SignSystem';
 import { startLoadingTimeout } from '../../utils/loadingTimeout';
-import { registerPreparationRenderer } from '../../utils/renderPreparation';
 
 const CorridorScene = lazy(() => import('./corridor/CorridorScene'));
 const DraftPortal = lazy(() => import('./corridor/DraftPortal'));
@@ -34,8 +32,6 @@ const Experience = ({ onSceneReady, onError, invitationVisible = false }) => {
     const { draftPhase, codeControllerOpen } = useSecrets();
     const { setEntrancePhase } = useWorldTheme();
 
-    const { gl } = useThree();
-    useEffect(() => registerPreparationRenderer(gl), [gl]);
     const [entranceReady, setEntranceReady] = useState(false);
     const [corridorReady, setCorridorReady] = useState(false);
     const [corridorReadiness] = useState(() => {

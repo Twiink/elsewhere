@@ -29,10 +29,11 @@ export function WatercolorHandle({ side }) {
 }
 
 // 灯画附着在共用门墙上，不改变门洞或相机的通道。
-export default function WatercolorSconce({ position, visible }) {
-    const lamp = useTextureCopy(useTexture(FIDELITY_ART.lamp), { colorSpace: SRGBColorSpace });
-    const glow = useTextureCopy(useTexture('/media/images/textures/moonlight/fidelity/light-pool.webp'), { colorSpace: SRGBColorSpace });
-    return <group name="watercolor-wall-sconce" position={position} visible={visible}>
+export default function WatercolorSconce({ position }) {
+    const [lampSource, glowSource] = useTexture([FIDELITY_ART.lamp, '/media/images/textures/moonlight/fidelity/light-pool.webp']);
+    const lamp = useTextureCopy(lampSource, { colorSpace: SRGBColorSpace });
+    const glow = useTextureCopy(glowSource, { colorSpace: SRGBColorSpace });
+    return <group name="watercolor-wall-sconce" position={position}>
         <mesh position={[0, -0.32, -0.01]} raycast={NO_RAYCAST}>
             <planeGeometry args={[0.9, 1.5]} />
             <meshBasicMaterial map={glow} transparent opacity={0.2} depthWrite={false} toneMapped={false} userData={KEEP_COLOR} />
