@@ -5,7 +5,6 @@ import { useRef, useState } from 'react';
 
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { siteInfo } from '../../../data/content';
 import { useWorldTheme } from '../../../context/contexts';
 import { useTextureCopy } from '../../../hooks/useTextureCopy';
 import { FIDELITY_ART } from '../../../config/fidelityArtwork';
@@ -37,19 +36,6 @@ const SignSystem = (props) => {
 
     return (
         <group {...props}>
-            <Text
-                position={[0, 0.78, 0.65]}
-                font="/media/fonts/LXGWWenKaiLite-site.woff"
-                rotation={[0, 0, 0]}
-                fontSize={0.13}
-                color={'#333333'}
-                anchorX="center"
-                anchorY="middle"
-                maxWidth={3}
-                textAlign="center"
-            >
-                {siteInfo.siteTitle}
-            </Text>
             {/* 1. 安装架：视觉锚点。 */}
             {/* 纹理为横向，宽 3.5、高 0.4，近似保持比例。 */}
             {/* 纹理本身已为横向，无需旋转。 */}
