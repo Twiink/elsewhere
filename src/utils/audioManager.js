@@ -26,8 +26,11 @@ export function applyBackgroundMusicSettings(volume, muted) {
 }
 
 export function playBackgroundMusic() {
-    const audio = initAudio();
-    if (audio.paused) {
-        audio.play().catch(error => console.warn('背景音乐播放失败', error));
-    }
+    const audio = getBackgroundMusic();
+    if (!audio.paused || audio.muted || audio.volume === 0) return;
+
+    initAudio();
+    audio.play().catch(error => {
+        if (error.name !== 'NotAllowedError') console.warn('背景音乐播放失败', error);
+    });
 }

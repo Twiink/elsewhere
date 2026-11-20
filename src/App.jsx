@@ -8,6 +8,7 @@ import LoadingFailure from './components/dom/LoadingFailure';
 import PaperTransition from './components/dom/PaperTransition';
 import { usePageVisibility } from './hooks/usePageVisibility';
 import { AudioProvider } from './context/AudioManager';
+import { playBackgroundMusic } from './utils/audioManager';
 import { PerformanceProvider } from './context/PerformanceContext';
 import { canPrefetchRooms } from './utils/performance';
 import { SceneProvider } from './context/SceneContext';
@@ -49,13 +50,20 @@ const DraftRoom = lazy(() => import('./components/ui/DraftRoom'));
 const PANELS = { about: AboutProfile, gallery: ProjectDetails, studio: StudioNotes, contact: ContactDetails };
 const PANEL_ROOMS = { profile: 'about', project: 'gallery', studio: 'studio', contact: 'contact' };
 
-function GlobalAudioEnabler() {
+function GlobalAudioEnabler({ ready }) {
   const { enableAudio } = useAudio();
   useEffect(() => {
-    const events = ['click', 'touchstart', 'keydown'];
-    events.forEach(name => window.addEventListener(name, enableAudio, { capture: true, once: true }));
-    return () => events.forEach(name => window.removeEventListener(name, enableAudio, true));
-  }, [enableAudio]);
+    if (ready) playBackgroundMusic();
+
+    const handleInteraction = event => {
+      if (!event.isTrusted) return;
+      enableAudio();
+      if (ready) playBackgroundMusic();
+    };
+    const events = ['click', 'touchend', 'keydown'];
+    events.forEach(name => window.addEventListener(name, handleInteraction, true));
+    return () => events.forEach(name => window.removeEventListener(name, handleInteraction, true));
+  }, [enableAudio, ready]);
   return null;
 }
 
@@ -155,7 +163,7 @@ function AppContent() {
   return <>
     <PaperPlaneCursor />
     <DocumentMetaBridge />
-    <GlobalAudioEnabler />
+    <GlobalAudioEnabler ready={isLoaded} />
     <div className="app">
       <WorldTheme />
       <div className="canvas-wrapper">
